@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@theme inline {
+  :root {
+    /* Fonts */
+    --text-h1: 2.25rem;
+    --text-h1--letter-spacing: -0.05rem;
+    --text-h1--line-height: 1rem;
+
+    --text-h1-alt: 2.5rem;
+    --text-h1-alt--letter-spacing: -0.02rem;
+    --text-h1-alt--line-height: 0.9rem;
+
+    --text-h3: 1.75rem;
+    --text-h3--letter-spacing: -0.07rem;
+    --text-h3--line-height: 1rem;
+
+    --text-h3-alt: 2rem;
+    --text-h3-alt--letter-spacing: -0.01rem;
+    --text-h3-alt--line-height: 0.9rem;
+
+    --text-h4: 1.25rem;
+    --text-h4--letter-spacing: -0.06rem;
+    --text-h4--line-height: 1.1rem;
+
+    --text-lg: 1.06rem;
+    --text-lg--letter-spacing: -0.04rem;
+    --text-lg--line-height: 1.1rem;
+
+    --text-base: 0.94rem;
+    --text-base--letter-spacing: -0.05rem;
+    --text-base--line-height: 1.2rem;
+
+    --text-sm: 0.81rem;
+    --text-sm--letter-spacing: -0.06rem;
+    --text-sm--line-height: 1.1rem;
+
+    /* Radius */
+    --radius: 0.825rem;
+    --radius-2xs: calc(var(--radius) - 11px);
+    --radius-xs: calc(var(--radius) - 8px);
+    --radius-sm: calc(var(--radius) - 6px);
+    --radius-md: calc(var(--radius) - 4px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius));
+
+    --background: hsla(0, 0%, 94%, 100%);
+    --foreground: hsla(0, 0%, 0%, 100%);
+
+    /* Neutral */
+    --neutral-50: hsla(0, 0%, 100%, 100%);
+    --neutral-100: hsla(0, 0%, 94%, 100%);
+    --neutral-200: hsla(0, 0%, 87%, 100%);
+    --neutral-400: hsla(0, 0%, 66%, 100%);
+    --neutral-800: hsla(0, 0%, 3%, 100%);
+    --neutral-900: hsla(0, 0%, 0%, 100%);
+
+    /* Blur */
+    --blur-light: hsla(0, 0%, 84%, 37%);
+    --blur-medium: hsla(0, 0%, 45%, 30%);
+    --blur-dark: hsla(0, 0%, 13%, 70%);
+    --blur-modal: hsla(0, 0%, 6%, 80%);
+
+    /* Primary */
+    --primary-900: hsla(76, 100%, 5%, 100%);
+    --primary-700: hsla(81, 69%, 35%, 100%);
+    --primary-500: hsla(74, 100%, 56%, 100%);
+    --primary-200: hsla(74, 100%, 82%, 100%);
+
+    /* Secondary */
+    --secondary-900: hsla(300, 100%, 3%, 100%);
+    --secondary-500: hsla(314, 100%, 68%, 100%);
+    --secondary-200: hsla(311, 100%, 82%, 100%);
+
+    /* Destructive */
+    --destructive-500: hsla(0, 85%, 54%, 100%);
+    --destructive-200: hsla(0, 0%, 100%, 100%);
+
+    /** spacing */
+    --spacing-1px: 1px;
+  }
+}
+
+@layer utilites {
+  .child-shrink-0>* {
+    @apply flex-shrink-0;
+  }
+}
+
+@utility flex-row-between {
+  @apply flex;
+  @apply flex-row;
+  @apply items-center;
+  @apply justify-between;
+}
+
+@utility flex-row-center {
+  @apply flex;
+  @apply flex-row;
+  @apply items-center;
+  @apply justify-center;
+}
+
+@utility flex-col-center {
+  @apply flex;
+  flex-direction: column;
+  @apply items-center;
+  @apply justify-center;
+}
+
+@utility inset-x-center {
+  @apply inset-x-1/2;
+  @apply -translate-x-1/2;
+}
+
+@utility inset-y-center {
+  @apply inset-y-1/2;
+  @apply -translate-y-1/2;
+}
+
+@utility inset-center {
+  @apply inset-x-1/2;
+  @apply inset-y-1/2;
+  @apply -translate-y-1/2;
+  @apply -translate-x-1/2;
+}
