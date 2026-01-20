@@ -1,0 +1,9 @@
+{
+  "Metadata": {
+    "description_unstylized": "Ceci est la page d'accueil de notre application."
+  },
+  "Hero": {
+    "title": "Bienvenue dans notre application",
+    "subtitle": "Votre voyage commence ici."
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "assets/*": [
+        "./assets/*"
+      ],
+      "global": [
+        "./expo/global"
+      ],
+      "env": [
+        "./env.js"
+      ],
+      "translations": [
+        "./translations/"
+      ],
+      "translations/server": [
+        "./translations/server"
+      ],
+      "@ui/hooks/*": [
+        "./expo/ui/hooks/*"
+      ],
+      "@ui/utils": [
+        "./expo/ui/utils"
+      ],
+      "@ui/*": [
+        "./expo/ui/components/*"
+      ],
+      "@utils/*": [
+        "./utils/*"
+      ],
+      // Convex folder paths mapping
+      "@shared/utils": [
+        "./utils/convex-allowed"
+      ],
+      "@/*": [
+        "./expo/*"
+      ]
+    }
+  },
+  "include": [
+    "**/*.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "convex",
+    ".history"
+  ]
+}

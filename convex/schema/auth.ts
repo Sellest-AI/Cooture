@@ -1,0 +1,1 @@
+export { authTables } from "@convex-dev/auth/server";
