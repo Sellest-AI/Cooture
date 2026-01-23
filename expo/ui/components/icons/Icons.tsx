@@ -6,5 +6,10 @@ export const Loader = (props: LoaderProps) => <LoaderCircle {...props} className
 
 export { IconSymbol } from './icon-symbol';
 
-export { ArrowLeft, Pause, Play, Plus, Rewind, SkipBack, SkipForward, X } from 'lucide-react-native';
+export { Explozish } from './explozish';
+export { Roundish } from './roundish';
+
+export {
+  ArrowLeft, ArrowUpRight, Bell, Bookmark, Camera, Check, Compass, Gem, Home, Pause, Play, Plus, Rewind, ScanLine, Settings, Shapes, SkipBack, SkipForward, User, X
+} from 'lucide-react-native';
 

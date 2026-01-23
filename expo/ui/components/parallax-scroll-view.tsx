@@ -1,76 +1,143 @@
-import type { PropsWithChildren, ReactElement } from 'react';
-import { StyleSheet, View } from 'react-native';
-import Animated, {
-  interpolate,
-  useAnimatedRef,
-  useAnimatedStyle,
-  useScrollViewOffset,
-} from 'react-native-reanimated';
+import { ComponentProps, ReactNode, useRef } from "react";
+import { Animated, View, ViewStyle } from "react-native";
+import { Colors } from "theme";
+import { LinearGradient } from "./linear-gradient";
+import { ParallaxScrollContext } from "./parallax-scroll-view.context";
+import { SafeAreaView } from "./safe-area-view";
 
-import { useColorScheme } from '@/ui/hooks/use-color-scheme';
+type Props = {
+  headerSpace?: number;
+  headerHeight?: number;
+  headerContent: ReactNode;
+  headerBackgroundImage?: ComponentProps<typeof Animated.Image>['source'];
+  children: ReactNode;
+  contentContainerStyle?: ViewStyle;
+  showsVerticalScrollIndicator?: boolean;
+};
 
-const HEADER_HEIGHT = 250;
-
-type Props = PropsWithChildren<{
-  headerImage: ReactElement;
-  headerBackgroundColor: { dark: string; light: string };
-}>;
-
-export default function ParallaxScrollView({
+export const ParallaxScrollView = ({
+  headerHeight = 400,
+  headerSpace = 80,
+  headerContent,
+  headerBackgroundImage,
   children,
-  headerImage,
-  headerBackgroundColor,
-}: Props) {
-  const colorScheme = useColorScheme() ?? 'light';
-  const scrollRef = useAnimatedRef<Animated.ScrollView>();
-  const scrollOffset = useScrollViewOffset(scrollRef);
-  const headerAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        {
-          translateY: interpolate(
-            scrollOffset.value,
-            [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
-            [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75]
-          ),
-        },
-        {
-          scale: interpolate(scrollOffset.value, [-HEADER_HEIGHT, 0, HEADER_HEIGHT], [2, 1, 1]),
-        },
-      ],
-    };
+  contentContainerStyle,
+  showsVerticalScrollIndicator = false,
+}: Props) => {
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const headerTranslateY = scrollY.interpolate({
+    inputRange: [0, headerHeight],
+    outputRange: [0, -headerHeight / 2],
+    extrapolate: 'clamp',
   });
 
-  return (
-    <Animated.ScrollView
-      ref={scrollRef}
-      className="bg-background"
-      scrollEventThrottle={16}>
-      <Animated.View
-        style={[
-          styles.header,
-          { backgroundColor: headerBackgroundColor[colorScheme] },
-          headerAnimatedStyle,
-        ]}>
-        {headerImage}
-      </Animated.View>
-      <View style={styles.content}>{children}</View>
-    </Animated.ScrollView>
-  );
-}
+  const headerOpacity = scrollY.interpolate({
+    inputRange: [0, headerHeight / 2, headerHeight],
+    outputRange: [1, 0.5, 0],
+    extrapolate: 'clamp',
+  });
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    height: HEADER_HEIGHT,
-    overflow: 'hidden',
-  },
-  content: {
-    flex: 1,
-    padding: 32,
-    gap: 16,
-    overflow: 'hidden',
-  },
-});
+  const headerOffset = headerHeight - headerSpace;
+
+  return (
+    <View style={{ flex: 1 }}>
+      {/* Parallax Background Header */}
+      <Animated.View
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: headerHeight,
+          transform: [{ translateY: headerTranslateY }],
+          opacity: headerOpacity,
+          zIndex: 0,
+          overflow: 'hidden',
+        }}
+        pointerEvents="none"
+      >
+        {headerBackgroundImage && (
+          <Animated.Image
+            source={headerBackgroundImage}
+            style={{
+              width: '100%',
+              height: '100%',
+            }}
+            resizeMode="cover"
+          />
+        )}
+        <LinearGradient
+          colors={['transparent', Colors.background]}
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: '50%'
+          }}
+        />
+        <LinearGradient
+          colors={[Colors.background, 'transparent']}
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 0,
+            height: '25%',
+            opacity: 0.5
+          }}
+        />
+      </Animated.View>
+
+      {/* Interactive Header Content */}
+      <Animated.View
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: headerHeight,
+          transform: [{ translateY: headerTranslateY }],
+          opacity: headerOpacity,
+          zIndex: 10,
+        }}
+        pointerEvents="box-none"
+      >
+        <SafeAreaView
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+          }}
+          pointerEvents="box-none"
+        >
+          {headerContent}
+        </SafeAreaView>
+      </Animated.View>
+
+      {/* Scrollable Content */}
+      <Animated.ScrollView
+        style={{ flex: 1 }}
+        showsVerticalScrollIndicator={showsVerticalScrollIndicator}
+        contentContainerStyle={contentContainerStyle}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+        scrollEventThrottle={16}
+      >
+        {/* Spacer for header */}
+        <View style={{ height: headerHeight - headerSpace, pointerEvents: 'none' }} />
+
+        <ParallaxScrollContext.Provider value={{ scrollY, headerOffset }}>
+          {/* Content with background */}
+          <View style={{ zIndex: 1 }}>
+            {children}
+          </View>
+        </ParallaxScrollContext.Provider >
+      </Animated.ScrollView>
+    </View >
+  );
+};

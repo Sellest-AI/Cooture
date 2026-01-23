@@ -6,6 +6,22 @@ export const POSTHOG_IGNORED_ROUTES = ['_next/image', '/_next/static', '/api'] a
 
 export const ROUTES = {
   HOME: '/',
+  TABS: {
+    NEW: '/new',
+    PROFILE: '/profile',
+  },
+  PROFILE: {
+    SETTINGS: '/settings',
+    GENERATIONS: '/profile/generations',
+    OUTFITS: '/profile/outfits',
+    SAVED: '/profile/saved',
+  },
+  WELCOME: {
+    INDEX: '/welcome',
+    STEP_1: '/welcome/step-1',
+    STEP_2: '/welcome/step-2',
+    STEP_3: '/welcome/step-3',
+  },
   AUTH: '/auth',
   PRICING: '/pricing',
   REFERRAL: (referralCode: string) => `${WEBSITE.URL}/${referralCode}`,

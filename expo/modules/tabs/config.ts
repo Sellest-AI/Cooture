@@ -1,0 +1,3 @@
+export const TABS_HEIGHT = 86;
+export const TABS_BOTTOM_MARGIN = 16;
+export const TOTAL_TABS_SPACE = TABS_HEIGHT + TABS_BOTTOM_MARGIN;

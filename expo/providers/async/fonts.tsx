@@ -7,7 +7,7 @@ SplashScreen.preventAutoHideAsync();
 
 export const FontsProvider = () => {
   const [fontsLoaded] = useFonts({
-    'Murays-Regular': require('assets/fonts/Murays-Regular.otf'),
+    'Murays': require('assets/fonts/Murays-Regular.otf'),
   });
 
   useEffect(() => {
