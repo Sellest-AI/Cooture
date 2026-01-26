@@ -58,19 +58,18 @@ export const Block = ({ className = "", children, variant, style }: Props) => {
   return (
     <Component
       {...BLUR_PROPS}
-      style={{
+      style={[{
         overflow: 'hidden',
         position: 'relative',
         ...VariantColors,
         borderTopWidth: 1,
         borderLeftWidth: 2,
         borderRadius: 18,
-        ...style,
-      }}
+      }, style]}
       className={cn(className)}
     >
       {showTopBorder && <LinearGradient
-        colors={[VariantColors.borderTopColor ?? 'transparent', VariantColors.borderTopColor ?? 'transparent', VariantColors.borderTopColor ?? 'transparent', VariantColors.borderTopColor ?? 'transparent', 'transparent']}
+        colors={[VariantColors.borderTopColor ?? 'transparent', VariantColors.borderTopColor ?? 'transparent', VariantColors.borderTopColor ?? 'transparent', 'transparent']}
         start={{ x: 0, y: 0.5 }} // Left center
         end={{ x: 1, y: 0.5 }}   // Right center
         style={{
@@ -78,7 +77,7 @@ export const Block = ({ className = "", children, variant, style }: Props) => {
           left: 0,
           right: 0,
           top: 0,
-          height: 2
+          height: 1
         }}
       />}
       <LinearGradient

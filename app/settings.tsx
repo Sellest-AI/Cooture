@@ -4,6 +4,7 @@ import { ArrowLeft } from "@ui/icons";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
 import { Pressable, ScrollView, View } from "react-native";
+import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 export default function SettingsScreen() {
@@ -14,7 +15,10 @@ export default function SettingsScreen() {
     >
       <View style={{ paddingHorizontal: 20, paddingTop: 60, paddingBottom: 24 }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
-          <Pressable onPress={() => router.back()}>
+          <Pressable onPress={() => {
+            if (router.canGoBack()) { router.back() }
+            else router.replace(ROUTES.PROFILE.PATH);
+          }}>
             <Block
               variant="blur"
               style={{

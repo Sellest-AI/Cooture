@@ -1,11 +1,11 @@
 import "@/global.css";
 import { Providers } from '@/providers';
-import { Stack } from 'expo-router';
+import { Slot, Stack } from 'expo-router';
 import { View } from "react-native";
 import { Colors } from "theme";
 
 export const unstable_settings = {
-  initialRouteName: 'welcome/step-1',
+  initialRouteName: 'welcome',
 };
 
 export default function RootLayout() {
@@ -20,8 +20,7 @@ export default function RootLayout() {
             presentation: 'pageSheet'
           }}
         >
-          <Stack.Screen name={'welcome'} />
-          <Stack.Screen name="settings" />
+          <Slot />
         </Stack>
       </View>
     </Providers>

@@ -78,7 +78,7 @@ export const Colors = {
   blur: {
     light: 'hsla(0, 0%, 84%, 0.20)',
     medium: 'hsla(0, 0%, 24%, 0.60)',
-    dark: 'hsla(0, 0%, 13%, 0.70)',
+    dark: 'hsla(0, 0%, 14%, 0.8)',
     modal: 'hsla(0, 0%, 6%, 0.80)',
   },
   primary: {

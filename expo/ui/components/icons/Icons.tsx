@@ -1,15 +1,19 @@
-import { LoaderCircle } from 'lucide-react-native';
-import type { ComponentProps } from 'react';
-
-type LoaderProps = ComponentProps<typeof LoaderCircle>;
-export const Loader = (props: LoaderProps) => <LoaderCircle {...props} className={`${props.className} animate-spin`} />;
-
 export { IconSymbol } from './icon-symbol';
 
 export { Explozish } from './explozish';
+export { Loader } from './loader';
 export { Roundish } from './roundish';
+export { Squirish } from './squirish';
+export { SquirishPlus } from './squirishPlus';
 
 export {
-  ArrowLeft, ArrowUpRight, Bell, Bookmark, Camera, Check, Compass, Gem, Home, Pause, Play, Plus, Rewind, ScanLine, Settings, Shapes, SkipBack, SkipForward, User, X
+  Glasses, Hand,
+  HardHat, Shirt, VenetianMask,
+  Watch
+} from 'lucide-react-native';
+
+export {
+  ArrowLeft, ArrowUpRight, Bell, Bookmark, Camera, Check, Compass, Feather, Gem, Home, ImageUp, LinkIcon, Pause, Pencil, Play, Plus, Rewind, ScanLine, Search, Settings, Shapes,
+  SkipBack, SkipForward, Smile, Snowflake, Sun, Trash, User, X
 } from 'lucide-react-native';
 

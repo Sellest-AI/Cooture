@@ -1,4 +1,4 @@
-import { QuickActions } from "@/modules/profile/quick-actions";
+import { QuickActions } from "@/modules/profiles/quick-actions";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Block } from "@ui/block";
 import { ArrowUpRight, Bell, Gem, Settings } from "@ui/icons";

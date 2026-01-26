@@ -2,10 +2,13 @@ import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Block } from "@ui/block";
 import { Collection } from "@ui/cards";
 import { ArrowUpRight, Bell, ScanLine } from "@ui/icons";
+import { Link } from "@ui/link";
 import { SafeAreaView } from "@ui/safe-area-view";
 
 import { Text } from "@ui/text";
+import { router } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 export default function Screen() {
@@ -49,21 +52,30 @@ export default function Screen() {
           gap: 8,
         }}
       >
-        <Pressable
-          style={{
+        <Link
+          href={ROUTES.SCAN}
+          style={{ flex: 1, aspectRatio: 1 }}
+        >
+          <View style={{
             ...styles.headerButtons,
             borderTopColor: Colors.primary[200],
             backgroundColor: Colors.primary[500],
-          }}
-        >
-          <ScanLine size={40} color={Colors.primary[900]} />
-          <Text.Lg color={Colors.primary[900]}>Scan an item</Text.Lg>
-        </Pressable>
+          }}>
+            <ScanLine size={40} color={Colors.primary[900]} />
+            <Text.Lg color={Colors.primary[900]}>Scan an item</Text.Lg>
+          </View>
+        </Link>
         <Pressable
           style={{
             ...styles.headerButtons,
             borderTopColor: Colors.secondary[200],
             backgroundColor: Colors.secondary[500],
+          }}
+          onPress={() => {
+            router.push({
+              pathname: ROUTES.MODALS.NEW_OUTFIT,
+              params: { nextPath: ROUTES.PROFILE.OUTFITS }
+            })
           }}
         >
           <ArrowUpRight size={40} color={Colors.primary[900]} />
@@ -129,6 +141,8 @@ export default function Screen() {
 
 const styles = StyleSheet.create({
   headerButtons: {
+    width: '100%',
+    height: '100%',
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",

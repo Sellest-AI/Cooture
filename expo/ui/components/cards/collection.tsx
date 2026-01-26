@@ -13,9 +13,10 @@ type Props = {
   selected?: boolean;
   source?: ComponentProps<typeof Image>['source'];
   contentFit?: ComponentProps<typeof Image>['contentFit'];
+  onPress?: ComponentProps<typeof Pressable>['onPress'];
 }
 
-export const Collection = ({ title, subtitle, disabled, selected, source, contentFit, style }: Props) => {
+export const Collection = ({ title, subtitle, disabled, selected, source, contentFit, style, onPress }: Props) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const rotate = useRef(new Animated.Value(7)).current;
 
@@ -71,6 +72,7 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
     <Pressable
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
+      onPress={(e) => { onPress?.(e); }}
       style={{ flex: 1 }}
     >
       <Animated.View
@@ -227,7 +229,8 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
         {subtitle && <Text.Sm
           style={{
             fontWeight: 700,
-            color: selected ? Colors.primary[200] : Colors.neutral[400],
+            color: selected ? Colors.primary[900] : Colors.neutral[400],
+            opacity: selected ? 0.5 : 1,
             marginTop: 0
           }}
         >

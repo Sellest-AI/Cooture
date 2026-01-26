@@ -10,6 +10,7 @@ type Props = {
   headerHeight?: number;
   headerContent: ReactNode;
   headerBackgroundImage?: ComponentProps<typeof Animated.Image>['source'];
+  headerBackground?: ReactNode;
   children: ReactNode;
   contentContainerStyle?: ViewStyle;
   showsVerticalScrollIndicator?: boolean;
@@ -20,6 +21,7 @@ export const ParallaxScrollView = ({
   headerSpace = 80,
   headerContent,
   headerBackgroundImage,
+  headerBackground,
   children,
   contentContainerStyle,
   showsVerticalScrollIndicator = false,
@@ -56,6 +58,15 @@ export const ParallaxScrollView = ({
         }}
         pointerEvents="none"
       >
+        {headerBackground && <View style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+        }}>
+          {headerBackground}
+        </View>}
         {headerBackgroundImage && (
           <Animated.Image
             source={headerBackgroundImage}
@@ -99,7 +110,7 @@ export const ParallaxScrollView = ({
           height: headerHeight,
           transform: [{ translateY: headerTranslateY }],
           opacity: headerOpacity,
-          zIndex: 10,
+          zIndex: 1,
         }}
         pointerEvents="box-none"
       >

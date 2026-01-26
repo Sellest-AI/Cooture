@@ -8,9 +8,19 @@ export const ROUTES = {
   HOME: '/',
   TABS: {
     NEW: '/new',
-    PROFILE: '/profile',
+  },
+  SCAN: '/scan',
+  MODALS: {
+    PICK_OUTFIT: `/pick-outfit`,
+    NEW_OUTFIT: `/new-outfit`,
+    OUTFIT_ADD_ITEM: `/add-item`,
+  },
+  ITEM: {
+    PATH: '/item/[id]',
+    ID: (id: string) => `/item/${id}` as const,
   },
   PROFILE: {
+    PATH: '/profile',
     SETTINGS: '/settings',
     GENERATIONS: '/profile/generations',
     OUTFITS: '/profile/outfits',

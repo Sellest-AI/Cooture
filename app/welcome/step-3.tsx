@@ -3,6 +3,7 @@ import { Button } from '@ui/button';
 import { Collection } from '@ui/cards';
 import { Plus } from '@ui/icons';
 import { Text } from '@ui/text';
+import { router } from 'expo-router';
 import { Platform, View } from 'react-native';
 import { ROUTES } from 'routes';
 import { Colors } from 'theme';
@@ -118,6 +119,9 @@ export default function Screen() {
         href={ROUTES.TABS.NEW}
         style={{ alignSelf: 'stretch', marginTop: 28 }}
         variant="primary"
+        onPress={() => {
+          router.replace(ROUTES.TABS.NEW)
+        }}
       >
         Begin the Journey
       </Button>

@@ -1,6 +1,8 @@
 import { Text } from '@ui/text';
+import { router } from 'expo-router';
 import { ArrowUpRight, Camera } from "lucide-react-native";
 import { Pressable, StyleSheet, View, ViewProps } from "react-native";
+import { ROUTES } from 'routes';
 import { Colors } from "theme";
 
 type Props = ViewProps;
@@ -27,6 +29,7 @@ export const QuickActions = ({ style, ...props }: Props) => {
         <Text.Lg color={Colors.primary[900]}>Photoshoot</Text.Lg>
       </Pressable>
       <Pressable
+        onPress={() => router.push(ROUTES.MODALS.NEW_OUTFIT)}
         style={{
           ...styles.headerButtons,
           borderTopColor: Colors.secondary[200],

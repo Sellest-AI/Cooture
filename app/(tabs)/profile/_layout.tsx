@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 import { Colors } from "theme";
 
 export const unstable_settings = {
-  initialRouteName: '(tabs)',
+  initialRouteName: '(tabs)/outfits',
 };
 
 export default function ProfileLayout() {
@@ -17,6 +17,7 @@ export default function ProfileLayout() {
         presentation: 'pageSheet'
       }}
     >
+      <Stack.Screen name="index" />
       <Stack.Screen name="(tabs)" />
     </Stack>
   );
