@@ -1,3 +1,4 @@
+import { useAccount } from "@/lib/convex/auth";
 import { QuickActions } from "@/modules/profiles/quick-actions";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Block } from "@ui/block";
@@ -20,6 +21,8 @@ export const unstable_settings = {
 const TABS = ['generations', 'outfits', 'saved'] as const;
 
 export default function TabsLayout() {
+  const { user } = useAccount();
+
   const segments = useSegments();
   const currentRoute = segments[segments.length - 1] as typeof TABS[number];
   const [activeTab, setActiveTab] = useState<typeof TABS[number]>(currentRoute ?? 'outfits');
@@ -34,6 +37,8 @@ export default function TabsLayout() {
     setActiveTab(tab);
     router.push(`/profile/${tab}`);
   };
+
+  if (!user) return null;
 
   return (
     <ParallaxScrollView
@@ -99,10 +104,10 @@ export default function TabsLayout() {
     >
       <View style={{ paddingHorizontal: 20 }}>
         <Text.H3 color={Colors.foreground}>
-          Clara Luciana
+          {user.name}
         </Text.H3>
         <Text.Base color={Colors.neutral[400]} weight={600} style={{ marginTop: 2 }}>
-          Since 2021
+          Since {new Date(user._creationTime).getFullYear()}
         </Text.Base>
       </View>
       <View style={{ paddingHorizontal: 8, gap: 8, marginTop: 16 }}>

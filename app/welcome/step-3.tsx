@@ -1,14 +1,16 @@
+import { useAuthActions } from '@/lib/convex/auth';
 import { Badge } from '@ui/badge';
 import { Button } from '@ui/button';
 import { Collection } from '@ui/cards';
 import { Plus } from '@ui/icons';
 import { Text } from '@ui/text';
-import { router } from 'expo-router';
 import { Platform, View } from 'react-native';
 import { ROUTES } from 'routes';
 import { Colors } from 'theme';
 
 export default function Screen() {
+  const { isLoading, signInGoogle } = useAuthActions();
+
   return (
     <View
       style={{
@@ -116,12 +118,10 @@ export default function Screen() {
         </View>
       </View>
       <Button
-        href={ROUTES.TABS.NEW}
+        isLoading={isLoading}
         style={{ alignSelf: 'stretch', marginTop: 28 }}
         variant="primary"
-        onPress={() => {
-          router.replace(ROUTES.TABS.NEW)
-        }}
+        onPress={async () => { signInGoogle(ROUTES.TABS.NEW); }}
       >
         Begin the Journey
       </Button>

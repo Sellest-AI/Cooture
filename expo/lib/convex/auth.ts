@@ -1,18 +1,35 @@
 import { useAuthToken, useAuthActions as useConvexAuthActions } from "@convex-dev/auth/react";
-import { env } from "env";
-import { useRouter } from "expo-router";
-import { ROUTES } from "global";
-import { useCallback } from "react";
+import { makeRedirectUri } from "expo-auth-session";
+import { Href, router } from "expo-router";
+import { openAuthSessionAsync } from "expo-web-browser";
+import { useCallback, useState } from "react";
+import { Platform } from "react-native";
+import { ROUTES } from "routes";
 import { api, useQuery } from "./client";
+import { convexAuthStorage } from "./storage";
 
 export const useAuthActions = () => {
-  const router = useRouter();
   const convex = useConvexAuthActions();
 
-  const signInGoogle = useCallback((route?: string) => convex.signIn("google", {
-    redirectTo: `${env.PUBLIC_AUTH_URL}?redirect=${window.location.origin}/${route ?? ROUTES.HOME}`
-      .replaceAll('//', '/'),
-  }), [convex]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const signInGoogle = useCallback(async (route?: Href) => {
+    setIsLoading(true);
+    const redirectTo = makeRedirectUri();
+    const { redirect } = await convex.signIn("google", { redirectTo });
+
+    if (Platform.OS === "web") { return; }
+
+    const result = await openAuthSessionAsync(redirect!.toString(), redirectTo);
+    if (result.type === "success") {
+      const { url } = result;
+      const code = new URL(url).searchParams.get("code")!;
+      await convex.signIn("google", { code });
+      router.replace(route || ROUTES.HOME);
+    }
+
+    setIsLoading(false);
+  }, [convex]);
 
   const signInEmail = useCallback((data: FormData) => {
     return convex.signIn("resend-otp", data);
@@ -24,13 +41,16 @@ export const useAuthActions = () => {
       convex.signOut();
       // posthog.reset();
       setTimeout(() => {
-        window.localStorage.clear();
-        window.location.reload();
+        convexAuthStorage.clear();
+        router.reload();
+        // window.localStorage.clear();
+        // window.location.reload();
       }, 500);
     }, 300)
-  }, [convex, router]);
+  }, [convex]);
 
   return {
+    isLoading,
     signOut,
     signInGoogle,
     signInEmail,

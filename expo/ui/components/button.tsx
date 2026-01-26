@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import { ComponentProps, useRef } from 'react';
 import { Animated, Pressable, View } from 'react-native';
 import { Block, getBlockColors } from './block';
+import { Loader } from './icons';
 import { Text } from './text';
 
 type Props = {
@@ -12,17 +13,20 @@ type Props = {
   href?: Parameters<ReturnType<typeof useRouter>['push']>[0];
   size?: "rounded",
   align?: "center" | "left" | "right" | "stretch";
+  isLoading?: boolean;
 } & ComponentProps<typeof Block> & Omit<ComponentProps<typeof Pressable>, 'style'>;
 
-export const Button = ({ startIcon, endIcon, children, disabled, variant, href, size, style, align, onPress, ...props }: Props) => {
-  const StartIcon = startIcon;
+export const Button = ({ startIcon, endIcon, children, disabled, variant, href, size, style, isLoading, align, onPress, ...props }: Props) => {
+  const StartIcon = isLoading ? Loader : startIcon;
   const EndIcon = endIcon;
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const { push } = useRouter();
 
+  const runtimeDisabled = disabled || isLoading;
+
   const handlePressIn = () => {
-    if (disabled) return;
+    if (runtimeDisabled) return;
     Animated.spring(scaleAnim, {
       toValue: 0.98,
       useNativeDriver: true,
@@ -32,7 +36,7 @@ export const Button = ({ startIcon, endIcon, children, disabled, variant, href, 
   };
 
   const handlePressOut = () => {
-    if (disabled) return;
+    if (runtimeDisabled) return;
     Animated.spring(scaleAnim, {
       toValue: 1,
       useNativeDriver: true,
@@ -58,6 +62,7 @@ export const Button = ({ startIcon, endIcon, children, disabled, variant, href, 
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       onPress={(e) => {
+        if (runtimeDisabled) return;
         if (onPress) onPress(e);
         if (href) push(href);
       }}

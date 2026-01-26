@@ -1,24 +1,23 @@
-import { convexAuth } from "@convex-dev/auth/server";
-import { MutationCtx } from "./_generated/server";
 import Google from "@auth/core/providers/google";
+import { convexAuth } from "@convex-dev/auth/server";
 import { internal } from "./_generated/api";
-import { env } from "./env";
+import { MutationCtx } from "./_generated/server";
 
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   providers: [
     Google,
   ],
   callbacks: {
-    async redirect(params) {
-      const { redirectTo } = params;
+    async redirect({ redirectTo }) {
       const url = new URL(redirectTo);
-      // USE THE FOLLOWING FOR DEPLOYED SITES (HTTPS CONNECTION)
-      const redirectOrigin = new URL(env.FRONTEND_SITE_URL);
-      // USE THE FOLLOWING FOR LOCAL TESTING (LOCALHOST CONNECTION)
-      // const redirectOrigin = new URL("http://localhost:3000");
-      const redirectUrl = new URL(url.toString().split("?redirect=")[1]);
-      const trackingUrl = new URL(redirectOrigin.origin + "/tracking/device?redirect=" + redirectUrl);
-      return trackingUrl.toString();
+
+      if (url.protocol === "http:" || url.protocol === "https:") {
+        // Web
+        return redirectTo;
+      } else {
+        // Mobile (scheme://)
+        return redirectTo;
+      }
     },
     async afterUserCreatedOrUpdated(ctx: MutationCtx, { userId }) {
       // avoid duplicate
