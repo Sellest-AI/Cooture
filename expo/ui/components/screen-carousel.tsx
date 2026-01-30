@@ -1,7 +1,9 @@
-import { ReactNode } from "react";
-import { View } from "react-native";
-import CarouselRNRC from "react-native-reanimated-carousel";
+import { ComponentProps, ReactNode, RefObject } from "react";
+import { View, ViewStyle } from "react-native";
+import CarouselRNRC, { ICarouselInstance } from "react-native-reanimated-carousel";
 import Animated, { interpolate, SharedValue, useAnimatedStyle } from "./motion";
+
+export type { ICarouselInstance } from "react-native-reanimated-carousel";
 
 type CarouselImageProps = {
   animationValue: SharedValue<number>,
@@ -57,17 +59,23 @@ type CarouselProps<T extends ReactNode> = {
   itemHeight?: number;
   itemsOffset?: number;
   scaleAnimation?: boolean;
+  style?: ViewStyle;
+  ref?: RefObject<ICarouselInstance | null>;
+  onProgressChange?: ComponentProps<typeof CarouselRNRC>['onProgressChange'];
+  defaultIndex?: ComponentProps<typeof CarouselRNRC>['defaultIndex'];
 }
 
-export const Carousel = <T extends ReactNode>({ scaleAnimation, items, itemWidth, itemsOffset, itemHeight }: CarouselProps<T>) => {
+export const Carousel = <T extends ReactNode>({ scaleAnimation, items, itemWidth, itemsOffset, itemHeight, style, ref, defaultIndex, onProgressChange }: CarouselProps<T>) => {
   return (
     <View style={{
       width: '100%',
       overflow: 'visible',
       flex: 1,
+      ...style
     }}
     >
       <CarouselRNRC
+        ref={ref}
         style={{ flex: 1, marginTop: -32, width: '100%', overflow: 'visible' }}
         data={items}
         mode="parallax"
@@ -77,6 +85,8 @@ export const Carousel = <T extends ReactNode>({ scaleAnimation, items, itemWidth
           parallaxAdjacentItemScale: 0.75,
           parallaxScrollingOffset: itemsOffset ?? 80,
         }}
+        defaultIndex={defaultIndex}
+        onProgressChange={onProgressChange}
         renderItem={({ item, index, animationValue }) => {
           const Component = item;
 

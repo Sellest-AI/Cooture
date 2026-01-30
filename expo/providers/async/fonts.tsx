@@ -1,18 +1,18 @@
 import { useFonts } from "expo-font";
-import { SplashScreen } from "expo-router";
 import { useEffect } from "react";
 
-// Keep the splash screen visible while we fetch resources
-SplashScreen.preventAutoHideAsync();
+type Props = {
+  onComplete?: () => void;
+}
 
-export const FontsProvider = () => {
+export const FontsProvider = ({ onComplete }: Props) => {
   const [fontsLoaded] = useFonts({
     'Murays': require('assets/fonts/Murays-Regular.otf'),
   });
 
   useEffect(() => {
-    if (fontsLoaded) { SplashScreen.hideAsync(); }
-  }, [fontsLoaded]);
+    if (fontsLoaded) { onComplete?.(); }
+  }, [fontsLoaded, onComplete]);
 
   return null;
 }

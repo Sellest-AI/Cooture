@@ -1,5 +1,6 @@
-import { ComponentProps, useRef } from "react";
-import { Animated, Pressable, ViewStyle } from "react-native";
+import { Download, Loader } from "@ui/icons";
+import { ComponentProps, useRef, useState } from "react";
+import { Animated, Pressable, View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 import { Block } from "../block";
 import { Roundish } from "../icons/roundish";
@@ -14,10 +15,14 @@ type ImageGenerationProps = {
   loading?: boolean;
   style?: ViewStyle;
   disabled?: boolean;
+  onDownload?: () => void;
+  onPresss?: () => void;
 }
 
-export const ImageGeneration = ({ text, textScale = 1, source, disabled, loading, style }: ImageGenerationProps) => {
+export const ImageGeneration = ({ text, textScale = 1, source, disabled, loading, style, onDownload, onPresss }: ImageGenerationProps) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const [downloading, setDownloading] = useState(false);
 
   const handlePressIn = () => {
     if (disabled) return;
@@ -44,6 +49,7 @@ export const ImageGeneration = ({ text, textScale = 1, source, disabled, loading
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       style={{ flex: 1, width: '100%' }}
+      onPress={onPresss}
     >
       <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
         <Block
@@ -80,18 +86,47 @@ export const ImageGeneration = ({ text, textScale = 1, source, disabled, loading
             }}
           />}
         </Block>
-        {text && <Text.Base
-          style={{
-            flexShrink: 0,
-            marginTop: 8,
-            color: Colors.neutral[400],
-            paddingHorizontal: 8,
-            transform: [{ scale: textScale }],
-            transformOrigin: 'left top',
-          }}
-        >
-          {text}
-        </Text.Base>}
+        {(text || onDownload) && <View style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginTop: 8,
+          paddingHorizontal: 8,
+        }}>
+          {text && <Text.Base
+            style={{
+              flexShrink: 0,
+              color: Colors.neutral[400],
+              transform: [{ scale: textScale }],
+              transformOrigin: 'left top',
+            }}
+          >
+            {text}
+          </Text.Base>}
+          {onDownload &&
+            <View style={{ width: 20, height: 20 }}>
+              <Pressable style={{
+                width: 32,
+                height: 32,
+                justifyContent: 'center',
+                alignItems: 'center',
+                position: 'absolute',
+                top: -4,
+                left: -8,
+              }}
+                onPress={async () => {
+                  setDownloading(true);
+                  await onDownload();
+                  setDownloading(false);
+                }}
+              >
+                {downloading ?
+                  <Loader color={Colors.primary[500]} size={20} /> :
+                  <Download color={Colors.primary[500]} size={20} />}
+              </Pressable>
+            </View>
+          }
+        </View>}
       </Animated.View>
     </Pressable>
   )

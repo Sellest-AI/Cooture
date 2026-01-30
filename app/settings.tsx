@@ -1,5 +1,7 @@
+import { useAuthActions } from "@/lib/convex/auth";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Block } from "@ui/block";
+import { Button } from "@ui/button";
 import { ArrowLeft } from "@ui/icons";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
@@ -8,6 +10,8 @@ import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 export default function SettingsScreen() {
+  const { signOut } = useAuthActions();
+
   return (
     <ScrollView
       style={{ flex: 1 }}
@@ -80,6 +84,15 @@ export default function SettingsScreen() {
             Manage notification preferences
           </Text.Base>
         </Block>
+
+        <Button
+          variant="destructive"
+          onPress={() => {
+            signOut();
+          }}
+        >
+          Sign out
+        </Button>
       </View>
     </ScrollView>
   );

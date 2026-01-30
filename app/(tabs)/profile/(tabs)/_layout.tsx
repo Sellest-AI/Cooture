@@ -18,7 +18,7 @@ export const unstable_settings = {
   initialRouteName: 'outfits',
 };
 
-const TABS = ['generations', 'outfits', 'saved'] as const;
+const TABS = ['generations', 'outfits', 'items'] as const;
 
 export default function TabsLayout() {
   const { user } = useAccount();
@@ -224,7 +224,7 @@ export default function TabsLayout() {
             tabs={[
               { label: 'Outfits', value: 'outfits' },
               { label: 'Generations', value: 'generations' },
-              { label: 'Saved', value: 'saved' },
+              { label: 'Items', value: 'items' },
             ]}
             activeTab={activeTab}
             onTabChange={handleTabChange}

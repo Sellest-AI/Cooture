@@ -72,10 +72,10 @@ export default function Screen() {
             backgroundColor: Colors.secondary[500],
           }}
           onPress={() => {
-            router.push({
-              pathname: ROUTES.MODALS.NEW_OUTFIT,
-              params: { nextPath: ROUTES.PROFILE.OUTFITS }
-            })
+            router.push(ROUTES.MODALS.NEW_OUTFIT({
+              nextPath: ROUTES.PROFILE.OUTFITS,
+              reset: true
+            }))
           }}
         >
           <ArrowUpRight size={40} color={Colors.primary[900]} />

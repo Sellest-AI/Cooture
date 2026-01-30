@@ -42,7 +42,10 @@ export const useAuthActions = () => {
       // posthog.reset();
       setTimeout(() => {
         convexAuthStorage.clear();
-        router.reload();
+        try {
+          router.replace(ROUTES.HOME);
+          router.reload();
+        } catch { }
         // window.localStorage.clear();
         // window.location.reload();
       }, 500);

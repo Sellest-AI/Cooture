@@ -1,0 +1,24 @@
+import { createTool as _createTool, type ToolCtx as _ToolCtx, } from "@convex-dev/agent";
+import type { Tool } from "ai";
+import { Id } from "../../_generated/dataModel";
+
+type ToolCtx = Omit<_ToolCtx, 'userId'> & { userId: Id<'users'>; };
+
+type Params<INPUT, OUTPUT, Ctx extends ToolCtx = ToolCtx> = Parameters<typeof _createTool<INPUT, OUTPUT, Ctx>>[0];
+
+export type ToolExtended<INPUT, OUTPUT, Ctx extends ToolCtx = ToolCtx> = Tool<INPUT, OUTPUT> & {
+  handler: (
+    ctx: Ctx,
+    args: INPUT,
+  ) => (OUTPUT | Promise<OUTPUT>);
+};
+
+export const createTool = <INPUT, OUTPUT, Ctx extends ToolCtx = ToolCtx>(
+  args: Params<INPUT, OUTPUT, Ctx>
+): ToolExtended<INPUT, OUTPUT, Ctx> => {
+  const tool = _createTool<INPUT, OUTPUT, Ctx>(args);
+
+  (tool as any).handler = args.handler;
+
+  return tool as ToolExtended<INPUT, OUTPUT, Ctx>;
+};

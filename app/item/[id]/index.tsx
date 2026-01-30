@@ -1,18 +1,29 @@
-import { Category } from "@/modules/items/category";
+import { Id } from "@/lib/convex/api";
+import { useItem } from "@/modules/items/_hooks/useItem";
+import { ColorCategory } from "@/modules/items/category.color";
+import { FeelCategory } from "@/modules/items/category.feel";
+import { GenderCategory } from "@/modules/items/category.gender";
 import { ItemCategory } from "@/modules/items/category.item";
+import { WeatherCategory } from "@/modules/items/category.weather";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
-import { Feather, LinkIcon, Smile, Snowflake, Sun } from "@ui/icons";
+import { LinkIcon } from "@ui/icons";
 import { Image } from "@ui/image";
+import { LoadingBlock } from "@ui/loadingBlock";
+import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
-import { router } from "expo-router";
-import { View } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import { Platform, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 const ColorsBlock = () => {
+  const { item } = useItem();
+
+  if (!item) return null;
+
   return (
     <Block
       variant="blur"
@@ -27,75 +38,70 @@ const ColorsBlock = () => {
         Colors
       </Text.H4>
       <View style={{ height: 72, flexDirection: 'row', gap: 4 }}>
-        <View
-          style={{
-            flex: 1,
-            borderRadius: 24,
-            backgroundColor: 'rgba(220,255,255,1)',
-            borderTopColor: Colors.blur.light,
-            borderTopWidth: 2,
-          }}
-        />
-        <View
-          style={{
-            flex: 1,
-            borderRadius: 24,
-            backgroundColor: 'rgba(24,130,180,1)',
-            borderTopColor: Colors.blur.light,
-            borderTopWidth: 2,
-          }}
-        />
-        <View
-          style={{
-            flex: 1,
-            borderRadius: 24,
-            backgroundColor: 'rgba(120,130,190,1)',
-            borderTopColor: Colors.blur.light,
-            borderTopWidth: 2,
-          }}
-        />
-        <View
-          style={{
-            flex: 1,
-            borderRadius: 24,
-            backgroundColor: 'rgba(70,255,180,0.5)',
-            borderTopColor: Colors.blur.light,
-            borderTopWidth: 2,
-          }}
-        />
+        {item.mainColors.slice(0, 4).map((color, i) => (
+          <View
+            key={color + i}
+            style={{
+              flex: 1,
+              borderRadius: 24,
+              backgroundColor: color,
+              borderTopColor: Colors.blur.light,
+              borderTopWidth: 2,
+            }}
+          />
+        ))}
       </View>
     </Block>
   )
 }
 
 export default function ItemScreen() {
+  const { id } = useLocalSearchParams<{ id: Id<'items'> }>();
+  const { item, isLoading, update } = useItem(id);
+
+  if (isLoading || !item) {
+    return <LoadingBlock style={{ height: 'auto' }} />
+  }
+
   return (
     <>
       <ParallaxScrollView
-        headerHeight={362}
+        headerHeight={456}
         headerSpace={0}
         headerBackground={
           <Image
+            allowDownscaling={false}
             contentFit="cover"
             blurRadius={100}
-            source={require('assets/placeholders/blue-shirt.png')}
+            source={item.image?.sizes.thumbnail.url}
             style={{ width: '100%', height: '100%', opacity: 0.2 }}
           />
         }
         headerContent={
-          <View style={{
-            padding: 32,
-            height: 362,
-            flex: 1
-          }}>
-            <Image
-              contentFit="contain"
-              source={require('assets/placeholders/blue-shirt.png')}
-              style={{
-                width: '100%',
-                height: '100%',
-              }}
+          <View style={{ flex: 1 }}>
+            <ModalHeader
+              style={{ marginTop: 12 }}
+              title={item.name}
+              onBack={router.canGoBack() ? () => { router.back() } : undefined}
             />
+            <View style={{
+              padding: 32,
+              paddingBottom: Platform.OS === 'web' ? 32 : 16,
+              flex: 1
+            }}>
+              <Image
+                priority="high"
+                allowDownscaling={false}
+                contentFit="contain"
+                source={item.image?.sizes.medium.url}
+                placeholder={item.image?.sizes.thumbnail.url}
+                placeholderContentFit="contain"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                }}
+              />
+            </View>
           </View>
         }
       >
@@ -123,39 +129,38 @@ export default function ItemScreen() {
             </Button>
           </Block>
           <ColorsBlock />
-          <Block
+          {item.description && <Block
             variant="blur"
             style={{
               borderRadius: 32,
               paddingHorizontal: 16,
-              paddingVertical: 20,
+              paddingTop: 20,
+              paddingBottom: 24,
               gap: 12
             }}
           >
-            <Text.H4 color={Colors.neutral[50]}>
-              About me
-            </Text.H4>
             <Text.Base color={Colors.neutral[200]} numberOfLines={4}>
-              I am a grey marl sweatshirt features a dynamic, multi-colored illustration of numerous skiers in various ski suits.
-              The hand-drawn style gives it a distinct vintage appeal, with each skier individually numbered…
+              {item.description}
             </Text.Base>
-          </Block>
+          </Block>}
           <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
-            <ItemCategory />
-            <Category icon={Snowflake} title="Cold Weather" />
+            <ItemCategory title={item.category} onPress={(category) => update({ category })} />
+            <WeatherCategory title={item.weatherTags[0]} onPress={(weather) => update({ weatherTags: [weather, ...item.weatherTags.slice(1)] })} />
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
-            <Category icon={Sun} title="Light" />
-            <Category icon={Smile} title="Light" borderRadius={24} />
-            <Category icon={Feather} title="Light" />
+            <ColorCategory title={item.colorTones[0]} onPress={(color) => update({ colorTones: [color, ...item.colorTones.slice(1)] })} />
+            <FeelCategory title={item.materialFeel} onPress={(materialFeel) => update({ materialFeel })} />
+            <GenderCategory title={item.gender} onPress={(gender) => update({ gender })} />
           </View>
           <Button
             style={{ marginTop: 4 }}
             variant="primary"
             onPress={() => {
               router.push({
-                pathname: ROUTES.MODALS.PICK_OUTFIT,
-                params: { nextPath: ROUTES.PROFILE.OUTFITS }
+                pathname: ROUTES.MODALS.PICK_OUTFIT({
+                  nextPath: ROUTES.PROFILE.OUTFITS,
+                  itemIds: [item._id]
+                }),
               })
             }}
           >

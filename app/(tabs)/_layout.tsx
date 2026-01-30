@@ -94,7 +94,7 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="feed"
         options={{
           tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
         }}

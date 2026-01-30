@@ -19,7 +19,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.cooture"
     },
     "web": {
       "output": "static",
@@ -34,9 +35,9 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "hsl(0, 0%, 3%)",
+          "backgroundColor": "#080808",
           "dark": {
-            "backgroundColor": "hsl(0, 0%, 3%)"
+            "backgroundColor": "#080808"
           }
         }
       ],
@@ -49,6 +50,12 @@
     },
     "fonts": [
       "./assets/fonts/Murays-Regular.otf"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "f31d9764-3c8b-402d-9458-91e02bddf9d9"
+      }
+    }
   }
 }

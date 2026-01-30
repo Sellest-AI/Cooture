@@ -1,17 +1,17 @@
 "use node"
 
-import { Infer, v } from "convex/values";
-import { ActionCtx, authAction } from "../../../procedures"
 import { compressImageAuto, hasImageAlpha, imageBufferFromUrl } from "@/lib/image/node";
 import { StorageCloud } from "@/lib/s3/node";
-import { createHash } from "node:crypto";
-import { Id } from "../../../_generated/dataModel";
-import { internal } from "../../../_generated/api";
-import { IMAGE_TAGS } from "../../../schema/images";
-import { SavedImage } from "../../../functions/images";
-import { uploadSingleArgs } from "./uploadOne";
-import { internalAction } from "../../../_generated/server";
 import { retryPromise } from "@shared/utils";
+import { Infer, v } from "convex/values";
+import { createHash } from "node:crypto";
+import { internal } from "../../../_generated/api";
+import { Id } from "../../../_generated/dataModel";
+import { internalAction } from "../../../_generated/server";
+import { SavedImage } from "../../../functions/images";
+import { ActionCtx, authAction } from "../../../procedures";
+import { IMAGE_TAGS } from "../../../schema/images";
+import { uploadSingleArgs } from "./uploadOne";
 
 type Extra = {
   userId: Id<'users'>,
@@ -26,17 +26,21 @@ type Extra = {
 const uploadImage = async (ctx: ActionCtx, base64orUrl: string, extra: Extra) => {
   const buffer = await imageBufferFromUrl(base64orUrl);
 
-  const hasAlpha = await hasImageAlpha(buffer);
-  const compressedImage = await compressImageAuto(buffer);
+  const [hasAlpha, compressedImage] = await Promise.all([
+    hasImageAlpha(buffer),
+    compressImageAuto(buffer),
+  ]);
 
   const base64Data = compressedImage.buffer.toString('base64');
   const hashBase64 = createHash('sha256').update(base64Data).digest('hex');
 
   const userId = extra.userId;
 
+  console.time('StorageCloud.uploadFile');
   // UPLOAD FILE
   const folder = StorageCloud.FOLDERS.USER(userId)
   const uploadedFile = await StorageCloud.uploadFile(compressedImage, folder);
+  console.timeEnd('StorageCloud.uploadFile');
 
   const image = {
     userId,
@@ -62,7 +66,7 @@ type SharedArgs = {
   userId: Id<'users'>,
 }
 
-export const uploadManySharedHandler = async (ctx: ActionCtx, args: SharedArgs): Promise<Array<SavedImage>> => {
+export const uploadManySharedHandler = async (ctx: ActionCtx, args: SharedArgs): Promise<SavedImage[]> => {
   const preparedImages = await Promise.all(args.images.map(async (image) => {
     const url = image.url ?? image.base64;
     if (!url) throw new Error("Either url or base64 image data must be provided");
@@ -89,7 +93,7 @@ export const uploadManySharedHandler = async (ctx: ActionCtx, args: SharedArgs):
     })),
   }));
 
-  ctx.scheduler.runAfter(0, internal.router.storage.images.uploadSizes._internal, {
+  await ctx.scheduler.runAfter(0, internal.router.storage.images.uploadSizes._internal, {
     imageIds: images.map((img) => img._id),
   });
 
@@ -98,7 +102,7 @@ export const uploadManySharedHandler = async (ctx: ActionCtx, args: SharedArgs):
 
 export const authed = authAction({
   args: { images: v.array(v.object(uploadSingleArgs)) },
-  handler: async (ctx, args): Promise<Array<SavedImage>> =>
+  handler: async (ctx, args): Promise<SavedImage[]> =>
     uploadManySharedHandler(ctx, { ...args, userId: ctx.userId })
 });
 

@@ -1,8 +1,12 @@
 import { defineSchema } from "convex/server";
 import { authTables } from "./schema/auth";
-import { userImages, usersExtended } from "./schema/users";
+import { generations, predictions } from "./schema/generations";
 import { imageObjects, images, imageSizes } from "./schema/images";
+import { items } from "./schema/items";
+import { outfitItems, outfits } from "./schema/outfits";
+import { presetGenerations, presets } from "./schema/presets";
 import { subscriptions, subscriptionsHistory } from "./schema/subscriptions";
+import { userImages, userPortraits, usersExtended } from "./schema/users";
 
 export default defineSchema({
   ...authTables,
@@ -11,10 +15,14 @@ export default defineSchema({
   imageSizes,
   imageObjects,
   userImages,
+  userPortraits,
   subscriptions,
   subscriptionsHistory,
-  // messages: defineTable({
-  //   body: v.string(),
-  //   user: v.id("users"),
-  // }),
+  items,
+  outfits,
+  outfitItems,
+  generations,
+  predictions,
+  presets,
+  presetGenerations,
 });

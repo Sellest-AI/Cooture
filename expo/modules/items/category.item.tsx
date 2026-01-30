@@ -1,48 +1,57 @@
-import { Glasses, Hand, HardHat, Shirt, VenetianMask, Watch } from "@ui/icons";
-import { Modal } from "@ui/modal";
-import { ComponentProps, useState } from "react";
-import { FlatList, View } from 'react-native';
+import {
+  Accessory,
+  Bag,
+  Bottom,
+  Cap,
+  DressIcon,
+  Glasses,
+  Hat,
+  HoodieIcon,
+  Jacket,
+  Jeans,
+  Outerwear,
+  Shoes,
+  Skirt,
+  Sweater,
+  Top,
+  TShirtIcon,
+} from "@ui/icons";
+import { ComponentProps } from "react";
+import { Categories } from "./categories";
 import { Category } from "./category";
 
-type Props = { style?: ComponentProps<typeof Category>['style'] };
+const categories = [
+  { icon: Top, value: 'TOP' as const },
+  { icon: Bottom, value: 'BOTTOM' as const },
+  { icon: DressIcon, value: 'DRESS' as const },
+  { icon: Outerwear, value: 'OUTERWEAR' as const },
+  { icon: Jacket, value: 'JACKET' as const },
+  { icon: Shoes, value: 'SHOES' as const },
+  { icon: Accessory, value: 'ACCESSORY' as const },
+  { icon: HoodieIcon, value: 'HOODIE' as const },
+  { icon: Sweater, value: 'SWEATER' as const },
+  { icon: TShirtIcon, value: 'TSHIRT' as const },
+  { icon: Jeans, value: 'JEANS' as const },
+  { icon: Skirt, value: 'SKIRT' as const },
+  { icon: Hat, value: 'HAT' as const },
+  { icon: Cap, value: 'CAP' as const },
+  { icon: Glasses, value: 'GLASSES' as const },
+  { icon: Bag, value: 'BAG' as const },
+];
 
-export const ItemCategory = ({ ...props }: Props) => {
-  const [open, setOpen] = useState(false);
+type Props = {
+  style?: ComponentProps<typeof Category>['style'];
+  title: ComponentProps<typeof Category>['title'];
+  onPress?: (value: typeof categories[number]['value']) => void;
+};
 
-  const items = [
-    { icon: Shirt, title: 'Hoodie', selected: true },
-    { icon: VenetianMask, title: 'Mask' },
-    { icon: HardHat, title: 'Cap' },
-    { icon: Glasses, title: 'Glasses' },
-    { icon: HardHat, title: 'Hat' },
-    { icon: Watch, title: 'Watch' },
-    { icon: Hand, title: 'Gloves' },
-  ]
-
+export const ItemCategory = ({ title, ...props }: Props) => {
   return (
-    <>
-      <Category
-        {...props}
-        icon={Shirt}
-        title="Hoodie"
-        onPress={() => setOpen(true)}
-      />
-      <Modal
-        onOpenChange={setOpen}
-        scrollable={false}
-        open={open}
-      >
-        <FlatList
-          data={items}
-          numColumns={2}
-          keyExtractor={(i) => i.title}
-          renderItem={({ item }) => (
-            <View style={{ padding: 2, flex: 1 }}>
-              <Category {...item} />
-            </View>
-          )}
-        />
-      </Modal>
-    </>
+    <Categories
+      {...props}
+      categories={categories}
+      value={title}
+      categoryTitle="Category"
+    />
   )
 }

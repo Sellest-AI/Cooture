@@ -10,36 +10,40 @@ type Props = {
   variant: 'primary' | 'secondary' | 'blur' | 'destructive';
   style?: ViewStyle;
   children?: React.ReactNode;
+  disabled?: boolean;
 }
 
-export const getBlockColors = (variant: Props['variant']) => {
+export const getBlockColors = (variant: Props['variant'], disabled?: boolean) => {
   switch (variant) {
     case 'primary':
+      if (disabled) {
+        return {
+          backgroundColor: Colors.primary[700],
+          borderColor: Colors.primary[700],
+          textColor: Colors.primary[900],
+        };
+      }
       return {
         backgroundColor: Colors.primary[500],
-        borderLeftColor: Colors.primary[200],
-        borderTopColor: Colors.primary[200],
+        borderColor: Colors.primary[200],
         textColor: Colors.primary[900],
       };
     case 'secondary':
       return {
         backgroundColor: Colors.blur.dark,
-        borderLeftColor: Colors.blur.medium,
-        borderTopColor: Colors.blur.medium,
+        borderColor: Colors.blur.medium,
         textColor: Colors.neutral[50],
       };
     case 'blur':
       return {
         backgroundColor: Colors.blur.dark,
-        borderLeftColor: Colors.blur.medium,
-        borderTopColor: Colors.blur.medium,
+        borderColor: Colors.blur.medium,
         textColor: Colors.neutral[50],
       };
     case 'destructive':
       return {
         backgroundColor: Colors.destructive[500],
-        borderLeftColor: 'rgba(255,255,255,0.3)',
-        borderTopColor: 'rgba(255,255,255,0.3)',
+        borderColor: 'rgba(255,255,255,0.3)',
         textColor: Colors.destructive[50],
       };
     default:
@@ -47,8 +51,8 @@ export const getBlockColors = (variant: Props['variant']) => {
   }
 }
 
-export const Block = ({ className = "", children, variant, style }: Props) => {
-  const VariantColors = useMemo(() => getBlockColors(variant), [variant]);
+export const Block = ({ className = "", children, variant, style, disabled }: Props) => {
+  const VariantColors = useMemo(() => getBlockColors(variant, disabled), [disabled, variant]);
 
   const Component = variant === 'blur' ? BlurView : View;
 
@@ -62,14 +66,14 @@ export const Block = ({ className = "", children, variant, style }: Props) => {
         overflow: 'hidden',
         position: 'relative',
         ...VariantColors,
-        borderTopWidth: 1,
-        borderLeftWidth: 2,
+        borderTopWidth: disabled ? 0 : 1,
+        borderLeftWidth: disabled ? 0 : 2,
         borderRadius: 18,
       }, style]}
       className={cn(className)}
     >
       {showTopBorder && <LinearGradient
-        colors={[VariantColors.borderTopColor ?? 'transparent', VariantColors.borderTopColor ?? 'transparent', VariantColors.borderTopColor ?? 'transparent', 'transparent']}
+        colors={[VariantColors.borderColor ?? 'transparent', VariantColors.borderColor ?? 'transparent', VariantColors.borderColor ?? 'transparent', 'transparent']}
         start={{ x: 0, y: 0.5 }} // Left center
         end={{ x: 1, y: 0.5 }}   // Right center
         style={{
@@ -77,7 +81,8 @@ export const Block = ({ className = "", children, variant, style }: Props) => {
           left: 0,
           right: 0,
           top: 0,
-          height: 1
+          height: 1,
+          opacity: style?.opacity
         }}
       />}
       <LinearGradient
@@ -89,9 +94,16 @@ export const Block = ({ className = "", children, variant, style }: Props) => {
           left: 0,
           right: 0,
           bottom: 0,
-          height: 3
+          height: 3,
+          opacity: style?.opacity
         }}
       />
+      {disabled && <View style={{
+        position: 'absolute',
+        inset: 0,
+        backgroundColor: VariantColors.textColor,
+        opacity: 0.2
+      }} />}
       {children}
     </Component>
   )

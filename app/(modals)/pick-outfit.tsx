@@ -1,15 +1,32 @@
+import { api, useQueryCached } from "@/lib/convex/client";
 import { Button } from "@ui/button";
 import { Collection } from "@ui/cards";
+import { LoadingBlock } from "@ui/loadingBlock";
 import { MasonryList } from "@ui/masonry-list";
 import { ModalHeader } from "@ui/modal";
-import { Href, router, useLocalSearchParams } from "expo-router";
+import { normalizeArray } from "@utils/convex-allowed";
+import { url } from "@utils/routes";
+import { Href, Redirect, router, useLocalSearchParams } from "expo-router";
 import { ScrollView, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 export default function PickOutfitScreen() {
-  const { nextPath, canSkip: _canSkip } = useLocalSearchParams();
+  const { nextPath, canSkip: _canSkip, itemIds: _itemIds } =
+    useLocalSearchParams<{ nextPath?: string, canSkip?: string, itemIds?: string[] }>();
   const canSkip = Boolean(_canSkip);
+  const itemIds = normalizeArray(_itemIds);
+
+  const { data: outfits } = useQueryCached(api.router.outfits.getAll.authed);
+
+  const filteredOutfits = outfits?.filter((outfit) => !outfit.items.some((item) => itemIds.includes(item.itemId)));
+
+  // Redirect to new outfit if no outfits available
+  if (filteredOutfits && filteredOutfits.length === 0) {
+    return <Redirect
+      href={ROUTES.MODALS.NEW_OUTFIT({ itemIds, nextPath, reset: true })}
+    />
+  }
 
   return (
     <>
@@ -20,16 +37,11 @@ export default function PickOutfitScreen() {
         }}
       >
         <ModalHeader title="Pick an outfit" />
-        <MasonryList
+        {filteredOutfits ? <MasonryList
           key="0"
           data={[
             undefined,
-            require('assets/placeholders/shoes-outfit.png'),
-            require('assets/placeholders/jeans-outfit.png'),
-            require('assets/placeholders/full-outfit.png'),
-            require('assets/placeholders/jeans-outfit.png'),
-            require('assets/placeholders/full-outfit.png'),
-            require('assets/placeholders/shoes-outfit.png'),
+            ...filteredOutfits,
           ]}
           style={{
             columnGap: 48,
@@ -37,16 +49,13 @@ export default function PickOutfitScreen() {
             paddingBottom: canSkip ? 86 : 0,
           }}
           keyExtractor={(_, index) => index.toString()}
-          renderItem={({ item, i }) => {
+          renderItem={({ item }) => {
             if (!item) {
               return (<View style={{ marginBottom: 24, paddingTop: 3 }}>
                 <Collection
                   title="New outfit"
                   onPress={() => {
-                    router.push({
-                      pathname: ROUTES.MODALS.NEW_OUTFIT,
-                      params: { nextPath }
-                    })
+                    router.push(ROUTES.MODALS.NEW_OUTFIT({ itemIds, nextPath, reset: true }))
                   }}
                 />
               </View>
@@ -56,14 +65,14 @@ export default function PickOutfitScreen() {
             return (
               <View style={{ marginBottom: 24, paddingTop: 3 }}>
                 <Collection
-                  source={item as string}
+                  source={item.cover.sizes.small.url}
                   contentFit="contain"
-                  title="Saved Item"
-                  subtitle="Favorited"
+                  title={item.name}
+                  subtitle={`${item.itemsCount} items`}
                   // selected={i % 3 === 0}
                   onPress={() => {
                     if (nextPath) {
-                      router.replace(nextPath as Href)
+                      router.replace(url(nextPath, { outfitId: item._id }) as Href)
                     } else if (router.canGoBack()) {
                       router.back()
                     } else {
@@ -75,7 +84,9 @@ export default function PickOutfitScreen() {
             )
           }}
           numColumns={2}
-        />
+        /> :
+          <LoadingBlock />
+        }
       </ScrollView>
       {(canSkip && nextPath) && <View style={{
         position: 'absolute',

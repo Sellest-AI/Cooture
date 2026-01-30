@@ -1,3 +1,4 @@
-export * from './index';
+export * from './createTool';
 export * from './sanitizeAiText';
 export * from './usageHandler';
+

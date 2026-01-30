@@ -1,5 +1,9 @@
+import { Image as NativeImage, Platform } from "react-native";
+
+type Dimensions = { width: number; height: number };
+
 export function getFileDimensions(file: File) {
-  return new Promise<{ width: number, height: number }>((resolve, reject) => {
+  return new Promise<Dimensions>((resolve, reject) => {
     if (!file.type.startsWith("image/")) {
       return reject(new Error("File is not an image"));
     }
@@ -22,9 +26,18 @@ export function getFileDimensions(file: File) {
   });
 }
 
-export function getImageDimensions(url: string) {
-  return new Promise<{ width: number, height: number }>((resolve, reject) => {
+export function getImageDimensions(url: string): Promise<Dimensions> {
+  if (Platform.OS !== 'web') {
+    return new Promise((resolve, reject) => {
+      NativeImage.getSize(
+        url,
+        (width, height) => resolve({ width, height }),
+        (error) => reject(error)
+      );
+    });
+  }
 
+  return new Promise<Dimensions>((resolve, reject) => {
     const img = new Image();
 
     img.onload = () => {

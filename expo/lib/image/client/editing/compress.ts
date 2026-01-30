@@ -1,10 +1,14 @@
-import { getFileDimensions } from "../metadata";
-import { urlToBase64, base64ToFile } from "../base64"
-import compress from "browser-image-compression";
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
+import { uriToImage } from '../base64/uri-to-file';
 
-const convertUrl = async (url: string) => base64ToFile(await urlToBase64(url));
+const convertUrl = async (url: string) => {
+  console.time('uriToImage');
+  const file = await uriToImage(url);
+  console.timeEnd('uriToImage');
+  return file;
+}
 
-type FileExtended = File & { width: number, height: number }
+type File = Awaited<ReturnType<typeof uriToImage>>;
 
 type Options = {
   progress?: (progress: number) => void,
@@ -17,10 +21,10 @@ type Level = {
   resolution: number;
   targetSizeKb: number;
   initialQuality: number;
-  compressionStrength: Array<{
+  compressionStrength: {
     sizeKb: number;
     initialQuality: number;
-  }>
+  }[]
 }
 
 type Compression = Omit<Level, 'compressionStrength'>;
@@ -153,18 +157,88 @@ const getCompression = (resolution: number, sizeKb: number): Compression => {
   };
 };
 
-export const compressImage = async (image: string | File, options?: Options): Promise<FileExtended> => {
-  const file = typeof image === 'string' ? await convertUrl(image) : image;
+/**
+ * Core compression logic using Expo Image Manipulator
+ * Iterates quality reduction until target size is met or max iterations reached.
+ */
+const compress = async (
+  file: File,
+  options: {
+    maxIteration: number;
+    initialQuality: number;
+    maxSizeMB: number;
+    fileType?: 'image/webp' | 'image/jpeg' | 'image/png';
+    alwaysKeepResolution: boolean;
+    maxWidthOrHeight?: number;
+    preserveExif: boolean;
+    onProgress?: (progress: number) => void;
+  }
+): Promise<File> => {
+  const { maxIteration, maxSizeMB, initialQuality, fileType, maxWidthOrHeight, onProgress } = options;
+  const targetSizeBytes = maxSizeMB * 1024 * 1024;
+
+  // Convert File to URI for Expo Image Manipulator
+  const imageUri = file.uri;
+  let currentQuality = initialQuality;
+  let lastResult: File = file;
+
+  // Map mime types to Expo SaveFormat
+  const format = fileType === 'image/png' ? SaveFormat.PNG :
+    fileType === 'image/webp' ? SaveFormat.WEBP :
+      SaveFormat.JPEG;
+
+  try {
+    for (let i = 0; i < maxIteration; i++) {
+      const resize = maxWidthOrHeight ? {
+        width: file.width > file.height ? maxWidthOrHeight : undefined,
+        height: file.height >= file.width ? maxWidthOrHeight : undefined
+      } : undefined;
+
+      let manipulator = ImageManipulator.manipulate(imageUri);
+      if (resize && (resize.width || resize.height)) {
+        manipulator = manipulator.resize(resize);
+      }
+
+      const result = await (await manipulator
+        .renderAsync())
+        .saveAsync({
+          format: format,
+          base64: false,
+          compress: Math.max(0, Math.min(1, currentQuality)),
+        });
+
+      const compressedFile = await convertUrl(result.uri);
+      lastResult = compressedFile;
+
+      if (onProgress) onProgress((i + 1) / maxIteration);
+
+      // Check if we hit the target
+      if (compressedFile.size <= targetSizeBytes) {
+        break;
+      }
+
+      // Reduce quality for next iteration (aggressive decay)
+      // If size is still 2x target, drop quality faster
+      const overageRatio = compressedFile.size / targetSizeBytes;
+      currentQuality -= overageRatio > 2 ? 0.15 : 0.08;
+
+      if (currentQuality <= 0.05) break; // Diminishing returns
+    }
+  } finally {
+    URL.revokeObjectURL(imageUri);
+  }
+
+  return lastResult;
+};
+
+export const compressImage = async (url: string, options?: Options): Promise<File> => {
+  const file = await convertUrl(url);
 
   const forceCompression = !['image/webp', 'image/png', 'image/jpeg'].includes(file.type);
 
-  const dimensions = await getFileDimensions(file);
+  const dimensions = { width: file.width, height: file.height };
   const dimension = Math.max(dimensions.width, dimensions.height);
   const targetDimension = Math.min(options?.maxResolution ?? Infinity, dimension);
-
-  // update file
-  (file as FileExtended).width = dimensions.width;
-  (file as FileExtended).height = dimensions.height;
 
   const sizeKb = Math.round(file.size / 1024);
 
@@ -173,7 +247,7 @@ export const compressImage = async (image: string | File, options?: Options): Pr
   // if image is not webp, png, or jpeg, force compression
   if (!forceCompression) {
     // If no compression is needed, return the original file
-    if (compression.targetSizeKb >= sizeKb) return (file as FileExtended);
+    if (compression.targetSizeKb >= sizeKb) return file;
   }
 
   // Override the runtime quality if it's smaller
@@ -181,7 +255,8 @@ export const compressImage = async (image: string | File, options?: Options): Pr
   // we divide by 98 not 100, because the compression algorithm decay the quality
   // more rapidly than the native browser canvas compression
   // 97% quality is almost equivalent to 92% quality in the browser
-  const initialQuality = baseQuality / 98
+  // ↗️↗️ DEPRECATED
+  const initialQuality = baseQuality / 100; // Expo uses [0, 1] range
 
   // Determine if resolution needs to be reduced
   const shouldReduceResolution = dimension > compression.resolution;
@@ -200,17 +275,8 @@ export const compressImage = async (image: string | File, options?: Options): Pr
   if (!forceCompression) {
     // if the compressed file is less than 10% smaller than the original file
     // we return the original file
-    if (compressedFile.size > 0.9 * file.size) return (file as FileExtended);
+    if (compressedFile.size > 0.9 * file.size) return file;
   }
 
-  // If resolution was reduced, get new dimensions
-  const finalDimensions = shouldReduceResolution
-    ? await getFileDimensions(compressedFile)
-    : dimensions;
-
-  // update file
-  (compressedFile as FileExtended).width = finalDimensions.width;
-  (compressedFile as FileExtended).height = finalDimensions.height;
-
-  return (compressedFile as FileExtended);
+  return compressedFile;
 }

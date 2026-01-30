@@ -130,12 +130,12 @@ export const CardItem = ({ title, subtitle, selected, disabled, badge, style, so
       </Animated.View>
       {showText && <View
         style={{
-          paddingHorizontal: 24,
+          paddingHorizontal: selected ? 20 : 0,
           paddingVertical: selected ? 4 : 0,
           backgroundColor: selected ? Colors.primary[500] : 'transparent',
-          borderRadius: 99,
+          borderRadius: selected ? 99 : 0,
           width: 'auto',
-          maxWidth: 'auto',
+          maxWidth: '100%',
           justifyContent: 'center',
           alignItems: 'center',
           alignSelf: 'center',
@@ -143,22 +143,29 @@ export const CardItem = ({ title, subtitle, selected, disabled, badge, style, so
         }}
       >
         {title && <Text.Sm
+          numberOfLines={1}
           style={{
             fontWeight: 700,
             color: selected ? Colors.primary[900] : Colors.neutral[50],
+            textAlign: 'center',
+            maxWidth: selected ? '100%' : '90%',
           }}
         >
           {title}
         </Text.Sm>}
         {subtitle && <Text.Sm
+          numberOfLines={1}
           style={{
             fontWeight: 600,
             color: selected ? Colors.primary[900] : Colors.neutral[400],
             opacity: selected ? 0.5 : 1,
-            marginTop: 0
+            marginTop: 1,
+            textAlign: 'center',
+            maxWidth: '90%',
+            paddingBottom: 2
           }}
         >
-          {subtitle}
+          {subtitle.charAt(0).toUpperCase() + subtitle.slice(1).toLowerCase()}
         </Text.Sm>}
       </View>}
     </Pressable>

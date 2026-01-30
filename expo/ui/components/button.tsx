@@ -1,14 +1,14 @@
 import { useRouter } from 'expo-router';
-import { ComponentProps, useRef } from 'react';
-import { Animated, Pressable, View } from 'react-native';
+import { ComponentProps, useRef, useState } from 'react';
+import { Animated, GestureResponderEvent, Pressable, View, ViewStyle } from 'react-native';
 import { Block, getBlockColors } from './block';
 import { Loader } from './icons';
 import { Text } from './text';
 
 type Props = {
   children?: React.ReactNode;
-  startIcon?: React.ComponentType<{ size?: number, color?: string }>;
-  endIcon?: React.ComponentType<{ size?: number, color?: string }>;
+  startIcon?: React.ComponentType<{ size?: number, color?: string, style?: ViewStyle }>;
+  endIcon?: React.ComponentType<{ size?: number, color?: string, style?: ViewStyle }>;
   disabled?: boolean;
   href?: Parameters<ReturnType<typeof useRouter>['push']>[0];
   size?: "rounded",
@@ -16,7 +16,10 @@ type Props = {
   isLoading?: boolean;
 } & ComponentProps<typeof Block> & Omit<ComponentProps<typeof Pressable>, 'style'>;
 
-export const Button = ({ startIcon, endIcon, children, disabled, variant, href, size, style, isLoading, align, onPress, ...props }: Props) => {
+export const Button = ({ startIcon, endIcon, children, disabled, variant, href, size, style, isLoading: _isLoading, align, onPress, onLongPress, ...props }: Props) => {
+  const [innerLoading, setInnerLoading] = useState(false);
+  const isLoading = _isLoading || innerLoading;
+
   const StartIcon = isLoading ? Loader : startIcon;
   const EndIcon = endIcon;
 
@@ -45,9 +48,20 @@ export const Button = ({ startIcon, endIcon, children, disabled, variant, href, 
     }).start();
   };
 
-  const colors = getBlockColors(variant);
+  const colors = getBlockColors(variant, runtimeDisabled);
   const isRounded = size === "rounded";
   const defaultAlign = align || (isRounded ? "center" : "stretch");
+
+  const onPressWrapper = async (e: GestureResponderEvent, fnc?: (((event: GestureResponderEvent) => void | Promise<void>) | null)) => {
+    if (runtimeDisabled) return;
+    const timer = setTimeout(() => { setInnerLoading(true); }, 50);
+    try {
+      await fnc?.(e);
+      if (href) push(href);
+    } catch { }
+    if (timer) clearTimeout(timer);
+    setInnerLoading(false);
+  }
 
   return (
     <Pressable
@@ -61,14 +75,12 @@ export const Button = ({ startIcon, endIcon, children, disabled, variant, href, 
       }}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
-      onPress={(e) => {
-        if (runtimeDisabled) return;
-        if (onPress) onPress(e);
-        if (href) push(href);
-      }}
+      onPress={(e) => onPressWrapper(e, onPress)}
+      onLongPress={(e) => onPressWrapper(e, onLongPress)}
     >
       <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
         <Block
+          disabled={runtimeDisabled}
           variant={variant}
           {...props}
           style={{
@@ -78,7 +90,7 @@ export const Button = ({ startIcon, endIcon, children, disabled, variant, href, 
         >
           <View
             style={{
-              height: isRounded ? undefined : 56,
+              height: isRounded ? undefined : (style?.height ?? 56),
               position: 'relative',
               flexDirection: 'row',
               justifyContent: 'center',
@@ -87,20 +99,27 @@ export const Button = ({ startIcon, endIcon, children, disabled, variant, href, 
               marginTop: -2,
               paddingHorizontal: isRounded ? undefined : 24,
               padding: isRounded ? 12 : 0,
+              opacity: runtimeDisabled ? 0.4 : 1,
             }}
           >
-            {StartIcon && <StartIcon size={20} color={colors.textColor} />}
+            {StartIcon && <StartIcon
+              size={20}
+              color={colors.textColor}
+            />}
             {typeof children === 'string' ? (
               <Text.Base
                 style={{
                   color: colors.textColor,
-                  fontWeight: 600
+                  fontWeight: 600,
                 }}
               >
                 {children}
               </Text.Base>
             ) : (children)}
-            {EndIcon && <EndIcon size={20} color={colors.textColor} />}
+            {EndIcon && <EndIcon
+              size={20}
+              color={colors.textColor}
+            />}
           </View>
         </Block>
       </Animated.View>

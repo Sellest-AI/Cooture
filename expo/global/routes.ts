@@ -7,17 +7,29 @@ export const POSTHOG_IGNORED_ROUTES = ['_next/image', '/_next/static', '/api'] a
 export const ROUTES = {
   HOME: '/',
   TABS: {
+    FEED: '/feed',
     NEW: '/new',
   },
   SCAN: '/scan',
   MODALS: {
-    PICK_OUTFIT: `/pick-outfit`,
-    NEW_OUTFIT: `/new-outfit`,
-    OUTFIT_ADD_ITEM: `/add-item`,
+    PICK_OUTFIT: (params: { nextPath?: string, canSkip?: boolean, itemIds?: string[] }) => url('/pick-outfit', params),
+    NEW_OUTFIT: (params: { itemIds?: string[], nextPath?: string, reset?: boolean }) => url('/new-outfit', params),
+    OUTFIT_ADD_ITEM: (params: { nextPath?: string, outfitId?: string, itemIds?: string[] }) => url('/add-item', params),
   },
   ITEM: {
     PATH: '/item/[id]',
     ID: (id: string) => `/item/${id}` as const,
+  },
+  OUTFIT: {
+    PATH: '/outfit/[id]',
+    ID: (id: string) => `/outfit/${id}` as const,
+  },
+  PHOTOSHOOT: {
+    NEW: '/photoshoot/new' as const,
+    PRESETS: '/photoshoot/presets' as const,
+    GENERATIONS: {
+      ID: (id: string) => `/photoshoot/generations/${id}` as const,
+    }
   },
   PROFILE: {
     PATH: '/profile',

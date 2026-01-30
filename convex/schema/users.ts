@@ -28,4 +28,14 @@ export const usersExtended = defineTable({
 export const userImages = defineTable({
   userId: v.id('users'),
   imageId: v.id('images'),
-}).index("by_user_id", ["userId"]);
+})
+  .index("by_image_id", ["imageId"])
+  .index("by_user_id", ["userId"]);
+
+export const userPortraits = defineTable({
+  userId: v.id('users'),
+  frontImageId: v.id('images'),
+  sideImageId: v.id('images'),
+  topAngleImageId: v.id('images'),
+})
+  .index("by_user_id", ["userId"])

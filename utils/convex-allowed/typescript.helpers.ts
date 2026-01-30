@@ -8,6 +8,9 @@ export function createArrayWithValidLength<T extends unknown[], K extends readon
   return array;
 }
 
+export const normalizeArray = <T extends string>(v?: T | T[] | null) =>
+  v == null ? [] : Array.isArray(v) ? v : [v];
+
 /**
  * Removes undefined values from an object recursively
  * @param obj The object to process
@@ -54,7 +57,7 @@ export function turnNullKeysToUndefined<T extends object>(obj: T): {
         : item !== null && typeof item === 'object'
           ? turnNullKeysToUndefined(item as object)
           : item
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     ) as any;
   }
 
@@ -67,7 +70,7 @@ export function turnNullKeysToUndefined<T extends object>(obj: T): {
           ? turnNullKeysToUndefined(value as object)
           : value
     ])
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   ) as any;
 }
 

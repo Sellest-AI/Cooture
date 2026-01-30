@@ -1,19 +1,29 @@
+import { api, useAction } from "@/lib/convex/client";
+import { useUpload } from "@/lib/convex/upload";
 import { useScan } from "@/modules/scan";
+// import { removeBackground } from '@six33/react-native-bg-removal';
 import { Block } from "@ui/block";
 import { Loader } from "@ui/icons";
 import { Image } from "@ui/image";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
-import { useRouter } from "expo-router";
-import { useEffect, useRef } from "react";
+import { Redirect, router } from "expo-router";
+import { useEffect, useRef, useState } from "react";
 import { Animated, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 export default function RemoveBackgroundScreen() {
-  const { replace } = useRouter();
   const { imageScanned } = useScan();
   const opacityAnim = useRef(new Animated.Value(0.5)).current;
+
+  const { uploadImage } = useUpload();
+  const [isTriggered, setIsTriggered] = useState(false);
+
+  const [finalImage, setFinalImage] = useState<string | null>(null);
+  const [step, setStep] = useState<'removing' | 'uploading' | 'analyzing'>('removing');
+
+  const { action: createItem } = useAction(api.router.items.createOne.authed);
 
   useEffect(() => {
     const pulse = Animated.loop(
@@ -35,24 +45,31 @@ export default function RemoveBackgroundScreen() {
   }, [opacityAnim]);
 
   useEffect(() => {
-    setTimeout(() => {
-      replace({
-        pathname: ROUTES.ITEM.PATH,
-        params: { id: 'XXX' }
-      })
-    }, 3000)
-  }, [replace])
+    if (!imageScanned) return;
+    if (isTriggered) return;
+    setIsTriggered(true);
+
+    (async () => {
+      // const trimmedImageURI = await removeBackground(imageScanned);
+      // setFinalImage(trimmedImageURI);
+      setStep('uploading');
+      const image = await uploadImage(imageScanned);
+      setFinalImage(image.url);
+      setStep('analyzing');
+      const item = await createItem({ imageId: image._id });
+      router.replace(ROUTES.ITEM.ID(item));
+    })();
+  }, [createItem, imageScanned, isTriggered, uploadImage])
 
   if (!imageScanned) {
-    // replace(ROUTES.SCAN);
-    return null;
+    return <Redirect href={ROUTES.SCAN} />;
   }
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <Image
         blurRadius={24}
-        source={{ uri: imageScanned }}
+        source={{ uri: finalImage ?? imageScanned }}
         style={{
           opacity: 0.1,
           position: 'absolute',
@@ -114,9 +131,15 @@ export default function RemoveBackgroundScreen() {
           }}
         >
           <Loader color={Colors.primary[500]} />
-          <Text.Base color={Colors.neutral[50]}>
+          {step === 'removing' && <Text.Base color={Colors.neutral[50]}>
             Removing background...
-          </Text.Base>
+          </Text.Base>}
+          {step === 'uploading' && <Text.Base color={Colors.neutral[50]}>
+            Uploading image...
+          </Text.Base>}
+          {step === 'analyzing' && <Text.Base color={Colors.neutral[50]}>
+            Analyzing item...
+          </Text.Base>}
         </Block>
       </SafeAreaView>
     </View>

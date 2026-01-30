@@ -209,7 +209,7 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
           paddingHorizontal: 24,
           paddingVertical: selected ? 4 : 0,
           backgroundColor: selected ? Colors.primary[500] : 'transparent',
-          borderRadius: 99,
+          borderRadius: selected ? 99 : 0,
           width: 'auto',
           maxWidth: 'auto',
           justifyContent: 'center',
@@ -219,6 +219,7 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
         }}
       >
         {title && <Text.Sm
+          numberOfLines={1}
           style={{
             fontWeight: 700,
             color: selected ? Colors.primary[900] : Colors.neutral[50],
@@ -227,6 +228,7 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
           {title}
         </Text.Sm>}
         {subtitle && <Text.Sm
+          numberOfLines={1}
           style={{
             fontWeight: 700,
             color: selected ? Colors.primary[900] : Colors.neutral[400],

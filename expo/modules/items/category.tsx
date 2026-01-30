@@ -36,7 +36,7 @@ export const Category = ({ icon, title, onPress, style, selected, borderRadius =
           weight={600}
           color={selected ? Colors.primary[900] : Colors.neutral[50]}
         >
-          {title}
+          {title.charAt(0).toUpperCase() + title.slice(1).toLowerCase()}
         </Text.Base>
       </Block>
     </Pressable>

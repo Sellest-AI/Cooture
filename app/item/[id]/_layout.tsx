@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 import { Colors } from "theme";
 
-export default function ScanLayout() {
+export default function Layout() {
   return (
     <Stack
       screenOptions={{

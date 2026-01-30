@@ -5,7 +5,7 @@ import { Texts } from "theme";
 type Props = {
   className?: string;
   color?: string,
-  weight?: 700 | 600 | 400;
+  weight?: 700 | 600 | 500 | 400;
   children?: React.ReactNode;
   style?: TextStyle & {
     textBalance?: boolean;

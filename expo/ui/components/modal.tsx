@@ -17,6 +17,7 @@ type Props = {
   header?: {
     title: string;
     showBackButton?: boolean;
+    type?: 'default' | 'alt';
   }
 }
 
@@ -75,10 +76,11 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
       visible={open}
       onRequestClose={() => { if (onOpenChange) closeAnimation(); }}
       animationType="slide"
-      backdropColor="rgba(0,0,0,0.6)"
+      backdropColor="rgba(0,0,0,0.8)"
+      statusBarTranslucent={true}
     >
       <Animated.View style={{
-        backgroundColor: "rgba(0,0,0,0.6)",
+        backgroundColor: "rgba(0,0,0,0.8)",
         position: 'absolute',
         flex: 1,
         width: '100%',
@@ -122,11 +124,15 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
             overflow: 'hidden',
             justifyContent: 'flex-end',
             backgroundColor: Colors.blur.modal,
+            paddingHorizontal: 12,
             ...style,
+            paddingBottom: 0,
           }}
         >
-          <FinalView style={{ padding: 12 }} showsVerticalScrollIndicator={false}>
+          <FinalView showsVerticalScrollIndicator={false}>
             {header && <ModalHeader
+              type={header.type}
+              style={{ marginTop: 16 }}
               title={header.title}
               onBack={(header.showBackButton || currentStep > 0) ? () => {
                 back?.();
@@ -166,29 +172,55 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
 
 type ModalHeaderProps = {
   title: string;
+  subtitle?: string;
   onBack?: () => void;
+  style?: ViewStyle;
+  type?: 'default' | 'alt';
+  size?: 'big' | 'normal';
 }
-export const ModalHeader = ({ title, onBack }: ModalHeaderProps) => {
+export const ModalHeader = ({ title, onBack, style, subtitle, type, size }: ModalHeaderProps) => {
+  const isAlt = type === 'alt';
+  const isBig = size === 'big';
+
+  const Title = isBig ? Text.H1 : Text.H3;
+
   return (
     <View style={{
       paddingHorizontal: 8,
       paddingTop: 4,
       marginBottom: 16,
-      flexDirection: 'row',
-      justifyContent: 'center'
+      ...style
     }}>
-      {onBack && <Pressable
-        onPress={() => onBack?.()}
-        style={{ position: 'absolute', left: 4, bottom: -4, padding: 4 }}
+      <View style={{
+        flexDirection: 'row',
+        justifyContent: 'center',
+      }}>
+        {onBack && <Pressable
+          onPress={() => onBack?.()}
+          style={{ position: 'absolute', left: 4, top: -4, padding: 4 }}
+        >
+          <ArrowLeft color={Colors.foreground} />
+        </Pressable>}
+        <Title
+          type={isAlt ? 'alt' : undefined}
+          numberOfLines={2}
+          color={isAlt ? Colors.primary[200] : Colors.foreground}
+          style={{
+            textAlign: 'center',
+            maxWidth: "65%"
+          }}
+        >
+          {title}
+        </Title>
+      </View>
+      {subtitle && <Text.Base
+        color={Colors.neutral[400]}
+        weight={600}
+        textBreakStrategy="balanced"
+        style={{ textAlign: 'center', marginTop: 6, maxWidth: "80%", alignSelf: 'center' }}
       >
-        <ArrowLeft color={Colors.foreground} />
-      </Pressable>}
-      <Text.H4
-        color={Colors.foreground}
-        style={{ textAlign: 'center' }}
-      >
-        {title}
-      </Text.H4>
+        {subtitle}
+      </Text.Base>}
     </View>
   )
 }

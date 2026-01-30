@@ -24,12 +24,18 @@ export const QuickActions = ({ style, ...props }: Props) => {
           borderTopColor: Colors.primary[200],
           backgroundColor: Colors.primary[500],
         }}
+        onPress={() => {
+          router.push(ROUTES.MODALS.PICK_OUTFIT({
+            canSkip: true,
+            nextPath: ROUTES.PHOTOSHOOT.NEW
+          }))
+        }}
       >
         <Camera size={40} color={Colors.primary[900]} />
         <Text.Lg color={Colors.primary[900]}>Photoshoot</Text.Lg>
       </Pressable>
       <Pressable
-        onPress={() => router.push(ROUTES.MODALS.NEW_OUTFIT)}
+        onPress={() => router.push(ROUTES.MODALS.NEW_OUTFIT({ reset: true }))}
         style={{
           ...styles.headerButtons,
           borderTopColor: Colors.secondary[200],
