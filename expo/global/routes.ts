@@ -12,9 +12,9 @@ export const ROUTES = {
   },
   SCAN: '/scan',
   MODALS: {
-    PICK_OUTFIT: (params: { nextPath?: string, canSkip?: boolean, itemIds?: string[] }) => url('/pick-outfit', params),
-    NEW_OUTFIT: (params: { itemIds?: string[], nextPath?: string, reset?: boolean }) => url('/new-outfit', params),
-    OUTFIT_ADD_ITEM: (params: { nextPath?: string, outfitId?: string, itemIds?: string[] }) => url('/add-item', params),
+    PICK_OUTFIT: '/pick-outfit' as const,
+    NEW_OUTFIT: '/new-outfit' as const,
+    OUTFIT_ADD_ITEM: '/add-item' as const,
   },
   ITEM: {
     PATH: '/item/[id]',
@@ -25,11 +25,17 @@ export const ROUTES = {
     ID: (id: string) => `/outfit/${id}` as const,
   },
   PHOTOSHOOT: {
-    NEW: '/photoshoot/new' as const,
-    PRESETS: '/photoshoot/presets' as const,
+    NEW: '/photoshoot/create' as const,
+    PRESETS: '/photoshoot/create/presets' as const,
+    RECAP: '/photoshoot/create/recap' as const,
     GENERATIONS: {
+      PATH: '/photoshoot/generations/[id]',
       ID: (id: string) => `/photoshoot/generations/${id}` as const,
     }
+  },
+  SETTINGS: {
+    PATH: '/settings',
+    UPDATE_PORTRAITS: '/settings/update-portraits' as const,
   },
   PROFILE: {
     PATH: '/profile',

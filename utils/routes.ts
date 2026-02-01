@@ -21,3 +21,13 @@ export const url = <T extends string>(path: T, params: Record<string, Param>): T
   const queryString = usp.toString();
   return `${path.split('?')[0]}${queryString ? `?${queryString}` : ''}` as T;
 }
+
+export const replaceParamsInPath = <T extends string>(path: T, pathParams: Record<string, string>): T => {
+  let newPath = path;
+
+  for (const [key, value] of Object.entries(pathParams || {})) {
+    newPath = newPath.replaceAll(`[${key}]`, value) as T;
+  }
+
+  return newPath;
+}

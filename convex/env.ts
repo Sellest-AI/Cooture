@@ -4,6 +4,7 @@ export const env = {
   CONVEX_SITE_URL: process.env.CONVEX_SITE_URL ?? '',
   SERVER_PRIVATE_KEY: process.env.SERVER_PRIVATE_KEY ?? '',
   // Optional Services
+  REPLICATE_API_KEY: process.env.REPLICATE_API_KEY ?? '',
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ?? '',
   STRIPE_WEBHOOK_SECRETS: process.env.STRIPE_WEBHOOK_SECRETS ?? '',
   OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY ?? '',

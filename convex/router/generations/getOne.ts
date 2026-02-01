@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { getPredictions } from "../../functions/generations";
+import { getGenerationDetails } from "../../functions/generations/getGenerationDetails";
 import { authQuery } from "../../procedures";
 
 export const authed = authQuery({
@@ -7,11 +7,9 @@ export const authed = authQuery({
     generationId: v.id("generations"),
   },
   handler: async (ctx, { generationId }) => {
-    const [generation, predictions, metadata] = await Promise.all([
+    const [generation, details] = await Promise.all([
       ctx.db.get(generationId),
-      getPredictions(ctx, generationId),
-      ctx.db.query('presetGenerations')
-        .withIndex('by_generation_id', q => q.eq('generationId', generationId)).collect()
+      getGenerationDetails(ctx, generationId)
     ]);
 
     if (!generation)
@@ -19,8 +17,7 @@ export const authed = authQuery({
 
     return {
       ...generation,
-      predictions,
-      metadata,
+      ...details,
     }
   }
 })

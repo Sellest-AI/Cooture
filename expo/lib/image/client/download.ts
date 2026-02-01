@@ -13,10 +13,15 @@ export async function downloadImageCrossPlatform(source: string) {
   }
 
   // native mobile
-  const { status } = await requestPermissionsAsync(true, ['photo']);
-  if (status !== 'granted') {
-    Alert.alert('Permission required', 'Photos permission is needed to save images.', undefined, { userInterfaceStyle: 'dark' });
-    return;
+  // Try to request media library permissions, but Expo Go may not allow full library access.
+  // If permissions are unavailable/denied, we'll still download the file to the app documents
+  // directory as a fallback so the user can access it via Files/Downloads.
+  let canSaveToLibrary = true;
+  try {
+    const { status } = await requestPermissionsAsync();
+    canSaveToLibrary = status === 'granted';
+  } catch {
+    canSaveToLibrary = false;
   }
 
   let localUri: string | null = null;
@@ -38,7 +43,11 @@ export async function downloadImageCrossPlatform(source: string) {
 
   if (!localUri) throw new Error('Failed to resolve file URI.');
 
-  const asset = await createAssetAsync(localUri);
-  try { await createAlbumAsync('Cooture', asset, false); } catch { }
-  Alert.alert('Saved', 'Image saved to your photos.', undefined, { userInterfaceStyle: 'dark' });
+  if (canSaveToLibrary) {
+    const asset = await createAssetAsync(localUri);
+    try { await createAlbumAsync('Cooture', asset, false); } catch { }
+    Alert.alert('Saved', 'Image saved to your photos.', undefined, { userInterfaceStyle: 'dark' });
+    return;
+  }
+
 }

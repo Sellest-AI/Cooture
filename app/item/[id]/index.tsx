@@ -1,3 +1,4 @@
+import { useRouter } from "@/hooks";
 import { Id } from "@/lib/convex/api";
 import { useItem } from "@/modules/items/_hooks/useItem";
 import { ColorCategory } from "@/modules/items/category.color";
@@ -14,7 +15,7 @@ import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { Platform, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
@@ -56,7 +57,7 @@ const ColorsBlock = () => {
 }
 
 export default function ItemScreen() {
-  const { id } = useLocalSearchParams<{ id: Id<'items'> }>();
+  const { searchParams: { id }, push } = useRouter<{ id: Id<'items'> }>('/item/[id]');
   const { item, isLoading, update } = useItem(id);
 
   if (isLoading || !item) {
@@ -156,11 +157,9 @@ export default function ItemScreen() {
             style={{ marginTop: 4 }}
             variant="primary"
             onPress={() => {
-              router.push({
-                pathname: ROUTES.MODALS.PICK_OUTFIT({
-                  nextPath: ROUTES.PROFILE.OUTFITS,
-                  itemIds: [item._id]
-                }),
+              push(ROUTES.MODALS.PICK_OUTFIT, {
+                redirectTo: ROUTES.PROFILE.OUTFITS,
+                params: { itemIds: [item._id] }
               })
             }}
           >

@@ -25,7 +25,7 @@ export const useAuthActions = () => {
       const { url } = result;
       const code = new URL(url).searchParams.get("code")!;
       await convex.signIn("google", { code });
-      router.replace(route || ROUTES.HOME);
+      router.replace(route || ROUTES.PROFILE.PATH);
     }
 
     setIsLoading(false);
@@ -36,14 +36,14 @@ export const useAuthActions = () => {
   }, [convex]);
 
   const signOut = useCallback(() => {
-    router.push(ROUTES.HOME);
+    router.push(ROUTES.WELCOME.INDEX);
     setTimeout(() => {
       convex.signOut();
       // posthog.reset();
       setTimeout(() => {
         convexAuthStorage.clear();
         try {
-          router.replace(ROUTES.HOME);
+          router.replace(ROUTES.WELCOME.INDEX);
           router.reload();
         } catch { }
         // window.localStorage.clear();

@@ -7,10 +7,11 @@ import { ChevronRight, Loader } from "./icons";
 type Props = {
   onComplete?: () => void;
   startIcon?: ComponentProps<typeof Button>['startIcon'];
+  endIcon?: ComponentProps<typeof Button>['endIcon'];
   children?: ComponentProps<typeof Button>['children'];
 };
 
-export const ButtonSlider = ({ onComplete, startIcon, children }: Props) => {
+export const ButtonSlider = ({ onComplete, startIcon, endIcon, children }: Props) => {
   const [layoutWidth, setLayoutWidth] = useState<number | null>(null);
   const TRACK_HEIGHT = 52;
   const KNOB_WIDTH = 170; // default/fallback
@@ -162,6 +163,7 @@ export const ButtonSlider = ({ onComplete, startIcon, children }: Props) => {
         <Button
           variant="primary"
           startIcon={startIcon}
+          endIcon={endIcon}
           style={{ borderRadius: 20, height: TRACK_HEIGHT }}
         >
           {children}

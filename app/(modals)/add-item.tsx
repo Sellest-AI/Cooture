@@ -1,5 +1,5 @@
-import { useStateEffect } from "@/hooks";
-import { api, Id, useQuery } from "@/lib/convex/client";
+import { ROUTES, useRouter, useStateEffect } from "@/hooks";
+import { api, useQuery } from "@/lib/convex/client";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { Button } from "@ui/button";
 import { CardItem } from "@ui/cards/card-item";
@@ -9,13 +9,14 @@ import { ModalHeader } from "@ui/modal";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { TextInput } from "@ui/text-input";
 import { normalizeArray } from "@utils/convex-allowed";
-import { Href, router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { useEffect } from "react";
 import { View } from "react-native";
 import { Colors } from "theme";
 
 export default function AddItemScreen() {
-  const { nextPath, outfitId, itemIds } = useLocalSearchParams<{ nextPath?: string, outfitId?: Id<'outfits'>, itemIds?: Id<'items'>[] }>();
+  const { params, redirect, dismissTo } = useRouter("/add-item");
+  const { outfitId, itemIds } = params;
   const { data: _items } = useQuery(api.router.items.getAll.authed);
 
   const mode = outfitId ? 'edit' : 'new';
@@ -89,8 +90,17 @@ export default function AddItemScreen() {
         <Button variant="primary"
           disabled={innerItems.length === 0}
           onPress={async () => {
-            if (mode === 'new') { setItems(innerItems) } else { await updateItems(innerItems) };
-            if (nextPath) router.replace(nextPath as Href);
+            if (mode === 'new') {
+              setItems(innerItems)
+              dismissTo(ROUTES.MODALS.NEW_OUTFIT, {
+                redirectTo: redirect,
+                params: { itemIds: innerItems }
+              });
+              return;
+            }
+
+            await updateItems(innerItems);
+            if (redirect) dismissTo(redirect, { params: { itemIds: innerItems } });
             else if (router.canGoBack()) router.back()
           }}
         >

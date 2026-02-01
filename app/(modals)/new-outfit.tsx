@@ -1,3 +1,4 @@
+import { useRouter } from "@/hooks";
 import { api, Id, useQueryCached } from "@/lib/convex/client";
 import { SelectedItemModal } from "@/modules/items/selected-item.modal";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
@@ -9,36 +10,27 @@ import { MasonryList } from "@ui/masonry-list";
 import { ModalHeader } from "@ui/modal";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { TextInput } from "@ui/text-input";
-import { normalizeArray } from "@utils/convex-allowed";
-import { url } from "@utils/routes";
-import { Href, Redirect, router, useLocalSearchParams } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { router } from "expo-router";
+import { useState } from "react";
 import { KeyboardAvoidingView, Platform, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 export default function NewOutfitScreen() {
-  const [selectedItem, setSelectedItem] = useState<Id<'items'> | null>(null);
-  const { nextPath, itemIds: _itemIds, reset: _reset } = useLocalSearchParams<{ nextPath?: string, itemIds?: Id<'items'>[], reset?: string }>();
-  const reset = Boolean(_reset);
-  const itemsParam = useMemo(() => normalizeArray(_itemIds), [_itemIds]);
+  const { reset, setItems, name, setName, items: itemIds, saveOutfit } = useOutfit.New();
+  const { redirect, push, dismissTo } = useRouter("/new-outfit", {
+    onInit: ({ itemIds }) => { setItems(itemIds ?? []) },
+    resetFnc: reset,
+  });
 
-  const { name, setName, items: itemIds, setItems, saveOutfit, reset: resetParams } = useOutfit.New();
+  const [selectedItem, setSelectedItem] = useState<Id<'items'> | null>(null);
   const { data: items } = useQueryCached(api.router.items.getMany.anon, { itemIds });
 
-  useEffect(() => { if (reset) resetParams() }, [reset, resetParams]);
-  useEffect(() => { if (itemsParam.length > 0) { setItems(itemsParam); } }, [itemsParam, setItems]);
-
   if (itemIds.length === 0) {
-    return <>
-      <LoadingBlock />
-      <Redirect
-        href={ROUTES.MODALS.OUTFIT_ADD_ITEM({
-          itemIds: itemsParam,
-          nextPath: ROUTES.MODALS.NEW_OUTFIT({ nextPath })
-        })}
-      />
-    </>;
+    return <useRouter.Redirect
+      href={ROUTES.MODALS.OUTFIT_ADD_ITEM}
+      redirectTo={redirect}
+    />
   }
 
   return (
@@ -74,7 +66,9 @@ export default function NewOutfitScreen() {
                       style={{ marginBottom: 24, paddingTop: 3, }}
                       size={112}
                       onPress={() => {
-                        router.push(ROUTES.MODALS.OUTFIT_ADD_ITEM({}))
+                        push(ROUTES.MODALS.OUTFIT_ADD_ITEM, {
+                          redirectHere: true
+                        })
                       }}
                     />)
                   }
@@ -117,8 +111,8 @@ export default function NewOutfitScreen() {
               onPress={async () => {
                 const outfit = await saveOutfit();
 
-                if (nextPath) {
-                  router.replace(url(nextPath, { outfitId: outfit }) as Href)
+                if (redirect) {
+                  dismissTo(redirect, { params: { outfitId: outfit } });
                 } else if (router.canGoBack()) {
                   router.back()
                 } else {

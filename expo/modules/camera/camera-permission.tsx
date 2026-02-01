@@ -1,0 +1,62 @@
+import { Block } from "@ui/block";
+import { Button } from "@ui/button";
+import { Image } from "@ui/image";
+import { Text } from "@ui/text";
+import { useCameraPermissions } from "expo-camera";
+import { useEffect } from "react";
+import { View, ViewStyle } from "react-native";
+import { Colors } from "theme";
+
+type Props = {
+  style?: ViewStyle;
+  onSuccess?: () => void;
+}
+
+export const CameraPermission = ({ style, onSuccess }: Props) => {
+  const [permission, requestPermission] = useCameraPermissions();
+
+  useEffect(() => { if (permission?.granted) { onSuccess?.() } }, [onSuccess, permission]);
+
+  if (!permission) return null;
+
+  if (!permission.granted) {
+    return (
+      <View style={{
+        flex: 1,
+        backgroundColor: Colors.background,
+        justifyContent: 'center',
+        alignItems: 'center',
+        ...style
+      }}>
+        <Image
+          contentFit="cover"
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            opacity: 0.2
+          }}
+          source={require('assets/backgrounds/dark-gradient.png')}
+        />
+        <Block
+          variant="blur"
+          style={{ borderRadius: 28, padding: 16, paddingTop: 20 }}
+        >
+          <Text.H4 style={{ textAlign: 'center', marginBottom: 8 }} color={Colors.neutral[50]}>
+            Camera Permission Required
+          </Text.H4>
+          <Text.Base style={{ textAlign: 'center', marginBottom: 20 }} color={Colors.neutral[400]}>
+            We need your permission to show the camera
+          </Text.Base>
+          <Button
+            onPress={requestPermission}
+            variant="primary"
+          >
+            Grant Permission
+          </Button>
+        </Block>
+      </View>
+    );
+  }
+
+}

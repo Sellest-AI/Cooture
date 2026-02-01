@@ -1,6 +1,7 @@
 import { ComponentProps, ReactNode, useRef } from "react";
 import { Animated, View, ViewStyle } from "react-native";
 import { Colors } from "theme";
+import { Image } from "./image";
 import { LinearGradient } from "./linear-gradient";
 import { ParallaxScrollContext } from "./parallax-scroll-view.context";
 import { SafeAreaView } from "./safe-area-view";
@@ -9,7 +10,7 @@ type Props = {
   headerSpace?: number;
   headerHeight?: number;
   headerContent: ReactNode;
-  headerBackgroundImage?: ComponentProps<typeof Animated.Image>['source'];
+  headerBackgroundImage?: ComponentProps<typeof Image>['source'];
   headerBackground?: ReactNode;
   children: ReactNode;
   contentContainerStyle?: ViewStyle;
@@ -68,7 +69,7 @@ export const ParallaxScrollView = ({
           {headerBackground}
         </View>}
         {headerBackgroundImage && (
-          <Animated.Image
+          <Image
             source={headerBackgroundImage}
             style={{
               width: '100%',

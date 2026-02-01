@@ -1,25 +1,24 @@
+import { CameraPermission } from "@/modules/camera/camera-permission";
 import { useScan } from "@/modules/scan";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
 import { Check, ImageUp, X } from "@ui/icons";
-import { Image } from "@ui/image";
 import { LinearGradient } from "@ui/linear-gradient";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
-import { CameraView, useCameraPermissions } from "expo-camera";
+import { CameraView } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
-import { useRouter } from "expo-router";
-import { useRef } from "react";
+import { router } from "expo-router";
+import { useRef, useState } from "react";
 import { View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 export default function ScanScreen() {
-  const { push, dismiss, canDismiss } = useRouter();
   const { setImageScanned } = useScan();
   const cameraRef = useRef<CameraView>(null);
 
-  const [permission, requestPermission] = useCameraPermissions();
+  const [hasPermission, setHasPermission] = useState(false);
 
   const handleCapture = async () => {
     if (!cameraRef.current) return;
@@ -28,7 +27,7 @@ export default function ScanScreen() {
       const photo = await cameraRef.current.takePictureAsync();
       if (photo) {
         setImageScanned(photo.uri);
-        push('/scan/remove-background')
+        router.push('/scan/remove-background')
       }
     } catch (error) {
       console.error('Failed to capture image:', error);
@@ -45,50 +44,17 @@ export default function ScanScreen() {
 
       if (!result.canceled && result.assets[0]) {
         setImageScanned(result.assets[0].uri);
-        push('/scan/remove-background');
+        router.push('/scan/remove-background');
       }
     } catch (error) {
       console.error('Failed to pick image:', error);
     }
   };
 
-  if (!permission) {
-    return <View />;
-  }
-
-  if (!permission.granted) {
+  if (!hasPermission)
     return (
-      <View style={{ flex: 1, backgroundColor: Colors.background, justifyContent: 'center', alignItems: 'center' }}>
-        <Image
-          contentFit="cover"
-          style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            opacity: 0.2
-          }}
-          source={require('assets/backgrounds/dark-gradient.png')}
-        />
-        <Block
-          variant="blur"
-          style={{ borderRadius: 28, padding: 16, paddingTop: 20 }}
-        >
-          <Text.H4 style={{ textAlign: 'center', marginBottom: 8 }} color={Colors.neutral[50]}>
-            Camera Permission Required
-          </Text.H4>
-          <Text.Base style={{ textAlign: 'center', marginBottom: 20 }} color={Colors.neutral[400]}>
-            We need your permission to show the camera
-          </Text.Base>
-          <Button
-            onPress={requestPermission}
-            variant="primary"
-          >
-            Grant Permission
-          </Button>
-        </Block>
-      </View>
-    );
-  }
+      <CameraPermission onSuccess={() => setHasPermission(true)} />
+    )
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -150,8 +116,8 @@ export default function ScanScreen() {
           variant="blur"
           style={{ padding: 4 }}
           onPress={() => {
-            if (canDismiss()) { dismiss(1) }
-            else push(ROUTES.TABS.NEW)
+            if (router.canGoBack()) { router.back() }
+            else router.push(ROUTES.TABS.NEW)
           }}
         >
           <X color={Colors.foreground} size={24} />
@@ -173,6 +139,5 @@ export default function ScanScreen() {
           <Check size={24} color={Colors.primary[900]} />
         </Button>
       </SafeAreaView>
-    </View>
-  );
+    </View>);
 }

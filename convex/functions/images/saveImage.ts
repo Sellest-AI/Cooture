@@ -1,7 +1,7 @@
 import { Infer } from "convex/values";
 import { Id } from "../../_generated/dataModel";
-import { IMAGE_TAGS } from "../../schema/images";
 import { MutationCtx } from "../../_generated/server";
+import { IMAGE_TAGS } from "../../schema/images";
 
 export type SaveImageArgs = {
   url: string;
@@ -14,7 +14,7 @@ export type SaveImageArgs = {
   alt?: string;
   hasAlpha?: boolean;
   tags?: Infer<typeof IMAGE_TAGS>;
-  userId: Id<'users'>;
+  userId: Id<'users'> | null;
   object?: {
     x: number;
     y: number;
@@ -44,11 +44,6 @@ export const saveImage = async (ctx: MutationCtx, args: SaveImageArgs) => {
     hasAlpha: args.hasAlpha ?? false,
   });
 
-  const imageUser = await ctx.db.insert('userImages', {
-    imageId: image,
-    userId: args.userId,
-  });
-
   if (args.object) {
     await ctx.db.insert('imageObjects', {
       ...args.object,
@@ -56,6 +51,13 @@ export const saveImage = async (ctx: MutationCtx, args: SaveImageArgs) => {
       imageId: image,
     })
   }
+
+  let imageUser: Id<'userImages'> | null = null;
+  if (args.userId)
+    imageUser = await ctx.db.insert('userImages', {
+      imageId: image,
+      userId: args.userId,
+    });
 
   const imageDb = await ctx.db.get(image);
   if (!imageDb) throw new Error(`Image not found`);

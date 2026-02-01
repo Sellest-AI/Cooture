@@ -1,10 +1,10 @@
 import { Infer, v } from "convex/values";
+import { SavedImage, saveImage } from "../../../functions/images/saveImage";
 import { internalMutation, serverMutation } from "../../../procedures";
-import { saveImage, SavedImage } from "../../../functions/images/saveImage";
 import { IMAGE_TAGS } from "../../../schema/images";
 
 const args = {
-  userId: v.id("users"),
+  userId: v.union(v.null(), v.id("users")),
   images: v.array(v.object({
     url: v.string(),
     key: v.string(),
@@ -27,7 +27,7 @@ const args = {
 const argsObj = v.object(args);
 type Args = Infer<typeof argsObj>;
 
-const sharedHandler = async (ctx: any, args: Args): Promise<Array<SavedImage>> => {
+const sharedHandler = async (ctx: any, args: Args): Promise<SavedImage[]> => {
   const images = await Promise.all(args.images.map((arg) => saveImage(ctx, { ...arg, userId: args.userId })));
 
   // const sizes = images.reduce((acc, img) => acc + img.size, 0)

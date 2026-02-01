@@ -1,3 +1,4 @@
+import { Id } from "@/lib/convex/api";
 import { downloadImageCrossPlatform } from "@/lib/image/client";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
 import { Badge } from "@ui/badge";
@@ -9,7 +10,7 @@ import { Image } from "@ui/image";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Carousel, ICarouselInstance } from "@ui/screen-carousel";
 import { Text } from "@ui/text";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useRef, useState } from "react";
 import { View } from "react-native";
 import { ROUTES } from "routes";
@@ -44,16 +45,20 @@ const Outfit = () => {
 
 type Generation = {
   _id: string,
-  uri?: string,
-  status: 'pending' | 'loading' | 'accepted' | 'rejected',
+  url?: string,
+  status: string,
 }
 
 type Props = {
   onNext: (validated: boolean) => void;
   currentItem: Generation | undefined;
+  items: Generation[];
 }
-const Buttons = ({ onNext, currentItem }: Props) => {
-  const isCurrentLoading = currentItem?.status === 'loading';
+const Buttons = ({ onNext, currentItem, items }: Props) => {
+  const isCurrentLoading = currentItem?.status === 'LOADING';
+  const processed = items.filter((i) => i.status !== 'LOADING').length;
+  const loading = items.filter((i) => i.status === 'LOADING').length;
+
   return (
     <View style={{
       marginTop: 24,
@@ -77,7 +82,7 @@ const Buttons = ({ onNext, currentItem }: Props) => {
           Please be patient...
         </Text.Base>
         <Text.Sm color={Colors.neutral[400]} weight={600} style={{ marginLeft: 12 }}>
-          1/2
+          {processed} / {processed + loading}
         </Text.Sm>
       </Block>}
       {!isCurrentLoading && <View style={{
@@ -96,8 +101,10 @@ const Buttons = ({ onNext, currentItem }: Props) => {
           variant="primary"
           startIcon={Heart}
           onPress={async () => {
-            if (!currentItem?.uri) return;
-            await downloadImageCrossPlatform(currentItem.uri);
+            if (!currentItem?.url) return;
+            try {
+              await downloadImageCrossPlatform(currentItem.url);
+            } catch { }
             onNext(true);
           }}
         >
@@ -109,38 +116,35 @@ const Buttons = ({ onNext, currentItem }: Props) => {
 }
 
 export default function Screen() {
-  const { outfitId } = usePhotoshoot.New();
+  const { id } = useLocalSearchParams<{ id: Id<'generations'> }>();
   const carouselRef = useRef<ICarouselInstance>(null);
 
-  const [items, setItems] = useState<Generation[]>([
-    { _id: '1', uri: require('assets/placeholders/street-model.png'), status: 'pending' },
-    { _id: '2', uri: require('assets/placeholders/bench-model.png'), status: 'pending' },
-    { _id: '3', uri: undefined, status: 'loading' },
-    { _id: '4', uri: undefined, status: 'loading' },
-  ]);
+  const { photoshoot, acceptPrediction, rejectPrediction } = usePhotoshoot(id);
+  const { outfitId } = usePhotoshoot.New();
+
+  const items = (photoshoot?.predictions ?? []).map((p) => ({
+    _id: p.predictionId,
+    url: p.image?.url,
+    status: p.status,
+  }))
 
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  const isCurrentLoading = items[currentIndex].status === 'loading';
+  const isCurrentLoading = items[currentIndex]?.status === 'LOADING';
 
   // Functions
   const next = (validated: boolean) => {
     const currentItem = items[currentIndex];
     if (!currentItem) return;
 
-    setItems((_prev) => {
-      return _prev.map((item, i) => {
-        if (i !== currentIndex) return item;
-        return {
-          ...item,
-          status: validated ? 'accepted' : 'rejected',
-        }
-      })
-    });
+    if (validated) {
+      acceptPrediction(currentItem._id);
+    } else {
+      rejectPrediction(currentItem._id);
+    }
 
     // Find an item that validated items does not already contain
-    const nextItem = items.find(a => a.status === 'pending' && a._id !== currentItem._id) ??
-      items.find((a) => a.status === 'loading' && a._id !== currentItem._id);
+    const nextItem = items.find(a => a.status === 'PENDING' && a._id !== currentItem._id) ??
+      items.find((a) => a.status === 'LOADING' && a._id !== currentItem._id);
 
     // If no next item, and all items are validated or rejected, go back to profile
     if (!nextItem) return router.replace(ROUTES.PROFILE.GENERATIONS);
@@ -191,7 +195,7 @@ export default function Screen() {
       </View>
       <View style={{ flex: 1, justifyContent: 'center' }}>
         <View style={{ flex: 1, maxHeight: 400, overflow: 'visible' }}>
-          <Carousel
+          {items.length > 0 && <Carousel
             defaultIndex={currentIndex}
             ref={carouselRef}
             onProgressChange={(_, v) => {
@@ -202,17 +206,18 @@ export default function Screen() {
             items={items.map((s, i) => (
               <ImageGeneration
                 key={s._id}
-                loading={s.status === 'loading'}
-                source={s.uri}
-                text={s.status === 'loading' ? "Generating..." : "Ready in 13s."}
+                loading={s.status === 'LOADING'}
+                source={s.url}
+                text={s.status === 'LOADING' ? "Generating..." : "Ready in 13s."}
                 textScale={1.2}
-                onDownload={s.uri ? () => downloadImageCrossPlatform(s.uri!) : undefined}
+                onDownload={s.url ? () => downloadImageCrossPlatform(s.url!) : undefined}
               />
             ))}
-          />
+          />}
         </View>
       </View>
       <Buttons
+        items={items}
         currentItem={items[currentIndex]}
         onNext={next}
       />

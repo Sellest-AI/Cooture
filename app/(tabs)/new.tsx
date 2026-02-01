@@ -1,5 +1,7 @@
+import { useRouter } from "@/hooks";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Block } from "@ui/block";
+import { Button } from "@ui/button";
 import { Collection } from "@ui/cards";
 import { ArrowUpRight, Bell, ScanLine } from "@ui/icons";
 import { Link } from "@ui/link";
@@ -12,6 +14,8 @@ import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 export default function Screen() {
+  const { push } = useRouter('/new');
+
   return (
     <ScrollView
       style={{ flex: 1 }}
@@ -72,10 +76,9 @@ export default function Screen() {
             backgroundColor: Colors.secondary[500],
           }}
           onPress={() => {
-            router.push(ROUTES.MODALS.NEW_OUTFIT({
-              nextPath: ROUTES.PROFILE.OUTFITS,
-              reset: true
-            }))
+            push(ROUTES.MODALS.NEW_OUTFIT, {
+              redirectTo: ROUTES.PROFILE.OUTFITS,
+            });
           }}
         >
           <ArrowUpRight size={40} color={Colors.primary[900]} />
@@ -135,6 +138,13 @@ export default function Screen() {
           ))}
         </ScrollView>
       </View>
+      <Button
+        variant="blur"
+        onPress={() => router.push('/presets/new')}
+        style={{ marginTop: 12 }}
+      >
+        New preset
+      </Button>
     </ScrollView>
   )
 }

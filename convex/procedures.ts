@@ -1,15 +1,15 @@
-import { customQuery, customCtx, customMutation, customAction } from "convex-helpers/server/customFunctions";
+import { customAction, customCtx, customMutation, customQuery } from "convex-helpers/server/customFunctions";
 // import { wrapDatabaseReader } from "convex-helpers/server/rowLevelSecurity";
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { action, ActionCtx, DatabaseReader, mutation, query } from "./_generated/server";
 import { Auth } from "convex/server";
 import { v } from "convex/values";
-import { env } from "./env";
 import { internal } from "./_generated/api";
 import { Doc, Id } from "./_generated/dataModel";
+import { action, ActionCtx, DatabaseReader, mutation, query } from "./_generated/server";
+import { env } from "./env";
 
-export type { MutationCtx, QueryCtx, ActionCtx } from './_generated/server';
-export { internalQuery, internalMutation } from "./_generated/server";
+export { internalMutation, internalQuery } from "./_generated/server";
+export type { ActionCtx, MutationCtx, QueryCtx } from './_generated/server';
 export const publicQuery = query;
 
 // export { internal, api } from './_generated/api'; // CIRCULAR DEPENDENCY
@@ -106,6 +106,12 @@ export const serverAction = customAction(action, {
     return { ctx, args: {} };
   },
 })
+
+export const adminAction = customAction(action, customCtx(async (ctx) => {
+  const data = await userCheckOrThrow(ctx);
+  if (data.user.role !== 'ADMIN') throw new Error("Unauthorized");
+  return data;
+}))
 
 export const adminQuery = customQuery(query, customCtx(async (ctx) => {
   const data = await userCheckOrThrow(ctx);

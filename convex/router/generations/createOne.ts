@@ -1,8 +1,10 @@
 import { v } from "convex/values";
-import { authMutation } from "../../procedures";
+import { Id } from "../../_generated/dataModel";
+import { internalMutation } from "../../procedures";
 
-export const authed = authMutation({
+export const _internal = internalMutation({
   args: {
+    userId: v.id("users"),
     predictionIds: v.array(v.string()),
     preset: v.optional(v.object({
       presetId: v.id("presets"),
@@ -10,9 +12,7 @@ export const authed = authMutation({
       prompts: v.array(v.string()),
     })),
   },
-  handler: async (ctx, { predictionIds, preset }) => {
-    const { userId } = ctx;
-
+  handler: async (ctx, { userId, predictionIds, preset }): Promise<Id<'generations'>> => {
     const generationId = await ctx.db.insert("generations", {
       userId,
       status: "LOADING",

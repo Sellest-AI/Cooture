@@ -56,20 +56,49 @@ const openrouterGrok41fast = {
   }
 }
 
+const openrouterGemini3pro = {
+  pricing: {
+    inputTokens: 0.5,
+    outputTokens: 3,
+  },
+  providerOptions: (options: { effort: 'none' | 'medium' | "high" }) => ({
+    openrouter: {
+      reasoning: options.effort === 'none' ? {
+        enabled: false,
+        effort: 'none'
+      } : (options.effort === 'high' ? {
+        enabled: true,
+        effort: "high"
+      } : {
+        enabled: true,
+        effort: "medium"
+      }),
+      provider: {
+        only: ["google-ai-studio", "google-vertex"],
+        order: ["google-ai-studio", "google-vertex"],
+        allow_fallbacks: true,
+      }
+    }
+  })
+}
+
 const openrouterGemini3flash = {
   pricing: {
     inputTokens: 0.5,
     outputTokens: 3,
   },
-  providerOptions: (options: { effort: 'none' | 'medium' }) => ({
+  providerOptions: (options: { effort: 'none' | 'medium' | "high" }) => ({
     openrouter: {
       reasoning: options.effort === 'none' ? {
         enabled: false,
         effort: 'none'
+      } : (options.effort === 'high' ? {
+        enabled: true,
+        effort: "high"
       } : {
         enabled: true,
         effort: "medium"
-      },
+      }),
       provider: {
         only: ["google-ai-studio", "google-vertex"],
         order: ["google-ai-studio", "google-vertex"],
@@ -100,6 +129,7 @@ const openrouterGemini25flash = {
 }
 export const providerOptions = {
   openrouter: {
+    gemini3pro: openrouterGemini3pro,
     gemini3flash: openrouterGemini3flash,
     gemini25flash: openrouterGemini25flash,
     gptOss120b: openrouterGptOss120b,

@@ -8,16 +8,18 @@ export const getPortraits = async (ctx: QueryCtx, userId: Id<'users'>) => {
 
   if (!portraits) { return null; }
 
-  const [frontImage, sideImage, topAngleImage] = await Promise.all([
+  const [frontImage, sideImage, smileImage] = await Promise.all([
     getImage(ctx, portraits.frontImageId),
     getImage(ctx, portraits.sideImageId),
-    getImage(ctx, portraits.topAngleImageId),
+    getImage(ctx, portraits.smileImageId),
   ])
+
+  if (!frontImage || !sideImage || !smileImage) { return null; }
 
   return {
     _id: portraits._id,
     frontImage,
     sideImage,
-    topAngleImage,
+    smileImage,
   };
 }

@@ -36,6 +36,7 @@ export const userPortraits = defineTable({
   userId: v.id('users'),
   frontImageId: v.id('images'),
   sideImageId: v.id('images'),
-  topAngleImageId: v.id('images'),
+  smileImageId: v.id('images'),
+  // topAngleImageId: v.id('images'),
 })
   .index("by_user_id", ["userId"])

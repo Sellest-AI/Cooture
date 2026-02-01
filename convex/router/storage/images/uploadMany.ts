@@ -14,7 +14,7 @@ import { IMAGE_TAGS } from "../../../schema/images";
 import { uploadSingleArgs } from "./uploadOne";
 
 type Extra = {
-  userId: Id<'users'>,
+  userId: Id<'users'> | null,
   tags?: Infer<typeof IMAGE_TAGS>,
   object?: {
     baseImageId: Id<'images'>,
@@ -38,7 +38,7 @@ const uploadImage = async (ctx: ActionCtx, base64orUrl: string, extra: Extra) =>
 
   console.time('StorageCloud.uploadFile');
   // UPLOAD FILE
-  const folder = StorageCloud.FOLDERS.USER(userId)
+  const folder = userId ? StorageCloud.FOLDERS.USER(userId) : StorageCloud.FOLDERS.PUBLIC;
   const uploadedFile = await StorageCloud.uploadFile(compressedImage, folder);
   console.timeEnd('StorageCloud.uploadFile');
 
@@ -63,7 +63,7 @@ const imagesArgs = v.array(v.object(uploadSingleArgs));
 
 type SharedArgs = {
   images: Infer<typeof imagesArgs>,
-  userId: Id<'users'>,
+  userId: Id<'users'> | null,
 }
 
 export const uploadManySharedHandler = async (ctx: ActionCtx, args: SharedArgs): Promise<SavedImage[]> => {
@@ -107,6 +107,6 @@ export const authed = authAction({
 });
 
 export const _internal = internalAction({
-  args: { images: v.array(v.object(uploadSingleArgs)), userId: v.id('users') },
+  args: { images: v.array(v.object(uploadSingleArgs)), userId: v.union(v.null(), v.id('users')) },
   handler: uploadManySharedHandler
 });

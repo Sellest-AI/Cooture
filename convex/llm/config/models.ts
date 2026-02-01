@@ -1,12 +1,13 @@
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
-import { providerOptions } from "./providers";
 import { env } from "../../env";
+import { providerOptions } from "./providers";
 
 const openrouter = createOpenRouter({
   apiKey: env.OPENROUTER_API_KEY,
 });
 
 // Perfect
+const gemini3pro = openrouter.chat("google/gemini-3-pro-preview");
 const gemini3flash = openrouter.chat("google/gemini-3-flash-preview");
 
 // Best Price / Performance balance
@@ -33,6 +34,10 @@ export const models = {
   },
   vision: {
     smartest: {
+      model: gemini3pro,
+      ...providerOptions.openrouter.gemini3pro,
+    },
+    smart: {
       model: gemini3flash,
       ...providerOptions.openrouter.gemini3flash,
     },

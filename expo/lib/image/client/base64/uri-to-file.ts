@@ -2,6 +2,29 @@ import { File } from 'expo-file-system';
 import { nanoid } from 'nanoid';
 import { getImageDimensions } from '../metadata';
 
+function getExtensionFromMimeType(mimeType: string) {
+  switch (mimeType) {
+    case 'image/jpeg':
+      return 'jpg';
+    case 'image/png':
+      return 'png';
+    case 'image/gif':
+      return 'gif';
+    case 'image/webp':
+      return 'webp';
+    case 'video/mp4':
+      return 'mp4';
+    case 'video/quicktime':
+      return 'mov';
+    case 'application/pdf':
+      return 'pdf';
+    case 'text/plain':
+      return 'txt';
+    default:
+      return '';
+  }
+}
+
 function getMimeType(uri: string) {
   const extension = uri.split('.').pop()?.toLowerCase();
   switch (extension) {
@@ -55,6 +78,7 @@ export async function uriToImage(uri: string) {
     name,
     type,
     size: fileInfo.size,
+    format: getExtensionFromMimeType(type),
     width,
     height,
     // Optional: convert to Blob if needed

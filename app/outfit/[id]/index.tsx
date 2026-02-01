@@ -1,4 +1,4 @@
-import { useStateEffect } from "@/hooks";
+import { useRouter, useStateEffect } from "@/hooks";
 import { Id } from "@/lib/convex/api";
 import { SelectedItemModal } from "@/modules/items/selected-item.modal";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
@@ -11,14 +11,14 @@ import { MasonryList } from "@ui/masonry-list";
 import { ModalHeader } from "@ui/modal";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { TextInput } from "@ui/text-input";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import { useMemo, useState } from "react";
 import { Dimensions, Keyboard, KeyboardAvoidingView, Platform, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 export default function ItemScreen() {
-  const { id } = useLocalSearchParams<{ id: Id<'outfits'> }>();
+  const { push, searchParams: { id } } = useRouter<{ id: Id<'outfits'> }>('/outfit/[id]');
   const { outfit, updateItems, updateName, remove } = useOutfit(id);
 
   const [selectedItem, setSelectedItem] = useState<Id<'items'> | null>(null);
@@ -97,7 +97,9 @@ export default function ItemScreen() {
                       size={112}
                       onPress={() => {
                         updateItems(items.map((i) => i._id));
-                        router.push(ROUTES.MODALS.OUTFIT_ADD_ITEM({ outfitId: id }))
+                        push(ROUTES.MODALS.OUTFIT_ADD_ITEM, {
+                          params: { outfitId: id }
+                        })
                       }}
                     />)
                   }

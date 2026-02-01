@@ -30,9 +30,9 @@ export const getBlockColors = (variant: Props['variant'], disabled?: boolean) =>
       };
     case 'secondary':
       return {
-        backgroundColor: Colors.blur.dark,
-        borderColor: Colors.blur.medium,
-        textColor: Colors.neutral[50],
+        backgroundColor: Colors.secondary[500],
+        borderColor: Colors.secondary[200],
+        textColor: Colors.secondary[900],
       };
     case 'blur':
       return {

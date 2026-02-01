@@ -1,9 +1,13 @@
+import { useRouter } from "@/hooks";
+import { api, useAction } from "@/lib/convex/client";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
+import { usePortraits } from "@/modules/profiles/_hooks/usePortraits";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
+import { ButtonSlider } from "@ui/button.slider";
 import { Col, Grid, Row } from "@ui/grid";
-import { ArrowRight, Pencil, Squirish } from "@ui/icons";
+import { Flame, Pencil, Squirish } from "@ui/icons";
 import { Image } from "@ui/image";
 import { Text } from "@ui/text";
 import React, { useMemo } from "react";
@@ -85,27 +89,36 @@ const OutfitGrid = ({ items, style }: { items: Items, style?: ViewStyle }) => {
 }
 
 const Portrait = ({ style }: { style?: ViewStyle }) => {
-  const HEIGHT = style?.height ?? 350;
+  const { frontImage, sideImage, smileImage, isPending } = usePortraits();
+  const { push } = useRouter('/photoshoot/create/recap');
+
+  const HEIGHT = style?.height ?? 256;
+
+  if (!frontImage && !isPending) return <useRouter.Redirect
+    href={ROUTES.SETTINGS.UPDATE_PORTRAITS}
+    redirectTo={ROUTES.PHOTOSHOOT.RECAP}
+  />
+
   return (
     <>
       <Grid style={{ width: '100%', ...style, height: HEIGHT }}>
-        <Col style={{ height: HEIGHT }}>
+        <Col style={{ height: HEIGHT, borderRadius: 64, backgroundColor: Colors.blur.medium }}>
           <Image
-            source={require('assets/placeholders/street-model.png')}
+            source={frontImage?.url}
             style={{ borderRadius: 64, flex: 1, borderWidth: 1, borderColor: Colors.blur.medium }}
           />
         </Col>
         <Col style={{ height: HEIGHT, marginLeft: 12, minWidth: 120, width: 120 }}>
-          <Row style={{ marginBottom: 12 }}>
+          <Row style={{ marginBottom: 12, borderRadius: 48, backgroundColor: Colors.blur.medium }}>
             <Image
-              source={require('assets/placeholders/street-model.png')}
-              style={{ borderRadius: 64, flex: 1, borderWidth: 1, borderColor: Colors.blur.medium }}
+              source={sideImage?.sizes.medium.url}
+              style={{ borderRadius: 48, flex: 1, borderWidth: 1, borderColor: Colors.blur.medium }}
             />
           </Row>
-          <Row>
+          <Row style={{ borderRadius: 48, backgroundColor: Colors.blur.medium }}>
             <Image
-              source={require('assets/placeholders/street-model.png')}
-              style={{ borderRadius: 64, flex: 1, borderWidth: 1, borderColor: Colors.blur.medium }}
+              source={smileImage?.sizes.medium.url}
+              style={{ borderRadius: 48, flex: 1, borderWidth: 1, borderColor: Colors.blur.medium }}
             />
           </Row>
         </Col>
@@ -114,6 +127,11 @@ const Portrait = ({ style }: { style?: ViewStyle }) => {
         variant="blur"
         startIcon={Pencil}
         style={{ marginTop: 12 }}
+        onPress={() => {
+          push(ROUTES.SETTINGS.UPDATE_PORTRAITS, {
+            redirectHere: true
+          })
+        }}
       >
         Edit my portraits
       </Button>
@@ -122,26 +140,16 @@ const Portrait = ({ style }: { style?: ViewStyle }) => {
 }
 
 export default function Screen() {
-  const { outfit } = usePhotoshoot.New();
+  const { outfit, outfitId, presetId, preset, setOutfitId, reset } = usePhotoshoot.New();
+  const { push, replace } = useRouter('/photoshoot/create/recap', {
+    onInit: ({ outfitId }) => { setOutfitId(outfitId ?? null) },
+    resetFnc: reset,
+  });
+
+  const { action } = useAction(api.llm.triggers.photoshoot.authed);
 
   return (
     <ScrollView style={{ flex: 1, padding: 12, backgroundColor: Colors.background }}>
-      {outfit && (
-        <Block
-          variant="blur"
-          style={{
-            borderRadius: 32,
-            paddingHorizontal: 16,
-            paddingVertical: 20,
-            gap: 12,
-            marginBottom: 8,
-          }}
-        >
-          <Text.H4 color={Colors.neutral[50]}>Outfit</Text.H4>
-          <Text.Base color={Colors.neutral[400]}>Make sure you selected the right outfit.</Text.Base>
-          <OutfitGrid items={outfit.items} />
-        </Block>
-      )}
       <Block
         variant="blur"
         style={{
@@ -155,14 +163,81 @@ export default function Screen() {
         <Text.Base color={Colors.neutral[400]}>Make sure your portrait images are up to date.</Text.Base>
         <Portrait style={{ marginTop: 16 }} />
       </Block>
-      <Button
-        style={{ marginTop: 12 }}
-        variant="primary"
-        href={ROUTES.PHOTOSHOOT.PRESETS}
-        endIcon={ArrowRight}
+      {preset && <Block
+        variant="blur"
+        style={{
+          borderRadius: 32,
+          paddingHorizontal: 16,
+          paddingVertical: 20,
+          marginTop: 8,
+          gap: 12,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}
       >
-        Next step
-      </Button>
+        <View style={{ gap: 6 }}>
+          <Text.H4 color={Colors.neutral[50]} numberOfLines={1}>{preset?.name}</Text.H4>
+          <Text.Base color={Colors.neutral[400]} numberOfLines={1} weight={600}>Preset</Text.Base>
+        </View>
+        <Image
+          style={{
+            width: 96,
+            height: 52,
+            borderRadius: 20
+          }}
+          source={preset?.cover?.sizes.medium.url}
+        />
+      </Block>}
+      <Block
+        variant="blur"
+        style={{
+          borderRadius: 32,
+          paddingHorizontal: 16,
+          paddingVertical: 20,
+          gap: 12,
+          marginTop: 8,
+        }}
+      >
+        <Text.H4 color={Colors.neutral[50]}>Custom Outfit</Text.H4>
+        {outfit && <Text.Base color={Colors.neutral[400]}>
+          This outfit will be used for your photoshoot.
+        </Text.Base>}
+        {!outfit && <Text.Base color={Colors.neutral[400]}>
+          We&apos;ll use the model&apos;s default wardrobe instead.
+        </Text.Base>}
+        {outfit && <OutfitGrid items={outfit.items} />}
+        <Button
+          style={{ marginTop: 8 }}
+          variant="blur"
+          onPress={() => {
+            push(ROUTES.MODALS.PICK_OUTFIT, {
+              params: { canSkip: true },
+              redirectHere: true,
+            });
+          }}
+        >
+          {outfit ? 'Change outfit' : 'Select an outfit'}
+        </Button>
+      </Block>
+      <View style={{ flex: 1, justifyContent: 'flex-end', marginTop: 12 }}>
+        <ButtonSlider
+          startIcon={Flame}
+          onComplete={async () => {
+            if (!presetId) return;
+
+            const generationId = await action({
+              outfitId: outfitId ?? undefined,
+              presetId: presetId,
+            });
+
+            replace(ROUTES.PHOTOSHOOT.GENERATIONS.PATH, {
+              pathParams: { id: generationId },
+            })
+          }}
+        >
+          Slide to generate
+        </ButtonSlider>
+      </View>
       {Platform.OS !== 'web' && <View style={{ height: 12 }} />}
     </ScrollView>
   );

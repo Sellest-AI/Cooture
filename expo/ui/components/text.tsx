@@ -1,5 +1,5 @@
 import { cn } from "@ui/utils";
-import { Text as NativeText, Platform, TextStyle } from "react-native";
+import { Text as NativeText, Platform, StyleSheet, TextStyle } from "react-native";
 import { Texts } from "theme";
 
 type Props = {
@@ -29,7 +29,7 @@ const Max = ({ children, color, weight, className, style, ...props }: Props) => 
   return (
     <NativeText
       className={cn(className)}
-      style={{ ...Texts.max, ...fontWeight, color, ...style }}
+      style={{ ...Texts.max, ...fontWeight, color, ...styles.shared, ...style }}
       {...props}
       {...textBreakProps}
     >
@@ -50,7 +50,7 @@ const H1 = ({ children, color, weight, className, style, type, ...props }: Props
   return (
     <NativeText
       className={cn(className)}
-      style={{ ...styleToApply, ...fontWeight, color, ...style, overflow: 'visible' }}
+      style={{ ...styleToApply, ...fontWeight, color, ...styles.shared, ...style }}
       {...props}
       {...textBreakProps}
     >
@@ -71,7 +71,7 @@ const H3 = ({ children, color, weight, className, style, type, ...props }: Props
   return (
     <NativeText
       className={cn(className)}
-      style={{ ...styleToApply, ...fontWeight, color, ...style }}
+      style={{ ...styleToApply, ...fontWeight, color, ...styles.shared, ...style }}
       {...props}
       {...textBreakProps}
     >
@@ -90,7 +90,7 @@ const H4 = ({ children, color, weight, className, style, ...props }: Props) => {
   return (
     <NativeText
       className={cn(className)}
-      style={{ ...Texts.h4, ...fontWeight, color, ...style }}
+      style={{ ...Texts.h4, ...fontWeight, color, ...styles.shared, ...style }}
       {...props}
       {...textBreakProps}
     >
@@ -110,7 +110,7 @@ const Lg = ({ children, color, weight, className, style, ...props }: Props) => {
   return (
     <NativeText
       className={cn(className)}
-      style={{ ...Texts.lg, ...fontWeight, color, ...style }}
+      style={{ ...Texts.lg, ...fontWeight, color, ...styles.shared, ...style }}
       {...props}
       {...textBreakProps}
     >
@@ -130,7 +130,7 @@ const Base = ({ children, color, weight, className, style, ...props }: Props) =>
   return (
     <NativeText
       className={cn(className)}
-      style={{ ...Texts.base, ...fontWeight, color, ...style }}
+      style={{ ...Texts.base, ...fontWeight, color, ...styles.shared, ...style }}
       {...props}
       {...textBreakProps}
     >
@@ -150,7 +150,7 @@ const Sm = ({ children, color, weight, className, style, ...props }: Props) => {
   return (
     <NativeText
       className={cn(className)}
-      style={{ ...Texts.sm, ...fontWeight, color, ...style }}
+      style={{ ...Texts.sm, ...fontWeight, color, ...styles.shared, ...style }}
       {...props}
       {...textBreakProps}
     >
@@ -158,6 +158,12 @@ const Sm = ({ children, color, weight, className, style, ...props }: Props) => {
     </NativeText>
   )
 }
+
+const styles = StyleSheet.create({
+  shared: {
+    overflow: 'visible',
+  }
+})
 
 Text.Max = Max;
 Text.H1 = H1;

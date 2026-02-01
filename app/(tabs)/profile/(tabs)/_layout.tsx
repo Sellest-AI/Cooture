@@ -1,4 +1,5 @@
 import { useAccount } from "@/lib/convex/auth";
+import { api, useQuery } from "@/lib/convex/client";
 import { QuickActions } from "@/modules/profiles/quick-actions";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Block } from "@ui/block";
@@ -21,6 +22,7 @@ export const unstable_settings = {
 const TABS = ['generations', 'outfits', 'items'] as const;
 
 export default function TabsLayout() {
+  const { data: _generations } = useQuery(api.router.generations.getAll.authed);
   const { user } = useAccount();
 
   const segments = useSegments();
@@ -40,11 +42,13 @@ export default function TabsLayout() {
 
   if (!user) return null;
 
+  const generations = (_generations ?? []).filter((g) => g.cover);
+
   return (
     <ParallaxScrollView
       headerHeight={372}
       headerSpace={120}
-      headerBackgroundImage={require('assets/placeholders/home-model.png')}
+      headerBackgroundImage={generations[0]?.cover?.url}
       contentContainerStyle={{ paddingBottom: TOTAL_TABS_SPACE }}
       headerContent={
         <View
@@ -121,12 +125,7 @@ export default function TabsLayout() {
             padding: 12
           }}
         >
-          {[
-            require('assets/placeholders/street-model.png'),
-            require('assets/placeholders/can-model.png'),
-            require('assets/placeholders/snow-model.png'),
-            require('assets/placeholders/home-model.png'),
-          ].map((src, i, arr) => {
+          {generations.slice(0, 4).map((item, i, arr) => {
             const isLast = i === arr.length - 1;
             return (
               <View
@@ -143,7 +142,7 @@ export default function TabsLayout() {
                 }}
               >
                 <Image
-                  source={src}
+                  source={item.cover?.sizes.thumbnail.url}
                   blurRadius={isLast ? Platform.OS === 'android' ? 30 : 2 : 0}
                   style={{
                     flex: 1,

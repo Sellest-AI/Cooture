@@ -1,13 +1,14 @@
+import { ROUTES, useRouter } from '@/hooks';
 import { Text } from '@ui/text';
-import { router } from 'expo-router';
 import { ArrowUpRight, Camera } from "lucide-react-native";
 import { Pressable, StyleSheet, View, ViewProps } from "react-native";
-import { ROUTES } from 'routes';
 import { Colors } from "theme";
 
 type Props = ViewProps;
 
 export const QuickActions = ({ style, ...props }: Props) => {
+  const { push } = useRouter()
+
   return (
     <View
       {...props}
@@ -25,17 +26,14 @@ export const QuickActions = ({ style, ...props }: Props) => {
           backgroundColor: Colors.primary[500],
         }}
         onPress={() => {
-          router.push(ROUTES.MODALS.PICK_OUTFIT({
-            canSkip: true,
-            nextPath: ROUTES.PHOTOSHOOT.NEW
-          }))
+          push(ROUTES.PHOTOSHOOT.NEW)
         }}
       >
         <Camera size={40} color={Colors.primary[900]} />
         <Text.Lg color={Colors.primary[900]}>Photoshoot</Text.Lg>
       </Pressable>
       <Pressable
-        onPress={() => router.push(ROUTES.MODALS.NEW_OUTFIT({ reset: true }))}
+        onPress={() => push(ROUTES.MODALS.NEW_OUTFIT)}
         style={{
           ...styles.headerButtons,
           borderTopColor: Colors.secondary[200],
