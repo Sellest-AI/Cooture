@@ -20,16 +20,17 @@ export const Text = () => {
 
 const Max = ({ children, color, weight, className, style, ...props }: Props) => {
   const textBreakProps = style?.textBalance ? {
-    textBreakStrategy: Platform.OS === 'android' ? 'balanced' as const : undefined,
+    textBreakStrategy: 'balanced' as const,
     lineBreakStrategyIOS: Platform.OS === 'ios' ? 'push-out' as const : undefined,
   } : {};
 
   const fontWeight = weight ? { fontWeight: weight } : {};
+  const overflow = props.numberOfLines ? 'hidden' : undefined;
 
   return (
     <NativeText
       className={cn(className)}
-      style={{ ...Texts.max, ...fontWeight, color, ...styles.shared, ...style }}
+      style={{ ...Texts.max, ...fontWeight, color, ...styles.shared, overflow, ...style }}
       {...props}
       {...textBreakProps}
     >
@@ -41,16 +42,17 @@ const Max = ({ children, color, weight, className, style, ...props }: Props) => 
 const H1 = ({ children, color, weight, className, style, type, ...props }: PropsExtended & { textBalance?: boolean }) => {
   const styleToApply = type === 'alt' ? Texts.h1.alt : Texts.h1;
   const textBreakProps = style?.textBalance ? {
-    textBreakStrategy: Platform.OS === 'android' ? 'balanced' as const : undefined,
+    textBreakStrategy: 'balanced' as const,
     lineBreakStrategyIOS: Platform.OS === 'ios' ? 'push-out' as const : undefined,
   } : {};
 
   const fontWeight = weight ? { fontWeight: weight } : {};
+  const overflow = props.numberOfLines ? 'hidden' : undefined;
 
   return (
     <NativeText
       className={cn(className)}
-      style={{ ...styleToApply, ...fontWeight, color, ...styles.shared, ...style }}
+      style={{ ...styleToApply, ...fontWeight, color, ...styles.shared, overflow, ...style }}
       {...props}
       {...textBreakProps}
     >
@@ -62,16 +64,17 @@ const H1 = ({ children, color, weight, className, style, type, ...props }: Props
 const H3 = ({ children, color, weight, className, style, type, ...props }: PropsExtended & { textBalance?: boolean }) => {
   const styleToApply = type === 'alt' ? Texts.h3.alt : Texts.h3;
   const textBreakProps = style?.textBalance ? {
-    textBreakStrategy: Platform.OS === 'android' ? 'balanced' as const : undefined,
+    textBreakStrategy: 'balanced' as const,
     lineBreakStrategyIOS: Platform.OS === 'ios' ? 'push-out' as const : undefined,
   } : {};
 
   const fontWeight = weight ? { fontWeight: weight } : {};
+  const overflow = props.numberOfLines ? 'hidden' : undefined;
 
   return (
     <NativeText
       className={cn(className)}
-      style={{ ...styleToApply, ...fontWeight, color, ...styles.shared, ...style }}
+      style={{ ...styleToApply, ...fontWeight, color, ...styles.shared, overflow, ...style }}
       {...props}
       {...textBreakProps}
     >
@@ -82,15 +85,16 @@ const H3 = ({ children, color, weight, className, style, type, ...props }: Props
 
 const H4 = ({ children, color, weight, className, style, ...props }: Props) => {
   const textBreakProps = style?.textBalance ? {
-    textBreakStrategy: Platform.OS === 'android' ? 'balanced' as const : undefined,
+    textBreakStrategy: 'balanced' as const,
     lineBreakStrategyIOS: Platform.OS === 'ios' ? 'push-out' as const : undefined,
   } : {};
   const fontWeight = weight ? { fontWeight: weight } : {};
+  const overflow = props.numberOfLines ? 'hidden' : undefined;
 
   return (
     <NativeText
       className={cn(className)}
-      style={{ ...Texts.h4, ...fontWeight, color, ...styles.shared, ...style }}
+      style={{ ...Texts.h4, ...fontWeight, color, ...styles.shared, overflow, ...style }}
       {...props}
       {...textBreakProps}
     >
@@ -101,16 +105,17 @@ const H4 = ({ children, color, weight, className, style, ...props }: Props) => {
 
 const Lg = ({ children, color, weight, className, style, ...props }: Props) => {
   const textBreakProps = style?.textBalance ? {
-    textBreakStrategy: Platform.OS === 'android' ? 'balanced' as const : undefined,
+    textBreakStrategy: 'balanced' as const,
     lineBreakStrategyIOS: Platform.OS === 'ios' ? 'push-out' as const : undefined,
   } : {};
 
   const fontWeight = weight ? { fontWeight: weight } : {};
+  const overflow = props.numberOfLines ? 'hidden' : undefined;
 
   return (
     <NativeText
       className={cn(className)}
-      style={{ ...Texts.lg, ...fontWeight, color, ...styles.shared, ...style }}
+      style={{ ...Texts.lg, ...fontWeight, color, ...styles.shared, overflow, ...style }}
       {...props}
       {...textBreakProps}
     >
@@ -121,16 +126,17 @@ const Lg = ({ children, color, weight, className, style, ...props }: Props) => {
 
 const Base = ({ children, color, weight, className, style, ...props }: Props) => {
   const textBreakProps = style?.textBalance ? {
-    textBreakStrategy: Platform.OS === 'android' ? 'balanced' as const : undefined,
+    textBreakStrategy: 'balanced' as const,
     lineBreakStrategyIOS: Platform.OS === 'ios' ? 'push-out' as const : undefined,
   } : {};
 
   const fontWeight = weight ? { fontWeight: weight } : {};
+  const overflow = props.numberOfLines ? 'hidden' : undefined;
 
   return (
     <NativeText
       className={cn(className)}
-      style={{ ...Texts.base, ...fontWeight, color, ...styles.shared, ...style }}
+      style={{ ...Texts.base, ...fontWeight, color, ...styles.shared, overflow, ...style }}
       {...props}
       {...textBreakProps}
     >
@@ -141,16 +147,17 @@ const Base = ({ children, color, weight, className, style, ...props }: Props) =>
 
 const Sm = ({ children, color, weight, className, style, ...props }: Props) => {
   const textBreakProps = style?.textBalance ? {
-    textBreakStrategy: Platform.OS === 'android' ? 'balanced' as const : undefined,
+    textBreakStrategy: 'balanced' as const,
     lineBreakStrategyIOS: Platform.OS === 'ios' ? 'push-out' as const : undefined,
   } : {};
 
   const fontWeight = weight ? { fontWeight: weight } : {};
+  const overflow = props.numberOfLines ? 'hidden' : undefined;
 
   return (
     <NativeText
       className={cn(className)}
-      style={{ ...Texts.sm, ...fontWeight, color, ...styles.shared, ...style }}
+      style={{ ...Texts.sm, ...fontWeight, color, ...styles.shared, overflow, ...style }}
       {...props}
       {...textBreakProps}
     >

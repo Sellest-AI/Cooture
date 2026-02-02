@@ -3,7 +3,7 @@ import { ComponentProps } from 'react';
 import { Platform, ScrollView, ViewStyle } from "react-native";
 
 type Props = {
-  style: ViewStyle,
+  style?: ViewStyle,
 } & Omit<ComponentProps<typeof ScrollView>, 'style'>;
 
 export const SafeScrollView = ({ style, children, contentContainerStyle, ...props }: Props) => {
@@ -11,7 +11,9 @@ export const SafeScrollView = ({ style, children, contentContainerStyle, ...prop
 
   const fallbackPadding =
     Platform.OS === 'web' ? 0 :
-      Number(style.padding ?? style.paddingBottom ?? 0);
+      Number(style?.paddingBottom ?? style?.padding ?? 0);
+
+  const contentPaddingBottom = (contentContainerStyle as ViewStyle)?.paddingBottom;
 
   return (
     <KeyboardAvoidingView
@@ -26,7 +28,7 @@ export const SafeScrollView = ({ style, children, contentContainerStyle, ...prop
             style={{ ...style }}
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={[contentContainerStyle, {
-              paddingBottom: Math.max(fallbackPadding * 2, insets.bottom),
+              paddingBottom: contentPaddingBottom ?? Math.max(fallbackPadding * 2, insets.bottom),
             }]}
           >
             {children}

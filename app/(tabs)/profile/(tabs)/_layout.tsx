@@ -1,17 +1,20 @@
 import { useAccount } from "@/lib/convex/auth";
 import { api, useQuery } from "@/lib/convex/client";
+import { PremiumBlock } from "@/modules/premium/premium-block";
+import { Notification } from "@/modules/profiles/notification";
 import { QuickActions } from "@/modules/profiles/quick-actions";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Block } from "@ui/block";
-import { ArrowUpRight, Bell, Gem, Settings } from "@ui/icons";
+import { Settings } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
+import { Pressable } from "@ui/pressable";
 import { StickyView } from "@ui/sticky-view";
 import { Tabs } from "@ui/tabs";
 import { Text } from "@ui/text";
 import { router, Slot, useSegments } from "expo-router";
 import { useEffect, useState } from "react";
-import { Platform, Pressable, View } from "react-native";
+import { Platform, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -43,12 +46,13 @@ export default function TabsLayout() {
   if (!user) return null;
 
   const generations = (_generations ?? []).filter((g) => g.cover);
+  const previewGenerations = generations.map((g) => g.predictions).flat().filter((p) => p.status === 'ACCEPTED');
 
   return (
     <ParallaxScrollView
-      headerHeight={372}
+      headerHeight={396}
       headerSpace={120}
-      headerBackgroundImage={generations[0]?.cover?.url}
+      headerBackgroundImage={previewGenerations[0]?.image?.url ?? require('assets/backgrounds/dark-gradient.png')}
       contentContainerStyle={{ paddingBottom: TOTAL_TABS_SPACE }}
       headerContent={
         <View
@@ -65,32 +69,7 @@ export default function TabsLayout() {
             Profile
           </Text.H1>
           <View style={{ flexDirection: 'row', gap: 8 }}>
-            <Pressable>
-              <Block
-                variant="blur"
-                style={{
-                  borderRadius: 99,
-                  padding: 10,
-                }}
-              >
-                <Bell size={24} color={Colors.foreground} />
-              </Block>
-              <Block
-                variant="destructive"
-                style={{
-                  position: "absolute",
-                  top: 2,
-                  left: -8,
-                  borderRadius: 99,
-                  width: 24,
-                  height: 24,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Text.Sm color={Colors.destructive[50]} weight={700}>2</Text.Sm>
-              </Block>
-            </Pressable>
+            <Notification />
             <Pressable onPress={() => router.push(ROUTES.PROFILE.SETTINGS)}>
               <Block
                 variant="blur"
@@ -116,7 +95,7 @@ export default function TabsLayout() {
       </View>
       <View style={{ paddingHorizontal: 8, gap: 8, marginTop: 16 }}>
         <QuickActions />
-        <Block
+        {previewGenerations.length > 3 && <Block
           variant="blur"
           style={{
             borderRadius: 28,
@@ -125,96 +104,55 @@ export default function TabsLayout() {
             padding: 12
           }}
         >
-          {generations.slice(0, 4).map((item, i, arr) => {
+          {previewGenerations.slice(0, 4).toReversed().map((item, i, arr) => {
             const isLast = i === arr.length - 1;
             return (
-              <View
+              <Pressable
                 key={i}
-                style={{
+                style={{ flex: 1, aspectRatio: 1 }}
+                onPress={() => {
+                  if (!isLast) router.push(ROUTES.POST.ID(item._id));
+                  else router.push(ROUTES.PROFILE.GENERATIONS);
+                }}
+              >
+                <View style={{
                   flex: 1,
                   aspectRatio: 1,
                   justifyContent: 'center',
                   alignItems: 'center',
                   borderTopWidth: 2,
                   borderColor: Colors.blur.medium,
-                  borderRadius: 20,
+                  borderRadius: 16,
                   overflow: 'hidden'
-                }}
-              >
-                <Image
-                  source={item.cover?.sizes.thumbnail.url}
-                  blurRadius={isLast ? Platform.OS === 'android' ? 30 : 2 : 0}
-                  style={{
-                    flex: 1,
-                    aspectRatio: 1,
-                    opacity: isLast ? 0.3 : 1,
-                  }}
-                />
-                {isLast && <Text.Sm
-                  weight={700}
-                  style={{
-                    position: 'absolute',
-                    color: Colors.foreground,
-                    textAlign: 'center',
-                    width: '50%',
-                  }}
-                >
-                  See more
-                </Text.Sm>}
-              </View>
+                }}>
+                  <Image
+                    source={item.image?.sizes.thumbnail.url}
+                    blurRadius={isLast ? 3 : 0}
+                    style={{
+                      flex: 1,
+                      aspectRatio: 1,
+                      opacity: isLast ? 0.3 : 1,
+                    }}
+                  />
+                  {isLast && <Text.Sm
+                    weight={700}
+                    style={{
+                      position: 'absolute',
+                      color: Colors.foreground,
+                      textAlign: 'center',
+                      width: '50%',
+                    }}
+                  >
+                    See more
+                  </Text.Sm>}
+                </View>
+              </Pressable>
             )
           })}
-        </Block>
-        <Block
-          variant="blur"
-          style={{
-            marginBottom: 32,
-            borderRadius: 28,
-            paddingHorizontal: 12,
-            paddingVertical: 10,
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Block
-            variant="primary"
-            style={{
-              width: 68,
-              aspectRatio: 1,
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: 22,
-            }}
-          >
-            <Gem size={28} color={Colors.primary[900]} />
-          </Block>
-          <View style={{ flex: 1, paddingHorizontal: 12, gap: 6 }}>
-            <Text.Lg
-              color={Colors.primary[500]}
-              numberOfLines={1}
-            >
-              Unlock unlimited generations
-            </Text.Lg>
-            <View style={{
-              flexDirection: "row",
-              alignItems: "flex-end",
-              gap: 8,
-            }}>
-              <Text.Sm
-                color={Colors.primary[200]}
-                numberOfLines={2}
-                style={{ flex: 1, overflow: 'visible' }}
-              >
-                Upgrade your plan and unlock more generations.
-              </Text.Sm>
-              <ArrowUpRight
-                color={Colors.primary[200]}
-                size={24}
-              />
-            </View>
-          </View>
-        </Block>
+        </Block>}
+        <PremiumBlock
+          style={{ marginBottom: 32 }}
+        />
         <StickyView
           topOffset={Platform.OS === 'web' ? -48 : -12}
           style={{ marginBottom: 24 }}

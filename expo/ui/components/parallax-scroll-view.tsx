@@ -75,7 +75,7 @@ export const ParallaxScrollView = ({
               width: '100%',
               height: '100%',
             }}
-            resizeMode="cover"
+            contentFit="cover"
           />
         )}
         <LinearGradient

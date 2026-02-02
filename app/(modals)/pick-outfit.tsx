@@ -1,8 +1,8 @@
 import { useRouter } from "@/hooks";
 import { api, useMutation, useQueryCached } from "@/lib/convex/client";
+import { LoadingBlock } from "@ui/block.loading";
 import { Button } from "@ui/button";
 import { Collection } from "@ui/cards";
-import { LoadingBlock } from "@ui/loadingBlock";
 import { MasonryList } from "@ui/masonry-list";
 import { ModalHeader } from "@ui/modal";
 import { router } from "expo-router";

@@ -12,7 +12,7 @@ export default function Screen() {
       imageUri={frontImage ?? undefined}
       onCapture={(photoUri) => {
         setFrontImage(photoUri);
-        setTimeout(() => { router.push('/settings/update-portraits/smile') }, 1300);
+        setTimeout(() => { router.push('/update-portraits/smile') }, 1300);
       }}
       examples={{
         hint: "Make sure to be in a bright enough room. Try to keep a plain white background.",

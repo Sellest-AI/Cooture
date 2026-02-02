@@ -30,9 +30,11 @@ export const authed = authAction({
 
     const AMOUNT_OF_IMAGES = 3;
 
+    const side = prompt.subject.head.direction === "front" ? portraits.frontImage : portraits.sideImage;
+
     const predictions = await Promise.all(Array.from({ length: AMOUNT_OF_IMAGES }).map(async () => predictImage({
       model: 'bytedance/seedream-4.5',
-      images: [{ url: portraits.frontImage.url, hasAlpha: portraits.frontImage?.hasAlpha }],
+      images: [{ url: side.url, hasAlpha: side?.hasAlpha }],
       prompt: JSON.stringify(prompt),
     })));
 

@@ -2,11 +2,11 @@ import { useRouter, useStateEffect } from "@/hooks";
 import { Id } from "@/lib/convex/api";
 import { SelectedItemModal } from "@/modules/items/selected-item.modal";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
+import { LoadingBlock } from "@ui/block.loading";
 import { Button } from "@ui/button";
 import { CardItem } from "@ui/cards/card-item";
 import { Pencil, SquirishPlus, Trash } from "@ui/icons";
 import { Image } from '@ui/image';
-import { LoadingBlock } from "@ui/loadingBlock";
 import { MasonryList } from "@ui/masonry-list";
 import { ModalHeader } from "@ui/modal";
 import { SafeScrollView } from "@ui/safe-scroll-view";
@@ -68,6 +68,7 @@ export default function ItemScreen() {
           <SafeScrollView
             style={{
               paddingTop: 12,
+              paddingHorizontal: 12,
             }}
           >
             <ModalHeader
@@ -77,7 +78,7 @@ export default function ItemScreen() {
               subtitle={outfit.name}
               onBack={exit}
             />
-            <View style={{ paddingHorizontal: 12, marginTop: 4 }}>
+            <View style={{ marginTop: 4 }}>
               <TextInput
                 startIcon={Pencil}
                 placeholder="Name your outfit..."

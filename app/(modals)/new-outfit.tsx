@@ -2,10 +2,10 @@ import { useRouter } from "@/hooks";
 import { api, Id, useQueryCached } from "@/lib/convex/client";
 import { SelectedItemModal } from "@/modules/items/selected-item.modal";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
+import { LoadingBlock } from "@ui/block.loading";
 import { Button } from "@ui/button";
 import { CardItem } from "@ui/cards/card-item";
 import { Pencil, SquirishPlus } from "@ui/icons";
-import { LoadingBlock } from "@ui/loadingBlock";
 import { MasonryList } from "@ui/masonry-list";
 import { ModalHeader } from "@ui/modal";
 import { SafeScrollView } from "@ui/safe-scroll-view";
@@ -36,18 +36,17 @@ export default function NewOutfitScreen() {
   return (
     <>
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={{ flex: 1, backgroundColor: Colors.blur.modal }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
-        <View style={{ flex: 1, backgroundColor: Colors.blur.modal }}>
+        <View style={{ flex: 1 }}>
           <SafeScrollView
             style={{
               padding: 12,
               paddingBottom: 172,
               // borderTopWidth: 2,
               // borderTopColor: Colors.blur.dark,
-              backgroundColor: Colors.blur.modal,
             }}
           >
             <ModalHeader

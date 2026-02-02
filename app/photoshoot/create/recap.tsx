@@ -95,7 +95,7 @@ const Portrait = ({ style }: { style?: ViewStyle }) => {
   const HEIGHT = style?.height ?? 256;
 
   if (!frontImage && !isPending) return <useRouter.Redirect
-    href={ROUTES.SETTINGS.UPDATE_PORTRAITS}
+    href={ROUTES.EXTRA.UPDATE_PORTRAITS}
     redirectTo={ROUTES.PHOTOSHOOT.RECAP}
   />
 
@@ -128,7 +128,7 @@ const Portrait = ({ style }: { style?: ViewStyle }) => {
         startIcon={Pencil}
         style={{ marginTop: 12 }}
         onPress={() => {
-          push(ROUTES.SETTINGS.UPDATE_PORTRAITS, {
+          push(ROUTES.EXTRA.UPDATE_PORTRAITS, {
             redirectHere: true
           })
         }}

@@ -21,18 +21,24 @@ Analyze the visual input and extract a structured JSON preset used to recreate t
 CRITICAL ARCHITECTURE RULES (STRICT ENFORCEMENT):
 This JSON is used in a pipeline where the User and the Outfit can be swapped independently. You must separate concerns:
 
-1. NO "GHOST" CLOTHING: 
+1. GENDER-NEUTRAL LANGUAGE (ABSOLUTE REQUIREMENT):
+   - NEVER use gendered terms: "woman", "man", "girl", "boy", "male", "female", "she", "he", "her", "him", "his", "hers".
+   - ALWAYS use: "the subject", "the person", "the individual", "they", "their".
+   - WHY: This preset will be used by people of ANY gender. Gendered descriptions will force gender transformation in the output.
+   - Example: Instead of "woman leaning against wall", write "subject leaning against wall".
+
+2. NO "GHOST" CLOTHING: 
    - NEVER describe clothing colors, specific garments, or brands in 'sceneDescription', 'subject', or 'environment'. 
 
-2. SUBJECT vs. OUTFIT:
+3. SUBJECT vs. OUTFIT:
    - 'subject': Describes the biological human, their pose, muscle tension, and expression.
    - 'outfit': Contains ALL fashion information.
 
-3. PROPS vs. ACCESSORIES:
+4. PROPS vs. ACCESSORIES:
    - Worn = 'outfit.accessories'. 
    - Held/Interacted = 'subject.heldObjects' or 'environment.surroundingElements'.
 
-4. VISIBILITY & CROPPING (ABSOLUTE RULES YOU MUST FOLLOW):
+5. VISIBILITY & CROPPING (ABSOLUTE RULES YOU MUST FOLLOW):
   - If a body part or clothing item is cut off by the frame, RETURN undefined (the JavaScript token) for that optional field. Do NOT invent or describe it.
   - If shoes are not visible, shoes: undefined.
   - If top or bottom clothing is not visible, top: undefined, bottom: undefined.
@@ -121,24 +127,24 @@ export const ImagePresetSchema = z.object({
     description: z.string().describe("Summary of the look. REQUIRED: Include fit and vibe."),
 
     top: z.object({
-      type: z.string().describe("Category: e.g., 'Crop top', 'T-shirt'."),
+      type: z.string().describe("Category: e.g., 'Crop top', 'T-shirt'.").optional(),
       details: z.string().describe("Specifics: e.g., 'Black cotton, red logo graphic on chest, ultra-short fit'.")
-        .optional().default(""),
+        .optional(),
     }).optional().describe("If not visible, return undefined."),
 
     bottom: z.object({
-      type: z.string().describe("Category: e.g., 'Cargo pants', 'Jeans'."),
+      type: z.string().describe("Category: e.g., 'Cargo pants', 'Jeans'.").optional(),
       details: z.string().describe("Specifics: e.g., 'Black baggy fit, low rise waist'.")
-        .optional().default(""),
+        .optional(),
     }).optional().describe("If not visible, return undefined."),
 
     // Useful for managing 'tucked in' styles or visible branding on waistbands
     innerLayer: z.string().optional().describe("Visible layers underneath: e.g., 'White elastic boxer waistband showing'."),
 
     outerwear: z.object({
-      type: z.string().describe("Category: e.g., 'Jacket', 'Hoodie'."),
+      type: z.string().describe("Category: e.g., 'Jacket', 'Hoodie'.").optional(),
       details: z.string().describe("Specifics: e.g., 'Black zip-up hoodie, slightly oversized fit'.")
-        .optional().default(""),
+        .optional(),
     }).optional().describe("If not visible, return undefined."),
 
     accessories: z.array(z.record(z.string(), z.string())).describe("Worn items (Glasses, Necklace, Hat). If none, return []."),
@@ -206,6 +212,27 @@ export const presetCreator = createTool({
       return obj;
     }
 
-    return sanitize(result.object);
+    const object = sanitize(result.object);
+
+    const outfit = {
+      ...object.outfit,
+      top: object.outfit.top?.details && object.outfit.top.type ? {
+        type: object.outfit.top.type,
+        details: object.outfit.top.details,
+      } : undefined,
+      bottom: object.outfit.bottom?.details && object.outfit.bottom.type ? {
+        type: object.outfit.bottom.type,
+        details: object.outfit.bottom.details,
+      } : undefined,
+      outerwear: object.outfit.outerwear?.details && object.outfit.outerwear.type ? {
+        type: object.outfit.outerwear.type,
+        details: object.outfit.outerwear.details,
+      } : undefined,
+    }
+
+    return {
+      ...object,
+      outfit,
+    }
   }
 })

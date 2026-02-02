@@ -1,14 +1,16 @@
-import { ComponentProps, useRef } from "react";
-import { Animated, Pressable as NativePressable } from "react-native";
+import { ComponentProps, useRef, useState } from "react";
+import { Animated, Pressable as NativePressable, ViewStyle } from "react-native";
 
 type PressableProps = {
   disabled?: boolean;
   children: React.ReactNode;
   intensity?: number;
+  style?: ViewStyle;
 } & ComponentProps<typeof NativePressable>;
 
-export const Pressable = ({ disabled, onPress, children, intensity = 0.98, ...props }: PressableProps) => {
+export const Pressable = ({ disabled, onPress, children, intensity = 0.98, style, ...props }: PressableProps) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const [innerDisabled, setInnerDisabled] = useState(false);
 
   const handlePressIn = () => {
     if (disabled) return;
@@ -33,14 +35,21 @@ export const Pressable = ({ disabled, onPress, children, intensity = 0.98, ...pr
   return (
     <NativePressable
       {...props}
+      style={style}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       onPress={(e) => {
+        if (innerDisabled) return;
+        setInnerDisabled(true);
         if (disabled) return;
         if (onPress) onPress(e);
+        setTimeout(() => { setInnerDisabled(false) }, 300);
       }}
     >
-      <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <Animated.View style={{
+        transform: [{ scale: scaleAnim }],
+        aspectRatio: style?.aspectRatio
+      }}>
         {children}
       </Animated.View>
     </NativePressable>

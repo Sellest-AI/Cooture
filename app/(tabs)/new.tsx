@@ -1,12 +1,12 @@
 import { useRouter } from "@/hooks";
+import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
-import { Block } from "@ui/block";
 import { Button } from "@ui/button";
 import { Collection } from "@ui/cards";
-import { ArrowUpRight, Bell, ScanLine } from "@ui/icons";
+import { ArrowUpRight, ScanLine } from "@ui/icons";
 import { Link } from "@ui/link";
-import { SafeAreaView } from "@ui/safe-area-view";
-
+import { ModalHeader } from "@ui/modal";
+import { SafeScrollView } from "@ui/safe-scroll-view";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
@@ -17,35 +17,22 @@ export default function Screen() {
   const { push } = useRouter('/new');
 
   return (
-    <ScrollView
-      style={{ flex: 1 }}
+    <SafeScrollView
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: TOTAL_TABS_SPACE }}
+    // stickyHeaderIndices={[0]}
     >
-      <SafeAreaView
+      <ModalHeader
+        title="Create"
+        type="alt"
+        size="big"
+        endContent={<Notification />}
         style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "flex-end",
+          paddingTop: 12,
           paddingHorizontal: 20,
-          marginTop: 12
+          backgroundColor: Colors.background,
         }}
-      >
-        <Text.H1 type="alt" color={Colors.primary[200]}>
-          Create
-        </Text.H1>
-        <Pressable>
-          <Block
-            variant="blur"
-            style={{
-              borderRadius: 99,
-              padding: 10,
-            }}
-          >
-            <Bell size={24} color={Colors.foreground} />
-          </Block>
-        </Pressable>
-      </SafeAreaView>
+      />
       <View
         style={{
           marginTop: 20,
@@ -145,7 +132,7 @@ export default function Screen() {
       >
         New preset
       </Button>
-    </ScrollView>
+    </SafeScrollView>
   )
 }
 

@@ -7,8 +7,8 @@ import { Text } from './text';
 
 type Props = {
   children?: React.ReactNode;
-  startIcon?: React.ComponentType<{ size?: number, color?: string, style?: ViewStyle }>;
-  endIcon?: React.ComponentType<{ size?: number, color?: string, style?: ViewStyle }>;
+  startIcon?: React.ComponentType<{ size?: number, color?: string, style?: ViewStyle }> | false;
+  endIcon?: React.ComponentType<{ size?: number, color?: string, style?: ViewStyle }> | false;
   disabled?: boolean;
   href?: Parameters<ReturnType<typeof useRouter>['push']>[0];
   size?: "rounded",

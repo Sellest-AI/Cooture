@@ -177,50 +177,75 @@ type ModalHeaderProps = {
   style?: ViewStyle;
   type?: 'default' | 'alt';
   size?: 'big' | 'normal';
+  endContent?: ReactNode;
 }
-export const ModalHeader = ({ title, onBack, style, subtitle, type, size }: ModalHeaderProps) => {
+export const ModalHeader = ({ title, onBack, style, subtitle, type, size, endContent }: ModalHeaderProps) => {
   const isAlt = type === 'alt';
   const isBig = size === 'big';
 
   const Title = isBig ? Text.H1 : Text.H3;
 
+  const justify = onBack && !endContent ? 'center' :
+    endContent ? 'flex-start' : 'center';
+
   return (
     <View style={{
-      paddingHorizontal: 8,
-      paddingTop: 4,
-      marginBottom: 16,
+      marginTop: 4,
+      marginBottom: 12,
       ...style
     }}>
       <View style={{
         flexDirection: 'row',
-        justifyContent: 'center',
+        justifyContent: justify,
+        gap: 0,
+        minHeight: 40,
       }}>
         {onBack && <Pressable
           onPress={() => onBack?.()}
-          style={{ position: 'absolute', left: 4, top: -4, padding: 4 }}
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: isBig ? -2 : -4,
+            // padding: 4,
+          }}
         >
-          <ArrowLeft color={Colors.foreground} />
+          <Block
+            variant="blur"
+            style={{
+              borderRadius: 99,
+              padding: 10,
+            }}
+          >
+            <ArrowLeft color={Colors.foreground} />
+          </Block>
         </Pressable>}
         <Title
           type={isAlt ? 'alt' : undefined}
-          numberOfLines={2}
           color={isAlt ? Colors.primary[200] : Colors.foreground}
           style={{
             textAlign: 'center',
-            maxWidth: "65%"
+            maxWidth: "60%",
+            marginTop: isBig ? 3 : (isAlt ? 6 : 2)
           }}
         >
           {title}
         </Title>
+        {endContent && <View style={{
+          position: 'absolute',
+          right: 0,
+          top: isBig ? -2 : -4,
+        }}>
+          {endContent}
+        </View>}
       </View>
       {subtitle && <Text.Base
         color={Colors.neutral[400]}
         weight={600}
         textBreakStrategy="balanced"
-        style={{ textAlign: 'center', marginTop: 6, maxWidth: "80%", alignSelf: 'center' }}
+        style={{ textAlign: 'center', marginTop: 2, maxWidth: "70%", alignSelf: 'center' }}
       >
         {subtitle}
       </Text.Base>}
-    </View>
+    </View >
   )
 }

@@ -4,6 +4,7 @@ import { atom, useAtom } from "jotai";
 
 export const usePhotoshoot = (id: Id<'generations'> | null) => {
   const { data: photoshoot } = useQuery(api.router.generations.getOne.authed, id ? { generationId: id } : 'skip');
+  const { data: preset } = useQuery(api.router.presets.getOne.anon, photoshoot?.metadata?.presetId ? { presetId: photoshoot.metadata.presetId } : 'skip');
 
   const { mutate } = useMutation(api.router.generations.updatePrediction.authed);
   const acceptPrediction = (predictionId: string) => {
@@ -15,6 +16,7 @@ export const usePhotoshoot = (id: Id<'generations'> | null) => {
 
   return {
     photoshoot,
+    preset,
     acceptPrediction,
     rejectPrediction,
   }

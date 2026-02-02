@@ -5,7 +5,7 @@ import { View } from "react-native";
 import { Colors } from "theme";
 
 export const unstable_settings = {
-  initialRouteName: 'profile',
+  initialRouteName: 'welcome',
 };
 
 export default function RootLayout() {

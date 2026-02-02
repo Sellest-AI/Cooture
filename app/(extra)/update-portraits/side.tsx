@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { ROUTES } from "routes";
 
 export default function Screen() {
-  const { dismissTo, redirect } = useRouter('/settings/update-portraits/side');
+  const { dismissTo, redirect } = useRouter('/update-portraits/side');
 
   const { uploadImage } = useUpload()
   const { setSideImage, sideImage, frontImage, smileImage, pushToServer } = usePortraits.Local();

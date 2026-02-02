@@ -1,7 +1,9 @@
 import { ROUTES, useRouter } from "@/hooks";
 import { api, useQuery } from "@/lib/convex/client";
+import { EmptyBlock } from "@ui/block.empty";
+import { LoadingBlock } from "@ui/block.loading";
 import { ImageGeneration } from "@ui/cards";
-import { EyeClosed } from "@ui/icons";
+import { EyeClosed, ImageIcon } from "@ui/icons";
 import { MasonryList } from "@ui/masonry-list";
 import { View } from "react-native";
 import { Colors } from "theme";
@@ -10,13 +12,30 @@ export default function GenerationsScreen() {
   const { push } = useRouter('/profile/generations');
   const { data: generations } = useQuery(api.router.generations.getAll.authed);
 
-  if (!generations) return null;
+  if (!generations) { return (<LoadingBlock />) }
 
-  const predictions = generations.map((g) => g.predictions).flat();
+  const predictions = generations.map((g) => g.predictions).flat()
+    .filter((g) => g.hasImage).filter((g) => g.status === "ACCEPTED");
+
+  if (predictions.length === 0) {
+    return (
+      <EmptyBlock
+        variant="secondary"
+        style={{ paddingVertical: 72 }}
+        icon={ImageIcon}
+        title="No Generations Yet"
+        description="You haven't generated any images yet. Start creating to see your generations here."
+        cta={{
+          label: "New Photoshoot",
+          onPress: () => push(ROUTES.PHOTOSHOOT.NEW)
+        }}
+      />
+    )
+  }
 
   return (
     <MasonryList
-      data={predictions.filter((g) => g.hasImage)}
+      data={predictions}
       style={{ columnGap: 8, paddingHorizontal: 0 }}
       keyExtractor={(_, index) => index.toString()}
       renderItem={({ item }) => (
@@ -25,8 +44,11 @@ export default function GenerationsScreen() {
             source={item.image?.sizes.medium.url}
             onPresss={() => {
               if (!item.generationId) return;
-              push(ROUTES.PHOTOSHOOT.GENERATIONS.PATH, {
-                pathParams: { id: item.generationId }
+              // push(ROUTES.PHOTOSHOOT.GENERATIONS.PATH, {
+              //   pathParams: { id: item.generationId }
+              // })
+              push(ROUTES.POST.PATH, {
+                pathParams: { id: item._id }
               })
             }}
           />

@@ -16,6 +16,10 @@ export const ROUTES = {
     NEW_OUTFIT: '/new-outfit' as const,
     OUTFIT_ADD_ITEM: '/add-item' as const,
   },
+  POST: {
+    PATH: '/post/[id]',
+    ID: (id: string) => `/post/${id}` as const,
+  },
   ITEM: {
     PATH: '/item/[id]',
     ID: (id: string) => `/item/${id}` as const,
@@ -33,9 +37,10 @@ export const ROUTES = {
       ID: (id: string) => `/photoshoot/generations/${id}` as const,
     }
   },
-  SETTINGS: {
-    PATH: '/settings',
-    UPDATE_PORTRAITS: '/settings/update-portraits' as const,
+  EXTRA: {
+    SETINGS: '/settings' as const,
+    NOTIFICATIONS: '/notifications' as const,
+    UPDATE_PORTRAITS: '/update-portraits' as const,
   },
   PROFILE: {
     PATH: '/profile',

@@ -7,10 +7,10 @@ import { GenderCategory } from "@/modules/items/category.gender";
 import { ItemCategory } from "@/modules/items/category.item";
 import { WeatherCategory } from "@/modules/items/category.weather";
 import { Block } from "@ui/block";
+import { LoadingBlock } from "@ui/block.loading";
 import { Button } from "@ui/button";
 import { LinkIcon } from "@ui/icons";
 import { Image } from "@ui/image";
-import { LoadingBlock } from "@ui/loadingBlock";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
 import { SafeAreaView } from "@ui/safe-area-view";
@@ -81,7 +81,7 @@ export default function ItemScreen() {
         headerContent={
           <View style={{ flex: 1 }}>
             <ModalHeader
-              style={{ marginTop: 12 }}
+              style={{ paddingTop: 12, paddingHorizontal: 12 }}
               title={item.name}
               onBack={router.canGoBack() ? () => { router.back() } : undefined}
             />

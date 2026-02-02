@@ -119,7 +119,7 @@ export default function Screen() {
   const { id } = useLocalSearchParams<{ id: Id<'generations'> }>();
   const carouselRef = useRef<ICarouselInstance>(null);
 
-  const { photoshoot, acceptPrediction, rejectPrediction } = usePhotoshoot(id);
+  const { photoshoot, preset, acceptPrediction, rejectPrediction } = usePhotoshoot(id);
   const { outfitId } = usePhotoshoot.New();
 
   const items = (photoshoot?.predictions ?? []).map((p) => ({
@@ -130,10 +130,10 @@ export default function Screen() {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const isCurrentLoading = items[currentIndex]?.status === 'LOADING';
+  const currentItem = items[currentIndex];
 
   // Functions
   const next = (validated: boolean) => {
-    const currentItem = items[currentIndex];
     if (!currentItem) return;
 
     if (validated) {
@@ -156,7 +156,7 @@ export default function Screen() {
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <Image
-        source={require('assets/placeholders/street-model.png')}
+        source={photoshoot?.cover?.url ?? require('assets/backgrounds/dark-gradient.png')}
         blurRadius={100}
         style={{
           opacity: 0.1,
@@ -174,13 +174,15 @@ export default function Screen() {
         }}
       >
         <Badge
-          source={require('assets/placeholders/street-model.png')}
+          source={preset?.cover?.sizes.thumbnail.url
+            ?? require('assets/backgrounds/dark-gradient.png')}
           contentFit="cover"
+          contentPosition="top center"
         />
         <Outfit />
       </SafeAreaView>
       <View style={{
-        marginTop: 36,
+        marginTop: 32,
         alignItems: 'center',
         maxWidth: "80%",
         marginHorizontal: "auto",

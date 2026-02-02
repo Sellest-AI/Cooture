@@ -22,6 +22,7 @@ export const predictions = defineTable({
   status: PREDICTION_STATUS,
   readyAt: v.optional(v.number()), // timestamp in ms
 })
+  .index('status', ['status'])
   .index("by_generation_id", ["generationId"])
   .index("by_prediction_id", ["predictionId"])
 

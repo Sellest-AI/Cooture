@@ -8,11 +8,12 @@ import { Text } from './text';
 type Props = {
   source?: ComponentProps<typeof Image>['source'];
   contentFit?: "cover" | "contain";
+  contentPosition?: ComponentProps<typeof Image>['contentPosition'];
   style?: ViewStyle;
   text?: string;
 }
 
-export const Badge = ({ source, contentFit = "cover", style, text }: Props) => {
+export const Badge = ({ source, contentFit = "cover", contentPosition, style, text }: Props) => {
   return (
     <Block
       variant="blur"
@@ -31,6 +32,7 @@ export const Badge = ({ source, contentFit = "cover", style, text }: Props) => {
       {source && <Image
         source={source}
         contentFit={contentFit}
+        contentPosition={contentPosition}
         style={{
           position: 'relative',
           width: '100%',
