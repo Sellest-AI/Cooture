@@ -12,9 +12,11 @@ export const anon = publicQuery({
     const prediction = await ctx.db.get(args.id);
     if (!prediction) return null;
 
-    const [image, generation] = await Promise.all([
+    const [image, generation, generationPredictions] = await Promise.all([
       prediction.imageId ? getImage(ctx, prediction.imageId) : null,
       prediction.generationId ? ctx.db.get(prediction.generationId) : null,
+      prediction.generationId ? ctx.db.query('predictions')
+        .withIndex('by_generation_id', (q) => q.eq("generationId", prediction.generationId)).collect() : []
     ]);
 
     const metadata = generation ? await ctx.db.query('presetGenerations')
@@ -42,6 +44,7 @@ export const anon = publicQuery({
       ...metadata,
       ...prediction,
       generation: generation || null,
+      generationPredictions,
       preset: preset ? {
         ...preset,
         cover: presetCover || null,

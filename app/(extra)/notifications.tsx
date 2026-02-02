@@ -42,7 +42,8 @@ const Notification = ({ generationId, status }: Props) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: 12,
-          marginBottom: 20,
+          paddingHorizontal: status === "COMPLETED" ? 8 : 12,
+          marginBottom: status === 'COMPLETED' ? 8 : 16,
           borderRadius: 28,
           gap: 24,
           overflow: 'hidden',
@@ -106,13 +107,14 @@ export default function Screen() {
     <Component
       style={{
         padding: 12,
+        paddingHorizontal: 8,
         paddingTop: 0,
         flex: generations.length === 0 ? 1 : undefined
       }}
       stickyHeaderIndices={[0]}
     >
       <ModalHeader
-        style={{ backgroundColor: Colors.background, paddingTop: 12 }}
+        style={{ backgroundColor: Colors.background, paddingTop: 12, paddingHorizontal: 4 }}
         onBack={() => router.back()}
         title="Notifications"
         type="alt"

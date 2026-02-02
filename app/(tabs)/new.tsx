@@ -53,7 +53,7 @@ export default function Screen() {
             backgroundColor: Colors.primary[500],
           }}>
             <ScanLine size={40} color={Colors.primary[900]} />
-            <Text.Lg color={Colors.primary[900]}>Scan an item</Text.Lg>
+            <Text.Lg color={Colors.primary[900]} style={{ textAlign: 'center' }}>Scan an item</Text.Lg>
           </View>
         </Link>
         <Pressable
@@ -69,7 +69,7 @@ export default function Screen() {
           }}
         >
           <ArrowUpRight size={40} color={Colors.primary[900]} />
-          <Text.Lg color={Colors.secondary[900]}>New Outfit</Text.Lg>
+          <Text.Lg color={Colors.secondary[900]} style={{ textAlign: 'center' }}>New Outfit</Text.Lg>
         </Pressable>
       </View>
       <View style={{ marginTop: 32 }}>

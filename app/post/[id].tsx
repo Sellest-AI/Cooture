@@ -1,24 +1,35 @@
 import { useRoute } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
-import { useQuery } from "@/lib/convex/client";
+import { useQuery, useQueryCached } from "@/lib/convex/client";
 import { Post } from "@ui/cards";
 import { ModalHeader } from "@ui/modal";
 import { SafeScrollView } from "@ui/safe-scroll-view";
+import { Text } from "@ui/text";
+import { notEmpty } from "@utils/convex-allowed";
 import { router } from "expo-router";
 import { ViewStyle } from "react-native";
 import { Colors } from "theme";
 
 const UserPost = ({ postId, style }: { postId: Id<'predictions'>, style?: ViewStyle }) => {
   const { data: post } = useQuery(api.router.post.getOne.anon, { id: postId });
+  const predictions = post ? [post, ...post.generationPredictions.filter((p) => p.status === 'ACCEPTED')] : [];
+  const imageIds = predictions.map((p) => p.imageId).filter(notEmpty);
+  const { data: images } = useQueryCached(api.router.storage.images.getMany.anon, imageIds.length > 0 ? { imageIds } : 'skip');
 
   if (!post) return <Post.Skeleton style={{ ...style }} />;
 
   return (<Post
     style={{ ...style }}
+    paddingHorizontal={12}
     postedAt={post.readyAt ? new Date(post.readyAt) : undefined}
     likedAccounts={[]}
-    postUrl={`/post/${postId}`}
+    images={images?.map((img) => ({
+      _id: predictions.find(p => p.imageId === img._id)!._id,
+      url: img.url,
+      contentFit: img.hasAlpha ? 'contain' : 'cover',
+    }))}
     image={post.image ? {
+      _id: post._id,
       url: post.image.url,
       contentFit: post.image.hasAlpha ? 'contain' : 'cover',
     } : undefined}
@@ -44,11 +55,11 @@ export default function Screen() {
 
   return (
     <SafeScrollView
-      style={{ padding: 12, paddingTop: 0 }}
+      style={{ paddingTop: 0 }}
       stickyHeaderIndices={[0]}
     >
       <ModalHeader
-        style={{ backgroundColor: Colors.background, paddingTop: 12 }}
+        style={{ backgroundColor: Colors.background, paddingTop: 12, paddingHorizontal: 12 }}
         onBack={() => router.back()}
         title="Publications"
         type="alt"
@@ -58,13 +69,24 @@ export default function Screen() {
         <Post.Skeleton style={{ marginBottom: 28 }} />
         <Post.Skeleton style={{ marginBottom: 28 }} />
       </>}
-      {postsFromUser?.filter((p) => p._id !== id).map((p, i, arr) => (
-        <UserPost
-          key={p._id}
-          postId={p._id}
-          style={{ marginBottom: i < arr.length - 1 ? 28 : 0 }}
-        />
-      ))}
+      {postsFromUser?.filter((p) => p.generationId !== post?.generationId)
+        .filter((p, _, arr) => arr.findLast(x => x.generationId === p.generationId)?._id === p._id)
+        .map((p, i, arr) => (
+          <UserPost
+            key={p._id}
+            postId={p._id}
+            style={{ marginBottom: i < arr.length - 1 ? 28 : 0 }}
+          />
+        ))}
+      <Text.Base color={Colors.neutral[400]} style={{
+        textAlign: 'center',
+        marginTop: 32,
+        maxWidth: 156,
+        alignSelf: 'center',
+        marginBottom: 32
+      }}>
+        No more posts to show from this user.
+      </Text.Base>
     </SafeScrollView>
   )
 }

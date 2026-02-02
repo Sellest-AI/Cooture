@@ -6,9 +6,11 @@ type Props = {
   children: ReactNode;
   topOffset?: number;
   style?: ViewStyle;
+  onLayout?: (event: LayoutChangeEvent) => void;
 };
 
 export const StickyView = ({
+  onLayout,
   children,
   topOffset = 0,
   style,
@@ -35,7 +37,7 @@ export const StickyView = ({
 
   return (
     <Animated.View
-      onLayout={handleLayout}
+      onLayout={(e) => { handleLayout(e); onLayout?.(e) }}
       style={[
         style,
         {

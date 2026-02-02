@@ -8,6 +8,7 @@ import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { Skeleton } from "@ui/skeleton";
+import { Text } from "@ui/text";
 import { router } from "expo-router";
 import { Pressable, View, ViewStyle } from "react-native";
 import { ROUTES } from "routes";
@@ -97,9 +98,9 @@ export default function Screen() {
           backgroundColor: Colors.background,
         }}
       />
-      <View style={{ marginTop: 8 }}>
+      <View>
         <PremiumBlock
-          style={{ marginBottom: 20, marginHorizontal: 8 }}
+          style={{ marginBottom: 20, marginHorizontal: 12 }}
         />
         {empty && <GridSkeleton />}
         {!empty && feed && (
@@ -114,11 +115,11 @@ export default function Screen() {
                   {posts.length > 0 && (
                     <Grid style={{ height: HEIGHT, gap: GAP }}>
                       <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
-                        {posts[0] && <Row><Post id={posts[0]} style={{ flex: 1 }} /></Row>}
-                        {posts[1] && <Row><Post id={posts[1]} style={{ flex: 1 }} /></Row>}
+                        {posts[0] ? <Post id={posts[0]} style={{ flex: 1, borderTopLeftRadius: 8 }} /> : <Skeleton style={{ flex: 1 }} />}
+                        {posts[1] ? <Post id={posts[1]} style={{ flex: 1 }} /> : <Skeleton style={{ flex: 1 }} />}
                       </Col>
                       <Col size={2}>
-                        {posts[2] && <Post id={posts[2]} style={{ flex: 1 }} />}
+                        {posts[2] ? <Post id={posts[2]} style={{ flex: 1, borderTopRightRadius: 8 }} /> : <Skeleton style={{ flex: 1 }} />}
                       </Col>
                     </Grid>
                   )}
@@ -127,19 +128,21 @@ export default function Screen() {
                   {posts.length > 3 && (
                     <Grid style={{ height: HEIGHT, gap: GAP }}>
                       <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
-                        {posts[3] && <Row><Post id={posts[3]} style={{ flex: 1 }} /></Row>}
-                        {posts[4] && <Row><Post id={posts[4]} style={{ flex: 1 }} /></Row>}
+                        {posts[3] ? <Row><Post id={posts[3]} style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                        <Row>
+                          {posts[4] ? <Post id={posts[4]} style={{ flex: 1 }} /> : <Skeleton style={{ flex: 1 }} />}
+                        </Row>
                       </Col>
                       {posts.length > 5 && (
                         <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
-                          {posts[5] && <Row><Post id={posts[5]} style={{ flex: 1 }} /></Row>}
-                          {posts[6] && <Row><Post id={posts[6]} style={{ flex: 1 }} /></Row>}
+                          {posts[5] ? <Row><Post id={posts[5]} style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                          {posts[6] ? <Row><Post id={posts[6]} style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
                         </Col>
                       )}
                       {posts.length > 7 && (
                         <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
-                          {posts[7] && <Row><Post id={posts[7]} style={{ flex: 1 }} /></Row>}
-                          {posts[8] && <Row><Post id={posts[8]} style={{ flex: 1 }} /></Row>}
+                          {posts[7] ? <Row><Post id={posts[7]} style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                          {posts[8] ? <Row><Post id={posts[8]} style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
                         </Col>
                       )}
                     </Grid>
@@ -149,11 +152,11 @@ export default function Screen() {
                   {posts.length > 9 && (
                     <Grid style={{ height: HEIGHT, gap: GAP }}>
                       <Col size={2}>
-                        {posts[9] && <Post id={posts[9]} style={{ flex: 1 }} />}
+                        {posts[9] ? <Post id={posts[9]} style={{ flex: 1 }} /> : <Skeleton style={{ flex: 1 }} />}
                       </Col>
                       <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
-                        {posts[10] && <Row><Post id={posts[10]} style={{ flex: 1 }} /></Row>}
-                        {posts[11] && <Row><Post id={posts[11]} style={{ flex: 1 }} /></Row>}
+                        {posts[10] ? <Row><Post id={posts[10]} style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                        {posts[11] ? <Row><Post id={posts[11]} style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
                       </Col>
                     </Grid>
                   )}
@@ -163,6 +166,9 @@ export default function Screen() {
           </View>
         )}
       </View>
+      <Text.Base color={Colors.neutral[400]} style={{ textAlign: 'center', marginTop: 32, maxWidth: 200, alignSelf: 'center' }}>
+        You have reached the end of the discover feed.
+      </Text.Base>
     </Component>
   );
 }

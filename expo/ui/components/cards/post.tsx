@@ -2,20 +2,27 @@ import { Badge } from '@ui/badge';
 import { Button } from '@ui/button';
 import { ArrowRight, Bookmark, CircleFadingArrowUp, Heart, ShareIcon } from '@ui/icons';
 import { Skeleton } from '@ui/skeleton';
-import { View, ViewStyle } from 'react-native';
+import { Dimensions, FlatList, Pressable, View, ViewStyle } from 'react-native';
 import { Colors } from 'theme';
 import { Image } from '../image';
 import { Text } from '../text';
 
 type Props = {
   style?: ViewStyle;
+  paddingHorizontal?: number;
   postedAt?: Date;
+  onPress?: (_id: string) => void;
   image?: {
+    _id: string;
     url: string;
     contentFit?: 'cover' | 'contain';
   }
+  images?: {
+    _id: string;
+    url: string;
+    contentFit?: 'cover' | 'contain';
+  }[]
   likedAccounts?: string[];
-  postUrl?: string;
   user?: {
     onPress?: () => void;
     imageUrl?: string;
@@ -32,8 +39,14 @@ type Props = {
   }
 }
 
-export const Post = ({ style, postedAt, image, user, preset, outfit, postUrl, likedAccounts }: Props) => {
+export const Post = ({ style, postedAt, image, user, preset, outfit, images, likedAccounts, paddingHorizontal, onPress }: Props) => {
   const type = preset ? 'preset' : outfit ? 'outfit' : undefined;
+  const hasImages = images && images.length > 0;
+
+  const PADDING_HORIZONTAL = paddingHorizontal ?? 12;
+  const GAP = 4;
+
+  const FALLBACK_IMAGE = image || images?.[0];
 
   return (
     <View style={[{}, style]}>
@@ -42,6 +55,7 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, postUrl, li
         justifyContent: 'space-between',
         alignItems: 'flex-end',
         marginBottom: 12,
+        paddingHorizontal: hasImages ? PADDING_HORIZONTAL : 0
       }}>
         {user && <View style={{
           flexDirection: 'row',
@@ -69,60 +83,81 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, postUrl, li
         </View>}
         {postedAt && <Text.Sm color={Colors.neutral[400]}>{postedAt.toDateString()}</Text.Sm>}
       </View>}
-      <View style={{
-        width: '100%',
-        aspectRatio: 3 / 4,
-        borderRadius: 32,
-        borderTopColor: Colors.blur.medium,
-        borderTopWidth: 1,
-        backgroundColor: Colors.blur.dark,
-        overflow: 'hidden',
-      }}>
-        {image && <Image
-          source={image.url}
-          contentFit={image.contentFit}
-          style={{ flex: 1 }}
-        />}
-        <View style={{
-          position: 'absolute',
-          top: 16,
-          right: 16,
-          left: 16,
-          flexDirection: 'row',
-          justifyContent: 'space-between'
-        }}>
-          {preset && <Badge
-            source={preset.imageUrl}
-            contentFit="cover"
-            contentPosition="top center"
-            style={{ width: 32, height: 32 }}
-          />}
-          {outfit && <View style={{
-            flexDirection: 'row',
-            gap: 0,
-          }}>
-            {outfit.itemUrls.map((url) => <Badge
-              key={url}
-              source={url}
-              contentFit="contain"
-              style={{ marginLeft: -4 }}
-            />)}
-          </View>}
-        </View>
-      </View>
+      <FlatList
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          gap: GAP,
+          paddingHorizontal: hasImages ? PADDING_HORIZONTAL : 0,
+        }}
+        decelerationRate="fast"
+        data={(images ?? [image])}
+        keyExtractor={(item) => item?.url ?? ''}
+        snapToInterval={Dimensions.get('window').width - (PADDING_HORIZONTAL * 2) + GAP}
+        numColumns={1}
+        renderItem={({ item: img, index }) => {
+          return (
+            <View
+              key={img?.url ?? index}
+              style={{
+                width: Dimensions.get('window').width - (PADDING_HORIZONTAL * 2),
+                aspectRatio: 3 / 4,
+                borderRadius: 32,
+                borderTopColor: Colors.blur.medium,
+                borderTopWidth: 1,
+                backgroundColor: Colors.blur.dark,
+                overflow: 'hidden',
+              }}>
+              {img && <Pressable style={{ flex: 1 }} onPress={() => onPress?.(img._id)}>
+                <Image
+                  source={img.url}
+                  contentFit={img.contentFit}
+                  style={{ flex: 1 }}
+                />
+              </Pressable>}
+              <View style={{
+                position: 'absolute',
+                top: 16,
+                right: 16,
+                left: 16,
+                flexDirection: 'row',
+                justifyContent: 'space-between'
+              }}>
+                {preset && <Badge
+                  source={preset.imageUrl}
+                  contentFit="cover"
+                  contentPosition="top center"
+                  style={{ width: 32, height: 32 }}
+                />}
+                {outfit && <View style={{
+                  flexDirection: 'row',
+                  gap: 0,
+                }}>
+                  {outfit.itemUrls.map((url) => <Badge
+                    key={url}
+                    source={url}
+                    contentFit="contain"
+                    style={{ marginLeft: -4 }}
+                  />)}
+                </View>}
+              </View>
+            </View>
+          )
+        }}
+      />
       {(type === 'preset' || type === 'outfit') && <Button
         onPress={() => {
           preset?.onPress?.();
           outfit?.onPress?.();
         }}
-        style={{ marginTop: 8 }}
+        style={{ marginTop: 8, marginHorizontal: hasImages ? PADDING_HORIZONTAL : 0 }}
         variant={type === 'preset' ? 'secondary' : 'primary'}
         endIcon={type === 'outfit' && ArrowRight}
         startIcon={type === 'preset' && CircleFadingArrowUp}
       >
         {type === 'preset' ? 'Recreate' : 'Try on'}
       </Button>}
-      <View style={{ marginTop: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 4 }}>
+      <View style={{ marginTop: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: hasImages ? (PADDING_HORIZONTAL + 4) : 4 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', gap: 8 }}>
           <Heart size={20} color={Colors.foreground} />
           {likedAccounts && <View style={{ flexDirection: 'row', gap: 0, alignItems: 'center' }}>
@@ -142,7 +177,7 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, postUrl, li
         </View>
         <View style={{ gap: 12, flexDirection: 'row', alignItems: 'center' }}>
           <Bookmark size={20} color={Colors.primary[500]} />
-          {postUrl && <ShareIcon size={20} color={Colors.secondary[500]} />}
+          {FALLBACK_IMAGE && <ShareIcon size={20} color={Colors.secondary[500]} onPress={() => onPress?.(FALLBACK_IMAGE._id)} />}
         </View>
       </View>
     </View>

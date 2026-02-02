@@ -19,7 +19,7 @@ export default function Layout() {
 
   const title = step === 1 ? "Preset" : "Recap";
   const subtitle = step === 1 ?
-    "Select an environment and we will generate up to 4 images of you with different poses in the same environment." :
+    "Select an environment and we will generate photos for you." :
     "Make sure your details are correct.";
 
   return (

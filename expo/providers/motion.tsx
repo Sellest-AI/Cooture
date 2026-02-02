@@ -6,5 +6,7 @@ type Props = {
 }
 
 export const MotionProvider = ({ children }: Props) => {
-  return <>{children}</>
+  return <>
+    {children}
+  </>
 }

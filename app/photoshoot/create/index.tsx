@@ -1,3 +1,4 @@
+import { useRouter } from "@/hooks";
 import { api, useQuery } from "@/lib/convex/client";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
 import { Button } from "@ui/button";
@@ -12,6 +13,7 @@ import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 export default function Screen() {
+  const { push } = useRouter('/photoshoot/create');
   const { setPresetId, presetId } = usePhotoshoot.New();
   const { data: presets } = useQuery(api.router.presets.getAll.anon);
 
@@ -32,15 +34,17 @@ export default function Screen() {
           data={(presets ?? [])}
           style={{ columnGap: 36, paddingHorizontal: 12, marginTop: 24 }}
           renderItem={({ item, i }) => {
+            const selected = presetId === item._id;
             return (
               <View style={{ marginBottom: 24, paddingTop: 3 }}>
                 <Collection
-                  selected={presetId === item._id}
+                  selected={selected}
                   source={item.cover.sizes.medium.url}
                   contentFit="cover"
                   title={item.name}
                   onPress={() => {
                     setPresetId((p) => p === item._id ? null : item._id);
+                    if (!selected) setTimeout(() => push(ROUTES.PHOTOSHOOT.RECAP), 100);
                   }}
                 />
               </View>
@@ -55,8 +59,9 @@ export default function Screen() {
           style={{ position: 'absolute', left: 12, right: 12, bottom: 12 }}
           from={{ opacity: 0, translateY: 10 }}
           animate={{ opacity: 1, translateY: 0 }}
+          transition={{ delay: 1000 }}
           exit={{ opacity: 0, translateY: 10 }}
-          exitTransition={{ duration: 100 }}
+          exitTransition={{ duration: 100, delay: 0 }}
         >
           <Button
             style={{ marginTop: 12 }}

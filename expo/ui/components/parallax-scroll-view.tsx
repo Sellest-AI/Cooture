@@ -1,5 +1,5 @@
 import { ComponentProps, ReactNode, useRef } from "react";
-import { Animated, View, ViewStyle } from "react-native";
+import { Animated, ScrollView, View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 import { Image } from "./image";
 import { LinearGradient } from "./linear-gradient";
@@ -7,6 +7,7 @@ import { ParallaxScrollContext } from "./parallax-scroll-view.context";
 import { SafeAreaView } from "./safe-area-view";
 
 type Props = {
+  ref?: React.Ref<ScrollView>;
   headerSpace?: number;
   headerHeight?: number;
   headerContent: ReactNode;
@@ -18,6 +19,7 @@ type Props = {
 };
 
 export const ParallaxScrollView = ({
+  ref,
   headerHeight = 400,
   headerSpace = 80,
   headerContent,
@@ -131,6 +133,7 @@ export const ParallaxScrollView = ({
 
       {/* Scrollable Content */}
       <Animated.ScrollView
+        ref={ref}
         style={{ flex: 1 }}
         showsVerticalScrollIndicator={showsVerticalScrollIndicator}
         contentContainerStyle={contentContainerStyle}

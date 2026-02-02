@@ -13,8 +13,8 @@ import { StickyView } from "@ui/sticky-view";
 import { Tabs } from "@ui/tabs";
 import { Text } from "@ui/text";
 import { router, Slot, useSegments } from "expo-router";
-import { useEffect, useState } from "react";
-import { Platform, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Dimensions, LayoutRectangle, PanResponder, Platform, ScrollView, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -27,10 +27,18 @@ const TABS = ['generations', 'outfits', 'items'] as const;
 export default function TabsLayout() {
   const { data: _generations } = useQuery(api.router.generations.getAll.authed);
   const { user } = useAccount();
+  const scrollRef = useRef<ScrollView>(null);
+  const slotRef = useRef<LayoutRectangle | null>(null);
 
   const segments = useSegments();
   const currentRoute = segments[segments.length - 1] as typeof TABS[number];
-  const [activeTab, setActiveTab] = useState<typeof TABS[number]>(currentRoute ?? 'outfits');
+  const [activeTab, _setActiveTab] = useState<typeof TABS[number]>(currentRoute ?? 'outfits');
+  const activeTabRef = useRef(activeTab);
+
+  const setActiveTab = (tab: typeof TABS[number]) => {
+    activeTabRef.current = tab;
+    _setActiveTab(tab);
+  }
 
   useEffect(() => {
     if (currentRoute && currentRoute !== activeTab) {
@@ -41,7 +49,34 @@ export default function TabsLayout() {
   const handleTabChange = (tab: typeof TABS[number]) => {
     setActiveTab(tab);
     router.push(`/profile/${tab}`);
+    // Scroll to the beginning of the slot content
+    setTimeout(() => {
+      scrollRef.current?.scrollTo({
+        y: Dimensions.get('window').height - 24,
+        animated: true
+      });
+    }, 100);
   };
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        return Math.abs(gestureState.dx) > 10;
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        const SWIPE_THRESHOLD = 50;
+        const currentIndex = TABS.indexOf(activeTabRef.current);
+
+        if (gestureState.dx > SWIPE_THRESHOLD) {
+          const nextIndex = (currentIndex - 1) < 0 ? TABS.length - 1 : currentIndex - 1;
+          handleTabChange(TABS[nextIndex]);
+        } else if (gestureState.dx < -SWIPE_THRESHOLD) {
+          const nextIndex = (currentIndex + 1) >= TABS.length ? 0 : currentIndex + 1;
+          handleTabChange(TABS[nextIndex]);
+        }
+      },
+    })
+  ).current;
 
   if (!user) return null;
 
@@ -50,6 +85,7 @@ export default function TabsLayout() {
 
   return (
     <ParallaxScrollView
+      ref={scrollRef}
       headerHeight={396}
       headerSpace={120}
       headerBackgroundImage={previewGenerations[0]?.image?.url ?? require('assets/backgrounds/dark-gradient.png')}
@@ -112,7 +148,7 @@ export default function TabsLayout() {
                 style={{ flex: 1, aspectRatio: 1 }}
                 onPress={() => {
                   if (!isLast) router.push(ROUTES.POST.ID(item._id));
-                  else router.push(ROUTES.PROFILE.GENERATIONS);
+                  else handleTabChange('generations');
                 }}
               >
                 <View style={{
@@ -156,18 +192,23 @@ export default function TabsLayout() {
         <StickyView
           topOffset={Platform.OS === 'web' ? -48 : -12}
           style={{ marginBottom: 24 }}
+          onLayout={(e) => {
+            slotRef.current = e.nativeEvent.layout;
+          }}
         >
           <Tabs
             tabs={[
-              { label: 'Outfits', value: 'outfits' },
               { label: 'Generations', value: 'generations' },
+              { label: 'Outfits', value: 'outfits' },
               { label: 'Items', value: 'items' },
             ]}
             activeTab={activeTab}
             onTabChange={handleTabChange}
           />
         </StickyView>
-        <Slot />
+        <View {...panResponder.panHandlers}>
+          <Slot />
+        </View>
       </View>
     </ParallaxScrollView>
   );

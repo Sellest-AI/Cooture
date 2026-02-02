@@ -84,6 +84,7 @@ import type * as router_presets_getAll from "../router/presets/getAll.js";
 import type * as router_presets_getOne from "../router/presets/getOne.js";
 import type * as router_storage_images_deleteOne from "../router/storage/images/deleteOne.js";
 import type * as router_storage_images_deleteOneMutation from "../router/storage/images/deleteOneMutation.js";
+import type * as router_storage_images_getMany from "../router/storage/images/getMany.js";
 import type * as router_storage_images_getOne from "../router/storage/images/getOne.js";
 import type * as router_storage_images_saveMany from "../router/storage/images/saveMany.js";
 import type * as router_storage_images_saveSizes from "../router/storage/images/saveSizes.js";
@@ -197,6 +198,7 @@ declare const fullApi: ApiFromModules<{
   "router/presets/getOne": typeof router_presets_getOne;
   "router/storage/images/deleteOne": typeof router_storage_images_deleteOne;
   "router/storage/images/deleteOneMutation": typeof router_storage_images_deleteOneMutation;
+  "router/storage/images/getMany": typeof router_storage_images_getMany;
   "router/storage/images/getOne": typeof router_storage_images_getOne;
   "router/storage/images/saveMany": typeof router_storage_images_saveMany;
   "router/storage/images/saveSizes": typeof router_storage_images_saveSizes;
