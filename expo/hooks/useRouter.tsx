@@ -6,8 +6,8 @@ import { atom, useAtom, useSetAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 type ParamsDefault<T extends Route> =
-  T extends "/photoshoot/create" ? { outfitId?: Id<'outfits'> } :
-  T extends "/photoshoot/create/recap" ? { outfitId?: Id<'outfits'> } :
+  T extends "/photoshoot/create" ? { outfitId?: Id<'outfits'>, presetId?: Id<'presets'> } :
+  T extends "/photoshoot/create/recap" ? { outfitId?: Id<'outfits'>, presetId?: Id<'presets'> } :
   T extends "/pick-outfit" ? { canSkip?: boolean, itemIds?: Id<'items'>[] } :
   T extends "/new-outfit" ? { itemIds?: Id<'items'>[] } :
   T extends "/add-item" ? { outfitId?: Id<'outfits'>, itemIds?: Id<'items'>[] } :

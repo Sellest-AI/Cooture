@@ -36,6 +36,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
       <Block
         variant="blur"
         style={styles.tabBar}
+      // blurComponent={BlurView}
       >
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];

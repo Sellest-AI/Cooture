@@ -52,7 +52,7 @@ export default function TabsLayout() {
     // Scroll to the beginning of the slot content
     setTimeout(() => {
       scrollRef.current?.scrollTo({
-        y: Dimensions.get('window').height - 24,
+        y: Dimensions.get('window').height - 32,
         animated: true
       });
     }, 100);
@@ -86,8 +86,7 @@ export default function TabsLayout() {
   return (
     <ParallaxScrollView
       ref={scrollRef}
-      headerHeight={396}
-      headerSpace={120}
+      contentNegativeSpace={56}
       headerBackgroundImage={previewGenerations[0]?.image?.url ?? require('assets/backgrounds/dark-gradient.png')}
       contentContainerStyle={{ paddingBottom: TOTAL_TABS_SPACE }}
       headerContent={
@@ -95,10 +94,11 @@ export default function TabsLayout() {
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
-            alignItems: "flex-end",
+            alignItems: "flex-start",
             paddingLeft: 20,
             paddingRight: 12,
-            marginTop: 16
+            marginTop: 16,
+            height: 286
           }}
         >
           <Text.H1 type="alt" color={Colors.primary[200]}>

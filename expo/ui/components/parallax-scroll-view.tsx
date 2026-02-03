@@ -1,38 +1,52 @@
-import { ComponentProps, ReactNode, useRef } from "react";
-import { Animated, ScrollView, View, ViewStyle } from "react-native";
+import { ComponentProps, ReactNode, useRef, useState } from "react";
+import { Animated, Dimensions, ScrollView, View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 import { Image } from "./image";
 import { LinearGradient } from "./linear-gradient";
 import { ParallaxScrollContext } from "./parallax-scroll-view.context";
-import { SafeAreaView } from "./safe-area-view";
+import { SafeAreaView, useSafeAreaInsets } from "./safe-area-view";
 
 type Props = {
   ref?: React.Ref<ScrollView>;
-  headerSpace?: number;
-  headerHeight?: number;
+  /** Space between the header and the scrollable content */
+  contentNegativeSpace?: number;
+  /** Height of the header */
   headerContent: ReactNode;
   headerBackgroundImage?: ComponentProps<typeof Image>['source'];
   headerBackground?: ReactNode;
   children: ReactNode;
   contentContainerStyle?: ViewStyle;
   showsVerticalScrollIndicator?: boolean;
+  locked?: boolean;
+  style?: ViewStyle;
 };
 
 export const ParallaxScrollView = ({
   ref,
-  headerHeight = 400,
-  headerSpace = 80,
+  contentNegativeSpace = 0,
   headerContent,
   headerBackgroundImage,
   headerBackground,
   children,
   contentContainerStyle,
   showsVerticalScrollIndicator = false,
+  locked = false,
+  style,
+
 }: Props) => {
+  const [headerHeight, setHeaderHeight] = useState(0);
+
   const scrollY = useRef(new Animated.Value(0)).current;
   const headerTranslateY = scrollY.interpolate({
     inputRange: [0, headerHeight],
     outputRange: [0, -headerHeight / 2],
+    extrapolate: 'clamp',
+  });
+
+  // For content inside ScrollView: counteract natural scroll to create parallax
+  const headerContentParallax = scrollY.interpolate({
+    inputRange: [0, headerHeight],
+    outputRange: [0, headerHeight / 2], // Positive to slow down natural scroll
     extrapolate: 'clamp',
   });
 
@@ -42,10 +56,12 @@ export const ParallaxScrollView = ({
     extrapolate: 'clamp',
   });
 
-  const headerOffset = headerHeight - headerSpace;
+  const { top } = useSafeAreaInsets();
+  const headerHeightRuntime = headerHeight;
+  const headerOffset = headerHeightRuntime - contentNegativeSpace;
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, ...style }}>
       {/* Parallax Background Header */}
       <Animated.View
         style={{
@@ -53,7 +69,7 @@ export const ParallaxScrollView = ({
           top: 0,
           left: 0,
           right: 0,
-          height: headerHeight,
+          height: headerHeightRuntime,
           transform: [{ translateY: headerTranslateY }],
           opacity: headerOpacity,
           zIndex: 0,
@@ -87,7 +103,7 @@ export const ParallaxScrollView = ({
             left: 0,
             right: 0,
             bottom: 0,
-            height: '50%'
+            height: '50%',
           }}
         />
         <LinearGradient
@@ -103,34 +119,6 @@ export const ParallaxScrollView = ({
         />
       </Animated.View>
 
-      {/* Interactive Header Content */}
-      <Animated.View
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: headerHeight,
-          transform: [{ translateY: headerTranslateY }],
-          opacity: headerOpacity,
-          zIndex: 1,
-        }}
-        pointerEvents="box-none"
-      >
-        <SafeAreaView
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-          }}
-          pointerEvents="box-none"
-        >
-          {headerContent}
-        </SafeAreaView>
-      </Animated.View>
-
       {/* Scrollable Content */}
       <Animated.ScrollView
         ref={ref}
@@ -143,12 +131,37 @@ export const ParallaxScrollView = ({
         )}
         scrollEventThrottle={16}
       >
-        {/* Spacer for header */}
-        <View style={{ height: headerHeight - headerSpace, pointerEvents: 'none' }} />
+        {/* Interactive Header Content */}
+        <Animated.View
+          onLayout={(layout) => setHeaderHeight(layout.nativeEvent.layout.height)}
+          style={{
+            position: 'relative',
+            transform: [{ translateY: headerContentParallax }],
+            opacity: headerOpacity,
+            zIndex: 1,
+          }}
+          pointerEvents="box-none"
+        >
+          <SafeAreaView
+            pointerEvents="box-none"
+          >
+            {headerContent}
+          </SafeAreaView>
+        </Animated.View>
 
         <ParallaxScrollContext.Provider value={{ scrollY, headerOffset }}>
           {/* Content with background */}
-          <View style={{ zIndex: 1 }}>
+          <View
+            key={locked ? 'locked' : 'unlocked'}
+            style={{
+              zIndex: 1,
+              pointerEvents: 'auto',
+              flex: 1,
+              marginTop: -contentNegativeSpace,
+              height: locked ?
+                Dimensions.get('window').height - headerHeightRuntime + contentNegativeSpace + top
+                : undefined,
+            }}>
             {children}
           </View>
         </ParallaxScrollContext.Provider >

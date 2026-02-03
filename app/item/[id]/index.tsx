@@ -67,8 +67,6 @@ export default function ItemScreen() {
   return (
     <>
       <ParallaxScrollView
-        headerHeight={456}
-        headerSpace={0}
         headerBackground={
           <Image
             allowDownscaling={false}
@@ -79,7 +77,7 @@ export default function ItemScreen() {
           />
         }
         headerContent={
-          <View style={{ flex: 1 }}>
+          <View style={{ height: 456 }}>
             <ModalHeader
               style={{ paddingTop: 12, paddingHorizontal: 12 }}
               title={item.name}
@@ -88,7 +86,7 @@ export default function ItemScreen() {
             <View style={{
               padding: 32,
               paddingBottom: Platform.OS === 'web' ? 32 : 16,
-              flex: 1
+              flex: 1,
             }}>
               <Image
                 priority="high"

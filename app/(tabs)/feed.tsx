@@ -1,3 +1,4 @@
+import { ROUTES, useRouter } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
 import { useQuery, useQueryCached } from "@/lib/convex/client";
 import { PremiumBlock } from "@/modules/premium/premium-block";
@@ -14,6 +15,7 @@ import { FlatList, ViewStyle } from "react-native";
 import { Colors } from "theme";
 
 const FeedPost = ({ id, style }: { id: Id<'predictions'>, style?: ViewStyle }) => {
+  const { push } = useRouter('/feed');
   const { data: post } = useQuery(api.router.post.getOne.anon, { id });
   const predictions = post ? [post, ...post.generationPredictions.filter((p) => p.status === 'ACCEPTED')] : [];
   const imageIds = predictions.map((p) => p.imageId).filter(notEmpty);
@@ -43,10 +45,16 @@ const FeedPost = ({ id, style }: { id: Id<'predictions'>, style?: ViewStyle }) =
       imageUrl: post.user.image
     } : undefined}
     preset={post.preset?.cover ? {
-      imageUrl: post.preset.cover.sizes.thumbnail.url
+      imageUrl: post.preset.cover.sizes.thumbnail.url,
+      onPress: () => push(ROUTES.PHOTOSHOOT.RECAP, {
+        params: { presetId: post.preset?._id, outfitId: post.outfit?._id }
+      })
     } : undefined}
     outfit={post.outfit ? {
       itemUrls: post.outfit.items.map(i => i.image.url),
+      onPress: () => push(ROUTES.PHOTOSHOOT.RECAP, {
+        params: { presetId: post.preset?._id, outfitId: post.outfit?._id }
+      })
     } : undefined}
   />
   )

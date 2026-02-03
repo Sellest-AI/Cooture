@@ -154,6 +154,16 @@ export const Stepper = ({ value, style }: StepperProps) => {
         ...style,
       }}
     >
+      <BlurView
+        {...BLUR_PROPS}
+        style={{
+          flex: 1, height: 6,
+          position: 'absolute',
+          backgroundColor: Colors.blur.medium,
+          width: '90%'
+        }}
+      >
+      </BlurView>
       <Step active={value >= 1}>1</Step>
       <Line active={value >= 2} inProgress={value === 1} delay={0} reverseDelay={400} />
       <Step active={value >= 2} delay={200}>2</Step>

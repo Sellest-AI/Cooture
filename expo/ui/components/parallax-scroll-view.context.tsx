@@ -3,7 +3,7 @@ import { Animated } from "react-native";
 
 type ParallaxScrollContextType = {
   scrollY: Animated.Value;
-  headerOffset: number;
+  headerOffset?: number;
 } | null;
 
 export const ParallaxScrollContext = createContext<ParallaxScrollContextType>(null);

@@ -1,4 +1,5 @@
 import { useRouter } from "@/hooks";
+import { api, useQueryCached } from "@/lib/convex/client";
 import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Button } from "@ui/button";
@@ -9,12 +10,15 @@ import { ModalHeader } from "@ui/modal";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
-import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 export default function Screen() {
   const { push } = useRouter('/new');
+
+  const { data: presets } = useQueryCached(api.router.presets.getAll.anon);
+  const { data: outfits } = useQueryCached(api.router.outfits.getAll.authed)
 
   return (
     <SafeScrollView
@@ -76,59 +80,55 @@ export default function Screen() {
         <Text.H4 color={Colors.foreground} style={{ marginLeft: 12 }}>
           Trending styles
         </Text.H4>
-        <ScrollView
+        <FlatList
           style={{ marginTop: 16 }}
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 36, paddingHorizontal: 16, paddingTop: 6 }}
+          contentContainerStyle={{ gap: 32, paddingHorizontal: 16, paddingTop: 6 }}
           contentOffset={{ x: 120, y: 0 }}
-        >
-          {[
-            require('assets/placeholders/can-model.png'),
-            require('assets/placeholders/snow-model.png'),
-            require('assets/placeholders/restaurant-model.png'),
-            require('assets/placeholders/tiger-model.png'),
-            require('assets/placeholders/street-model.png'),
-          ].map((src, i) => (
+          data={(presets?.slice(0, 6) || [])}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
             <Collection
-              key={i}
-              source={src}
-              title="Sushi Restaurant"
-              style={{ width: 145 }}
+              onPress={() => push(ROUTES.PHOTOSHOOT.RECAP, {
+                params: { presetId: item._id }
+              })}
+              source={item.cover.sizes.medium.url}
+              title={item.name}
+              style={{ width: 132 }}
             />
-          ))}
-        </ScrollView>
+          )}
+        />
       </View>
       <View style={{ marginTop: 40 }}>
         <Text.H4 color={Colors.foreground} style={{ marginLeft: 12 }}>
           You next try on
         </Text.H4>
-        <ScrollView
+        <FlatList
           style={{ marginTop: 16 }}
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 36, paddingHorizontal: 16, paddingTop: 6 }}
+          contentContainerStyle={{ gap: 32, paddingHorizontal: 16, paddingTop: 6 }}
           contentOffset={{ x: 120, y: 0 }}
-        >
-          {[
-            require('assets/placeholders/jeans-outfit.png'),
-            require('assets/placeholders/full-outfit.png'),
-            require('assets/placeholders/shoes-outfit.png'),
-          ].map((src, i) => (
+          data={(outfits?.slice(0, 6) || [])}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
             <Collection
-              key={i}
-              source={src}
-              title="Outfit"
-              style={{ width: 156 }}
+              onPress={() => push(ROUTES.PHOTOSHOOT.RECAP, {
+                params: { outfitId: item._id }
+              })}
+              source={item.cover.sizes.small.url}
+              title={item.name}
+              style={{ width: 132 }}
               contentFit="contain"
             />
-          ))}
-        </ScrollView>
+          )}
+        />
       </View>
       <Button
         variant="blur"
         onPress={() => router.push('/presets/new')}
-        style={{ marginTop: 12 }}
+        style={{ marginTop: 48, marginHorizontal: 12 }}
       >
         New preset
       </Button>

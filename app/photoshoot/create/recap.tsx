@@ -11,7 +11,7 @@ import { Flame, Pencil, Squirish } from "@ui/icons";
 import { Image } from "@ui/image";
 import { Text } from "@ui/text";
 import React, { useMemo } from "react";
-import { Platform, ScrollView, View, ViewStyle } from "react-native";
+import { Platform, View, ViewStyle } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -90,7 +90,7 @@ const OutfitGrid = ({ items, style }: { items: Items, style?: ViewStyle }) => {
 
 const Portrait = ({ style }: { style?: ViewStyle }) => {
   const { frontImage, sideImage, smileImage, isPending } = usePortraits();
-  const { push } = useRouter('/photoshoot/create/recap');
+  const { push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
 
   const HEIGHT = style?.height ?? 256;
 
@@ -140,16 +140,26 @@ const Portrait = ({ style }: { style?: ViewStyle }) => {
 }
 
 export default function Screen() {
-  const { outfit, outfitId, presetId, preset, setOutfitId, reset } = usePhotoshoot.New();
-  const { push, replace } = useRouter('/photoshoot/create/recap', {
-    onInit: ({ outfitId }) => { setOutfitId(outfitId ?? null) },
+  const { outfit, outfitId, presetId, preset, setOutfitId, setPresetId, reset } = usePhotoshoot.New();
+  const { push, replace, dismissTo } = useRouter(ROUTES.PHOTOSHOOT.RECAP, {
+    onInit: ({ outfitId, presetId }) => {
+      setOutfitId(outfitId ?? null);
+      if (presetId) setPresetId(presetId);
+    },
     resetFnc: reset,
   });
 
   const { action } = useAction(api.llm.triggers.photoshoot.authed);
 
   return (
-    <ScrollView style={{ flex: 1, padding: 12, backgroundColor: Colors.background }}>
+    <View style={{ paddingHorizontal: 12 }}>
+      <Button
+        onPress={() => dismissTo('/photoshoot/create')}
+        variant="secondary"
+        style={{ marginBottom: 8 }}
+      >
+        Change Preset
+      </Button>
       <Block
         variant="blur"
         style={{
@@ -163,31 +173,6 @@ export default function Screen() {
         <Text.Base color={Colors.neutral[400]}>Make sure your portrait images are up to date.</Text.Base>
         <Portrait style={{ marginTop: 16 }} />
       </Block>
-      {preset && <Block
-        variant="blur"
-        style={{
-          borderRadius: 32,
-          paddingHorizontal: 16,
-          paddingVertical: 20,
-          marginTop: 8,
-          gap: 12,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-        }}
-      >
-        <View style={{ gap: 6 }}>
-          <Text.H4 color={Colors.neutral[50]} numberOfLines={1}>{preset?.name}</Text.H4>
-          <Text.Base color={Colors.neutral[400]} numberOfLines={1} weight={600}>Preset</Text.Base>
-        </View>
-        <Image
-          style={{
-            width: 96,
-            height: 52,
-            borderRadius: 20
-          }}
-          source={preset?.cover?.sizes.medium.url}
-        />
-      </Block>}
       <Block
         variant="blur"
         style={{
@@ -239,6 +224,6 @@ export default function Screen() {
         </ButtonSlider>
       </View>
       {Platform.OS !== 'web' && <View style={{ height: 12 }} />}
-    </ScrollView>
+    </View>
   );
 }

@@ -1,5 +1,5 @@
 import { useRouter } from "@/hooks";
-import { api, useQuery } from "@/lib/convex/client";
+import { api, useQueryCached } from "@/lib/convex/client";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
 import { Button } from "@ui/button";
 import { Collection } from "@ui/cards";
@@ -15,7 +15,7 @@ import { Colors } from "theme";
 export default function Screen() {
   const { push } = useRouter('/photoshoot/create');
   const { setPresetId, presetId } = usePhotoshoot.New();
-  const { data: presets } = useQuery(api.router.presets.getAll.anon);
+  const { data: presets } = useQueryCached(api.router.presets.getAll.anon);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -59,7 +59,7 @@ export default function Screen() {
           style={{ position: 'absolute', left: 12, right: 12, bottom: 12 }}
           from={{ opacity: 0, translateY: 10 }}
           animate={{ opacity: 1, translateY: 0 }}
-          transition={{ delay: 1000 }}
+          transition={{ delay: 800 }}
           exit={{ opacity: 0, translateY: 10 }}
           exitTransition={{ duration: 100, delay: 0 }}
         >

@@ -11,6 +11,7 @@ type Props = {
   style?: ViewStyle;
   children?: React.ReactNode;
   disabled?: boolean;
+  blurComponent?: typeof BlurView;
 }
 
 export const getBlockColors = (variant: Props['variant'], disabled?: boolean) => {
@@ -51,10 +52,10 @@ export const getBlockColors = (variant: Props['variant'], disabled?: boolean) =>
   }
 }
 
-export const Block = ({ className = "", children, variant, style, disabled }: Props) => {
+export const Block = ({ className = "", children, variant, style, disabled, blurComponent }: Props) => {
   const VariantColors = useMemo(() => getBlockColors(variant, disabled), [disabled, variant]);
 
-  const Component = variant === 'blur' ? BlurView : View;
+  const Component = variant === 'blur' ? (blurComponent ?? BlurView) : View;
 
   const showTopBorder = (Number(style?.width) || Infinity) > 24 &&
     (Number(style?.borderRadius) || 0) < 99;

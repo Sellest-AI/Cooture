@@ -76,7 +76,7 @@ export const CaptureButtons = ({ style, cameraRef, onCapture, backButton = "clos
       <Button
         size="rounded"
         variant="blur"
-        style={{ padding: 4 }}
+        style={{ padding: 12 }}
         onPress={handlePickImage}
       >
         <ImageIcon color={Colors.foreground} size={24} />
@@ -84,10 +84,10 @@ export const CaptureButtons = ({ style, cameraRef, onCapture, backButton = "clos
       <Button
         size="rounded"
         variant="primary"
-        style={{ padding: 8 }}
+        style={{ padding: 20 }}
         onPress={handleCapture}
       >
-        <Camera size={24} color={Colors.primary[900]} />
+        <Camera size={28} color={Colors.primary[900]} />
       </Button>
     </View>
   )

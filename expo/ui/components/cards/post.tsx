@@ -55,7 +55,7 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
         justifyContent: 'space-between',
         alignItems: 'flex-end',
         marginBottom: 12,
-        paddingHorizontal: hasImages ? PADDING_HORIZONTAL : 0
+        paddingHorizontal: PADDING_HORIZONTAL
       }}>
         {user && <View style={{
           flexDirection: 'row',
@@ -88,7 +88,7 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
           gap: GAP,
-          paddingHorizontal: hasImages ? PADDING_HORIZONTAL : 0,
+          paddingHorizontal: PADDING_HORIZONTAL,
         }}
         decelerationRate="fast"
         data={(images ?? [image])}
@@ -157,7 +157,7 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
       >
         {type === 'preset' ? 'Recreate' : 'Try on'}
       </Button>}
-      <View style={{ marginTop: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: hasImages ? (PADDING_HORIZONTAL + 4) : 4 }}>
+      <View style={{ marginTop: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: PADDING_HORIZONTAL + 4 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', gap: 8 }}>
           <Heart size={20} color={Colors.foreground} />
           {likedAccounts && <View style={{ flexDirection: 'row', gap: 0, alignItems: 'center' }}>

@@ -22,7 +22,7 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples }: Props) => {
   const cameraRef = useRef<CameraView>(null);
   const [hasPermission, setHasPermission] = useState(false);
 
-  if (hasPermission) {
+  if (!hasPermission) {
     return <CameraPermission onSuccess={() => setHasPermission(true)} />
   }
 
@@ -33,29 +33,24 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples }: Props) => {
       <View style={{
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 40,
-        borderWidth: 1,
-        borderColor: Colors.blur.medium,
-        padding: 16,
-        width: '80%',
+        width: '100%',
+        aspectRatio: 2 / 3,
         marginHorizontal: 'auto',
-        borderRadius: 48,
+        marginBottom: 56,
       }}>
         <View style={{
+          backgroundColor: Colors.blur.dark,
+          flex: 1,
           width: '100%',
-          aspectRatio: '3/4',
-          borderRadius: 32,
+          borderBottomLeftRadius: 64,
+          borderBottomRightRadius: 64,
           overflow: 'hidden',
-          backgroundColor: Colors.blur.medium,
-          borderWidth: 1,
-          borderColor: Colors.blur.medium,
         }}>
           <CameraView
             ref={cameraRef}
             style={{ flex: 1 }}
             mirror={true}
             animateShutter={false}
-            ratio={'1:1'}
             facing="front"
             flash="off"
           />
@@ -68,7 +63,8 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples }: Props) => {
           style={{
             position: 'absolute',
             padding: 0,
-            bottom: -20
+            bottom: -28,
+            marginLeft: -28
           }}
           showBackButton={false}
           cameraRef={cameraRef}

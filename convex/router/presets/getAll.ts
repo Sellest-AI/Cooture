@@ -5,7 +5,7 @@ import { publicQuery } from "../../procedures";
 export const anon = publicQuery({
   args: {},
   handler: async (ctx) => {
-    const presets = await ctx.db.query('presets').collect();
+    const presets = await ctx.db.query('presets').order('desc').collect();
     // Sanitize presets by removing prompts
     const sanitizedPresets = await Promise.all(presets.map(async ({ prompts, ...rest }) => {
       const cover = await getImage(ctx, rest.imageIds[0]);

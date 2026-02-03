@@ -5,7 +5,7 @@ import { openAuthSessionAsync } from "expo-web-browser";
 import { useCallback, useState } from "react";
 import { Platform } from "react-native";
 import { ROUTES } from "routes";
-import { api, useQuery } from "./client";
+import { api, useQueryCached } from "./client";
 import { convexAuthStorage } from "./storage";
 
 export const useAuthActions = () => {
@@ -62,7 +62,7 @@ export const useAuthActions = () => {
 
 export const useAccount = () => {
   const token = useAuthToken();
-  const { data: user } = useQuery(api.router.users.getAccount.authed, !!token ? undefined : 'skip');
+  const { data: user } = useQueryCached(api.router.users.getAccount.authed, !!token ? undefined : 'skip');
 
   const isAuthenticated = !!token;
   const isAdmin = useIsAdmin();
@@ -84,7 +84,7 @@ export const useAccount = () => {
 }
 
 export const useIsAdmin = () => {
-  const { data: user } = useQuery(api.router.users.getAccount.authed);
+  const { data: user } = useQueryCached(api.router.users.getAccount.authed);
   const isAdmin = user?.role === 'ADMIN';
   return isAdmin;
 }
