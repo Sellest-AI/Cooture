@@ -114,7 +114,7 @@ export default function Screen() {
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
             <Collection
-              onPress={() => push(ROUTES.PHOTOSHOOT.RECAP, {
+              onPress={() => push(ROUTES.PHOTOSHOOT.NEW, {
                 params: { outfitId: item._id }
               })}
               source={item.cover.sizes.small.url}

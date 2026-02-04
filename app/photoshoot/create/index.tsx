@@ -44,7 +44,7 @@ export default function Screen() {
                   title={item.name}
                   onPress={() => {
                     setPresetId((p) => p === item._id ? null : item._id);
-                    if (!selected) setTimeout(() => push(ROUTES.PHOTOSHOOT.RECAP), 100);
+                    if (!selected) requestAnimationFrame(() => push(ROUTES.PHOTOSHOOT.RECAP));
                   }}
                 />
               </View>

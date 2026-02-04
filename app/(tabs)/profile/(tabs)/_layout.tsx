@@ -1,5 +1,5 @@
 import { useAccount } from "@/lib/convex/auth";
-import { api, useQuery } from "@/lib/convex/client";
+import { api, usePaginatedQueryCached } from "@/lib/convex/client";
 import { PremiumBlock } from "@/modules/premium/premium-block";
 import { Notification } from "@/modules/profiles/notification";
 import { QuickActions } from "@/modules/profiles/quick-actions";
@@ -25,7 +25,7 @@ export const unstable_settings = {
 const TABS = ['generations', 'outfits', 'items'] as const;
 
 export default function TabsLayout() {
-  const { data: _generations } = useQuery(api.router.generations.getAll.authed);
+  const _generations = usePaginatedQueryCached(api.router.generations.getPaginated.authed, {}, { initialNumItems: 4 });
   const { user } = useAccount();
   const scrollRef = useRef<ScrollView>(null);
   const slotRef = useRef<LayoutRectangle | null>(null);
@@ -80,7 +80,7 @@ export default function TabsLayout() {
 
   if (!user) return null;
 
-  const generations = (_generations ?? []).filter((g) => g.cover);
+  const generations = (_generations.results ?? []).filter((g) => g.cover);
   const previewGenerations = generations.map((g) => g.predictions).flat().filter((p) => p.status === 'ACCEPTED');
 
   return (

@@ -1,5 +1,5 @@
 import { api, Id } from "@/lib/convex/api";
-import { useQuery } from "@/lib/convex/client";
+import { usePaginatedQueryCached, useQueryCached } from "@/lib/convex/client";
 import { Badge } from "@ui/badge";
 import { Block } from "@ui/block";
 import { EmptyBlock } from "@ui/block.empty";
@@ -21,9 +21,9 @@ type Props = {
   status: 'PENDING' | 'COMPLETED' | 'LOADING';
 }
 const Notification = ({ generationId, status }: Props) => {
-  const { data: generation, isPending } = useQuery(api.router.generations.getOne.authed, { generationId: generationId });
+  const { data: generation, isPending } = useQueryCached(api.router.generations.getOne.authed, { generationId: generationId });
   const presetId = generation?.metadata?.presetId;
-  const { data: preset, isPending: presetPending } = useQuery(api.router.presets.getOne.anon, presetId ? { presetId } : 'skip');
+  const { data: preset, isPending: presetPending } = useQueryCached(api.router.presets.getOne.anon, presetId ? { presetId } : 'skip');
 
   if (isPending || !generation) return <Skeleton
     style={{ height: 76, width: '100%', marginBottom: 20 }}
@@ -95,11 +95,28 @@ const Notification = ({ generationId, status }: Props) => {
   )
 }
 
-export default function Screen() {
-  const { data } = useQuery(api.router.generations.getAll.authed);
-  const generations = (data ?? []);
+const NotificationSkeleton = () => {
+  return (
+    <View style={{ padding: 12, flexDirection: 'row', alignItems: 'center' }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+        <Skeleton style={{ width: 46, height: 46, borderRadius: 99 }} />
+        <View style={{ marginLeft: 12, justifyContent: 'center' }}>
+          <Skeleton style={{ width: 80, height: 14 }} />
+          <Skeleton style={{ width: 128, height: 14, marginTop: 4 }} />
+        </View>
+      </View>
+      <Skeleton style={{ width: 56, height: 56 }} />
+    </View>
+  )
+}
 
-  const Component = generations.length === 0 ? View : SafeScrollView;
+export default function Screen() {
+  const data = usePaginatedQueryCached(api.router.generations.getPaginated.authed, {}, { initialNumItems: 12 });
+  const generations = (data.results ?? []);
+
+  const isEmpty = !data.isLoading && generations.length === 0;
+
+  const Component = isEmpty ? View : SafeScrollView;
 
   const pendingGenerations = generations.filter((g) => g.status !== 'COMPLETED');
 
@@ -109,9 +126,10 @@ export default function Screen() {
         padding: 12,
         paddingHorizontal: 8,
         paddingTop: 0,
-        flex: generations.length === 0 ? 1 : undefined
+        flex: isEmpty ? 1 : undefined
       }}
       stickyHeaderIndices={[0]}
+      onReachEnd={() => { if (data.status === "CanLoadMore") data.loadMore(12); }}
     >
       <ModalHeader
         style={{ backgroundColor: Colors.background, paddingTop: 12, paddingHorizontal: 4 }}
@@ -119,7 +137,7 @@ export default function Screen() {
         title="Notifications"
         type="alt"
       />
-      {generations.length === 0 && <EmptyBlock
+      {isEmpty && <EmptyBlock
         style={{ marginTop: -52 }}
         icon={Bell}
         title="Notifications"
@@ -147,6 +165,12 @@ export default function Screen() {
           status={generation.status}
         />
       ))}
+      {(data.status === "CanLoadMore" || data.isLoading) && <>
+        <NotificationSkeleton />
+        <NotificationSkeleton />
+        <NotificationSkeleton />
+        <NotificationSkeleton />
+      </>}
     </Component>
   )
 }

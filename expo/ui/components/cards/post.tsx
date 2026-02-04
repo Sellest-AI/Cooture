@@ -2,10 +2,12 @@ import { Badge } from '@ui/badge';
 import { Button } from '@ui/button';
 import { ArrowRight, Bookmark, CircleFadingArrowUp, Heart, ShareIcon } from '@ui/icons';
 import { Skeleton } from '@ui/skeleton';
-import { Dimensions, FlatList, Pressable, View, ViewStyle } from 'react-native';
+import { useState } from 'react';
+import { Dimensions, FlatList, View, ViewStyle } from 'react-native';
 import { Colors } from 'theme';
 import { Image } from '../image';
 import { Text } from '../text';
+import { ZoomableImage } from '../zoomable-image';
 
 type Props = {
   style?: ViewStyle;
@@ -40,6 +42,7 @@ type Props = {
 }
 
 export const Post = ({ style, postedAt, image, user, preset, outfit, images, likedAccounts, paddingHorizontal, onPress }: Props) => {
+  const [pinching, setPinching] = useState<{ index: number } | false>(false);
   const type = preset ? 'preset' : outfit ? 'outfit' : undefined;
   const hasImages = images && images.length > 0;
 
@@ -102,20 +105,23 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
               style={{
                 width: Dimensions.get('window').width - (PADDING_HORIZONTAL * 2),
                 aspectRatio: 3 / 4,
-                borderRadius: 32,
-                borderTopColor: Colors.blur.medium,
-                borderTopWidth: 1,
-                backgroundColor: Colors.blur.dark,
-                overflow: 'hidden',
+                zIndex: pinching && pinching.index === index ? 10 : 0,
               }}>
-              {img && <Pressable style={{ flex: 1 }} onPress={() => onPress?.(img._id)}>
-                <Image
-                  source={img.url}
-                  contentFit={img.contentFit}
-                  style={{ flex: 1 }}
-                />
-              </Pressable>}
-              <View style={{
+              {img && <ZoomableImage
+                onPinchChange={(pinching) => setPinching(pinching ? { index } : false)}
+                source={img.url}
+                contentFit={img.contentFit}
+                width={Dimensions.get('window').width - (PADDING_HORIZONTAL * 2)}
+                aspectRatio={3 / 4}
+                style={{
+                  backgroundColor: Colors.blur.dark,
+                  borderRadius: 32,
+                  borderColor: Colors.blur.medium,
+                  borderTopWidth: 1,
+                  flex: 1,
+                }}
+              />}
+              {!pinching && <View style={{
                 position: 'absolute',
                 top: 16,
                 right: 16,
@@ -140,7 +146,7 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
                     style={{ marginLeft: -4 }}
                   />)}
                 </View>}
-              </View>
+              </View>}
             </View>
           )
         }}

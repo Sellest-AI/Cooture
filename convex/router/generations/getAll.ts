@@ -1,4 +1,4 @@
-import { getGenerationDetails } from "../../functions/generations/getGenerationDetails";
+import { getGenerationDetails } from "../../functions/generations";
 import { authQuery } from "../../procedures";
 
 export const authed = authQuery({

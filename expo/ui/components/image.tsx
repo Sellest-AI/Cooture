@@ -40,3 +40,5 @@ export const Image = forwardRef<any, ExpoImageProps>((props, ref) => {
 });
 
 Image.displayName = 'Image';
+
+export type ImageProps = ExpoImageProps; 

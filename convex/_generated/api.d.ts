@@ -18,6 +18,7 @@ import type * as functions_images_getImage from "../functions/images/getImage.js
 import type * as functions_images_index from "../functions/images/index.js";
 import type * as functions_images_saveImage from "../functions/images/saveImage.js";
 import type * as functions_items_createItem from "../functions/items/createItem.js";
+import type * as functions_items_extractPosition from "../functions/items/extractPosition.js";
 import type * as functions_items_getItem from "../functions/items/getItem.js";
 import type * as functions_subscriptions_getUserSubscription from "../functions/subscriptions/getUserSubscription.js";
 import type * as functions_subscriptions_index from "../functions/subscriptions/index.js";
@@ -64,6 +65,7 @@ import type * as router_examples_query from "../router/examples/query.js";
 import type * as router_generations_createOne from "../router/generations/createOne.js";
 import type * as router_generations_getAll from "../router/generations/getAll.js";
 import type * as router_generations_getOne from "../router/generations/getOne.js";
+import type * as router_generations_getPaginated from "../router/generations/getPaginated.js";
 import type * as router_generations_getUser from "../router/generations/getUser.js";
 import type * as router_generations_updatePrediction from "../router/generations/updatePrediction.js";
 import type * as router_items_createOne from "../router/items/createOne.js";
@@ -132,6 +134,7 @@ declare const fullApi: ApiFromModules<{
   "functions/images/index": typeof functions_images_index;
   "functions/images/saveImage": typeof functions_images_saveImage;
   "functions/items/createItem": typeof functions_items_createItem;
+  "functions/items/extractPosition": typeof functions_items_extractPosition;
   "functions/items/getItem": typeof functions_items_getItem;
   "functions/subscriptions/getUserSubscription": typeof functions_subscriptions_getUserSubscription;
   "functions/subscriptions/index": typeof functions_subscriptions_index;
@@ -178,6 +181,7 @@ declare const fullApi: ApiFromModules<{
   "router/generations/createOne": typeof router_generations_createOne;
   "router/generations/getAll": typeof router_generations_getAll;
   "router/generations/getOne": typeof router_generations_getOne;
+  "router/generations/getPaginated": typeof router_generations_getPaginated;
   "router/generations/getUser": typeof router_generations_getUser;
   "router/generations/updatePrediction": typeof router_generations_updatePrediction;
   "router/items/createOne": typeof router_items_createOne;

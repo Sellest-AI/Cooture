@@ -1,7 +1,7 @@
-import { ComponentProps, useEffect, useRef } from "react";
+import { ComponentProps, useEffect, useRef, useState } from "react";
 import { Animated, Pressable, View, ViewStyle } from "react-native";
 import { Colors } from "theme";
-import { Explozish, Plus } from "../icons";
+import { Explozish, Loader, Plus } from "../icons";
 import { Image } from '../image';
 import { Text } from "../text";
 
@@ -17,6 +17,7 @@ type Props = {
 }
 
 export const Collection = ({ title, subtitle, disabled, selected, source, contentFit, style, onPress }: Props) => {
+  const [loading, setLoading] = useState(false);
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const rotate = useRef(new Animated.Value(7)).current;
 
@@ -72,8 +73,12 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
     <Pressable
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
-      onPress={(e) => { onPress?.(e); }}
-      style={{ flex: 1 }}
+      onPress={(e) => {
+        setLoading(true);
+        requestAnimationFrame(() => onPress?.(e));
+        setTimeout(() => setLoading(false), 200);
+      }}
+      style={{ flex: 1, width: style?.width }}
     >
       <Animated.View
         style={{
@@ -206,38 +211,40 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
       </Animated.View>
       {showText && <View
         style={{
-          paddingHorizontal: 24,
+          paddingHorizontal: 16,
           paddingVertical: selected ? 4 : 0,
           backgroundColor: selected ? Colors.primary[500] : 'transparent',
           borderRadius: selected ? 99 : 0,
-          width: 'auto',
-          maxWidth: 'auto',
           justifyContent: 'center',
           alignItems: 'center',
           alignSelf: 'center',
           marginTop: 12,
         }}
       >
-        {title && <Text.Sm
-          numberOfLines={1}
-          style={{
-            fontWeight: 700,
-            color: selected ? Colors.primary[900] : Colors.neutral[50],
-          }}
-        >
-          {title}
-        </Text.Sm>}
-        {subtitle && <Text.Sm
-          numberOfLines={1}
-          style={{
-            fontWeight: 700,
-            color: selected ? Colors.primary[900] : Colors.neutral[400],
-            opacity: selected ? 0.5 : 1,
-            marginTop: 0
-          }}
-        >
-          {subtitle}
-        </Text.Sm>}
+        {(loading && !selected) ? <Loader color={Colors.foreground} size={14} /> : <>
+          {title && <Text.Sm
+            numberOfLines={1}
+            style={{
+              maxWidth: '100%',
+              width: '100%',
+              fontWeight: 700,
+              color: selected ? Colors.primary[900] : Colors.neutral[50],
+            }}
+          >
+            {title}
+          </Text.Sm>}
+          {subtitle && <Text.Sm
+            numberOfLines={1}
+            style={{
+              fontWeight: 700,
+              color: selected ? Colors.primary[900] : Colors.neutral[400],
+              opacity: selected ? 0.5 : 1,
+              marginTop: 0
+            }}
+          >
+            {subtitle}
+          </Text.Sm>}
+        </>}
       </View>}
     </Pressable>
   )

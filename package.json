@@ -78,15 +78,16 @@
     "react-native-svg": "^15.12.1",
     "react-native-web": "~0.21.0",
     "react-native-worklets": "0.5.1",
+    "react-native-zoom-toolkit": "^5.0.1",
     "reanimated-masonry-list": "^1.0.1",
     "replicate": "^1.4.0",
     "sharp": "0.33.5",
     "stripe": "^20.2.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^3.4.17",
+    "tslib": "^2.8.1",
     "voyage-ai-provider": "^2.0.0",
-    "zod": "^4.3.5",
-    "tslib": "^2.8.1"
+    "zod": "^4.3.5"
   },
   "resolutions": {
     "tslib": "2.8.1"

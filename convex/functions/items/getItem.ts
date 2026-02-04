@@ -1,6 +1,7 @@
 import { Id } from "../../_generated/dataModel";
 import { QueryCtx } from "../../procedures";
 import { getImage } from "../images";
+import { extractPosition } from "./extractPosition";
 
 export const getItem = async (ctx: QueryCtx, itemId: Id<'items'>) => {
   const item = await ctx.db.get(itemId);
@@ -9,6 +10,7 @@ export const getItem = async (ctx: QueryCtx, itemId: Id<'items'>) => {
   if (!image) return null;
   return {
     ...item,
+    position: extractPosition(item.category),
     image,
   }
 }

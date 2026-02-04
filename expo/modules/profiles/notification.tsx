@@ -1,5 +1,5 @@
 import { ROUTES, useRouter } from "@/hooks";
-import { api, useQuery } from "@/lib/convex/client";
+import { api, usePaginatedQuery } from "@/lib/convex/client";
 import { Block } from "@ui/block";
 import { Bell, Loader } from "@ui/icons";
 import { Pressable } from "@ui/pressable";
@@ -12,8 +12,8 @@ type Props = {
 }
 
 export const Notification = ({ style }: Props) => {
-  const { data } = useQuery(api.router.generations.getAll.authed);
-  const generations = data ?? [];
+  const data = usePaginatedQuery(api.router.generations.getPaginated.authed, {}, { initialNumItems: 9 });
+  const generations = data.results ?? [];
   const newGenerations = generations.filter(g => g.status === 'PENDING');
   const hasNewNotifications = newGenerations.length > 0;
   const isLoading = generations.some(g => g.status === 'LOADING');

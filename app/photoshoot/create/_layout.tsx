@@ -1,8 +1,10 @@
 import { useRouter } from "@/hooks";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
+import { Badge } from "@ui/badge";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
+import { Skeleton } from "@ui/skeleton";
 import { Stepper } from "@ui/stepper";
 import { Text } from "@ui/text";
 import { router, Slot, usePathname } from "expo-router";
@@ -34,7 +36,7 @@ export default function Layout() {
         locked={step > 1 ? false : true}
         headerBackground={step > 1 ? <Image
           source={preset?.cover?.url}
-          style={{ flex: 1, opacity: 0.3 }}
+          style={{ flex: 1, opacity: 0.2 }}
         /> : undefined}
         headerContent={
           <View style={{ marginBottom: 4, flex: 1 }}>
@@ -51,15 +53,20 @@ export default function Layout() {
               />
 
             </View>
-            {(preset && step > 1) && <View style={{
+            {(step > 1) && <View style={{
               alignItems: 'center',
               justifyContent: 'center',
               paddingBottom: 8,
-              marginTop: 96
+              marginTop: 32
             }}
             >
+              <Badge
+                source={preset?.cover?.url}
+                style={{ width: 112, height: 112, marginBottom: 16 }}
+              />
               <Text.Base color={Colors.neutral[400]} weight={600}>Preset</Text.Base>
-              <Text.H4 color={Colors.foreground}>{preset.name}</Text.H4>
+              {!preset ? <Skeleton style={{ height: 20, width: 148, marginTop: 4 }} /> :
+                <Text.H4 color={Colors.foreground}>{preset.name}</Text.H4>}
             </View>}
           </View>
         }

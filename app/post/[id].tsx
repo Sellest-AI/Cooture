@@ -54,7 +54,8 @@ const UserPost = ({ postId, style }: { postId: Id<'predictions'>, style?: ViewSt
   />
   )
 }
-export default function Screen() {
+
+export function Screen() {
   const { searchParams: { id } } = useRoute<{ id: Id<'predictions'> }>('/post/[id]');
 
   const { data: post } = useQuery(api.router.post.getOne.anon, { id });

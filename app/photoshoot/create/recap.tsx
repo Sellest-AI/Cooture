@@ -140,7 +140,7 @@ const Portrait = ({ style }: { style?: ViewStyle }) => {
 }
 
 export default function Screen() {
-  const { outfit, outfitId, presetId, preset, setOutfitId, setPresetId, reset } = usePhotoshoot.New();
+  const { outfit, outfitId, presetId, setOutfitId, setPresetId, reset } = usePhotoshoot.New();
   const { push, replace, dismissTo } = useRouter(ROUTES.PHOTOSHOOT.RECAP, {
     onInit: ({ outfitId, presetId }) => {
       setOutfitId(outfitId ?? null);

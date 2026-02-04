@@ -4,9 +4,10 @@ import { Platform, ScrollView, ViewStyle } from "react-native";
 
 type Props = {
   style?: ViewStyle,
+  onReachEnd?: () => void,
 } & Omit<ComponentProps<typeof ScrollView>, 'style'>;
 
-export const SafeScrollView = ({ style, children, contentContainerStyle, ...props }: Props) => {
+export const SafeScrollView = ({ style, children, contentContainerStyle, onReachEnd, ...props }: Props) => {
   const insets = useSafeAreaInsets();
 
   const fallbackPadding =
@@ -30,6 +31,14 @@ export const SafeScrollView = ({ style, children, contentContainerStyle, ...prop
             contentContainerStyle={[contentContainerStyle, {
               paddingBottom: contentPaddingBottom ?? Math.max(fallbackPadding * 2, insets.bottom),
             }]}
+            scrollEventThrottle={400}
+            onScroll={(e) => {
+              const { layoutMeasurement, contentOffset, contentSize } = e.nativeEvent;
+              const paddingToBottom = 120;
+              const isCloseToBottom = layoutMeasurement.height + contentOffset.y >= contentSize.height - paddingToBottom;
+
+              if (isCloseToBottom) { onReachEnd?.(); }
+            }}
           >
             {children}
           </ScrollView>

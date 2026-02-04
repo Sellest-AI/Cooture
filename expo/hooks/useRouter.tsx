@@ -133,7 +133,7 @@ export const useRouter = <K extends Record<string, any> = Record<string, any>, T
               newData[key] = {
                 ...(options?.params ?? {}),
                 redirectTo: redirect,
-                reset: false,
+                reset: true,
               };
             }
             else if (keyPath.startsWith(basePath + '/')) {

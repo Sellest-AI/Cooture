@@ -1,10 +1,10 @@
 import { api, Id } from "@/lib/convex/api";
-import { useMutation, useQuery } from "@/lib/convex/client";
+import { useMutation, useQuery, useQueryCached } from "@/lib/convex/client";
 import { atom, useAtom } from "jotai";
 
 export const usePhotoshoot = (id: Id<'generations'> | null) => {
   const { data: photoshoot } = useQuery(api.router.generations.getOne.authed, id ? { generationId: id } : 'skip');
-  const { data: preset } = useQuery(api.router.presets.getOne.anon, photoshoot?.metadata?.presetId ? { presetId: photoshoot.metadata.presetId } : 'skip');
+  const { data: preset } = useQueryCached(api.router.presets.getOne.anon, photoshoot?.metadata?.presetId ? { presetId: photoshoot.metadata.presetId } : 'skip');
 
   const { mutate } = useMutation(api.router.generations.updatePrediction.authed);
   const acceptPrediction = (predictionId: string) => {
@@ -30,7 +30,7 @@ const useNew = () => {
   const [presetId, setPresetId] = useAtom(presetAtom);
 
   const { data: outfit } = useQuery(api.router.outfits.getOne.anon, outfitId ? { outfitId } : 'skip');
-  const { data: preset } = useQuery(api.router.presets.getOne.anon, presetId ? { presetId } : 'skip');
+  const { data: preset } = useQueryCached(api.router.presets.getOne.anon, presetId ? { presetId } : 'skip');
 
   const reset = () => {
     setOutfitId(null);
