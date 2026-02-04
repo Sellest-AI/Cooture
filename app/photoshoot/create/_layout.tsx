@@ -4,6 +4,7 @@ import { Badge } from "@ui/badge";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
+import { SafeAreaView } from "@ui/safe-area-view";
 import { Skeleton } from "@ui/skeleton";
 import { Stepper } from "@ui/stepper";
 import { Text } from "@ui/text";
@@ -31,7 +32,10 @@ export default function Layout() {
     "Make sure the options are correct.";
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.background }}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: Colors.background }}
+      edges={{ bottom: 'additive', top: 'off' }}
+    >
       <ParallaxScrollView
         locked={step > 1 ? false : true}
         headerBackground={step > 1 ? <Image
@@ -80,6 +84,6 @@ export default function Layout() {
           <Slot />
         </MotiView>
       </ParallaxScrollView>
-    </View>
+    </SafeAreaView>
   )
 }

@@ -7,6 +7,7 @@ export const authed = authQuery({
   handler: async (ctx) => {
     const outfits = await ctx.db.query("outfits")
       .withIndex('by_user_id', q => q.eq('userId', ctx.userId))
+      .order('desc')
       .collect();
 
     const detailedOutfits = await Promise.all(outfits.map(async (outfit) => {

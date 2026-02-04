@@ -71,12 +71,18 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, outfitId?: Id<'outfi
       type: top.name,
       details: buildDetails(top),
       reference: references.filter((r) => r.type === 'TOP').map((r) => r.text).join(' '),
-    } : undefined,
+    } : {
+      type: 'White t-shirt',
+      details: 'A plain white cotton t-shirt',
+    },
     bottom: bottom ? {
       type: bottom.name,
       details: buildDetails(bottom),
       reference: references.filter((r) => r.type === 'BOTTOM').map((r) => r.text).join(' '),
-    } : undefined,
+    } : (top?.description?.includes('dress') ? undefined : {
+      type: 'Blue jeans',
+      details: 'Classic blue straight denim jeans',
+    }),
     innerLayer: innerLayer
       ? `${innerLayer.mainColors.join(' ')} ${innerLayer.name}${innerLayer.description ? `, ${innerLayer.description}` : ''}`
       : undefined,
@@ -138,7 +144,6 @@ export const authed = authAction({
     outfitId: v.optional(v.id("outfits")),
   },
   handler: async (ctx, args): Promise<Id<'generations'>> => {
-
     const preset = await ctx.runQuery(internal.router.presets.getOne._internal, { presetId: args.presetId });
     if (!preset) throw new Error("Preset not found");
 
@@ -159,6 +164,7 @@ export const authed = authAction({
       predictionIds: predictions.map(p => p.id),
       preset: {
         presetId: preset._id,
+        outfitId: args.outfitId,
         prompts: [JSON.stringify(schema.prompt)],
       }
     })

@@ -139,12 +139,16 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
                   flexDirection: 'row',
                   gap: 0,
                 }}>
-                  {outfit.itemUrls.map((url) => <Badge
+                  {outfit.itemUrls.slice(0, 2).map((url) => <Badge
                     key={url}
                     source={url}
                     contentFit="contain"
-                    style={{ marginLeft: -4 }}
+                    style={{ marginLeft: -14, width: 32, height: 32 }}
                   />)}
+                  {outfit.itemUrls.length > 2 &&
+                    <Badge text={`+${outfit.itemUrls.length - 2}`}
+                      style={{ marginLeft: -14, width: 32, height: 32 }}
+                    />}
                 </View>}
               </View>}
             </View>

@@ -8,7 +8,7 @@ import { MasonryList } from "@ui/masonry-list";
 import { AnimatePresence, MotiView } from "@ui/motion";
 import { TextInput } from "@ui/text-input";
 import React from "react";
-import { Platform, ScrollView, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -22,7 +22,6 @@ export default function Screen() {
       <View style={{
         marginTop: 8,
         paddingHorizontal: 12,
-        marginBottom: Platform.OS === 'web' ? 0 : 52
       }}>
         <TextInput
           startIcon={Search}

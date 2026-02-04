@@ -60,11 +60,12 @@ const Buttons = ({ onNext, currentItem, items }: Props) => {
   const loading = items.filter((i) => i.status === 'LOADING').length;
 
   return (
-    <View style={{
-      marginTop: 24,
-      marginBottom: 24,
-      alignItems: 'center'
-    }}>
+    <SafeAreaView
+      edges={{ top: 'off', bottom: 'maximum' }}
+      style={{
+        paddingBottom: 56,
+        alignItems: 'center',
+      }}>
       {isCurrentLoading && <Block
         variant="blur"
         style={{
@@ -111,7 +112,7 @@ const Buttons = ({ onNext, currentItem, items }: Props) => {
           Save
         </Button>
       </View>}
-    </View>
+    </SafeAreaView>
   )
 }
 
@@ -147,7 +148,7 @@ export default function Screen() {
       items.find((a) => a.status === 'LOADING' && a._id !== currentItem._id);
 
     // If no next item, and all items are validated or rejected, go back to profile
-    if (!nextItem) return router.replace(ROUTES.PROFILE.GENERATIONS);
+    if (!nextItem) return router.dismissTo(ROUTES.PROFILE.GENERATIONS);
 
     const nextItemIndex = items.findIndex(i => i._id === nextItem._id);
     carouselRef.current?.scrollTo({ index: nextItemIndex, animated: true });
@@ -165,12 +166,13 @@ export default function Screen() {
         }}
       />
       <SafeAreaView
+        edges={{ bottom: 'off' }}
         style={{
-          marginTop: 16,
+          paddingTop: 16,
           paddingHorizontal: 12,
           flexDirection: 'row',
           justifyContent: outfitId ? 'space-between' : 'center',
-          alignItems: 'center'
+          alignItems: 'center',
         }}
       >
         <Badge
@@ -182,7 +184,7 @@ export default function Screen() {
         <Outfit />
       </SafeAreaView>
       <View style={{
-        marginTop: 32,
+        marginTop: 28,
         alignItems: 'center',
         maxWidth: "80%",
         marginHorizontal: "auto",

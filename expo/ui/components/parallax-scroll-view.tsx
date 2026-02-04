@@ -144,6 +144,7 @@ export const ParallaxScrollView = ({
         >
           <SafeAreaView
             pointerEvents="box-none"
+            edges={{ bottom: 'off' }}
           >
             {headerContent}
           </SafeAreaView>
@@ -164,7 +165,7 @@ export const ParallaxScrollView = ({
             }}>
             {children}
           </View>
-        </ParallaxScrollContext.Provider >
+        </ParallaxScrollContext.Provider>
       </Animated.ScrollView>
     </View >
   );

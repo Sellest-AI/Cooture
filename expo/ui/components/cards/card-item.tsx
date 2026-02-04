@@ -14,10 +14,11 @@ type Props = {
   selected?: boolean;
   source: ComponentProps<typeof Image>['source'];
   onPress?: ComponentProps<typeof Pressable>['onPress'];
+  onLongPress?: ComponentProps<typeof Pressable>['onLongPress'];
   animate?: boolean;
 }
 
-export const CardItem = ({ title, subtitle, selected, disabled, badge, style, source, onPress, animate = true }: Props) => {
+export const CardItem = ({ title, subtitle, selected, disabled, badge, style, source, onPress, onLongPress, animate = true }: Props) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   // Default height if we can't compute one from the image
@@ -72,6 +73,7 @@ export const CardItem = ({ title, subtitle, selected, disabled, badge, style, so
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       onPress={(e) => { onPress?.(e); }}
+      onLongPress={(e) => { onLongPress?.(e); }}
       style={{ flex: 1 }}
     >
       <Animated.View

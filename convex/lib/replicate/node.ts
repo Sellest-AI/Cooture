@@ -86,9 +86,9 @@ type PredictImageParams = {
 export const predictImage = async (params: PredictImageParams) => {
   const { prompt, aspectRatio } = params;
 
-  const imageUrls = await Promise.all(params.images.map((img) => {
+  const imageUrls = await Promise.all(params.images.map(async (img) => {
     if (!img.hasAlpha) return img.url;
-    return sanitizeImageForReplicate(img.url);
+    return (await sanitizeImageForReplicate(img.url)).url;
   }));
 
   const prediction = await replicate.predictions.create({

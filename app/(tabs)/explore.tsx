@@ -80,6 +80,7 @@ export default function Screen() {
 
   return (
     <Component
+      edges={{ top: 'padding', bottom: 'maximum' }}
       style={{ flex: empty ? 1 : undefined }}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{
@@ -166,7 +167,10 @@ export default function Screen() {
           </View>
         )}
       </View>
-      <Text.Base color={Colors.neutral[400]} style={{ textAlign: 'center', marginTop: 32, maxWidth: 200, alignSelf: 'center' }}>
+      <Text.Base
+        style={{ textAlign: 'center', marginVertical: 32, maxWidth: 200, alignSelf: 'center' }}
+        color={Colors.neutral[400]}
+      >
         You have reached the end of the discover feed.
       </Text.Base>
     </Component>

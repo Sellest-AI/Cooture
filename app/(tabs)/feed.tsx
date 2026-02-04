@@ -6,7 +6,7 @@ import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Post } from "@ui/cards";
 import { ModalHeader } from "@ui/modal";
-import { SafeAreaView } from "@ui/safe-area-view";
+import { SafeAreaView, useSafeAreaInsets } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import { notEmpty } from "@utils/convex-allowed";
 import { router } from "expo-router";
@@ -62,6 +62,7 @@ const FeedPost = ({ id, style }: { id: Id<'predictions'>, style?: ViewStyle }) =
 
 export default function Screen() {
   const { data: feed } = useQuery(api.router.post.getFeed.anon);
+  const { top } = useSafeAreaInsets();
 
   const items = useMemo(() => [
     { type: 'header' as const },
@@ -72,10 +73,13 @@ export default function Screen() {
   ], [feed]);
 
   return (
-    <SafeAreaView>
+    <SafeAreaView edges={{ top: 'off', bottom: 'maximum' }}>
       <FlatList
         data={items}
-        contentContainerStyle={{ paddingBottom: TOTAL_TABS_SPACE }}
+        contentContainerStyle={{
+          paddingBottom: TOTAL_TABS_SPACE,
+          paddingTop: top,
+        }}
         renderItem={({ item, index }) => {
           if (item.type === 'header') {
             return <ModalHeader

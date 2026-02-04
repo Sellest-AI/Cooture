@@ -24,6 +24,7 @@ export default function Screen() {
     <SafeScrollView
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: TOTAL_TABS_SPACE }}
+      edges={{ top: 'padding', bottom: 'maximum' }}
     // stickyHeaderIndices={[0]}
     >
       <ModalHeader

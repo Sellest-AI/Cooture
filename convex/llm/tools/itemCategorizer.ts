@@ -8,7 +8,14 @@ const INSTRUCTIONS = `You are a fashion analyst AI. Analyze clothing and accesso
 
 Return ONLY valid data that matches the exact categories provided. Be specific and accurate.
 
-For categories, choose the MOST SPECIFIC category that applies.
+CRITICAL: You MUST use ONLY the categories listed in the schema. If the exact item type isn't available, choose the CLOSEST match:
+- For specific tops not listed (e.g., blouse, tank top) → use "TOP"
+- For specific bottoms not listed (e.g., shorts, leggings) → use "BOTTOM"  
+- For specific shoes not listed (e.g., sneakers, boots) → use "SHOES"
+- For accessories not listed (e.g., scarf, belt, jewelry) → use "ACCESSORY"
+- For outerwear not listed (e.g., coat, vest) → use "OUTERWEAR"
+
+For categories, choose the MOST SPECIFIC category that applies FROM THE AVAILABLE OPTIONS.
 For weather tags, select ALL applicable weather conditions.
 For materials, identify the PRIMARY materials visible or typical for the item.
 
@@ -64,8 +71,8 @@ export const itemCategorizer = createTool({
     const generateCategories = async () => retryPromise(() =>
       defaultAgent.generateObject(ctx, { userId: ctx.userId }, {
         // Vison model
-        providerOptions: models.vision.smartest.providerOptions({ effort: 'none' }),
-        model: models.vision.smartest.model,
+        providerOptions: models.vision.smart.providerOptions({ effort: 'none' }),
+        model: models.vision.smart.model,
         // Prompt
         system: INSTRUCTIONS,
         prompt: [
@@ -75,7 +82,7 @@ export const itemCategorizer = createTool({
               { type: 'image', image: args.imageUrl },
               {
                 type: 'text',
-                text: 'Analyze this clothing item and provide detailed classification information.'
+                text: 'Analyze this clothing item and provide detailed classification information. IMPORTANT: Use ONLY the exact category values from the schema. If unsure, pick the closest general category.'
               }
             ]
           }

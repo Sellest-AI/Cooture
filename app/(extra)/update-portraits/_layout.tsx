@@ -26,13 +26,15 @@ export default function ProfileLayout() {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
-      <SafeAreaView style={{
-        zIndex: 10,
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-      }}>
+      <SafeAreaView
+        edges={{ bottom: 'off' }}
+        style={{
+          zIndex: 10,
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+        }}>
         <LinearGradient
           colors={['black', 'transparent']}
           style={{

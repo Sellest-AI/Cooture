@@ -1,3 +1,4 @@
+import { KeyboardAvoiderProvider } from '@good-react-native/keyboard-avoider'
 import { AsyncProviders } from "./async"
 import { ConvexClientProvider } from "./convex-client"
 import { I18nProvider } from "./i18n"
@@ -14,9 +15,11 @@ export const Providers = ({ children }: Props) => {
       <I18nProvider>
         <ThemeProvider>
           <MotionProvider>
-            <AsyncProviders>
-              {children}
-            </AsyncProviders>
+            <KeyboardAvoiderProvider>
+              <AsyncProviders>
+                {children}
+              </AsyncProviders>
+            </KeyboardAvoiderProvider>
           </MotionProvider>
         </ThemeProvider>
       </I18nProvider>

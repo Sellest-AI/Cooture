@@ -66,105 +66,107 @@ export default function ItemScreen() {
 
   return (
     <>
-      <ParallaxScrollView
-        headerBackground={
-          <Image
-            allowDownscaling={false}
-            contentFit="cover"
-            blurRadius={100}
-            source={item.image?.sizes.thumbnail.url}
-            style={{ width: '100%', height: '100%', opacity: 0.2 }}
-          />
-        }
-        headerContent={
-          <View style={{ height: 456 }}>
-            <ModalHeader
-              style={{ paddingTop: 12, paddingHorizontal: 12 }}
-              title={item.name}
-              onBack={router.canGoBack() ? () => { router.back() } : undefined}
+      <SafeAreaView style={{ flex: 1 }} edges={{ top: 'off' }}>
+        <ParallaxScrollView
+          headerBackground={
+            <Image
+              allowDownscaling={false}
+              contentFit="cover"
+              blurRadius={100}
+              source={item.image?.sizes.thumbnail.url}
+              style={{ width: '100%', height: '100%', opacity: 0.2 }}
             />
-            <View style={{
-              padding: 32,
-              paddingBottom: Platform.OS === 'web' ? 32 : 16,
-              flex: 1,
-            }}>
-              <Image
-                priority="high"
-                allowDownscaling={false}
-                contentFit="contain"
-                source={item.image?.sizes.medium.url}
-                placeholder={item.image?.sizes.thumbnail.url}
-                placeholderContentFit="contain"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                }}
+          }
+          headerContent={
+            <View style={{ height: 456 }}>
+              <ModalHeader
+                style={{ paddingTop: 12, paddingHorizontal: 12 }}
+                title={item.name}
+                onBack={router.canGoBack() ? () => { router.back() } : undefined}
               />
+              <View style={{
+                padding: 32,
+                paddingBottom: Platform.OS === 'web' ? 32 : 16,
+                flex: 1,
+              }}>
+                <Image
+                  priority="high"
+                  allowDownscaling={false}
+                  contentFit="contain"
+                  source={item.image?.sizes.medium.url}
+                  placeholder={item.image?.sizes.thumbnail.url}
+                  placeholderContentFit="contain"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                  }}
+                />
+              </View>
             </View>
-          </View>
-        }
-      >
-        <SafeAreaView style={{ padding: 8, gap: 8 }}>
-          <Block
-            variant="blur"
-            style={{
-              borderRadius: 32,
-              paddingHorizontal: 16,
-              paddingVertical: 20,
-              gap: 12
-            }}
-          >
-            <Text.H4 color={Colors.neutral[50]}>
-              Website link
-            </Text.H4>
-            <Text.Base color={Colors.neutral[200]}>
-              Extract more information such as materials, price, sizes, higher quality images, etc…
-            </Text.Base>
-            <Button
+          }
+        >
+          <View style={{ padding: 8, gap: 8 }}>
+            <Block
               variant="blur"
-              startIcon={LinkIcon}
+              style={{
+                borderRadius: 32,
+                paddingHorizontal: 16,
+                paddingVertical: 20,
+                gap: 12
+              }}
             >
-              Add link
+              <Text.H4 color={Colors.neutral[50]}>
+                Website link
+              </Text.H4>
+              <Text.Base color={Colors.neutral[200]}>
+                Extract more information such as materials, price, sizes, higher quality images, etc…
+              </Text.Base>
+              <Button
+                variant="blur"
+                startIcon={LinkIcon}
+              >
+                Add link
+              </Button>
+            </Block>
+            <ColorsBlock />
+            {item.description && <Block
+              variant="blur"
+              style={{
+                borderRadius: 32,
+                paddingHorizontal: 16,
+                paddingTop: 20,
+                paddingBottom: 24,
+                gap: 12
+              }}
+            >
+              <Text.Base color={Colors.neutral[200]} numberOfLines={4}>
+                {item.description}
+              </Text.Base>
+            </Block>}
+            <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
+              <ItemCategory title={item.category} onPress={(category) => update({ category })} />
+              <WeatherCategory title={item.weatherTags[0]} onPress={(weather) => update({ weatherTags: [weather, ...item.weatherTags.slice(1)] })} />
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
+              <ColorCategory title={item.colorTones[0]} onPress={(color) => update({ colorTones: [color, ...item.colorTones.slice(1)] })} />
+              <FeelCategory title={item.materialFeel} onPress={(materialFeel) => update({ materialFeel })} />
+              <GenderCategory title={item.gender} onPress={(gender) => update({ gender })} />
+            </View>
+            <Button
+              style={{ marginTop: 4 }}
+              variant="primary"
+              onPress={() => {
+                push(ROUTES.MODALS.PICK_OUTFIT, {
+                  redirectTo: ROUTES.PROFILE.OUTFITS,
+                  params: { itemIds: [item._id] }
+                })
+              }}
+            >
+              Save to collection
             </Button>
-          </Block>
-          <ColorsBlock />
-          {item.description && <Block
-            variant="blur"
-            style={{
-              borderRadius: 32,
-              paddingHorizontal: 16,
-              paddingTop: 20,
-              paddingBottom: 24,
-              gap: 12
-            }}
-          >
-            <Text.Base color={Colors.neutral[200]} numberOfLines={4}>
-              {item.description}
-            </Text.Base>
-          </Block>}
-          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
-            <ItemCategory title={item.category} onPress={(category) => update({ category })} />
-            <WeatherCategory title={item.weatherTags[0]} onPress={(weather) => update({ weatherTags: [weather, ...item.weatherTags.slice(1)] })} />
           </View>
-          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
-            <ColorCategory title={item.colorTones[0]} onPress={(color) => update({ colorTones: [color, ...item.colorTones.slice(1)] })} />
-            <FeelCategory title={item.materialFeel} onPress={(materialFeel) => update({ materialFeel })} />
-            <GenderCategory title={item.gender} onPress={(gender) => update({ gender })} />
-          </View>
-          <Button
-            style={{ marginTop: 4 }}
-            variant="primary"
-            onPress={() => {
-              push(ROUTES.MODALS.PICK_OUTFIT, {
-                redirectTo: ROUTES.PROFILE.OUTFITS,
-                params: { itemIds: [item._id] }
-              })
-            }}
-          >
-            Save to collection
-          </Button>
-        </SafeAreaView>
-      </ParallaxScrollView>
+        </ParallaxScrollView>
+      </SafeAreaView>
     </>
   )
 }

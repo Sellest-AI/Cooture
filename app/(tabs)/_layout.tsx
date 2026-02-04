@@ -1,6 +1,7 @@
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Block } from "@ui/block";
 import { Bookmark, Compass, Home, Plus, User } from "@ui/icons";
+import { SafeAreaView } from "@ui/safe-area-view";
 import { Tabs } from "expo-router";
 import { useRef } from "react";
 import { Animated, Pressable, StyleSheet, View } from "react-native";
@@ -32,7 +33,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   };
 
   return (
-    <View style={styles.tabBarContainer}>
+    <SafeAreaView style={styles.tabBarContainer}>
       <Block
         variant="blur"
         style={styles.tabBar}
@@ -79,7 +80,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
           );
         })}
       </Block>
-    </View>
+    </SafeAreaView>
   );
 }
 

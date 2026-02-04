@@ -110,10 +110,12 @@ export default function RemoveBackgroundScreen() {
             }}
           >
             <Image
-              source={{ uri: imageScanned }}
+              source={{ uri: finalImage ?? imageScanned }}
+              contentFit={finalImage ? 'contain' : 'cover'}
               style={{
                 aspectRatio: 3 / 4,
-                width: '100%'
+                width: '100%',
+                padding: finalImage ? 32 : 0,
               }}
             />
           </Animated.View>
