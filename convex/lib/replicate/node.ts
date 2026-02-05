@@ -97,7 +97,7 @@ export const predictImage = async (params: PredictImageParams) => {
       prompt,
       image_input: imageUrls,
       max_images: 1,
-      aspect_ratio: aspectRatio,
+      aspect_ratio: aspectRatio ?? '3:4',
       size: '4K',
       enhance_prompt: true,
       sequential_image_generation: "disabled"
