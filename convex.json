@@ -1,7 +1,8 @@
 {
   "node": {
     "externalPackages": [
-      "sharp"
+      "sharp",
+      "runpod-sdk"
     ]
   }
 }

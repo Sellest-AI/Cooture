@@ -79,11 +79,13 @@ export default function ScanScreen() {
           height: 150
         }}
       />
-      <SafeAreaView style={{
-        position: 'absolute',
-        top: 24,
-        alignSelf: 'center',
-      }}>
+      <SafeAreaView
+        edges={{ bottom: 'off' }}
+        style={{
+          position: 'absolute',
+          top: 24,
+          alignSelf: 'center',
+        }}>
         <Block variant="blur" style={{ alignSelf: 'center', borderRadius: 999 }}>
           <Text.Base color={Colors.neutral[50]}
             style={{ textAlign: 'center', paddingHorizontal: 24, paddingVertical: 12 }}

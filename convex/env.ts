@@ -14,4 +14,6 @@ export const env = {
   S3_APP_KEY_ID: process.env.S3_APP_KEY_ID ?? '',
   S3_DEFAULT_BUCKET: process.env.S3_DEFAULT_BUCKET ?? '',
   S3_ENDPOINT: process.env.S3_ENDPOINT ?? '',
+  // Runpod Configuration
+  RUNPOD_API_KEY: process.env.RUNPOD_API_KEY ?? '',
 }

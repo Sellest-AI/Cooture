@@ -6,13 +6,31 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_CUSTOM_NODE_ENV": "development",
+        "EXPO_PUBLIC_CONVEX_URL": "https://flippant-ocelot-772.convex.cloud",
+        "EXPO_PUBLIC_AUTH_URL": "cooture://"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_CUSTOM_NODE_ENV": "production",
+        "EXPO_PUBLIC_CONVEX_URL": "https://flippant-ocelot-772.convex.cloud",
+        "EXPO_PUBLIC_AUTH_URL": "cooture://"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_CUSTOM_NODE_ENV": "production",
+        "EXPO_PUBLIC_CONVEX_URL": "https://flippant-ocelot-772.convex.cloud",
+        "EXPO_PUBLIC_AUTH_URL": "cooture://"
+      }
     }
   },
   "submit": {
