@@ -11,6 +11,9 @@
         "EXPO_PUBLIC_CUSTOM_NODE_ENV": "development",
         "EXPO_PUBLIC_CONVEX_URL": "https://flippant-ocelot-772.convex.cloud",
         "EXPO_PUBLIC_AUTH_URL": "cooture://"
+      },
+      "android": {
+        "buildType": "apk"
       }
     },
     "preview": {
