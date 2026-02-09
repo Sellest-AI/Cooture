@@ -33,7 +33,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   };
 
   return (
-    <SafeAreaView style={styles.tabBarContainer}>
+    <SafeAreaView style={styles.tabBarContainer} edges={{ top: 'off' }}>
       <Block
         variant="blur"
         style={styles.tabBar}

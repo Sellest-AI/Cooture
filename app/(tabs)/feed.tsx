@@ -52,8 +52,8 @@ const FeedPost = ({ id, style }: { id: Id<'predictions'>, style?: ViewStyle }) =
     } : undefined}
     outfit={post.outfit ? {
       itemUrls: post.outfit.items.map(i => i.image.url),
-      onPress: () => push(ROUTES.PHOTOSHOOT.RECAP, {
-        params: { presetId: post.preset?._id, outfitId: post.outfit?._id }
+      onPress: () => push(ROUTES.OUTFIT.PATH, {
+        pathParams: { id: post.outfit!._id }
       })
     } : undefined}
   />
@@ -76,6 +76,7 @@ export default function Screen() {
     <SafeAreaView edges={{ top: 'off', bottom: 'maximum' }}>
       <FlatList
         data={items}
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingBottom: TOTAL_TABS_SPACE,
           paddingTop: top,

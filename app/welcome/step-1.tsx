@@ -1,9 +1,8 @@
 import { Button } from '@ui/button';
 import { Image } from '@ui/image';
-import { SafeAreaView } from '@ui/safe-area-view';
 import { Text } from '@ui/text';
 import { useEffect, useRef } from 'react';
-import { Animated, Platform, View } from 'react-native';
+import { Animated, View } from 'react-native';
 import { ROUTES } from 'routes';
 import { Colors } from 'theme';
 
@@ -19,13 +18,13 @@ export default function Screen() {
   }, []);
 
   return (
-    <SafeAreaView
+    <View
       style={{
         flexDirection: 'column',
         justifyContent: 'space-between',
         alignItems: 'center',
         flex: 1,
-        marginTop: Platform.OS === "web" ? 164 : 172,
+        marginTop: 196,
         padding: 8,
       }}
     >
@@ -83,6 +82,6 @@ export default function Screen() {
       >
         Next
       </Button>
-    </SafeAreaView>
+    </View>
   );
 }

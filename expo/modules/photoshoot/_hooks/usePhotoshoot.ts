@@ -22,10 +22,15 @@ export const usePhotoshoot = (id: Id<'generations'> | null) => {
   }
 }
 
+const outfitSizes = ['TIGHT', 'DEFAULT', 'LOOSE', 'EXTRA_LOOSE'] as const;
+type Sizes = typeof outfitSizes[number];
+
+const outfitSizeAtom = atom<Sizes>("DEFAULT");
 const outfitAtom = atom<Id<"outfits"> | null>(null);
 const presetAtom = atom<Id<"presets"> | null>(null);
 
 const useNew = () => {
+  const [outfitSize, setOutfitSize] = useAtom(outfitSizeAtom);
   const [outfitId, setOutfitId] = useAtom(outfitAtom);
   const [presetId, setPresetId] = useAtom(presetAtom);
 
@@ -33,6 +38,7 @@ const useNew = () => {
   const { data: preset } = useQueryCached(api.router.presets.getOne.anon, presetId ? { presetId } : 'skip');
 
   const reset = () => {
+    setOutfitSize('DEFAULT');
     setOutfitId(null);
     setPresetId(null);
   }
@@ -44,6 +50,9 @@ const useNew = () => {
     preset,
     presetId,
     setPresetId,
+    outfitSize,
+    outfitSizes,
+    setOutfitSize,
     reset,
   }
 }

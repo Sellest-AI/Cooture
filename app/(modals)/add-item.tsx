@@ -36,6 +36,7 @@ export default function AddItemScreen() {
       backgroundColor: Colors.blur.modal,
     }}>
       <SafeScrollView
+        showsVerticalScrollIndicator={false}
         style={{
           padding: 12,
         }}

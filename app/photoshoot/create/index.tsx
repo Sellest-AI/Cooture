@@ -28,7 +28,10 @@ export default function Screen() {
           placeholder="Search preset"
         />
       </View>
-      <ScrollView style={{ flex: 1, paddingHorizontal: 12 }}>
+      <ScrollView
+        style={{ flex: 1, paddingHorizontal: 12 }}
+        showsVerticalScrollIndicator={false}
+      >
         <MasonryList
           data={(presets ?? [])}
           style={{ columnGap: 36, paddingHorizontal: 12, marginTop: 24 }}
@@ -43,7 +46,7 @@ export default function Screen() {
                   title={item.name}
                   onPress={() => {
                     setPresetId((p) => p === item._id ? null : item._id);
-                    if (!selected) requestAnimationFrame(() => push(ROUTES.PHOTOSHOOT.RECAP));
+                    if (!selected) requestAnimationFrame(() => push(ROUTES.PHOTOSHOOT.RECAP, { resetNextRoute: false }));
                   }}
                 />
               </View>

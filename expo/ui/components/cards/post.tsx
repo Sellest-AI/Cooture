@@ -2,8 +2,9 @@ import { Badge } from '@ui/badge';
 import { Button } from '@ui/button';
 import { ArrowRight, Bookmark, CircleFadingArrowUp, Heart, ShareIcon } from '@ui/icons';
 import { Skeleton } from '@ui/skeleton';
+import { MotiView } from 'moti';
 import { useState } from 'react';
-import { Dimensions, FlatList, View, ViewStyle } from 'react-native';
+import { Dimensions, FlatList, Pressable, View, ViewStyle } from 'react-native';
 import { Colors } from 'theme';
 import { Image } from '../image';
 import { Text } from '../text';
@@ -135,10 +136,15 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
                   contentPosition="top center"
                   style={{ width: 32, height: 32 }}
                 />}
-                {outfit && <View style={{
-                  flexDirection: 'row',
-                  gap: 0,
-                }}>
+                {outfit && <Pressable
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    outfit.onPress?.()
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    gap: 0,
+                  }}>
                   {outfit.itemUrls.slice(0, 2).map((url) => <Badge
                     key={url}
                     source={url}
@@ -149,7 +155,7 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
                     <Badge text={`+${outfit.itemUrls.length - 2}`}
                       style={{ marginLeft: -14, width: 32, height: 32 }}
                     />}
-                </View>}
+                </Pressable>}
               </View>}
             </View>
           )
@@ -157,8 +163,11 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
       />
       {(type === 'preset' || type === 'outfit') && <Button
         onPress={() => {
-          preset?.onPress?.();
-          outfit?.onPress?.();
+          if (preset?.onPress) {
+            preset?.onPress?.();
+          } else {
+            outfit?.onPress?.();
+          }
         }}
         style={{ marginTop: 8, marginHorizontal: hasImages ? PADDING_HORIZONTAL : 0 }}
         variant={type === 'preset' ? 'secondary' : 'primary'}
@@ -185,6 +194,20 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
             ))}
           </View>}
         </View>
+        <View style={{ backgroundColor: 'red', width: 50, height: 50 }} />
+        {images && <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center' }}>
+          {images?.map((img) => (
+            <MotiView
+              key={img._id}
+              style={{
+                width: 8,
+                height: 8,
+                backgroundColor: Colors.neutral[400],
+              }}
+            // animate={{}}
+            />
+          ))}
+        </View>}
         <View style={{ gap: 12, flexDirection: 'row', alignItems: 'center' }}>
           <Bookmark size={20} color={Colors.primary[500]} />
           {FALLBACK_IMAGE && <ShareIcon size={20} color={Colors.secondary[500]} onPress={() => onPress?.(FALLBACK_IMAGE._id)} />}

@@ -1,9 +1,8 @@
 import { Button } from '@ui/button';
 import { ImageGeneration } from '@ui/cards';
-import { SafeAreaView } from '@ui/safe-area-view';
 import { Carousel } from '@ui/screen-carousel';
 import { Text } from '@ui/text';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import { ROUTES } from 'routes';
 import { Colors } from 'theme';
 
@@ -37,13 +36,13 @@ const CarouselComponent = () => {
 
 export default function Screen() {
   return (
-    <SafeAreaView
+    <View
       style={{
         flexDirection: 'column',
         justifyContent: 'space-between',
         alignItems: 'center',
         flex: 1,
-        marginTop: Platform.OS === "web" ? 164 : 172,
+        marginTop: 196,
         overflow: 'hidden'
       }}
     >
@@ -92,6 +91,6 @@ export default function Screen() {
           Next
         </Button>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }

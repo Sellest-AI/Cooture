@@ -89,6 +89,7 @@ export default function TabsLayout() {
       <ParallaxScrollView
         ref={scrollRef}
         contentNegativeSpace={56}
+        headerBackgroundImagePosition="top center"
         headerBackgroundImage={previewGenerations[0]?.image?.url ?? require('assets/backgrounds/dark-gradient.png')}
         contentContainerStyle={{ paddingBottom: TOTAL_TABS_SPACE }}
         headerContent={

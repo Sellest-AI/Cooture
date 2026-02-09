@@ -21,6 +21,8 @@ const BackgroundImage = () => {
   return (
     <Animated.View
       style={{
+        top: 0,
+        left: 0,
         position: 'absolute',
         width: '100%',
         height: '100%',
@@ -63,12 +65,13 @@ const BackgroundImage = () => {
 
 export default function Screen() {
   return (
-    <View style={{
-      flexDirection: 'column',
-      justifyContent: 'flex-end',
-      alignItems: 'center',
-      flex: 1,
-    }}>
+    <View
+      style={{
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        flex: 1,
+      }}>
       <BackgroundImage />
       <View
         style={{ maxWidth: 456, padding: 8 }}
@@ -93,7 +96,7 @@ export default function Screen() {
             color: Colors.neutral[200],
             maxWidth: 280,
             marginInline: 'auto',
-            marginBottom: 60,
+            marginBottom: 40,
           }}
         >
           Create your outfits and turn yourself into a professional model.

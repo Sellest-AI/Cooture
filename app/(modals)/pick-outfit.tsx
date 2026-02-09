@@ -30,6 +30,7 @@ export default function PickOutfitScreen() {
   return (
     <>
       <ScrollView
+        showsVerticalScrollIndicator={false}
         style={{
           padding: 12,
           backgroundColor: Colors.blur.modal,

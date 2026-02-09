@@ -4,7 +4,7 @@ import { Button } from '@ui/button';
 import { Collection } from '@ui/cards';
 import { Plus } from '@ui/icons';
 import { Text } from '@ui/text';
-import { Platform, View } from 'react-native';
+import { View } from 'react-native';
 import { ROUTES } from 'routes';
 import { Colors } from 'theme';
 
@@ -18,7 +18,7 @@ export default function Screen() {
         justifyContent: 'space-between',
         alignItems: 'center',
         flex: 1,
-        marginTop: Platform.OS === "web" ? 108 : 144,
+        marginTop: 144,
         padding: 8,
       }}
     >
@@ -97,23 +97,24 @@ export default function Screen() {
               contentFit='cover'
             />
           </View>
-          <View
-            style={{
-              flex: 1,
-              paddingHorizontal: 24,
-              marginHorizontal: 'auto',
-              maxWidth: 300,
-              alignSelf: 'stretch',
-              alignItems: 'center',
-            }}
-          >
-            <Collection
-              source={require('assets/placeholders/bench-model.png')}
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <View
               style={{
-                height: '100%'
-
+                flex: 1,
+                paddingHorizontal: 24,
+                marginHorizontal: 'auto',
+                alignSelf: 'stretch',
+                alignItems: 'center',
+                maxHeight: 370
               }}
-            />
+            >
+              <Collection
+                source={require('assets/placeholders/bench-model.png')}
+                style={{
+                  height: '100%'
+                }}
+              />
+            </View>
           </View>
         </View>
       </View>

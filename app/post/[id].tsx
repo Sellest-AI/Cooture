@@ -47,8 +47,8 @@ const UserPost = ({ postId, style }: { postId: Id<'predictions'>, style?: ViewSt
     } : undefined}
     outfit={post.outfit ? {
       itemUrls: post.outfit.items.map(i => i.image.url),
-      onPress: () => push(ROUTES.PHOTOSHOOT.RECAP, {
-        params: { presetId: post.preset?._id, outfitId: post.outfit?._id }
+      onPress: () => push(ROUTES.OUTFIT.PATH, {
+        pathParams: { id: post.outfit!._id }
       })
     } : undefined}
   />
@@ -65,6 +65,7 @@ export default function Screen() {
     <SafeScrollView
       style={{ paddingTop: 0 }}
       stickyHeaderIndices={[0]}
+      showsVerticalScrollIndicator={false}
     >
       <ModalHeader
         style={{ backgroundColor: Colors.background, paddingTop: 12, paddingHorizontal: 12 }}

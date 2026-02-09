@@ -66,6 +66,7 @@ export default function ItemScreen() {
           }}
         />}
         <SafeScrollView
+          showsVerticalScrollIndicator={false}
           edges={{ top: 'padding' }}
           style={{
             paddingTop: 12,

@@ -42,6 +42,7 @@ export default function NewOutfitScreen() {
             // borderTopWidth: 2,
             // borderTopColor: Colors.blur.dark,
           }}
+          showsVerticalScrollIndicator={false}
           stickyHeaderIndices={[0]}
         >
           <ModalHeader

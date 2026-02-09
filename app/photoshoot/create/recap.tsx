@@ -9,6 +9,7 @@ import { ButtonSlider } from "@ui/button.slider";
 import { Col, Grid, Row } from "@ui/grid";
 import { Flame, Pencil, Squirish } from "@ui/icons";
 import { Image } from "@ui/image";
+import { Slider } from "@ui/slider";
 import { Text } from "@ui/text";
 import React, { useMemo } from "react";
 import { Platform, View, ViewStyle } from "react-native";
@@ -139,11 +140,69 @@ const Portrait = ({ style }: { style?: ViewStyle }) => {
   )
 }
 
+
+const OutfitComponent = () => {
+  const { outfit, outfitSize, outfitSizes, setOutfitSize } = usePhotoshoot.New();
+  const { push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
+
+  const sizes = outfitSizes.map((size, i) => ({
+    value: Math.round((i / (outfitSizes.length - 1)) * 100) / 100,
+    label: `${size[0]}${size.slice(1).toLowerCase().replaceAll('_', ' ')}`,
+    defaultLabel: size,
+  }));
+
+  return (
+    <Block
+      variant="blur"
+      style={{
+        borderRadius: 32,
+        paddingHorizontal: 16,
+        paddingVertical: 20,
+        gap: 12,
+        marginTop: 8,
+      }}
+    >
+      <Text.H4 color={Colors.neutral[50]}>Custom Outfit</Text.H4>
+      {outfit && <Text.Base color={Colors.neutral[400]}>
+        This outfit will be used for your photoshoot.
+      </Text.Base>}
+      {!outfit && <Text.Base color={Colors.neutral[400]}>
+        We&apos;ll use the model&apos;s default wardrobe instead.
+      </Text.Base>}
+      {outfit && <OutfitGrid items={outfit.items} />}
+      {outfit && <Slider
+        value={sizes.find(s => s.defaultLabel === outfitSize)?.value ?? 0}
+        onValueChange={(v) => {
+          const closest = sizes.reduce((prev, curr) => {
+            return (Math.abs(curr.value - v) < Math.abs(prev.value - v) ? curr : prev);
+          });
+          setOutfitSize(closest.defaultLabel);
+        }}
+        customHeight={36}
+        labels={sizes}
+        label="Fit"
+      />}
+      <Button
+        style={{ marginTop: 8 }}
+        variant="blur"
+        onPress={() => {
+          push(ROUTES.MODALS.PICK_OUTFIT, {
+            params: { canSkip: true },
+            redirectHere: true,
+          });
+        }}
+      >
+        {outfit ? 'Change outfit' : 'Select an outfit'}
+      </Button>
+    </Block>
+  )
+}
+
 export default function Screen() {
-  const { outfit, outfitId, presetId, setOutfitId, setPresetId, reset } = usePhotoshoot.New();
-  const { push, replace, dismissTo } = useRouter(ROUTES.PHOTOSHOOT.RECAP, {
+  const { outfitId, outfitSize, presetId, setOutfitId, setPresetId, reset } = usePhotoshoot.New();
+  const { replace, dismissTo } = useRouter(ROUTES.PHOTOSHOOT.RECAP, {
     onInit: ({ outfitId, presetId }) => {
-      setOutfitId(outfitId ?? null);
+      if (outfitId) setOutfitId(outfitId);
       if (presetId) setPresetId(presetId);
     },
     resetFnc: reset,
@@ -154,7 +213,7 @@ export default function Screen() {
   return (
     <View style={{ paddingHorizontal: 12 }}>
       <Button
-        onPress={() => dismissTo('/photoshoot/create')}
+        onPress={() => dismissTo('/photoshoot/create', { resetNextRoute: false })}
         variant="secondary"
         style={{ marginBottom: 8 }}
       >
@@ -173,37 +232,7 @@ export default function Screen() {
         <Text.Base color={Colors.neutral[400]}>Make sure your portrait images are up to date.</Text.Base>
         <Portrait style={{ marginTop: 16 }} />
       </Block>
-      <Block
-        variant="blur"
-        style={{
-          borderRadius: 32,
-          paddingHorizontal: 16,
-          paddingVertical: 20,
-          gap: 12,
-          marginTop: 8,
-        }}
-      >
-        <Text.H4 color={Colors.neutral[50]}>Custom Outfit</Text.H4>
-        {outfit && <Text.Base color={Colors.neutral[400]}>
-          This outfit will be used for your photoshoot.
-        </Text.Base>}
-        {!outfit && <Text.Base color={Colors.neutral[400]}>
-          We&apos;ll use the model&apos;s default wardrobe instead.
-        </Text.Base>}
-        {outfit && <OutfitGrid items={outfit.items} />}
-        <Button
-          style={{ marginTop: 8 }}
-          variant="blur"
-          onPress={() => {
-            push(ROUTES.MODALS.PICK_OUTFIT, {
-              params: { canSkip: true },
-              redirectHere: true,
-            });
-          }}
-        >
-          {outfit ? 'Change outfit' : 'Select an outfit'}
-        </Button>
-      </Block>
+      <OutfitComponent />
       <View style={{ flex: 1, justifyContent: 'flex-end', marginTop: 12 }}>
         <ButtonSlider
           startIcon={Flame}
@@ -211,8 +240,11 @@ export default function Screen() {
             if (!presetId) return;
 
             const generationId = await action({
-              outfitId: outfitId ?? undefined,
               presetId: presetId,
+              outfit: outfitId ? {
+                _id: outfitId,
+                size: outfitSize
+              } : undefined,
             });
 
             replace(ROUTES.PHOTOSHOOT.GENERATIONS.PATH, {

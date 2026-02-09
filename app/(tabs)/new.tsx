@@ -8,6 +8,7 @@ import { ArrowUpRight, ScanLine } from "@ui/icons";
 import { Link } from "@ui/link";
 import { ModalHeader } from "@ui/modal";
 import { SafeScrollView } from "@ui/safe-scroll-view";
+import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
@@ -40,7 +41,6 @@ export default function Screen() {
       />
       <View
         style={{
-          marginTop: 20,
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
@@ -81,6 +81,16 @@ export default function Screen() {
         <Text.H4 color={Colors.foreground} style={{ marginLeft: 12 }}>
           Trending styles
         </Text.H4>
+        {presets?.length === 0 && <View style={{
+          marginTop: 16,
+          flexDirection: 'row',
+          paddingHorizontal: 16, gap: 32
+        }}
+        >
+          <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
+          <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
+          <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
+        </View>}
         <FlatList
           style={{ marginTop: 16 }}
           horizontal
@@ -105,6 +115,16 @@ export default function Screen() {
         <Text.H4 color={Colors.foreground} style={{ marginLeft: 12 }}>
           You next try on
         </Text.H4>
+        {outfits?.length === 0 && <View style={{
+          marginTop: 16,
+          flexDirection: 'row',
+          paddingHorizontal: 16, gap: 32
+        }}
+        >
+          <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
+          <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
+          <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
+        </View>}
         <FlatList
           style={{ marginTop: 16 }}
           horizontal

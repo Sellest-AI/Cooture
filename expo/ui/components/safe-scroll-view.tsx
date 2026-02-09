@@ -18,7 +18,7 @@ type Props = {
   edges?: Edges;
 } & Omit<ComponentProps<typeof ScrollView>, 'style'>;
 
-export const SafeScrollView = ({ style, children, contentContainerStyle, onReachEnd, edges, ...props }: Props) => {
+export const SafeScrollView = ({ style, children, contentContainerStyle, onReachEnd, edges, showsVerticalScrollIndicator = false, ...props }: Props) => {
   const insets = useSafeAreaInsets();
 
   const fallbackPadding =
@@ -54,6 +54,7 @@ export const SafeScrollView = ({ style, children, contentContainerStyle, onReach
               paddingBottom: contentPaddingBottom ?? Math.max(fallbackPadding * 2, insets.bottom),
             }]}
             scrollEventThrottle={400}
+            showsVerticalScrollIndicator={showsVerticalScrollIndicator}
             onScroll={(e) => {
               const { layoutMeasurement, contentOffset, contentSize } = e.nativeEvent;
               const paddingToBottom = 120;

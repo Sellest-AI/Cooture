@@ -32,6 +32,7 @@ export const Categories = <T extends string>({ value, categories, categoryTitle,
         header={{ title: categoryTitle }}
       >
         <FlatList
+          showsVerticalScrollIndicator={false}
           data={categories}
           numColumns={2}
           keyExtractor={(i) => i.value}

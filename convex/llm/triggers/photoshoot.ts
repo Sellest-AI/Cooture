@@ -12,10 +12,13 @@ type Schema = {
   images: { url: string; hasAlpha: boolean }[];
 }
 
-const updateOutfit = async (ctx: ActionCtx, schema: Schema, outfitId?: Id<'outfits'>): Promise<Schema> => {
-  if (!outfitId) return schema;
+const OUTFIT_SIZES_ARGS = v.union(v.literal("TIGHT"), v.literal("DEFAULT"), v.literal("LOOSE"), v.literal("EXTRA_LOOSE"));
+type OutfitSize = 'TIGHT' | 'DEFAULT' | 'LOOSE' | 'EXTRA_LOOSE';
 
-  const outfit = await ctx.runQuery(internal.router.outfits.getOne._internal, { outfitId });
+const updateOutfit = async (ctx: ActionCtx, schema: Schema, _outfit?: { _id: Id<'outfits'>, size?: OutfitSize }): Promise<Schema> => {
+  if (!_outfit) return schema;
+
+  const outfit = await ctx.runQuery(internal.router.outfits.getOne._internal, { outfitId: _outfit._id });
   if (!outfit) return schema;
 
   // ---- EXTRACT ITEMS BY POSITION ----
@@ -62,6 +65,7 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, outfitId?: Id<'outfi
   // Build outfit description
   const itemNames = outfit.items.map(item => item.name);
   const description = itemNames.length > 0 ? `An outfit featuring ${itemNames.join(', ')}` : schema.prompt.outfit.description;
+  const outfitSize = _outfit.size ? `VERY IMPORTANT: ${_outfit.size.replaceAll('_', ' ')} fit on the subject` : undefined;
 
   // ---- CUSTOM OUTFIT ----
   const customOutfit = {
@@ -71,6 +75,7 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, outfitId?: Id<'outfi
       type: top.name,
       details: buildDetails(top),
       reference: references.filter((r) => r.type === 'TOP').map((r) => r.text).join(' '),
+      fit: outfitSize ?? 'default',
     } : {
       type: 'White t-shirt',
       details: 'A plain white cotton t-shirt',
@@ -79,6 +84,7 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, outfitId?: Id<'outfi
       type: bottom.name,
       details: buildDetails(bottom),
       reference: references.filter((r) => r.type === 'BOTTOM').map((r) => r.text).join(' '),
+      fit: outfitSize ?? 'default',
     } : (top?.description?.includes('dress') ? undefined : {
       type: 'Blue jeans',
       details: 'Classic blue straight denim jeans',
@@ -135,13 +141,34 @@ const updateSubject = async (ctx: ActionCtx, schema: Schema, userId: Id<'users'>
     images,
     prompt
   }
+}
 
+const updateStyle = async (schema: Schema): Promise<Schema> => {
+  const prompt = {
+    ...schema.prompt,
+    style: {
+      ...schema.prompt.style,
+      "grain": "Visible film grain texture, medium particle distribution, 35mm analog character, opacity 30-40%, nostalgic film aesthetic"
+    },
+    technical: {
+      ...schema.prompt.technical,
+      postProcessing: `${schema.prompt.technical.postProcessing}, subtle 35mm film grain overlay`.replaceAll(',,', ',')
+    }
+  }
+
+  return {
+    ...schema,
+    prompt
+  }
 }
 
 export const authed = authAction({
   args: {
     presetId: v.id("presets"),
-    outfitId: v.optional(v.id("outfits")),
+    outfit: v.optional(v.object({
+      _id: v.id("outfits"),
+      size: v.optional(OUTFIT_SIZES_ARGS),
+    }))
   },
   handler: async (ctx, args): Promise<Id<'generations'>> => {
     const preset = await ctx.runQuery(internal.router.presets.getOne._internal, { presetId: args.presetId });
@@ -149,7 +176,8 @@ export const authed = authAction({
 
     let schema: Schema = { prompt: preset.prompts[0], images: [] }
     schema = await updateSubject(ctx, schema, ctx.userId);
-    schema = await updateOutfit(ctx, schema, args.outfitId);
+    schema = await updateOutfit(ctx, schema, args.outfit);
+    schema = await updateStyle(schema);
 
     const AMOUNT_OF_IMAGES = 2;
 
@@ -164,7 +192,7 @@ export const authed = authAction({
       predictionIds: predictions.map(p => p.id),
       preset: {
         presetId: preset._id,
-        outfitId: args.outfitId,
+        outfitId: args.outfit?._id,
         prompts: [JSON.stringify(schema.prompt)],
       }
     })

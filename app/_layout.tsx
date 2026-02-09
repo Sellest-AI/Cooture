@@ -7,10 +7,6 @@ import { View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
-export const unstable_settings = {
-  initialRouteName: 'welcome',
-};
-
 const Router = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated } = useAccount();
   const pathname = usePathname();

@@ -13,6 +13,7 @@ type Props = {
   /** Height of the header */
   headerContent: ReactNode;
   headerBackgroundImage?: ComponentProps<typeof Image>['source'];
+  headerBackgroundImagePosition?: ComponentProps<typeof Image>['contentPosition'];
   headerBackground?: ReactNode;
   children: ReactNode;
   contentContainerStyle?: ViewStyle;
@@ -25,6 +26,7 @@ export const ParallaxScrollView = ({
   ref,
   contentNegativeSpace = 0,
   headerContent,
+  headerBackgroundImagePosition,
   headerBackgroundImage,
   headerBackground,
   children,
@@ -93,6 +95,7 @@ export const ParallaxScrollView = ({
               width: '100%',
               height: '100%',
             }}
+            contentPosition={headerBackgroundImagePosition}
             contentFit="cover"
           />
         )}

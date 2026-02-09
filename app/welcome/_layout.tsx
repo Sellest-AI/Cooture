@@ -83,6 +83,7 @@ export default function WelcomeLayout() {
 
       {/* Static header that stays in place */}
       <SafeAreaView
+        edges={{ bottom: 'off' }}
         className="absolute overflow-visible"
         style={{
           zIndex: 10,
@@ -115,6 +116,6 @@ export default function WelcomeLayout() {
           <Stepper value={currentStep} />
         </AnimatedScaleView>
       </SafeAreaView>
-    </SafeAreaView >
+    </SafeAreaView>
   )
 }
