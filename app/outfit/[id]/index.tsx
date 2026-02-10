@@ -1,11 +1,12 @@
 import { useRouter, useStateEffect } from "@/hooks";
 import { Id } from "@/lib/convex/api";
+import { useAccount } from "@/lib/convex/auth";
 import { SelectedItemModal } from "@/modules/items/selected-item.modal";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { LoadingBlock } from "@ui/block.loading";
 import { Button } from "@ui/button";
 import { CardItem } from "@ui/cards/card-item";
-import { Pencil, SquirishPlus, Trash } from "@ui/icons";
+import { ArrowRight, Pencil, SquirishPlus, Trash } from "@ui/icons";
 import { Image } from '@ui/image';
 import { MasonryList } from "@ui/masonry-list";
 import { ModalHeader } from "@ui/modal";
@@ -19,6 +20,7 @@ import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 export default function ItemScreen() {
+  const { user } = useAccount();
   const { bottom } = useSafeAreaInsets();
 
   const { push, searchParams: { id } } = useRouter<{ id: Id<'outfits'> }>('/outfit/[id]');
@@ -47,6 +49,8 @@ export default function ItemScreen() {
     }
   }
 
+  const ownOutfit = outfit?.userId === user?._id;
+
   if (!outfit) {
     return <LoadingBlock style={{ height: 'auto', flex: 1 }} />
   }
@@ -71,6 +75,7 @@ export default function ItemScreen() {
           style={{
             paddingTop: 12,
             paddingHorizontal: 12,
+            paddingBottom: 56
           }}
         >
           <ModalHeader
@@ -81,13 +86,13 @@ export default function ItemScreen() {
             onBack={exit}
           />
           <View style={{ marginTop: 4 }}>
-            <TextInput
+            {ownOutfit && <TextInput
               startIcon={Pencil}
               placeholder="Name your outfit..."
               onChangeText={setName}
               value={name}
               style={{ marginBottom: 20 }}
-            />
+            />}
             <MasonryList
               key="0"
               data={[...items, undefined]}
@@ -95,6 +100,7 @@ export default function ItemScreen() {
               keyExtractor={(_, index) => index.toString()}
               renderItem={({ item }) => {
                 if (!item) {
+                  if (!ownOutfit) return null;
                   return (<SquirishPlus
                     style={{ marginBottom: 24, paddingTop: 3, }}
                     size={112}
@@ -120,7 +126,7 @@ export default function ItemScreen() {
               }}
               numColumns={2}
             />
-            <Button
+            {ownOutfit && <Button
               style={{ marginTop: 12 }}
               variant="destructive"
               startIcon={Trash}
@@ -131,9 +137,8 @@ export default function ItemScreen() {
               }}
             >
               Delete Outfit
-            </Button>
+            </Button>}
           </View>
-          <View style={{ height: 72 }} />
         </SafeScrollView>
         <View style={{
           position: 'absolute',
@@ -141,8 +146,20 @@ export default function ItemScreen() {
           right: 12,
           bottom: bottom + 8,
         }}>
-          <Button
+          {!ownOutfit && <Button
             variant="primary"
+            endIcon={ArrowRight}
+            style={{ marginBottom: 12 }}
+            onPress={async () => {
+              push(ROUTES.PHOTOSHOOT.NEW, {
+                params: { outfitId: outfit._id }
+              })
+            }}
+          >
+            Try on
+          </Button>}
+          {ownOutfit && <Button
+            variant={'primary'}
             disabled={!hasChanges}
             onPress={async () => {
               Keyboard.dismiss();
@@ -151,7 +168,7 @@ export default function ItemScreen() {
             }}
           >
             Save Changes
-          </Button>
+          </Button>}
         </View>
       </View>
       <SelectedItemModal

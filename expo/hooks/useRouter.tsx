@@ -1,6 +1,6 @@
 import { Id } from "@/lib/convex/api";
 import { replaceParamsInPath, url } from "@utils/routes";
-import { Redirect as ExpoRedirect, Route, router, useLocalSearchParams } from "expo-router";
+import { Redirect as ExpoRedirect, Route, router, useLocalSearchParams, usePathname } from "expo-router";
 import { NavigationOptions } from "expo-router/build/global-state/routing";
 import { atom, useAtom, useSetAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -57,6 +57,7 @@ export const useRoute = <K extends Record<string, any> = Record<string, any>, T 
   const [_data, setData] = useAtom(dataAtom);
   const sharedData = useMemo(() => retrieveData(href, _data), [href, _data]);
   const [localData, setLocalData] = useState(sharedData);
+  const path = usePathname();
 
   const params = useMemo(() => sharedData ?? localData ?? {} as Params<T>, [sharedData, localData]);
   const finalParams = useMemo(() => {
@@ -94,12 +95,13 @@ export const useRoute = <K extends Record<string, any> = Record<string, any>, T 
     searchParams,
     redirectTo: redirectTo,
     params: finalParams,
+    path,
   }
 }
 
 export const useRouter = <K extends Record<string, any> = Record<string, any>, T extends Route = Route>(href?: T, options?: Options<T>) => {
   const setData = useSetAtom(dataAtom);
-  const { params, redirectTo, searchParams } = useRoute<K, T>(href, options);
+  const { path, params, redirectTo, searchParams } = useRoute<K, T>(href, options);
 
   const _toUrl = useCallback(<T extends Route>(to: T, options?: RouterParams<T>) => {
     return url(replaceParamsInPath(to, options?.pathParams ?? {}), options?.searchParams ?? {});
@@ -162,6 +164,11 @@ export const useRouter = <K extends Record<string, any> = Record<string, any>, T
     router.dismissTo(toUrl, options);
   }, [_routerFunction]);
 
+  const back = useCallback(() => {
+    if (router.canGoBack()) router.back();
+    else router.dismissTo('/');
+  }, []);
+
   const consume = useCallback(() => {
     if (params !== undefined) {
       setData((d) => {
@@ -174,9 +181,11 @@ export const useRouter = <K extends Record<string, any> = Record<string, any>, T
   }, [href, params, setData]);
 
   return {
+    path,
     searchParams,
     redirect: redirectTo,
     params,
+    back,
     push,
     replace,
     dismissTo,

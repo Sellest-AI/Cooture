@@ -1,17 +1,29 @@
+import { v } from "convex/values";
 import { getGenerationDetails } from "../../functions/generations";
-import { authQuery } from "../../procedures";
+import { publicQuery } from "../../procedures";
 
-export const authed = authQuery({
-  args: {},
-  handler: async (ctx) => {
-    const generations = await ctx.db.query("generations")
-      .withIndex("by_user_id", (q) => q.eq("userId", ctx.userId))
+export const anon = publicQuery({
+  args: {
+    userId: v.id('users'),
+  },
+  handler: async (ctx, { userId }) => {
+    const result = await ctx.db.query("generations")
+      .withIndex("by_user_id", (q) => q.eq("userId", userId))
       .order("desc")
+      .filter(q => q.eq(q.field("status"), "COMPLETED"))
       .collect();
 
-    return await Promise.all(generations.map(async g => ({
-      ...g,
-      ...(await getGenerationDetails(ctx, g._id))
-    })));
+    const generations = await Promise.all(result.map(async g => {
+      const details = await getGenerationDetails(ctx, g._id);
+      const predictions = details.predictions.filter(p => p.status === 'ACCEPTED');
+
+      return {
+        ...g,
+        ...details,
+        predictions
+      }
+    }));
+
+    return generations;
   }
-});
+})

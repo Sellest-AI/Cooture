@@ -1,31 +1,40 @@
 import { notEmpty } from "@shared/utils";
+import { v } from "convex/values";
+import { Id } from "../../_generated/dataModel";
 import { getImage } from "../../functions/images";
-import { authQuery } from "../../procedures";
+import { authQuery, QueryCtx } from "../../procedures";
+
+const getPublicOutfits = async (ctx: QueryCtx, userId: Id<'users'>) => {
+  const outfits = await ctx.db.query("outfits")
+    .withIndex('by_user_id', q => q.eq('userId', userId))
+    .order('desc')
+    .collect();
+
+  const detailedOutfits = await Promise.all(outfits.map(async (outfit) => {
+    const items = await ctx.db.query('outfitItems')
+      .withIndex('by_outfit_id', q => q.eq('outfitId', outfit._id)).collect();
+    if (items.length === 0) return null;
+    const item = await ctx.db.get(items[0].itemId);
+    if (!item) return null;
+    const image = await getImage(ctx, item.imageId);
+    if (!image) return null;
+    return {
+      ...outfit,
+      items,
+      itemsCount: items.length,
+      cover: image
+    }
+  }));
+
+  return detailedOutfits.filter(notEmpty);
+}
 
 export const authed = authQuery({
   args: {},
-  handler: async (ctx) => {
-    const outfits = await ctx.db.query("outfits")
-      .withIndex('by_user_id', q => q.eq('userId', ctx.userId))
-      .order('desc')
-      .collect();
+  handler: async (ctx) => getPublicOutfits(ctx, ctx.userId)
+})
 
-    const detailedOutfits = await Promise.all(outfits.map(async (outfit) => {
-      const items = await ctx.db.query('outfitItems')
-        .withIndex('by_outfit_id', q => q.eq('outfitId', outfit._id)).collect();
-      if (items.length === 0) return null;
-      const item = await ctx.db.get(items[0].itemId);
-      if (!item) return null;
-      const image = await getImage(ctx, item.imageId);
-      if (!image) return null;
-      return {
-        ...outfit,
-        items,
-        itemsCount: items.length,
-        cover: image
-      }
-    }));
-
-    return detailedOutfits.filter(notEmpty);
-  }
+export const anon = authQuery({
+  args: { userId: v.id('users') },
+  handler: async (ctx, { userId }) => getPublicOutfits(ctx, userId)
 })

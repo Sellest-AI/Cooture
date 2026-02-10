@@ -9,7 +9,7 @@ type Props = {
   icon?: React.ComponentType<{ size?: number, color?: string, style?: ViewStyle }> | false;
   title: string;
   description: string;
-  cta?: {
+  cta?: false | {
     onPress: () => void;
     label: string;
   }

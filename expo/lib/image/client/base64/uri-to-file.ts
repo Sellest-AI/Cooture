@@ -1,6 +1,7 @@
 import { File } from 'expo-file-system';
-import { nanoid } from 'nanoid';
 import { getImageDimensions } from '../metadata';
+
+const randomId = () => Math.random().toString(36).slice(2, 12);
 
 function getExtensionFromMimeType(mimeType: string) {
   switch (mimeType) {
@@ -62,7 +63,7 @@ export async function uriToImage(uri: string) {
   if (!fileInfo.exists) throw new Error('File does not exist');
 
   // 2️⃣ Get file name
-  const name = uri.split('/').pop() ?? nanoid();
+  const name = uri.split('/').pop() ?? randomId();
 
   // 3️⃣ Detect MIME type
   let type = getMimeType(uri) || 'application/octet-stream';

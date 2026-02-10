@@ -42,12 +42,12 @@ export function getImageDimensions(url: string): Promise<Dimensions> {
 
     img.onload = () => {
       const { width, height } = img;
-      URL.revokeObjectURL(url); // Clean up object URL
+      if (Platform.OS === 'web') URL.revokeObjectURL(url); // Clean up object URL
       resolve({ width, height });
     };
 
     img.onerror = (err) => {
-      URL.revokeObjectURL(url); // Clean up on error
+      if (Platform.OS === 'web') URL.revokeObjectURL(url); // Clean up on error
       reject(new Error(err.toString()));
     };
 

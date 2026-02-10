@@ -3,7 +3,7 @@ import { Button } from '@ui/button';
 import { ArrowRight, Bookmark, CircleFadingArrowUp, Heart, ShareIcon } from '@ui/icons';
 import { Skeleton } from '@ui/skeleton';
 import { MotiView } from 'moti';
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Dimensions, FlatList, Pressable, View, ViewStyle } from 'react-native';
 import { Colors } from 'theme';
 import { Image } from '../image';
@@ -43,14 +43,28 @@ type Props = {
 }
 
 export const Post = ({ style, postedAt, image, user, preset, outfit, images, likedAccounts, paddingHorizontal, onPress }: Props) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [pinching, setPinching] = useState<{ index: number } | false>(false);
   const type = preset ? 'preset' : outfit ? 'outfit' : undefined;
-  const hasImages = images && images.length > 0;
 
   const PADDING_HORIZONTAL = paddingHorizontal ?? 12;
   const GAP = 4;
 
   const FALLBACK_IMAGE = image || images?.[0];
+
+  const onViewableItemsChanged = useCallback(({ viewableItems }: { viewableItems: { index?: number | null }[] }) => {
+    if (viewableItems.length === 0) return;
+    setCurrentIndex(viewableItems[0].index ?? 0);
+  }, [])
+
+  const viewabilityConfigCallbackPairs = useRef([
+    {
+      onViewableItemsChanged,
+      viewabilityConfig: {
+        minimumViewTime: 100, itemVisiblePercentThreshold: 90,
+      }
+    },
+  ]);
 
   return (
     <View style={[{}, style]}>
@@ -61,12 +75,14 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
         marginBottom: 12,
         paddingHorizontal: PADDING_HORIZONTAL
       }}>
-        {user && <View style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-          gap: 10
-        }}>
+        {user && <Pressable
+          onPress={user.onPress}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            gap: 10
+          }}>
           <View style={{
             width: 32, height: 32,
             borderRadius: 99,
@@ -84,7 +100,7 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
             <Text.Sm color={Colors.neutral[50]} weight={600}>{user.name}</Text.Sm>
             <Text.Sm color={Colors.neutral[400]} style={{ marginTop: 2 }}>@{user.username}</Text.Sm>
           </View>
-        </View>}
+        </Pressable>}
         {postedAt && <Text.Sm color={Colors.neutral[400]}>{postedAt.toDateString()}</Text.Sm>}
       </View>}
       <FlatList
@@ -99,6 +115,7 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
         keyExtractor={(item) => item?.url ?? ''}
         snapToInterval={Dimensions.get('window').width - (PADDING_HORIZONTAL * 2) + GAP}
         numColumns={1}
+        viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
         renderItem={({ item: img, index }) => {
           return (
             <View
@@ -144,6 +161,7 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
                   style={{
                     flexDirection: 'row',
                     gap: 0,
+                    marginLeft: preset ? 0 : 16,
                   }}>
                   {outfit.itemUrls.slice(0, 2).map((url) => <Badge
                     key={url}
@@ -169,7 +187,7 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
             outfit?.onPress?.();
           }
         }}
-        style={{ marginTop: 8, marginHorizontal: hasImages ? PADDING_HORIZONTAL : 0 }}
+        style={{ marginTop: 8, marginHorizontal: PADDING_HORIZONTAL }}
         variant={type === 'preset' ? 'secondary' : 'primary'}
         endIcon={type === 'outfit' && ArrowRight}
         startIcon={type === 'preset' && CircleFadingArrowUp}
@@ -194,15 +212,22 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
             ))}
           </View>}
         </View>
-        <View style={{ backgroundColor: 'red', width: 50, height: 50 }} />
-        {images && <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center' }}>
-          {images?.map((img) => (
+        {(images && images.length > 1) && <View style={{
+          position: 'absolute',
+          left: '50%',
+          transform: [{ translateX: '-50%' }],
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 4
+        }}>
+          {images?.map((img, i) => (
             <MotiView
               key={img._id}
               style={{
-                width: 8,
-                height: 8,
-                backgroundColor: Colors.neutral[400],
+                width: 5,
+                height: 5,
+                backgroundColor: currentIndex === i ? Colors.neutral[50] : Colors.neutral[400],
+                borderRadius: 99,
               }}
             // animate={{}}
             />

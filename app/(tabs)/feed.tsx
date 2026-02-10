@@ -14,14 +14,14 @@ import { useMemo } from "react";
 import { FlatList, ViewStyle } from "react-native";
 import { Colors } from "theme";
 
-const FeedPost = ({ id, style }: { id: Id<'predictions'>, style?: ViewStyle }) => {
+const PredictionPost = ({ id, style }: { id: Id<'predictions'>, style?: ViewStyle }) => {
   const { push } = useRouter('/feed');
   const { data: post } = useQuery(api.router.post.getOne.anon, { id });
   const predictions = post ? [post, ...post.generationPredictions.filter((p) => p.status === 'ACCEPTED')] : [];
   const imageIds = predictions.map((p) => p.imageId).filter(notEmpty);
   const { data: images } = useQueryCached(api.router.storage.images.getMany.anon, imageIds.length > 0 ? { imageIds } : 'skip');
 
-  if (!post) return <Post.Skeleton style={style} />;
+  if (!post) return <Post.Skeleton style={{ ...style, paddingHorizontal: 12 }} />;
 
   return (<Post
     style={{ ...style }}
@@ -42,7 +42,10 @@ const FeedPost = ({ id, style }: { id: Id<'predictions'>, style?: ViewStyle }) =
     user={post.user ? {
       name: post.user.name ?? 'Anonymous',
       username: post.user.name ?? 'anon',
-      imageUrl: post.user.image
+      imageUrl: post.user.image,
+      onPress: () => push(ROUTES.USER.PATH, {
+        pathParams: { id: post.user!._id }
+      })
     } : undefined}
     preset={post.preset?.cover ? {
       imageUrl: post.preset.cover.sizes.thumbnail.url,
@@ -51,13 +54,50 @@ const FeedPost = ({ id, style }: { id: Id<'predictions'>, style?: ViewStyle }) =
       })
     } : undefined}
     outfit={post.outfit ? {
-      itemUrls: post.outfit.items.map(i => i.image.url),
+      itemUrls: post.outfit.items.map(i => i.image.sizes.thumbnail.url),
       onPress: () => push(ROUTES.OUTFIT.PATH, {
         pathParams: { id: post.outfit!._id }
       })
     } : undefined}
   />
   )
+}
+
+const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle }) => {
+  const { push } = useRouter('/feed');
+  const { data: outfit } = useQuery(api.router.outfits.getOne.anon, { outfitId: id });
+  const { data: user } = useQuery(api.router.users.getAccount.anon, outfit ? { userId: outfit.userId } : 'skip');
+
+  if (!outfit) return <Post.Skeleton style={{ ...style, paddingHorizontal: 12 }} />;
+
+  const cover = {
+    _id: outfit._id,
+    url: outfit.items[0].image.url,
+    contentFit: 'contain' as const,
+  }
+
+  return <Post
+    style={style}
+    paddingHorizontal={12}
+    postedAt={outfit._creationTime ? new Date(outfit._creationTime) : undefined}
+    likedAccounts={[]}
+    image={cover}
+    user={user ? {
+      name: user.name ?? 'Anonymous',
+      username: user.name ?? 'anon',
+      imageUrl: user.image,
+      onPress: () => push(ROUTES.USER.PATH, {
+        pathParams: { id: user!._id }
+      })
+    } : undefined}
+    outfit={{
+      itemUrls: outfit.items.map((i) => i.image.sizes.thumbnail.url),
+      onPress: () => push(ROUTES.PHOTOSHOOT.NEW, {
+        params: { outfitId: outfit._id }
+      })
+    }}
+  // user={outfit.}
+  />;
 }
 
 export default function Screen() {
@@ -67,7 +107,7 @@ export default function Screen() {
   const items = useMemo(() => [
     { type: 'header' as const },
     { type: 'premium' as const },
-    ...(feed ? feed.map(id => ({ type: 'item' as const, id })) :
+    ...(feed ? feed.map(item => ({ type: 'item' as const, item })) :
       [{ type: 'skeleton' as const }]),
     { type: 'end' as const }
   ], [feed]);
@@ -116,9 +156,16 @@ export default function Screen() {
           }
 
           if (item.type === 'item') {
-            return <FeedPost
-              key={item.id}
-              id={item.id}
+            if (item.item.type === 'outfit')
+              return <OutfitPost
+                key={item.item._id}
+                id={item.item._id}
+                style={{ marginBottom: index === items.length - 1 ? 0 : 28 }}
+              />
+
+            return <PredictionPost
+              key={item.item._id}
+              id={item.item._id}
               style={{ marginBottom: index === items.length - 1 ? 0 : 28 }}
             />
           }

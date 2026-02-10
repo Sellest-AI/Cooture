@@ -29,6 +29,7 @@ import type * as functions_users_index from "../functions/users/index.js";
 import type * as http from "../http.js";
 import type * as http_replicate from "../http/replicate.js";
 import type * as http_runpod from "../http/runpod.js";
+import type * as lib_algorithms_feedSuffler from "../lib/algorithms/feedSuffler.js";
 import type * as lib_image_index from "../lib/image/index.js";
 import type * as lib_image_node from "../lib/image/node.js";
 import type * as lib_image_sanitizeImage from "../lib/image/sanitizeImage.js";
@@ -153,6 +154,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   "http/replicate": typeof http_replicate;
   "http/runpod": typeof http_runpod;
+  "lib/algorithms/feedSuffler": typeof lib_algorithms_feedSuffler;
   "lib/image/index": typeof lib_image_index;
   "lib/image/node": typeof lib_image_node;
   "lib/image/sanitizeImage": typeof lib_image_sanitizeImage;

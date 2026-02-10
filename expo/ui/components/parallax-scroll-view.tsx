@@ -58,7 +58,7 @@ export const ParallaxScrollView = ({
     extrapolate: 'clamp',
   });
 
-  const { top } = useSafeAreaInsets();
+  const { bottom } = useSafeAreaInsets();
   const headerHeightRuntime = headerHeight;
   const headerOffset = headerHeightRuntime - contentNegativeSpace;
 
@@ -73,42 +73,52 @@ export const ParallaxScrollView = ({
           right: 0,
           height: headerHeightRuntime,
           transform: [{ translateY: headerTranslateY }],
-          opacity: headerOpacity,
           zIndex: 0,
           overflow: 'hidden',
         }}
         pointerEvents="none"
       >
-        {headerBackground && <View style={{
+        <Animated.View style={{
           position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
+          inset: 0,
+          opacity: headerOpacity,
         }}>
-          {headerBackground}
-        </View>}
-        {headerBackgroundImage && (
-          <Image
-            source={headerBackgroundImage}
-            style={{
-              width: '100%',
-              height: '100%',
-            }}
-            contentPosition={headerBackgroundImagePosition}
-            contentFit="cover"
-          />
-        )}
-        <LinearGradient
-          colors={['transparent', Colors.background]}
-          style={{
+          {headerBackground && <View style={{
             position: 'absolute',
+            top: 0,
             left: 0,
             right: 0,
             bottom: 0,
-            height: '50%',
-          }}
-        />
+          }}>
+            {headerBackground}
+          </View>}
+          {headerBackgroundImage && (
+            <Image
+              source={headerBackgroundImage}
+              style={{
+                width: '100%',
+                height: '100%',
+              }}
+              contentPosition={headerBackgroundImagePosition}
+              contentFit="cover"
+            />
+          )}
+        </Animated.View>
+        <Animated.View style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: -1,
+          height: '50%',
+        }}>
+          <LinearGradient
+            colors={['transparent', Colors.background]}
+            style={{
+              width: '100%',
+              height: '100%'
+            }}
+          />
+        </Animated.View>
         <LinearGradient
           colors={[Colors.background, 'transparent']}
           style={{
@@ -116,8 +126,8 @@ export const ParallaxScrollView = ({
             left: 0,
             right: 0,
             top: 0,
-            height: '25%',
-            opacity: 0.5
+            height: '30%',
+            opacity: 0.8
           }}
         />
       </Animated.View>
@@ -163,7 +173,7 @@ export const ParallaxScrollView = ({
               flex: 1,
               marginTop: -contentNegativeSpace,
               height: locked ?
-                Dimensions.get('window').height - headerHeightRuntime + contentNegativeSpace + top
+                Dimensions.get('screen').height - headerHeightRuntime + contentNegativeSpace - bottom
                 : undefined,
             }}>
             {children}

@@ -151,7 +151,6 @@ export const Slider = ({ value, label, labels, onValueChange, style, customHeigh
   const currentLabel = useMemo(() => {
     if (!labels || labels.length === 0) return null;
     const closestValue = findClosestLabel(value);
-    console.log(value, labels);
     const labelItem = labels.find((l) => l.value === closestValue);
     return labelItem?.label || "";
 

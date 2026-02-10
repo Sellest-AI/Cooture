@@ -1,10 +1,9 @@
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
+import { Platform } from 'react-native';
 import { uriToImage } from '../base64/uri-to-file';
 
 const convertUrl = async (url: string) => {
-  console.time('uriToImage');
   const file = await uriToImage(url);
-  console.timeEnd('uriToImage');
   return file;
 }
 
@@ -224,8 +223,10 @@ const compress = async (
 
       if (currentQuality <= 0.05) break; // Diminishing returns
     }
-  } finally {
-    URL.revokeObjectURL(imageUri);
+  } catch (error) {
+    if (Platform.OS === 'web') URL.revokeObjectURL(imageUri);
+    console.error('Image compression failed:', error);
+    throw error;
   }
 
   return lastResult;

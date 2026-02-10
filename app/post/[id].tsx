@@ -37,7 +37,10 @@ const UserPost = ({ postId, style }: { postId: Id<'predictions'>, style?: ViewSt
     user={post.user ? {
       name: post.user.name ?? 'Anonymous',
       username: post.user.name ?? 'anon',
-      imageUrl: post.user.image
+      imageUrl: post.user.image,
+      onPress: () => push(ROUTES.USER.PATH, {
+        pathParams: { id: post.user!._id }
+      })
     } : undefined}
     preset={post.preset?.cover ? {
       imageUrl: post.preset.cover.sizes.thumbnail.url,
@@ -46,7 +49,7 @@ const UserPost = ({ postId, style }: { postId: Id<'predictions'>, style?: ViewSt
       })
     } : undefined}
     outfit={post.outfit ? {
-      itemUrls: post.outfit.items.map(i => i.image.url),
+      itemUrls: post.outfit.items.map(i => i.image.sizes.thumbnail.url),
       onPress: () => push(ROUTES.OUTFIT.PATH, {
         pathParams: { id: post.outfit!._id }
       })

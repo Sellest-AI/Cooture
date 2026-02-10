@@ -81,7 +81,7 @@ export default function Screen() {
         <Text.H4 color={Colors.foreground} style={{ marginLeft: 12 }}>
           Trending styles
         </Text.H4>
-        {presets?.length === 0 && <View style={{
+        {!presets && <View style={{
           marginTop: 16,
           flexDirection: 'row',
           paddingHorizontal: 16, gap: 32
@@ -115,7 +115,7 @@ export default function Screen() {
         <Text.H4 color={Colors.foreground} style={{ marginLeft: 12 }}>
           You next try on
         </Text.H4>
-        {outfits?.length === 0 && <View style={{
+        {!outfits && <View style={{
           marginTop: 16,
           flexDirection: 'row',
           paddingHorizontal: 16, gap: 32

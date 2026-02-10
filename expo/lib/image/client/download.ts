@@ -30,7 +30,8 @@ export async function downloadImageCrossPlatform(source: string) {
     // write base64 data URI to file
     const [, base64] = source.split(',');
     const file = new File(Paths.document, `img_${Date.now()}.jpg`);
-    const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+    // Decode base64 string to bytes (Buffer is available in React Native via polyfill)
+    const bytes = Uint8Array.from(Buffer.from(base64 ?? '', 'base64'));
     file.write(bytes);
     localUri = file.uri;
   } else {

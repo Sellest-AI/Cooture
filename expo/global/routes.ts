@@ -37,6 +37,10 @@ export const ROUTES = {
       ID: (id: string) => `/photoshoot/generations/${id}` as const,
     }
   },
+  USER: {
+    PATH: '/users/[id]',
+    ID: (id: string) => `/users/${id}` as const,
+  },
   EXTRA: {
     SETINGS: '/settings' as const,
     NOTIFICATIONS: '/notifications' as const,
