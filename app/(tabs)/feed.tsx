@@ -72,7 +72,7 @@ const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle }) => 
 
   const cover = {
     _id: outfit._id,
-    url: outfit.items[0].image.url,
+    url: outfit.cover?.url ?? outfit.items[0].image.url,
     contentFit: 'contain' as const,
   }
 

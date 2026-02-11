@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+import { internal } from "../../_generated/api";
 import { authMutation } from "../../procedures";
 
 export const authed = authMutation({
@@ -27,6 +28,10 @@ export const authed = authMutation({
       // Add new items to the outfit
       const itemsToAdd = args.items.filter(itemId => !existingOutfitItems.some(oi => oi.itemId === itemId));
       for (const itemId of itemsToAdd) { await ctx.db.insert('outfitItems', { outfitId: args.outfitId, itemId, }) }
+
+      if (itemsToAdd.length > 0 || itemsToRemove.length > 0) {
+        await ctx.scheduler.runAfter(0, internal.router.outfits.updateCover._internal, { outfitId: args.outfitId });
+      }
     }
 
     return true;

@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+import { internal } from "../../_generated/api";
 import { authMutation } from "../../procedures";
 
 export const authed = authMutation({
@@ -19,6 +20,8 @@ export const authed = authMutation({
         itemId,
       })
     }
+
+    await ctx.scheduler.runAfter(0, internal.router.outfits.updateCover._internal, { outfitId: outfit });
 
     return outfit;
   }

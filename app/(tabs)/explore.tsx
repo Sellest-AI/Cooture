@@ -15,7 +15,7 @@ import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 const GAP = 4;
-const HEIGHT = 320;
+const HEIGHT = 332;
 
 const GridSkeleton = () => {
   return (
@@ -76,13 +76,15 @@ const Outfit = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle }) => {
   const { data: outfit } = useQuery(api.router.outfits.getOne.anon, { outfitId: id });
   if (!outfit) return <Skeleton style={style} />;
 
+  const image = outfit.cover ?? outfit.items[0].image;
+
   return (
     <Pressable style={{ borderRadius: 16, overflow: 'hidden', flex: 1, ...style }}
       onPress={() => router.push(ROUTES.OUTFIT.ID(outfit._id))}
     >
       <Image
         style={{ flex: 1 }}
-        source={{ uri: outfit.items[0].image.sizes.medium.url }}
+        source={{ uri: image.url }}
       />
     </Pressable>
   )

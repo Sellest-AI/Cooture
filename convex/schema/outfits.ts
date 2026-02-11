@@ -5,6 +5,7 @@ export const outfits = defineTable({
   name: v.string(),
   updatedAt: v.number(),
   userId: v.id("users"),
+  coverId: v.optional(v.id("images")),
 })
   .index("by_user_id", ["userId"]);
 

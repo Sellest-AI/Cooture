@@ -1,6 +1,7 @@
 import { notEmpty } from "@shared/utils";
 import { v } from "convex/values";
 import { Id } from "../../_generated/dataModel";
+import { getImage } from "../../functions/images";
 import { getItem } from "../../functions/items/getItem";
 import { internalQuery, publicQuery, QueryCtx } from "../../procedures";
 
@@ -16,9 +17,12 @@ const getOutfit = async (ctx: QueryCtx, outfitId: Id<'outfits'>) => {
   const _items = await Promise.all(itemIds.map(({ itemId }) => getItem(ctx, itemId)));
   const items = _items.filter(notEmpty);
 
+  const cover = outfit.coverId ? await getImage(ctx, outfit.coverId) : null;
+
   return {
     ...outfit,
     items,
+    cover,
     itemsCount: items.length,
   }
 }

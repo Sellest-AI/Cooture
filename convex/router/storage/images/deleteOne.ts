@@ -25,7 +25,7 @@ export const _internal = internalAction({
       await StorageCloud.deleteFile(imageObject.key);
     }
 
-    await ctx.runMutation(internal.router.storage.images.deleteOneMutation._internal, { imageId });
+    await ctx.runMutation(internal.router.storage.images.deleteOneMutationInternal._internal, { imageId });
   },
 })
 
