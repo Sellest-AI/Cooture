@@ -1,4 +1,4 @@
-import { useRouter } from "@/hooks";
+import { Router, useRoute, useRouter } from "@/hooks";
 import { api, useAction } from "@/lib/convex/client";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
@@ -95,7 +95,7 @@ const Portrait = ({ style }: { style?: ViewStyle }) => {
 
   const HEIGHT = style?.height ?? 256;
 
-  if (!frontImage && !isPending) return <useRouter.Redirect
+  if (!frontImage && !isPending) return <Router.Redirect
     href={ROUTES.EXTRA.UPDATE_PORTRAITS}
     redirectTo={ROUTES.PHOTOSHOOT.RECAP}
   />
@@ -200,12 +200,13 @@ const OutfitComponent = () => {
 
 export default function Screen() {
   const { outfitId, outfitSize, presetId, setOutfitId, setPresetId, reset } = usePhotoshoot.New();
-  const { replace, dismissTo } = useRouter(ROUTES.PHOTOSHOOT.RECAP, {
+  const { replace, dismissTo } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
+  useRoute(ROUTES.PHOTOSHOOT.RECAP, {
+    resetFnc: reset,
     onInit: ({ outfitId, presetId }) => {
       if (outfitId) setOutfitId(outfitId);
       if (presetId) setPresetId(presetId);
-    },
-    resetFnc: reset,
+    }
   });
 
   const { action } = useAction(api.llm.triggers.photoshoot.authed);

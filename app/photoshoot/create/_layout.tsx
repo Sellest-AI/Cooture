@@ -1,4 +1,4 @@
-import { useRouter } from "@/hooks";
+import { useRoute } from "@/hooks";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
 import { Badge } from "@ui/badge";
 import { Image } from "@ui/image";
@@ -15,7 +15,7 @@ import { Colors } from "theme";
 
 export default function Layout() {
   const { setOutfitId, setPresetId, reset, preset } = usePhotoshoot.New();
-  useRouter('/photoshoot/create', {
+  useRoute('/photoshoot/create', {
     resetFnc: reset,
     onInit: ({ outfitId, presetId }) => {
       if (outfitId) setOutfitId(outfitId)

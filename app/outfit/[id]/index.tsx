@@ -1,4 +1,4 @@
-import { useRouter, useStateEffect } from "@/hooks";
+import { useRoute, useRouter, useStateEffect } from "@/hooks";
 import { Id } from "@/lib/convex/api";
 import { useAccount } from "@/lib/convex/auth";
 import { SelectedItemModal } from "@/modules/items/selected-item.modal";
@@ -23,7 +23,8 @@ export default function ItemScreen() {
   const { user } = useAccount();
   const { bottom } = useSafeAreaInsets();
 
-  const { push, searchParams: { id } } = useRouter<{ id: Id<'outfits'> }>('/outfit/[id]');
+  const { push } = useRouter('/outfit/[id]');
+  const { id } = useRoute.Params<{ id: Id<'outfits'> }>();
   const { outfit, updateItems, updateName, remove } = useOutfit(id);
 
   const [selectedItem, setSelectedItem] = useState<Id<'items'> | null>(null);

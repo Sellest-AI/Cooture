@@ -134,7 +134,7 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
                 style={{
                   backgroundColor: Colors.blur.dark,
                   borderRadius: 32,
-                  borderColor: Colors.blur.medium,
+                  borderColor: !pinching ? Colors.blur.medium : undefined,
                   borderTopWidth: 1,
                   flex: 1,
                 }}

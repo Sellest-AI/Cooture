@@ -17,7 +17,7 @@ const UserPost = ({ postId, style }: { postId: Id<'predictions'>, style?: ViewSt
   const imageIds = predictions.map((p) => p.imageId).filter(notEmpty);
   const { data: images } = useQueryCached(api.router.storage.images.getMany.anon, imageIds.length > 0 ? { imageIds } : 'skip');
 
-  if (!post) return <Post.Skeleton style={{ ...style }} />;
+  if (!post) return <Post.Skeleton style={{ ...style, paddingHorizontal: 12 }} />;
 
   return (<Post
     style={{ ...style }}
@@ -59,8 +59,7 @@ const UserPost = ({ postId, style }: { postId: Id<'predictions'>, style?: ViewSt
 }
 
 export default function Screen() {
-  const { searchParams: { id } } = useRoute<{ id: Id<'predictions'> }>('/post/[id]');
-
+  const { id } = useRoute.Params<{ id: Id<'predictions'> }>();
   const { data: post } = useQuery(api.router.post.getOne.anon, { id });
   const { data: postsFromUser, isPending } = useQuery(api.router.post.getFromUser.anon, post?.user?._id ? { userId: post?.user?._id } : 'skip');
 
@@ -78,8 +77,8 @@ export default function Screen() {
       />
       <UserPost postId={id} style={{ marginTop: 8, marginBottom: 28 }} />
       {isPending && <>
-        <Post.Skeleton style={{ marginBottom: 28 }} />
-        <Post.Skeleton style={{ marginBottom: 28 }} />
+        <Post.Skeleton style={{ marginBottom: 28, marginHorizontal: 12 }} />
+        <Post.Skeleton style={{ marginBottom: 28, marginHorizontal: 12 }} />
       </>}
       {postsFromUser?.filter((p) => p.generationId !== post?.generationId)
         .filter((p, _, arr) => arr.findLast(x => x.generationId === p.generationId)?._id === p._id)

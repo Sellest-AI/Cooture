@@ -5,6 +5,7 @@ import { Image, ImageProps } from './image';
 type ZoomableImageProps = {
   source: string | undefined;
   contentFit?: 'cover' | 'contain';
+  cachePolicy?: ImageProps['cachePolicy'];
   style?: ImageProps['style'];
   width: number;
   aspectRatio?: number;
@@ -14,6 +15,7 @@ type ZoomableImageProps = {
 export const ZoomableImage = ({
   source,
   contentFit = 'cover',
+  cachePolicy,
   style,
   width,
   aspectRatio = 1,
@@ -41,6 +43,7 @@ export const ZoomableImage = ({
       <Image
         source={source}
         contentFit={contentFit}
+        cachePolicy={cachePolicy}
         style={[style, {
           width,
           height: width / aspectRatio,

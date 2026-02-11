@@ -1,29 +1,28 @@
-import { useRouter } from "@/hooks";
+import { Router, useRoute, useRouter } from "@/hooks";
 import { api, useMutation, useQueryCached } from "@/lib/convex/client";
 import { LoadingBlock } from "@ui/block.loading";
 import { Button } from "@ui/button";
 import { Collection } from "@ui/cards";
 import { MasonryList } from "@ui/masonry-list";
 import { ModalHeader } from "@ui/modal";
-import { router } from "expo-router";
 import { ScrollView, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 export default function PickOutfitScreen() {
   const { mutate: update } = useMutation(api.router.outfits.editOne.authed);
-  const { params, push, dismissTo, redirect } = useRouter("/pick-outfit");
-  const { canSkip, itemIds } = params;
+  const { push, redirect } = useRouter("/pick-outfit");
+  const { canSkip, itemIds, redirectTo } = useRoute("/pick-outfit");
 
   const { data: outfits } = useQueryCached(api.router.outfits.getAll.authed);
   const filteredOutfits = outfits?.filter((outfit) => !outfit.items.some((item) => itemIds?.includes(item.itemId)));
 
   // Redirect to new outfit if no outfits available
   if (filteredOutfits && filteredOutfits.length === 0) {
-    return <useRouter.Redirect
+    return <Router.Redirect
+      redirectTo={redirectTo}
       href={ROUTES.MODALS.NEW_OUTFIT}
       params={{ itemIds }}
-      redirectTo={redirect}
     />
   }
 
@@ -57,7 +56,7 @@ export default function PickOutfitScreen() {
                   onPress={() => {
                     push(ROUTES.MODALS.NEW_OUTFIT, {
                       params: { itemIds },
-                      redirectTo: redirect,
+                      forwardRedirect: true,
                     })
                   }}
                 />
@@ -79,13 +78,10 @@ export default function PickOutfitScreen() {
                       update({ outfitId: outfit._id, items });
                     }
 
-                    if (redirect) {
-                      dismissTo(redirect, { params: { outfitId: outfit._id } });
-                    } else if (router.canGoBack()) {
-                      router.back()
-                    } else {
-                      router.replace(ROUTES.PROFILE.OUTFITS)
-                    }
+                    redirect({
+                      params: { outfitId: outfit._id },
+                      fallbackTo: ['back', ROUTES.PROFILE.OUTFITS]
+                    });
                   }}
                 />
               </View>
@@ -96,7 +92,7 @@ export default function PickOutfitScreen() {
           <LoadingBlock />
         }
       </ScrollView>
-      {(canSkip && redirect) && <View style={{
+      {(canSkip && redirectTo) && <View style={{
         position: 'absolute',
         left: 12,
         right: 12,
@@ -105,7 +101,7 @@ export default function PickOutfitScreen() {
         <Button
           variant="blur"
           onPress={() => {
-            dismissTo(redirect, { params: { outfitId: undefined } });
+            redirect({ params: { outfitId: undefined } });
           }}>
           Skip
         </Button>

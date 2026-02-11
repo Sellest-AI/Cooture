@@ -10,7 +10,6 @@ import { ModalHeader } from "@ui/modal";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
-import { router } from "expo-router";
 import { FlatList, Pressable, StyleSheet, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
@@ -148,7 +147,7 @@ export default function Screen() {
       </View>
       <Button
         variant="blur"
-        onPress={() => router.push('/presets/new')}
+        onPress={() => push('/presets/new')}
         style={{ marginTop: 48, marginHorizontal: 12 }}
       >
         New preset

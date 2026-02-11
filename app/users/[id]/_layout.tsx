@@ -9,10 +9,10 @@ export const unstable_settings = {
 };
 
 export default function Layout() {
-  const { searchParams } = useRoute<{ id: Id<'users'> }>(ROUTES.USER.PATH);
+  const { id } = useRoute.Params<{ id: Id<'users'> }>();
 
-  const _generations = usePaginatedQueryCached(api.router.generations.getPaginated.anon, { userId: searchParams.id }, { initialNumItems: 4 });
-  const { data: user } = useQuery(api.router.users.getAccount.anon, { userId: searchParams.id });
+  const _generations = usePaginatedQueryCached(api.router.generations.getPaginated.anon, { userId: id }, { initialNumItems: 4 });
+  const { data: user } = useQuery(api.router.users.getAccount.anon, { userId: id });
 
   const recentPosts = (_generations?.results ?? [])
     .flatMap(generation => generation.predictions)
@@ -20,7 +20,7 @@ export default function Layout() {
     .filter((a) => a.image);
 
   const { user: account } = useAccount();
-  if (searchParams.id === account?._id)
+  if (id === account?._id)
     return <Redirect href={ROUTES.PROFILE.PATH} />
 
   return (

@@ -32,6 +32,7 @@ export const Image = forwardRef<any, ExpoImageProps>((props, ref) => {
         {...(rest as ExpoImageProps)}
         ref={ref}
         onLoad={handleLoad}
+        cachePolicy={props.cachePolicy ?? 'memory-disk'}
         // Let the inner image inherit the same sizing rules as before
         style={style as any}
       />

@@ -1,4 +1,4 @@
-import { useRouter } from "@/hooks";
+import { useRoute, useRouter } from "@/hooks";
 import { Id } from "@/lib/convex/api";
 import { useItem } from "@/modules/items/_hooks/useItem";
 import { ColorCategory } from "@/modules/items/category.color";
@@ -57,7 +57,8 @@ const ColorsBlock = () => {
 }
 
 export default function ItemScreen() {
-  const { searchParams: { id }, push } = useRouter<{ id: Id<'items'> }>('/item/[id]');
+  const { id } = useRoute.Params<{ id: Id<'items'> }>();
+  const { push } = useRouter('/item/[id]');
   const { item, isLoading, update } = useItem(id);
 
   if (isLoading || !item) {

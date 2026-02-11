@@ -1,4 +1,4 @@
-import { useRouter } from "@/hooks";
+import { Router, useRoute, useRouter } from "@/hooks";
 import { api, Id, useQueryCached } from "@/lib/convex/client";
 import { SelectedItemModal } from "@/modules/items/selected-item.modal";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
@@ -18,7 +18,8 @@ import { ROUTES } from "routes";
 
 export default function NewOutfitScreen() {
   const { reset, setItems, name, setName, items: itemIds, saveOutfit } = useOutfit.New();
-  const { redirect, push, dismissTo } = useRouter("/new-outfit", {
+  const { push, redirect } = useRouter("/new-outfit");
+  useRoute("/new-outfit", {
     onInit: ({ itemIds }) => { setItems(itemIds ?? []) },
     resetFnc: reset,
   });
@@ -27,9 +28,10 @@ export default function NewOutfitScreen() {
   const { data: items } = useQueryCached(api.router.items.getMany.anon, { itemIds });
 
   if (itemIds.length === 0) {
-    return <useRouter.Redirect
+    return <Router.Redirect
       href={ROUTES.MODALS.OUTFIT_ADD_ITEM}
-      redirectTo={redirect}
+      currentRoute="/new-outfit"
+      forwardRedirect={true}
     />
   }
 
@@ -104,14 +106,10 @@ export default function NewOutfitScreen() {
             variant="primary"
             onPress={async () => {
               const outfit = await saveOutfit();
-
-              if (redirect) {
-                dismissTo(redirect, { params: { outfitId: outfit } });
-              } else if (router.canGoBack()) {
-                router.back()
-              } else {
-                router.replace(ROUTES.OUTFIT.ID(outfit))
-              }
+              redirect({
+                params: { outfitId: outfit },
+                fallbackTo: ['back', ROUTES.OUTFIT.ID(outfit)]
+              });
             }}
           >
             Save Outfit

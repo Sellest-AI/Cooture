@@ -1,8 +1,10 @@
 import { Id } from "@/lib/convex/api";
+import { notEmpty } from "@utils/convex-allowed";
 import { replaceParamsInPath, url } from "@utils/routes";
-import { Redirect as ExpoRedirect, Route, router, useLocalSearchParams, usePathname } from "expo-router";
+import { EmptyObject } from "convex-helpers";
+import { Redirect as ExpoRedirect, Href, Route, router, useFocusEffect, useLocalSearchParams, usePathname } from "expo-router";
 import { NavigationOptions } from "expo-router/build/global-state/routing";
-import { atom, useAtom, useSetAtom } from "jotai";
+import { atom, getDefaultStore, useAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 type ParamsDefault<T extends Route> =
@@ -23,6 +25,7 @@ type RouterParams<T extends Route> = NavigationOptions & {
   searchParams?: Record<string, string>,
   params?: ParamsDefault<T>,
   redirectTo?: Route,
+  forwardRedirect?: boolean, // If true, the redirect will be applied to the target route instead of the current route. Only makes sense if redirectTo is provided.
   redirectHere?: boolean,
   /** @default true */
   resetNextRoute?: boolean,
@@ -30,8 +33,8 @@ type RouterParams<T extends Route> = NavigationOptions & {
 
 const dataAtom = atom<Record<string, object | undefined>>({});
 
-const retrieveData = <T extends Route>(href: T | undefined, data: Record<string, object | undefined>) => {
-  if (!href) return undefined;
+const retrieveData = <T extends Route>(href: T | undefined, data: Record<string, object | undefined>): Params<T> => {
+  if (!href) return {} as Params<T>;
   // If want to retrieve data for a specific route
   // If it's a child route, try to find parent route data TOO
   // For example: /photoshoot/create/recap should also retrieve /photoshoot/create data
@@ -43,7 +46,7 @@ const retrieveData = <T extends Route>(href: T | undefined, data: Record<string,
       params = { ...params, ...data[path] }
     }
   }
-  return params as Params<T> | undefined;
+  return params as Params<T>;
 }
 
 
@@ -52,23 +55,23 @@ type Options<T extends Route> = {
   onInit?: (params: ParamsDefault<T>) => void,
 }
 
-export const useRoute = <K extends Record<string, any> = Record<string, any>, T extends Route = Route>(href?: T, options?: Options<T>) => {
-  const searchParams = useLocalSearchParams<K>();
+export const useRoute = <K extends Record<string, any> = EmptyObject, T extends Route = Route>(_href?: T, options?: Options<T>) => {
   const [_data, setData] = useAtom(dataAtom);
-  const sharedData = useMemo(() => retrieveData(href, _data), [href, _data]);
-  const [localData, setLocalData] = useState(sharedData);
-  const path = usePathname();
+  const [href] = useState(_href);
 
-  const params = useMemo(() => sharedData ?? localData ?? {} as Params<T>, [sharedData, localData]);
-  const finalParams = useMemo(() => {
-    // If empty object, return undefined
-    if (params && Object.keys(params).length === 0) return {} as ParamsDefault<T>;
-    return params as ParamsDefault<T>;
-  }, [params]);
+  const [localData, setLocalData] = useState(retrieveData(href, _data) as ParamsDefault<T>);
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
+    const newData = retrieveData(href, _data);
+    if (!newData) return;
+    if (Object.keys(newData).length === 0) return;
+    setLocalData(newData);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [_data]));
+
+  useFocusEffect(useCallback(() => {
     if (!options?.resetFnc) return;
-    if (!(finalParams as { reset?: boolean })?.reset) return;
+    if (!(localData as { reset?: boolean })?.reset) return;
     options?.resetFnc?.();
     setData((d) => {
       const newData = { ...d };
@@ -77,31 +80,32 @@ export const useRoute = <K extends Record<string, any> = Record<string, any>, T 
       setLocalData(newObject as Params<T>);
       return newData;
     });
-  }, [finalParams, options, setData, href]);
-
-  useEffect(() => {
-    if (!options?.onInit) return;
-    options.onInit(finalParams ?? {} as ParamsDefault<T>);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [finalParams]);
+  }, [localData, setData]));
+
+  useFocusEffect(useCallback(() => {
+    if (!options?.onInit) return;
+    options.onInit(localData ?? {} as ParamsDefault<T>);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localData]));
 
   const redirectTo = useMemo(() => {
-    if (!params?.redirectTo) return undefined;
-    if (href === params.redirectTo) return undefined;
-    return params.redirectTo;
-  }, [href, params.redirectTo]);
+    if (!(localData as Params<T>)?.redirectTo) return undefined;
+    if (href === (localData as Params<T>).redirectTo) return undefined;
+    return (localData as Params<T>).redirectTo;
+  }, [localData, href]);
 
-  return {
-    searchParams,
-    redirectTo: redirectTo,
-    params: finalParams,
-    path,
-  }
+  const searchParams = useLocalSearchParams<K>();
+
+  const params = useMemo(() => {
+    return { ...searchParams, redirectTo, ...localData };
+  }, [localData, redirectTo, searchParams]);
+
+  return params;
 }
 
-export const useRouter = <K extends Record<string, any> = Record<string, any>, T extends Route = Route>(href?: T, options?: Options<T>) => {
-  const setData = useSetAtom(dataAtom);
-  const { path, params, redirectTo, searchParams } = useRoute<K, T>(href, options);
+export const useRouter = <T extends Route = Route>(_href?: T) => {
+  const [href] = useState(_href);
 
   const _toUrl = useCallback(<T extends Route>(to: T, options?: RouterParams<T>) => {
     return url(replaceParamsInPath(to, options?.pathParams ?? {}), options?.searchParams ?? {});
@@ -109,13 +113,21 @@ export const useRouter = <K extends Record<string, any> = Record<string, any>, T
 
   const _routerFunction = useCallback(<T extends Route>(to: T, options?: RouterParams<T>) => {
     const toUrl = _toUrl(to, options);
-    const redirect = options?.redirectTo ?? (options?.redirectHere === true ? href : undefined);
+
+    const store = getDefaultStore();
+
+    const forwardedRedirect = options?.forwardRedirect === true ?
+      retrieveData(href, store.get(dataAtom)).redirectTo
+      : undefined;
+
+    const redirect = options?.redirectTo ?? forwardedRedirect ??
+      (options?.redirectHere === true ? href : undefined);
 
     const resetNextRoute = options?.resetNextRoute ?? true;
 
     // Update data for the target route and, when requested, mark nested child routes as reset too.
     if (resetNextRoute || options?.params || redirect) {
-      setData((d) => {
+      store.set(dataAtom, (d) => {
         const newData = { ...d };
         const basePath = (toUrl as string).split('?')[0];
 
@@ -147,7 +159,7 @@ export const useRouter = <K extends Record<string, any> = Record<string, any>, T
       });
     }
     return toUrl;
-  }, [_toUrl, href, setData]);
+  }, [_toUrl, href]);
 
   const push = useCallback(<T extends Route>(to: T, options?: RouterParams<T>) => {
     const toUrl = _routerFunction(to, options);
@@ -156,7 +168,7 @@ export const useRouter = <K extends Record<string, any> = Record<string, any>, T
 
   const replace = useCallback(<T extends Route>(to: T, options?: RouterParams<T>) => {
     const toUrl = _routerFunction(to, options);
-    router.push(toUrl, options);
+    router.replace(toUrl, options);
   }, [_routerFunction]);
 
   const dismissTo = useCallback(<T extends Route>(to: T, options?: RouterParams<T>) => {
@@ -169,27 +181,25 @@ export const useRouter = <K extends Record<string, any> = Record<string, any>, T
     else router.dismissTo('/');
   }, []);
 
-  const consume = useCallback(() => {
-    if (params !== undefined) {
-      setData((d) => {
-        const newData = { ...d };
-        delete newData[href as string];
-        return newData;
-      });
+  const redirect = useCallback(<T extends Route>(options?: RouterParams<T> & { fallbackTo?: Href | ['back', Href] }) => {
+    const to = retrieveData(href, getDefaultStore().get(dataAtom)).redirectTo;
+    const nextPaths = [to, ...(Array.isArray(options?.fallbackTo) ? options.fallbackTo : [options?.fallbackTo])].filter(notEmpty);
+
+    if (nextPaths[0] === 'back' && router.canGoBack()) {
+      router.back();
+      return;
     }
-    return params;
-  }, [href, params, setData]);
+
+    const nextPath = nextPaths.filter((p) => p !== 'back')[0] ?? '/';
+    dismissTo(nextPath as Route, options);
+  }, [dismissTo, href]);
 
   return {
-    path,
-    searchParams,
-    redirect: redirectTo,
-    params,
+    redirect,
     back,
     push,
     replace,
     dismissTo,
-    consume,
     _routerFunction,
     _toUrl
   }
@@ -197,10 +207,9 @@ export const useRouter = <K extends Record<string, any> = Record<string, any>, T
 
 export { ROUTES } from 'routes';
 
-
-const Redirect = <T extends Route>({ href, ...props }: { href: T } & Omit<RouterParams<T>, 'redirectHere'>) => {
-  const { _routerFunction, _toUrl } = useRouter();
-
+const Redirect = <T extends Route>({ href, currentRoute, ...props }: { href: T, currentRoute?: Route } & Omit<RouterParams<T>, 'redirectHere'>) => {
+  const { _routerFunction, _toUrl } = useRouter(currentRoute);
+  ;
   useEffect(() => {
     _routerFunction(href, { ...props });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -211,5 +220,11 @@ const Redirect = <T extends Route>({ href, ...props }: { href: T } & Omit<Router
   return (<ExpoRedirect href={path} />)
 }
 
-useRouter.Redirect = Redirect;
+useRoute.Path = usePathname;
+useRoute.Params = useLocalSearchParams;
+
+useRouter.Path = usePathname;
+
+export const Router = () => { }
+Router.Redirect = Redirect;
 

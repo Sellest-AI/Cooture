@@ -19,10 +19,6 @@ import { Dimensions, LayoutRectangle, PanResponder, Platform, ScrollView, View, 
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
-
-
-
-
 const TABS = ['generations', 'outfits', 'items'] as const;
 
 type Props = {
@@ -43,7 +39,8 @@ type Props = {
 }
 
 export function Screen({ user, isSelf, recentPosts, style }: Props) {
-  const { path, back } = useRouter();
+  const { back } = useRouter();
+  const path = useRouter.Path();
   const scrollRef = useRef<ScrollView>(null);
   const slotRef = useRef<LayoutRectangle | null>(null);
 

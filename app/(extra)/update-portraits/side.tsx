@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { ROUTES } from "routes";
 
 export default function Screen() {
-  const { dismissTo, redirect } = useRouter('/update-portraits/side');
+  const { redirect } = useRouter('/update-portraits/side');
 
   const { uploadImage } = useUpload()
   const { setSideImage, sideImage, frontImage, smileImage, pushToServer } = usePortraits.Local();
@@ -31,7 +31,7 @@ export default function Screen() {
           sideImageId: _photoUri._id,
         })
 
-        dismissTo(redirect ?? ROUTES.PROFILE.PATH);
+        redirect({ fallbackTo: ROUTES.PROFILE.PATH });
       }}
       examples={{
         hint: "Make sure to be in a bright enough room. Try to keep a plain white background.",

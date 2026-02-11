@@ -1,4 +1,4 @@
-import { ROUTES, useRouter, useStateEffect } from "@/hooks";
+import { ROUTES, useRoute, useRouter, useStateEffect } from "@/hooks";
 import { api, useQuery } from "@/lib/convex/client";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { Button } from "@ui/button";
@@ -15,8 +15,8 @@ import { View } from "react-native";
 import { Colors } from "theme";
 
 export default function AddItemScreen() {
-  const { params, redirect, dismissTo } = useRouter("/add-item");
-  const { outfitId, itemIds } = params;
+  const { redirect, dismissTo } = useRouter("/add-item");
+  const { outfitId, itemIds } = useRoute("/add-item");
   const { data: _items } = useQuery(api.router.items.getAll.authed);
 
   const mode = outfitId ? 'edit' : 'new';
@@ -93,16 +93,16 @@ export default function AddItemScreen() {
           onPress={async () => {
             if (mode === 'new') {
               setItems(innerItems)
+
               dismissTo(ROUTES.MODALS.NEW_OUTFIT, {
-                redirectTo: redirect,
+                forwardRedirect: true,
                 params: { itemIds: innerItems }
               });
               return;
             }
 
             await updateItems(innerItems);
-            if (redirect) dismissTo(redirect, { params: { itemIds: innerItems } });
-            else if (router.canGoBack()) router.back()
+            redirect({ params: { itemIds: innerItems }, fallbackTo: ['back', '/'] });
           }}
         >
           Save Selection

@@ -66,7 +66,7 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
 
   const noSource = !source;
   const borderColor = (selected || noSource) ? Colors.primary[500] : Colors.blur.light;
-  const backgroundColor = (selected || noSource) ? Colors.primary[500] : (contentFit === 'contain' ? Colors.neutral[50] : undefined);
+  const backgroundColor = (selected || noSource) ? Colors.primary[500] : (contentFit === 'contain' ? Colors.neutral[50] : Colors.blur.dark);
   const showText = title || subtitle;
 
   return (
