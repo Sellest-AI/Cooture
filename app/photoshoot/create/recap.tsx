@@ -107,7 +107,7 @@ const Portrait = ({ style }: { style?: ViewStyle }) => {
       <Grid style={{ width: '100%', ...style, height: HEIGHT }}>
         <Col style={{ height: HEIGHT, borderRadius: 64, backgroundColor: Colors.blur.medium }}>
           <Image
-            source={frontImage?.url}
+            source={frontImage?.sizes.large.url}
             style={{ borderRadius: 64, flex: 1, borderWidth: 1, borderColor: Colors.blur.medium }}
           />
         </Col>

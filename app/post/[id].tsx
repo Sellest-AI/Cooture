@@ -12,7 +12,7 @@ import { useCallback, useMemo } from "react";
 import { ViewStyle } from "react-native";
 import { Colors } from "theme";
 
-const UserPost = ({ postId, style }: { postId: Id<'generations'>, style?: ViewStyle }) => {
+const UserPost = ({ postId, style, fullResolution }: { postId: Id<'generations'>, style?: ViewStyle, fullResolution?: boolean }) => {
   const { push } = useRouter('/post/[id]');
   const { data: post } = useQuery(api.router.generations.getOne.anon, { id: postId });
   const imageIds = post?.predictions.map((p) => p.imageId).filter(notEmpty) ?? [];
@@ -27,12 +27,12 @@ const UserPost = ({ postId, style }: { postId: Id<'generations'>, style?: ViewSt
     likedAccounts={[]}
     images={images?.map((img) => ({
       _id: post.predictions.find(p => p.imageId === img._id)?._id ?? post.predictions[0]?._id,
-      url: img.url,
+      url: fullResolution ? img.url : img.sizes.large.url,
       contentFit: img.hasAlpha ? 'contain' : 'cover',
     }))}
     image={post.cover ? {
       _id: post.predictions.find(p => p.imageId === post.cover!._id)?._id ?? post.predictions[0]?._id,
-      url: post.cover.url,
+      url: fullResolution ? post.cover.url : post.cover.sizes.large.url,
       contentFit: post.cover.hasAlpha ? 'contain' : 'cover',
     } : undefined}
     user={post.user ? {
@@ -76,8 +76,9 @@ export default function Screen() {
     return <UserPost
       postId={item.id}
       style={{ marginTop: 8, marginBottom: 28 }}
+      fullResolution={item.id === post?._id}
     />
-  }, []);
+  }, [post]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

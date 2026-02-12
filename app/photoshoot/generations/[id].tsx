@@ -159,7 +159,7 @@ export default function Screen() {
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <Image
-        source={photoshoot?.cover?.url ?? require('assets/backgrounds/dark-gradient.png')}
+        source={photoshoot?.cover?.sizes.large.url ?? require('assets/backgrounds/dark-gradient.png')}
         blurRadius={100}
         style={{
           opacity: 0.1,

@@ -32,7 +32,7 @@ type Props = {
     _id: Id<'predictions'>;
     image: {
       url: string
-      sizes: { thumbnail: { url: string } };
+      sizes: { thumbnail: { url: string }, large: { url: string } };
     }
   }[],
   style?: ViewStyle;
@@ -105,7 +105,7 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
         ref={scrollRef}
         contentNegativeSpace={56}
         headerBackgroundImagePosition="top center"
-        headerBackgroundImage={recentPosts?.[0]?.image?.url ?? require('assets/backgrounds/dark-gradient.png')}
+        headerBackgroundImage={recentPosts?.[0]?.image?.sizes.large.url ?? require('assets/backgrounds/dark-gradient.png')}
         contentContainerStyle={style}
         headerContent={
           <View

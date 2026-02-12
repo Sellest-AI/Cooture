@@ -19,7 +19,7 @@ const uploadSizes = async (ctx: ActionCtx, imageId: Id<'images'>) => {
     { px: 150, quality: 40 },
     { px: 336, quality: 40 },
     { px: 600, quality: 50 },
-    { px: 1024, quality: 92 },
+    { px: 1440, quality: 98 },
   ];
 
   type Data = typeof api.router.storage.images.saveSizes.server._args;
@@ -31,7 +31,7 @@ const uploadSizes = async (ctx: ActionCtx, imageId: Id<'images'>) => {
     const alreadyExist = image._sizes.find((s) => Math.max(s.width, s.height) === px && s.quality === quality);
     if (alreadyExist) continue;
 
-    const threshold = px < 1000 ? px : px * 1.4;
+    const threshold = px < 1000 ? px : px * 1.3;
     const isTooSmall = Math.max(image.width, image.height) <= threshold;
     if (isTooSmall) continue;
 

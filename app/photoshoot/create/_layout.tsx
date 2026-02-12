@@ -40,7 +40,7 @@ export default function Layout() {
         scrollKey={step}
         locked={step > 1 ? false : true}
         headerBackground={step > 1 ? <Image
-          source={preset?.cover?.url}
+          source={preset?.cover?.sizes.large.url}
           style={{ flex: 1, opacity: 0.2 }}
         /> : undefined}
         headerContent={
@@ -66,7 +66,7 @@ export default function Layout() {
             }}
             >
               <Badge
-                source={preset?.cover?.url}
+                source={preset?.cover?.sizes.small.url}
                 style={{ width: 112, height: 112, marginBottom: 16 }}
               />
               <Text.Base color={Colors.neutral[400]} weight={600}>Preset</Text.Base>
