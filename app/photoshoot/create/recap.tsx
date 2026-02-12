@@ -57,6 +57,22 @@ const OutfitGrid = ({ items, style }: { items: Items, style?: ViewStyle }) => {
             style={{ height: HEIGHT, padding: 8 }}
             key={items.map(i => i._id).join('-')}
           >
+            {showMore && <Row style={{
+              // flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginBottom: 6
+            }}>
+              <Squirish color={Colors.secondary[500]}
+                size="75%"
+                style={{
+                  position: 'absolute',
+                  alignSelf: 'center',
+                }} />
+              <Text.Base color={Colors.secondary[900]} weight={600}>
+                +{grid.remaining}
+              </Text.Base>
+            </Row>}
             {items.map((item, index) => item && <Row
               key={item._id} style={{ marginBottom: index === 0 ? 8 : 0 }}
             >
@@ -67,21 +83,6 @@ const OutfitGrid = ({ items, style }: { items: Items, style?: ViewStyle }) => {
               />
             </Row>
             )}
-            {showMore && <Row style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-              <Squirish color={Colors.secondary[500]}
-                style={{
-                  width: '80%',
-                  position: 'absolute',
-                  alignSelf: 'center',
-                }} />
-              <Text.Base color={Colors.secondary[900]} weight={600}>
-                +{grid.remaining}
-              </Text.Base>
-            </Row>}
           </Col>
         )
       })}
@@ -200,7 +201,7 @@ const OutfitComponent = () => {
 
 export default function Screen() {
   const { outfitId, outfitSize, presetId, setOutfitId, setPresetId, reset } = usePhotoshoot.New();
-  const { replace, dismissTo } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
+  const { dismissTo } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
   useRoute(ROUTES.PHOTOSHOOT.RECAP, {
     resetFnc: reset,
     onInit: ({ outfitId, presetId }) => {
@@ -240,6 +241,8 @@ export default function Screen() {
           onComplete={async () => {
             if (!presetId) return;
 
+            const timer = setTimeout(() => dismissTo(ROUTES.PHOTOSHOOT.GENERATIONS.NEXT), 4000);
+
             const generationId = await action({
               presetId: presetId,
               outfit: outfitId ? {
@@ -248,7 +251,9 @@ export default function Screen() {
               } : undefined,
             });
 
-            replace(ROUTES.PHOTOSHOOT.GENERATIONS.PATH, {
+            clearTimeout(timer);
+
+            dismissTo(ROUTES.PHOTOSHOOT.GENERATIONS.PATH, {
               pathParams: { id: generationId },
             })
           }}

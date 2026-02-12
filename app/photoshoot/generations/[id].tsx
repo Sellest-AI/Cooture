@@ -96,7 +96,7 @@ const Buttons = ({ onNext, currentItem, items }: Props) => {
           startIcon={X}
           onPress={() => onNext(false)}
         >
-          Reject
+          Archive
         </Button>
         <Button
           variant="primary"
