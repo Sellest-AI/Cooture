@@ -53,7 +53,7 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, _outfit?: { _id: Id<
   // Build outfit description
   const itemNames = outfit.items.map(item => item.name);
   const description = itemNames.length > 0 ? `An outfit featuring ${itemNames.join(', ')}` : schema.prompt.outfit.description;
-  const outfitSize = _outfit.size ? `VERY IMPORTANT: ${_outfit.size.replaceAll('_', ' ')} fit on the subject` : undefined;
+  const outfitSize = _outfit.size ? `VERY IMPORTANT: the subject is wearing it with ${_outfit.size.replaceAll('_', ' ')} fit` : undefined;
 
   // Helper function to build details string
   const buildDetails = (item: typeof top | typeof bottom | typeof outerwear | typeof innerLayer) => {

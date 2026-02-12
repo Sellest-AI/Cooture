@@ -30,6 +30,8 @@ export const PRESET_PROMPT = v.object({
   composition: v.object({
     shotType: v.string(),
     cameraAngle: v.string(),
+    cameraPosition: v.string(),
+    subjectPlacement: v.string(),
     focus: v.string(),
   }),
   technical: v.object({

@@ -71,7 +71,7 @@ Follow these rules exactly. The consumer of this object expects literal undefine
 export const ImagePresetSchema = z.object({
   // --- SCENE ---
   sceneDescription: z.string().min(300).describe(
-    `The core concept/action. MUST describe the scene as if the subject were wearing a neutral grey suit or naked. Do NOT mention specific garments. ${NO_CLOTHING}`
+    `The core concept/action. MUST describe the scene as if the subject were wearing a neutral grey suit or naked. Do NOT mention specific garments except held objects. ${NO_CLOTHING}`
   ),
 
   // --- 2. STYLE (ARTISTIC DIRECTION) ---
@@ -112,6 +112,8 @@ export const ImagePresetSchema = z.object({
   composition: z.object({
     shotType: z.string().describe("Size: e.g., 'Medium Shot', 'POV'."),
     cameraAngle: z.string().describe("Height: e.g., 'Eye level', 'Slightly high angle'."),
+    cameraPosition: z.string().describe("Camera position relative to subject: e.g., 'Frontal', 'Three-quarter left', 'Three-quarter right', 'Profile', 'From behind'."),
+    subjectPlacement: z.string().describe("Subject position in frame: e.g., 'Centered', 'Left third of frame', 'Right side', 'Off-center right'."),
     focus: z.string().describe("Depth: e.g., 'Deep focus', 'Subject sharp, background slightly visible'."),
   }),
 
