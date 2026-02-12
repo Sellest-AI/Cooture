@@ -1,4 +1,3 @@
-
 import { BlurViewProps, BlurView as ExpoBlurView } from 'expo-blur';
 import { Platform, View } from 'react-native';
 export const BlurView = Platform.OS === 'web' ? ExpoBlurView : View;

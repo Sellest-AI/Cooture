@@ -124,6 +124,8 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
                 width: Dimensions.get('window').width - (PADDING_HORIZONTAL * 2),
                 aspectRatio: 3 / 4,
                 zIndex: pinching && pinching.index === index ? 10 : 0,
+                backgroundColor: Colors.blur.dark,
+                borderRadius: 32,
               }}>
               {img && <ZoomableImage
                 onPinchChange={(pinching) => setPinching(pinching ? { index } : false)}

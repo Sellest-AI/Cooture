@@ -36,6 +36,7 @@ export const Categories = <T extends string>({ value, categories, categoryTitle,
           data={categories}
           numColumns={2}
           keyExtractor={(i) => i.value}
+          contentContainerStyle={{ paddingTop: 12 }}
           renderItem={({ item }) => (
             <View style={{ padding: 2, flex: 1 }}>
               <Category

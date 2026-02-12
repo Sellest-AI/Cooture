@@ -4,8 +4,8 @@ import { api, useQuery } from "@/lib/convex/client";
 import { EmptyBlock } from "@ui/block.empty";
 import { LoadingBlock } from "@ui/block.loading";
 import { ImageGeneration } from "@ui/cards";
+import { FlashList } from "@ui/flat-list";
 import { EyeClosed, ImageIcon } from "@ui/icons";
-import { MasonryList } from "@ui/masonry-list";
 import { View } from "react-native";
 import { Colors } from "theme";
 import { useProfileContext } from "./page";
@@ -40,37 +40,40 @@ export function Screen() {
   }
 
   return (
-    <MasonryList
+    <FlashList
       data={predictions}
-      style={{ columnGap: 8, paddingHorizontal: 0 }}
-      keyExtractor={(_, index) => index.toString()}
-      renderItem={({ item }) => (
-        <View style={{ marginBottom: 8 }}>
-          <ImageGeneration
-            source={item.image?.sizes.medium.url}
-            onPresss={() => {
-              if (!item.generationId) return;
-              // push(ROUTES.PHOTOSHOOT.GENERATIONS.PATH, {
-              //   pathParams: { id: item.generationId }
-              // })
-              push(ROUTES.POST.PATH, {
-                pathParams: { id: item._id }
-              })
-            }}
-          />
-          {item.status === "REJECTED" && <View style={{
-            position: 'absolute',
-            top: 12,
-            right: 12,
-            paddingHorizontal: 8,
-            paddingVertical: 6,
-            borderRadius: 10,
-            backgroundColor: Colors.secondary[500],
-          }}>
-            <EyeClosed size={12} color={Colors.secondary[900]} />
-          </View>}
-        </View>
-      )}
+      style={{ paddingHorizontal: 0 }}
+      renderItem={({ item, index }) => {
+        const marginLeft = index % 2 === 0 ? 0 : 4;
+        const marginRight = index % 2 === 0 ? 4 : 0;
+        return (
+          <View style={{ marginBottom: 8, marginLeft, marginRight }}>
+            <ImageGeneration
+              source={item.image?.sizes.medium.url}
+              onPresss={() => {
+                if (!item.generationId) return;
+                // push(ROUTES.PHOTOSHOOT.GENERATIONS.PATH, {
+                //   pathParams: { id: item.generationId }
+                // })
+                push(ROUTES.POST.PATH, {
+                  pathParams: { id: item._id }
+                })
+              }}
+            />
+            {item.status === "REJECTED" && <View style={{
+              position: 'absolute',
+              top: 12,
+              right: 12,
+              paddingHorizontal: 8,
+              paddingVertical: 6,
+              borderRadius: 10,
+              backgroundColor: Colors.secondary[500],
+            }}>
+              <EyeClosed size={12} color={Colors.secondary[900]} />
+            </View>}
+          </View>
+        )
+      }}
       numColumns={2}
     />
   );

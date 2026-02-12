@@ -3,7 +3,7 @@ import { api, useMutation, useQueryCached } from "@/lib/convex/client";
 import { LoadingBlock } from "@ui/block.loading";
 import { Button } from "@ui/button";
 import { Collection } from "@ui/cards";
-import { MasonryList } from "@ui/masonry-list";
+import { FlashList } from "@ui/flat-list";
 import { ModalHeader } from "@ui/modal";
 import { ScrollView, View } from "react-native";
 import { ROUTES } from "routes";
@@ -36,21 +36,23 @@ export default function PickOutfitScreen() {
         }}
       >
         <ModalHeader title="Pick an outfit" />
-        {filteredOutfits ? <MasonryList
-          key="0"
+        {filteredOutfits ? <FlashList
           data={[
             undefined,
             ...filteredOutfits,
           ]}
           style={{
-            columnGap: 48,
             paddingHorizontal: 8,
-            paddingBottom: canSkip ? 86 : 0,
+            paddingBottom: canSkip ? 86 : 24,
           }}
-          keyExtractor={(_, index) => index.toString()}
-          renderItem={({ item: outfit }) => {
+          renderItem={({ item: outfit, index }) => {
             if (!outfit) {
-              return (<View style={{ marginBottom: 24, paddingTop: 3 }}>
+              return (<View style={{
+                marginBottom: 24,
+                paddingTop: 3,
+                marginLeft: index % 2 === 0 ? 8 : 24,
+                marginRight: index % 2 === 0 ? 24 : 8,
+              }}>
                 <Collection
                   title="New outfit"
                   onPress={() => {
@@ -65,7 +67,13 @@ export default function PickOutfitScreen() {
             }
 
             return (
-              <View style={{ marginBottom: 24, paddingTop: 3 }}>
+              <View style={{
+                marginBottom: 24,
+                paddingTop: 3,
+                marginLeft: index % 2 === 0 ? 8 : 24,
+                marginRight: index % 2 === 0 ? 24 : 8,
+              }}
+              >
                 <Collection
                   source={outfit.cover.sizes.small.url}
                   contentFit="contain"

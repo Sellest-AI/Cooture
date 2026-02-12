@@ -15,7 +15,6 @@ import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
-import { router } from "expo-router";
 import { Platform, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
@@ -58,7 +57,7 @@ const ColorsBlock = () => {
 
 export default function ItemScreen() {
   const { id } = useRoute.Params<{ id: Id<'items'> }>();
-  const { push } = useRouter('/item/[id]');
+  const { push, redirect } = useRouter('/item/[id]');
   const { item, isLoading, update } = useItem(id);
 
   if (isLoading || !item) {
@@ -83,7 +82,7 @@ export default function ItemScreen() {
               <ModalHeader
                 style={{ paddingTop: 12, paddingHorizontal: 12 }}
                 title={item.name}
-                onBack={router.canGoBack() ? () => { router.back() } : undefined}
+                onBack={() => redirect({ fallbackTo: ['back', ROUTES.PROFILE.ITEMS] })}
               />
               <View style={{
                 padding: 32,

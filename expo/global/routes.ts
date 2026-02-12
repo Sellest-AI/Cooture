@@ -33,6 +33,7 @@ export const ROUTES = {
     PRESETS: '/photoshoot/create/presets' as const,
     RECAP: '/photoshoot/create/recap' as const,
     GENERATIONS: {
+      NEXT: '/photoshoot/generations/next',
       PATH: '/photoshoot/generations/[id]',
       ID: (id: string) => `/photoshoot/generations/${id}` as const,
     }
@@ -51,6 +52,7 @@ export const ROUTES = {
     SETTINGS: '/settings',
     GENERATIONS: '/profile/generations',
     OUTFITS: '/profile/outfits',
+    ITEMS: '/profile/items',
     SAVED: '/profile/saved',
   },
   WELCOME: {

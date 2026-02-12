@@ -3,8 +3,8 @@ import { api, useQuery } from "@/lib/convex/client";
 import { EmptyBlock } from "@ui/block.empty";
 import { LoadingBlock } from "@ui/block.loading";
 import { Collection } from "@ui/cards";
+import { FlashList } from "@ui/flat-list";
 import { HoodieIcon } from "@ui/icons";
-import { MasonryList } from "@ui/masonry-list";
 import { router } from "expo-router";
 import { View } from "react-native";
 import { ROUTES } from "routes";
@@ -36,21 +36,24 @@ export function Screen() {
   }
 
   return (
-    <MasonryList
+    <FlashList
       data={outfits}
-      style={{ columnGap: 48, paddingHorizontal: 12 }}
-      keyExtractor={(_, index) => index.toString()}
-      renderItem={({ item }) => (
-        <View style={{ marginBottom: 24, paddingTop: 3 }}>
-          <Collection
-            source={item.cover.sizes.small.url}
-            contentFit="contain"
-            title={item.name}
-            subtitle={`${item.items.length} items`}
-            onPress={() => router.push(ROUTES.OUTFIT.ID(item._id))}
-          />
-        </View>
-      )}
+      style={{ paddingHorizontal: 12 }}
+      renderItem={({ item, index }) => {
+        const marginLeft = index % 2 === 0 ? 6 : 20;
+        const marginRight = index % 2 === 0 ? 20 : 6;
+        return (
+          <View style={{ marginBottom: 24, marginLeft, marginRight, paddingTop: 3 }}>
+            <Collection
+              source={item.cover.sizes.small.url}
+              contentFit="contain"
+              title={item.name}
+              subtitle={`${item.items.length} items`}
+              onPress={() => router.push(ROUTES.OUTFIT.ID(item._id))}
+            />
+          </View>
+        )
+      }}
       numColumns={2}
     />
   );

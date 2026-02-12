@@ -3,8 +3,8 @@ import { api, useQuery } from "@/lib/convex/client";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { Button } from "@ui/button";
 import { CardItem } from "@ui/cards/card-item";
+import { FlashList } from "@ui/flat-list";
 import { Search } from "@ui/icons";
-import { MasonryList } from "@ui/masonry-list";
 import { ModalHeader } from "@ui/modal";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { TextInput } from "@ui/text-input";
@@ -52,14 +52,17 @@ export default function AddItemScreen() {
             marginBottom: 12,
           }}
         />
-        <MasonryList
-          key="0"
+        <FlashList
           data={_items ?? []}
-          style={{ columnGap: 48, paddingHorizontal: 8, paddingBottom: 56 }}
-          keyExtractor={(_, index) => index.toString()}
+          style={{ paddingHorizontal: 8, paddingBottom: 56, marginTop: 16 }}
           renderItem={({ item }) => {
             return (
-              <View style={{ marginBottom: 24, paddingTop: 3 }}>
+              <View style={{
+                marginBottom: 36,
+                paddingTop: 3,
+                marginLeft: 20,
+                marginRight: 20,
+              }}>
                 <CardItem
                   source={item.image.sizes.small.url}
                   title={item.name}
@@ -80,6 +83,7 @@ export default function AddItemScreen() {
             )
           }}
           numColumns={2}
+          masonry
         />
       </SafeScrollView>
       <View style={{

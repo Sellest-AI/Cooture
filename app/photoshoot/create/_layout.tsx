@@ -37,6 +37,7 @@ export default function Layout() {
       edges={{ bottom: 'additive', top: 'off' }}
     >
       <ParallaxScrollView
+        scrollKey={step}
         locked={step > 1 ? false : true}
         headerBackground={step > 1 ? <Image
           source={preset?.cover?.url}

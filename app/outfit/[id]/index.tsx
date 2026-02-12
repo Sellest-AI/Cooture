@@ -6,9 +6,9 @@ import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { LoadingBlock } from "@ui/block.loading";
 import { Button } from "@ui/button";
 import { CardItem } from "@ui/cards/card-item";
+import { FlashList } from "@ui/flat-list";
 import { ArrowRight, Pencil, SquirishPlus, Trash } from "@ui/icons";
 import { Image } from '@ui/image';
-import { MasonryList } from "@ui/masonry-list";
 import { ModalHeader } from "@ui/modal";
 import { useSafeAreaInsets } from "@ui/safe-area-view";
 import { SafeScrollView } from "@ui/safe-scroll-view";
@@ -75,8 +75,8 @@ export default function ItemScreen() {
           edges={{ top: 'padding' }}
           style={{
             paddingTop: 12,
-            paddingHorizontal: 12,
-            paddingBottom: 56
+            paddingBottom: 56,
+            marginHorizontal: 12
           }}
         >
           <ModalHeader
@@ -94,16 +94,23 @@ export default function ItemScreen() {
               value={name}
               style={{ marginBottom: 20 }}
             />}
-            <MasonryList
-              key="0"
+            <FlashList
               data={[...items, undefined]}
-              style={{ columnGap: 48, paddingHorizontal: 8, minHeight: Dimensions.get('window').height - 316 }}
-              keyExtractor={(_, index) => index.toString()}
+              style={{
+                marginTop: 16,
+                paddingHorizontal: 8,
+                minHeight: Dimensions.get('window').height - 316
+              }}
               renderItem={({ item }) => {
                 if (!item) {
                   if (!ownOutfit) return null;
                   return (<SquirishPlus
-                    style={{ marginBottom: 24, paddingTop: 3, }}
+                    style={{
+                      marginBottom: 40,
+                      paddingTop: 3,
+                      marginLeft: 20,
+                      marginRight: 20,
+                    }}
                     size={112}
                     onPress={() => {
                       updateItems(items.map((i) => i._id));
@@ -115,7 +122,13 @@ export default function ItemScreen() {
                 }
 
                 return (
-                  <View style={{ marginBottom: 24, paddingTop: 3 }}>
+                  <View style={{
+                    marginBottom: 40,
+                    paddingTop: 3,
+                    marginLeft: 20,
+                    marginRight: 20,
+                  }}
+                  >
                     <CardItem
                       source={item.image.sizes.small.url}
                       title={item.name}
@@ -126,6 +139,7 @@ export default function ItemScreen() {
                 )
               }}
               numColumns={2}
+              masonry
             />
             {ownOutfit && <Button
               style={{ marginTop: 12 }}

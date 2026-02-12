@@ -1,4 +1,4 @@
-import { ComponentProps, ReactNode, useRef, useState } from "react";
+import { ComponentProps, ReactNode, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Animated, Dimensions, ScrollView, View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 import { Image } from "./image";
@@ -20,10 +20,13 @@ type Props = {
   showsVerticalScrollIndicator?: boolean;
   locked?: boolean;
   style?: ViewStyle;
+  /** Scroll key to control scroll position */
+  scrollKey?: string | number;
 };
 
 export const ParallaxScrollView = ({
   ref,
+  scrollKey = undefined,
   contentNegativeSpace = 0,
   headerContent,
   headerBackgroundImagePosition,
@@ -37,6 +40,8 @@ export const ParallaxScrollView = ({
 
 }: Props) => {
   const [headerHeight, setHeaderHeight] = useState(0);
+  const scrollRef = useRef<ScrollView>(null);
+  useImperativeHandle(ref, () => scrollRef.current!, []);
 
   const scrollY = useRef(new Animated.Value(0)).current;
   const headerTranslateY = scrollY.interpolate({
@@ -61,6 +66,13 @@ export const ParallaxScrollView = ({
   const { bottom } = useSafeAreaInsets();
   const headerHeightRuntime = headerHeight;
   const headerOffset = headerHeightRuntime - contentNegativeSpace;
+
+  // Scroll to top when scrollKey changes
+  useEffect(() => {
+    if (scrollKey !== undefined) {
+      scrollRef.current?.scrollTo({ y: 0, animated: true });
+    }
+  }, [scrollKey]);
 
   return (
     <View style={{ flex: 1, ...style }}>
@@ -134,7 +146,7 @@ export const ParallaxScrollView = ({
 
       {/* Scrollable Content */}
       <Animated.ScrollView
-        ref={ref}
+        ref={scrollRef}
         style={{ flex: 1 }}
         showsVerticalScrollIndicator={showsVerticalScrollIndicator}
         contentContainerStyle={contentContainerStyle}

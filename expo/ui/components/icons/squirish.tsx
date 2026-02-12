@@ -3,7 +3,7 @@ import Svg, { ClipPath, Defs, G, Path, Use } from 'react-native-svg';
 import Animated from '../motion';
 
 type SquirishProps = {
-  size?: number;
+  size?: number | string;
   color?: string;
   strokeColor?: string;
   strokeWidth?: number;
@@ -31,8 +31,8 @@ export const Squirish = ({
       ]}
     >
       <Svg
-        width={size}
-        height={size}
+        width={size ?? style?.width ?? style?.height}
+        height={size ?? style?.height ?? style?.width}
         viewBox="0 0 86 87"
         fill="none"
       >

@@ -5,12 +5,12 @@ import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Button } from "@ui/button";
 import { Collection } from "@ui/cards";
 import { ArrowUpRight, ScanLine } from "@ui/icons";
-import { Link } from "@ui/link";
 import { ModalHeader } from "@ui/modal";
+import { Pressable } from "@ui/pressable";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
-import { FlatList, Pressable, StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -47,19 +47,19 @@ export default function Screen() {
           gap: 8,
         }}
       >
-        <Link
-          href={ROUTES.SCAN}
-          style={{ flex: 1, aspectRatio: 1 }}
-        >
-          <View style={{
-            ...styles.headerButtons,
+        <Pressable
+          onPress={() => {
+            push(ROUTES.SCAN);
+          }}
+          style={{
             borderTopColor: Colors.primary[200],
             backgroundColor: Colors.primary[500],
-          }}>
-            <ScanLine size={40} color={Colors.primary[900]} />
-            <Text.Lg color={Colors.primary[900]} style={{ textAlign: 'center' }}>Scan an item</Text.Lg>
-          </View>
-        </Link>
+            ...styles.headerButtons,
+          }}
+        >
+          <ScanLine size={40} color={Colors.primary[900]} />
+          <Text.Lg color={Colors.primary[900]} style={{ textAlign: 'center' }}>Scan an item</Text.Lg>
+        </Pressable>
         <Pressable
           style={{
             ...styles.headerButtons,

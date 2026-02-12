@@ -71,10 +71,10 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
     // Scroll to the beginning of the slot content
     setTimeout(() => {
       scrollRef.current?.scrollTo({
-        y: Dimensions.get('window').height - 32,
+        y: Dimensions.get('screen').height - 32,
         animated: true
       });
-    }, 100);
+    }, 300);
   };
 
   const panResponder = useRef(
@@ -115,36 +115,31 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
               alignItems: "flex-start",
               paddingLeft: !isSelf ? 12 : 20,
               paddingRight: 12,
-              marginTop: isSelf ? 16 : 0,
+              marginTop: 12,
               height: 286
             }}
           >
-            {!isSelf && <ModalHeader
-              style={{ width: '100%', marginTop: 12 }}
-              onBack={() => back()}
+            <ModalHeader
+              style={{ width: '100%' }}
+              onBack={isSelf ? undefined : () => back()}
               title="Profile"
               type="alt"
               size="big"
-            />}
-            {isSelf && <Text.H1 color={Colors.primary[200]} type="alt"
-              style={isSelf ? undefined : { marginTop: 8 }}
-            >
-              Profile
-            </Text.H1>}
-            {isSelf && <View style={{ flexDirection: 'row', gap: 8 }}>
-              <Notification />
-              <Pressable onPress={() => router.push(ROUTES.PROFILE.SETTINGS)}>
-                <Block
-                  variant="blur"
-                  style={{
-                    borderRadius: 99,
-                    padding: 10,
-                  }}
-                >
-                  <Settings size={24} color={Colors.foreground} />
-                </Block>
-              </Pressable>
-            </View>}
+              endContent={isSelf ? <View style={{ flexDirection: 'row', gap: 8 }}>
+                <Notification />
+                <Pressable onPress={() => router.push(ROUTES.PROFILE.SETTINGS)}>
+                  <Block
+                    variant="blur"
+                    style={{
+                      borderRadius: 99,
+                      padding: 10,
+                    }}
+                  >
+                    <Settings size={24} color={Colors.foreground} />
+                  </Block>
+                </Pressable>
+              </View> : undefined}
+            />
           </View>
         }
       >

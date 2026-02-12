@@ -1,3 +1,4 @@
+import { useRouter } from "@/hooks";
 import { api, useAction, useQuery } from "@/lib/convex/client";
 import { useUpload } from "@/lib/convex/upload";
 import { addBase64Header } from "@/lib/image/client/base64";
@@ -8,13 +9,14 @@ import { Loader } from "@ui/icons";
 import { Image } from "@ui/image";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
-import { Redirect, router } from "expo-router";
+import { Redirect } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Animated, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 export default function RemoveBackgroundScreen() {
+  const { replace } = useRouter();
   const { imageScanned } = useScan();
   const opacityAnim = useRef(new Animated.Value(0.5)).current;
 
@@ -48,9 +50,12 @@ export default function RemoveBackgroundScreen() {
     if (!triggeredAt.current) return;
     const recenItem = (items || [])?.find((item) => item._creationTime > triggeredAt.current!.getTime());
     if (recenItem) {
-      router.replace(ROUTES.ITEM.ID(recenItem._id));
+      replace(ROUTES.ITEM.PATH, {
+        pathParams: { id: recenItem._id },
+        redirectTo: ROUTES.SCAN,
+      })
     }
-  }, [triggeredAt, items, step])
+  }, [triggeredAt, items, step, replace])
 
   useEffect(() => {
     const pulse = Animated.loop(

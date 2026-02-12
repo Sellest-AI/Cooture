@@ -1,10 +1,11 @@
 import { useCallback, useMemo, useState } from "react";
-import { LayoutChangeEvent, View, ViewStyle } from "react-native";
+import { LayoutChangeEvent, Pressable, View, ViewStyle } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   SharedValue,
   useAnimatedStyle,
   useSharedValue,
+  withDecay,
   withSpring,
 } from "react-native-reanimated";
 import { runOnJS } from "react-native-worklets";
@@ -32,9 +33,10 @@ type LabelIndicatorProps = {
   translationX: SharedValue<number>;
   knobSize: number;
   trackHeight: number;
+  onPress?: () => void;
 };
 
-const LabelIndicator = ({ position, translationX, knobSize, trackHeight }: LabelIndicatorProps) => {
+const LabelIndicator = ({ position, translationX, knobSize, trackHeight, onPress }: LabelIndicatorProps) => {
   const animatedStyle = useAnimatedStyle(() => {
     const hasPassed = translationX.value + knobSize / 2 >= position;
     return {
@@ -55,7 +57,9 @@ const LabelIndicator = ({ position, translationX, knobSize, trackHeight }: Label
           borderRadius: 99,
         }
       ]}
-    />
+    >
+      <Pressable style={{ flex: 1 }} onPress={onPress} />
+    </Animated.View>
   );
 };
 
@@ -119,15 +123,31 @@ export const Slider = ({ value, label, labels, onValueChange, style, customHeigh
       const newX = startX.value + event.translationX;
       translationX.value = Math.max(0, Math.min(newX, maxTranslation));
     })
-    .onEnd(() => {
+    .onEnd((event) => {
       isDragging.value = false;
       const maxTranslation = width - KNOB_SIZE;
-      const currentValue = maxTranslation > 0 ? translationX.value / maxTranslation : 0;
-      const closestValue = findClosestLabel(currentValue);
 
-      // Snap to closest label
-      translationX.value = withSpring(closestValue * maxTranslation);
-      runOnJS(updateValue)(translationX.value);
+      // Use velocity for a natural fling effect
+      const velocityX = event.velocityX;
+
+      // Apply decay animation with velocity
+      translationX.value = withDecay({
+        velocity: velocityX,
+        clamp: [0, maxTranslation],
+        deceleration: 0.7,
+      }, (finished) => {
+        if (finished) {
+          // After decay, snap to closest label
+          const currentValue = maxTranslation > 0 ? translationX.value / maxTranslation : 0;
+          const closestValue = findClosestLabel(currentValue);
+          translationX.value = withSpring(closestValue * maxTranslation, {
+            damping: 40,
+            stiffness: 300,
+          });
+          runOnJS(updateValue)(closestValue * maxTranslation);
+        }
+      });
+
     });
 
   // Animated styles for the knob
@@ -198,6 +218,11 @@ export const Slider = ({ value, label, labels, onValueChange, style, customHeigh
                 translationX={translationX}
                 knobSize={KNOB_SIZE}
                 trackHeight={TRACK_HEIGHT}
+                onPress={() => {
+                  // Snap to closest label
+                  translationX.value = withSpring(labelItem.value * maxTranslation);
+                  runOnJS(updateValue)(translationX.value);
+                }}
               />
             );
           })}

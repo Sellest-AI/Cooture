@@ -32,10 +32,17 @@ export const Pressable = ({ disabled, onPress, children, intensity = 0.98, style
     }).start();
   };
 
+  const { margin, marginTop, ...filteredStyle } = (style ?? {}) as ViewStyle;
+
   return (
     <NativePressable
       {...props}
-      style={style}
+      style={{
+        flex: 1,
+        aspectRatio: style?.aspectRatio,
+        margin,
+        marginTop,
+      }}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       onPress={(e) => {
@@ -46,10 +53,10 @@ export const Pressable = ({ disabled, onPress, children, intensity = 0.98, style
         setTimeout(() => { setInnerDisabled(false) }, 300);
       }}
     >
-      <Animated.View style={{
+      <Animated.View style={[filteredStyle, {
         transform: [{ scale: scaleAnim }],
-        aspectRatio: style?.aspectRatio
-      }}>
+        aspectRatio: style?.aspectRatio,
+      }]}>
         {children}
       </Animated.View>
     </NativePressable>

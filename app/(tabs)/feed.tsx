@@ -5,13 +5,13 @@ import { PremiumBlock } from "@/modules/premium/premium-block";
 import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Post } from "@ui/cards";
+import { FlashList } from "@ui/flat-list";
 import { ModalHeader } from "@ui/modal";
 import { SafeAreaView, useSafeAreaInsets } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import { notEmpty } from "@utils/convex-allowed";
 import { router } from "expo-router";
-import { useMemo } from "react";
-import { FlatList, ViewStyle } from "react-native";
+import { ViewStyle } from "react-native";
 import { Colors } from "theme";
 
 const PredictionPost = ({ id, style }: { id: Id<'predictions'>, style?: ViewStyle }) => {
@@ -104,73 +104,58 @@ export default function Screen() {
   const { data: feed } = useQuery(api.router.post.getFeed.anon);
   const { top } = useSafeAreaInsets();
 
-  const items = useMemo(() => [
-    { type: 'header' as const },
-    { type: 'premium' as const },
-    ...(feed ? feed.map(item => ({ type: 'item' as const, item })) :
-      [{ type: 'skeleton' as const }]),
-    { type: 'end' as const }
-  ], [feed]);
-
   return (
-    <SafeAreaView edges={{ top: 'off', bottom: 'maximum' }}>
-      <FlatList
-        data={items}
+    <SafeAreaView edges={{ top: 'off', bottom: 'maximum' }} style={{ flex: 1 }}>
+      <FlashList
+        data={(feed ?? [])}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingBottom: TOTAL_TABS_SPACE,
           paddingTop: top,
         }}
+        ListEmptyComponent={<>
+          <Post.Skeleton style={{ marginHorizontal: 12 }} />
+          <Post.Skeleton style={{ marginHorizontal: 12 }} />
+        </>}
+        ListHeaderComponent={<>
+          <ModalHeader
+            title="Feed"
+            type="alt"
+            size="big"
+            endContent={<Notification />}
+            style={{
+              paddingTop: 12,
+              paddingHorizontal: 20,
+              backgroundColor: Colors.background,
+            }}
+          />
+          <PremiumBlock
+            style={{ marginBottom: 24, marginHorizontal: 12 }}
+          />
+        </>}
+        ListFooterComponent={<>
+          <Text.Base
+            color={Colors.neutral[400]}
+            style={{ textAlign: 'center', maxWidth: 148, alignSelf: 'center', marginTop: 32 }}
+          >
+            No more posts to show in your feed.
+          </Text.Base>
+        </>}
         renderItem={({ item, index }) => {
-          if (item.type === 'header') {
-            return <ModalHeader
-              title="Feed"
-              type="alt"
-              size="big"
-              endContent={<Notification />}
-              style={{
-                paddingTop: 12,
-                paddingHorizontal: 20,
-                backgroundColor: Colors.background,
-              }}
-            />
-          }
+          const items = (feed ?? []);
 
-          if (item.type === 'premium') {
-            return <PremiumBlock
-              style={{ marginBottom: 20, marginHorizontal: 12 }}
-            />
-          }
-
-          if (item.type === 'end') {
-            return <Text.Base
-              color={Colors.neutral[400]}
-              style={{ textAlign: 'center', maxWidth: 148, alignSelf: 'center' }}
-            >
-              No more posts to show in your feed.
-            </Text.Base>
-          }
-
-          if (item.type === 'skeleton') {
-            return <Post.Skeleton style={{ marginHorizontal: 12 }} />
-          }
-
-          if (item.type === 'item') {
-            if (item.item.type === 'outfit')
-              return <OutfitPost
-                key={item.item._id}
-                id={item.item._id}
-                style={{ marginBottom: index === items.length - 1 ? 0 : 28 }}
-              />
-
-            return <PredictionPost
-              key={item.item._id}
-              id={item.item._id}
+          if (item.type === 'outfit')
+            return <OutfitPost
+              key={item._id}
+              id={item._id}
               style={{ marginBottom: index === items.length - 1 ? 0 : 28 }}
             />
-          }
 
-          return null;
+          return <PredictionPost
+            key={item._id}
+            id={item._id}
+            style={{ marginBottom: index === items.length - 1 ? 0 : 28 }}
+          />
         }}
       />
     </SafeAreaView>

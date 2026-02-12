@@ -2,17 +2,19 @@ import { ROUTES, useRoute, useRouter } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
 import { useQuery, useQueryCached } from "@/lib/convex/client";
 import { Post } from "@ui/cards";
+import { FlashList } from "@ui/flat-list";
 import { ModalHeader } from "@ui/modal";
-import { SafeScrollView } from "@ui/safe-scroll-view";
+import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import { notEmpty } from "@utils/convex-allowed";
 import { router } from "expo-router";
+import { useCallback, useMemo } from "react";
 import { ViewStyle } from "react-native";
 import { Colors } from "theme";
 
 const UserPost = ({ postId, style }: { postId: Id<'predictions'>, style?: ViewStyle }) => {
   const { push } = useRouter('/post/[id]');
-  const { data: post } = useQuery(api.router.post.getOne.anon, { id: postId });
+  const { data: post } = useQueryCached(api.router.post.getOne.anon, { id: postId });
   const predictions = post ? [post, ...post.generationPredictions.filter((p) => p.status === 'ACCEPTED')] : [];
   const imageIds = predictions.map((p) => p.imageId).filter(notEmpty);
   const { data: images } = useQueryCached(api.router.storage.images.getMany.anon, imageIds.length > 0 ? { imageIds } : 'skip');
@@ -63,41 +65,60 @@ export default function Screen() {
   const { data: post } = useQuery(api.router.post.getOne.anon, { id });
   const { data: postsFromUser, isPending } = useQuery(api.router.post.getFromUser.anon, post?.user?._id ? { userId: post?.user?._id } : 'skip');
 
+  const posts = (postsFromUser ?? []).filter((p) => p.generationId !== post?.generationId)
+    .filter((p, _, arr) => arr.findLast(x => x.generationId === p.generationId)?._id === p._id);
+
+  const items = useMemo(() => [
+    { id: id },
+    ...posts.map((p) => ({ id: p._id })),
+  ], [id, posts]);
+
+  const renderItem = useCallback(({ item }: { item: typeof items[number] }) => {
+    return <UserPost
+      postId={item.id}
+      style={{ marginTop: 8, marginBottom: 28 }}
+    />
+  }, []);
+
   return (
-    <SafeScrollView
-      style={{ paddingTop: 0 }}
-      stickyHeaderIndices={[0]}
-      showsVerticalScrollIndicator={false}
-    >
+    <SafeAreaView style={{ flex: 1 }}>
       <ModalHeader
-        style={{ backgroundColor: Colors.background, paddingTop: 12, paddingHorizontal: 12 }}
+        style={{
+          paddingTop: 12,
+          backgroundColor: Colors.background,
+          paddingHorizontal: 12
+        }}
         onBack={() => router.back()}
         title="Publications"
         type="alt"
       />
-      <UserPost postId={id} style={{ marginTop: 8, marginBottom: 28 }} />
-      {isPending && <>
-        <Post.Skeleton style={{ marginBottom: 28, marginHorizontal: 12 }} />
-        <Post.Skeleton style={{ marginBottom: 28, marginHorizontal: 12 }} />
-      </>}
-      {postsFromUser?.filter((p) => p.generationId !== post?.generationId)
-        .filter((p, _, arr) => arr.findLast(x => x.generationId === p.generationId)?._id === p._id)
-        .map((p, i, arr) => (
-          <UserPost
-            key={p._id}
-            postId={p._id}
-            style={{ marginBottom: i < arr.length - 1 ? 28 : 0 }}
-          />
-        ))}
-      <Text.Base color={Colors.neutral[400]} style={{
-        textAlign: 'center',
-        marginTop: 32,
-        maxWidth: 156,
-        alignSelf: 'center',
-        marginBottom: 32
-      }}>
-        No more posts to show from this user.
-      </Text.Base>
-    </SafeScrollView>
+      <FlashList
+        data={items}
+        renderItem={renderItem}
+        removeClippedSubviews={true}
+        showsVerticalScrollIndicator={false}
+        ListEmptyComponent={<>
+          <Post.Skeleton style={{ marginBottom: 28, marginHorizontal: 12 }} />
+          <Post.Skeleton style={{ marginBottom: 28, marginHorizontal: 12 }} />
+        </>}
+        ListFooterComponent={
+          <>
+            {isPending && <>
+              <Post.Skeleton style={{ marginBottom: 28, marginHorizontal: 12 }} />
+              <Post.Skeleton style={{ marginBottom: 28, marginHorizontal: 12 }} />
+            </>}
+            <Text.Base color={Colors.neutral[400]} style={{
+              textAlign: 'center',
+              marginTop: 32,
+              maxWidth: 156,
+              alignSelf: 'center',
+              marginBottom: 32
+            }}>
+              No more posts to show from this user.
+            </Text.Base>
+          </>
+        }
+      />
+    </SafeAreaView>
   )
 }

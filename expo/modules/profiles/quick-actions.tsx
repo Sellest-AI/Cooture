@@ -1,7 +1,8 @@
 import { ROUTES, useRouter } from '@/hooks';
+import { Pressable } from '@ui/pressable';
 import { Text } from '@ui/text';
 import { ArrowUpRight, Camera } from "lucide-react-native";
-import { Pressable, StyleSheet, View, ViewProps } from "react-native";
+import { StyleSheet, View, ViewProps } from "react-native";
 import { Colors } from "theme";
 
 type Props = ViewProps;

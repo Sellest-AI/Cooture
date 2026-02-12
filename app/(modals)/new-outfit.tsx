@@ -6,8 +6,8 @@ import { KeyboardAvoiderView } from "@good-react-native/keyboard-avoider";
 import { LoadingBlock } from "@ui/block.loading";
 import { Button } from "@ui/button";
 import { CardItem } from "@ui/cards/card-item";
+import { FlashList } from "@ui/flat-list";
 import { Pencil, SquirishPlus } from "@ui/icons";
-import { MasonryList } from "@ui/masonry-list";
 import { ModalHeader } from "@ui/modal";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { TextInput } from "@ui/text-input";
@@ -52,15 +52,24 @@ export default function NewOutfitScreen() {
             onBack={router.canGoBack() ? () => { router.back() } : undefined}
           />
           {items ?
-            <MasonryList
-              key="0"
+            <FlashList
               data={[...items, undefined]}
-              style={{ columnGap: 48, paddingHorizontal: 8 }}
-              keyExtractor={(_, index) => index.toString()}
-              renderItem={({ item }) => {
+              style={{
+                marginTop: 16,
+                paddingHorizontal: 8
+              }}
+              renderItem={({ item, index }) => {
+                const marginLeft = 20;
+                const marginRight = 20;
+
                 if (!item) {
                   return (<SquirishPlus
-                    style={{ marginBottom: 24, paddingTop: 3, }}
+                    style={{
+                      marginBottom: 24,
+                      paddingTop: 3,
+                      marginLeft,
+                      marginRight,
+                    }}
                     size={112}
                     onPress={() => {
                       push(ROUTES.MODALS.OUTFIT_ADD_ITEM, {
@@ -71,7 +80,7 @@ export default function NewOutfitScreen() {
                 }
 
                 return (
-                  <View style={{ marginBottom: 24, paddingTop: 3 }}>
+                  <View style={{ marginBottom: 24, paddingTop: 3, marginLeft, marginRight }}>
                     <CardItem
                       source={item.image.sizes.small.url}
                       title={item.name}
@@ -82,6 +91,7 @@ export default function NewOutfitScreen() {
                 )
               }}
               numColumns={2}
+              masonry
             />
             : <LoadingBlock style={{ height: 500 }} />
           }
