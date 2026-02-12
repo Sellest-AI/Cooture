@@ -1,10 +1,11 @@
 "use node"
 import { addBase64Header, bufferToBase64, imageBufferFromUrl } from "@shared/node/images";
-import { getLighterHsl, getSaturatedHsl, hslToHex, notEmpty, parseColorToHsl } from "@shared/utils";
+import { notEmpty } from "@shared/utils";
 import { v } from "convex/values";
 import sharp from "sharp";
 import { internal } from "../../_generated/api";
 import { internalAction } from "../../_generated/server";
+import { getBackgroundColor } from "../../functions/outfits";
 
 type Position = {
   top: number;
@@ -123,17 +124,12 @@ export const _internal = internalAction({
 
     composite.push(await positionImage(shoes?.image.url, shoesPosition));
 
-    let mainColor = top1?.mainColors[0] ?? top2?.mainColors[0] ?? bottom?.mainColors[0] ?? '#ffffff';
-    // make the mainColor a bit lighter to avoid too much contrast with the items
-    const mainColorHsl = parseColorToHsl(mainColor) ?? [0, 0, 100];
-    mainColor = hslToHex(...getSaturatedHsl(getLighterHsl(mainColorHsl, 65), -45));
-
     const base = sharp({
       create: {
         width: 880,
         height: 1184,
         channels: 4,
-        background: mainColor
+        background: 'transparent'
       }
     })
 
@@ -148,9 +144,12 @@ export const _internal = internalAction({
 
     if (newImage.length === 0) return false;
 
+    const backgroundColor = getBackgroundColor(items.map(i => i.mainColors[0]).filter(notEmpty));
+
     await ctx.runMutation(internal.router.outfits.updateCoverInternal._internal, {
       outfitId,
       newCoverId: newImage[0]._id,
+      backgroundColor,
     });
 
     return true;

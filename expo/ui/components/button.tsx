@@ -7,6 +7,7 @@ import { Text } from './text';
 
 type Props = {
   children?: React.ReactNode;
+  startContent?: React.ReactNode;
   startIcon?: React.ComponentType<{ size?: number, color?: string, style?: ViewStyle }> | false;
   endIcon?: React.ComponentType<{ size?: number, color?: string, style?: ViewStyle }> | false;
   disabled?: boolean;
@@ -16,7 +17,7 @@ type Props = {
   isLoading?: boolean;
 } & ComponentProps<typeof Block> & Omit<ComponentProps<typeof Pressable>, 'style'>;
 
-export const Button = ({ startIcon, endIcon, children, disabled, variant, href, size, style, isLoading: _isLoading, align, onPress, onLongPress, ...props }: Props) => {
+export const Button = ({ startIcon, startContent, endIcon, children, disabled, variant, href, size, style, isLoading: _isLoading, align, onPress, onLongPress, ...props }: Props) => {
   const [innerLoading, setInnerLoading] = useState(false);
   const isLoading = _isLoading || innerLoading;
 
@@ -102,6 +103,7 @@ export const Button = ({ startIcon, endIcon, children, disabled, variant, href, 
               opacity: runtimeDisabled ? 0.4 : 1,
             }}
           >
+            {startContent && startContent}
             {StartIcon && <StartIcon
               size={20}
               color={colors.textColor}

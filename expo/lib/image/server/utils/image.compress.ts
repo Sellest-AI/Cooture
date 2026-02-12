@@ -5,10 +5,10 @@ type Level = {
   resolution: number;
   targetSizeKb: number;
   initialQuality: number;
-  compressionStrength: Array<{
+  compressionStrength: {
     sizeKb: number;
     initialQuality: number;
-  }>
+  }[]
 }
 
 type Compression = Omit<Level, 'compressionStrength'>;

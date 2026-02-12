@@ -14,7 +14,8 @@ export const sanitizeImage = <T extends MainImage>(image: Image<T>): SanitizedIm
   const sizes = (image.sizes ?? []).sort((a, b) => b.size - a.size).map((s) => ({ ...s, dimension: Math.max(s.width, s.height) }));
   const sanitizeSize = ({ url, width, height, size }: { url: string, width: number, height: number, size: number }) => ({ url, width, height, size });
 
-  const medium = sizes.find((s) => s.dimension <= 600 && s.dimension > 400) ?? image;
+  const large = sizes.find((s) => s.dimension <= 1024 && s.dimension > 600) ?? image;
+  const medium = sizes.find((s) => s.dimension <= 600 && s.dimension > 400) ?? large;
   const small = sizes.find((s) => s.dimension <= 400 && s.dimension > 200) ?? medium;
   const thumbnail = sizes.find((s) => s.dimension <= 200) ?? small;
 
@@ -26,6 +27,7 @@ export const sanitizeImage = <T extends MainImage>(image: Image<T>): SanitizedIm
       thumbnail: sanitizeSize(thumbnail),
       small: sanitizeSize(small),
       medium: sanitizeSize(medium),
+      large: sanitizeSize(large),
       original: sanitizeSize(image),
     }
   }
@@ -42,6 +44,7 @@ export type SanitizedImage<T extends MainImage> =
       thumbnail: PartialImage;
       small: PartialImage;
       medium: PartialImage;
+      large: PartialImage;
       original: PartialImage;
     };
   };

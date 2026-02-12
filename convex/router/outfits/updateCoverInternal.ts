@@ -10,13 +10,15 @@ export const _internal = internalMutation({
   args: {
     outfitId: v.id("outfits"),
     newCoverId: v.id("images"),
+    backgroundColor: v.string(),
   },
-  handler: async (ctx, { outfitId, newCoverId }) => {
+  handler: async (ctx, { outfitId, newCoverId, backgroundColor }) => {
     const outfit = await ctx.db.get(outfitId);
     if (!outfit) return false;
 
     await ctx.db.patch(outfitId, {
       coverId: newCoverId,
+      backgroundColor,
     });
 
     if (outfit.coverId)

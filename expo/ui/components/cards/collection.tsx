@@ -14,9 +14,10 @@ type Props = {
   source?: ComponentProps<typeof Image>['source'];
   contentFit?: ComponentProps<typeof Image>['contentFit'];
   onPress?: ComponentProps<typeof Pressable>['onPress'];
+  backgroundColor?: string;
 }
 
-export const Collection = ({ title, subtitle, disabled, selected, source, contentFit, style, onPress }: Props) => {
+export const Collection = ({ title, subtitle, disabled, selected, source, contentFit, style, backgroundColor, onPress }: Props) => {
   const [loading, setLoading] = useState(false);
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const rotate = useRef(new Animated.Value(7)).current;
@@ -66,7 +67,7 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
 
   const noSource = !source;
   const borderColor = (selected || noSource) ? Colors.primary[500] : Colors.blur.light;
-  const backgroundColor = (selected || noSource) ? Colors.primary[500] : (contentFit === 'contain' ? Colors.neutral[50] : Colors.blur.dark);
+  const _backgroundColor = (selected || noSource) ? Colors.primary[500] : (contentFit === 'contain' ? (backgroundColor ?? Colors.neutral[50]) : Colors.blur.dark);
   const showText = title || subtitle;
 
   return (
@@ -101,7 +102,7 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
             }, { scale: -1 }],
             top: "3.5%",
             left: "2.5%",
-            backgroundColor: backgroundColor,
+            backgroundColor: _backgroundColor,
             borderRadius: 12,
             overflow: 'hidden',
             borderBottomWidth: 1,
@@ -134,7 +135,7 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
             }, { scale: -1 }],
             top: "2%",
             left: "2.5%",
-            backgroundColor: backgroundColor,
+            backgroundColor: _backgroundColor,
             borderRadius: 12,
             overflow: 'hidden',
             borderBottomWidth: 1,
@@ -163,7 +164,7 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
             borderTopWidth: 1,
             borderLeftWidth: 1,
             borderColor: borderColor,
-            backgroundColor: backgroundColor,
+            backgroundColor: _backgroundColor,
             position: 'absolute',
             top: "3%",
             left: "2.5%",

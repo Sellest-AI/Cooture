@@ -1,5 +1,6 @@
 import { defineSchema } from "convex/server";
 import { authTables } from "./schema/auth";
+import { feedScores } from "./schema/feed";
 import { generations, predictions } from "./schema/generations";
 import { imageObjects, images, imageSizes } from "./schema/images";
 import { items } from "./schema/items";
@@ -25,4 +26,5 @@ export default defineSchema({
   predictions,
   presets,
   presetGenerations,
+  feedScores
 });

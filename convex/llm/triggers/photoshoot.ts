@@ -23,26 +23,14 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, _outfit?: { _id: Id<
 
   // ---- EXTRACT ITEMS BY POSITION ----
   const top = outfit.items.find(i => i.position === 'TOP');
-  const bottom = outfit.items.find(i => i.position === 'BOTTOM');
   const innerLayer = outfit.items.find(i => i.position === 'INNERLAYER');
+  const bottom = outfit.items.find(i => i.position === 'BOTTOM');
   const outerwear = outfit.items.find(i => i.position === 'OUTERWEAR');
   const accessories = outfit.items.filter(i => i.position === 'ACCESSORY');
   const shoes = outfit.items.find(i => i.position === 'SHOES');
 
   const hasItems = top || bottom || innerLayer || outerwear || accessories.length > 0 || shoes;
   if (!hasItems) return schema;
-
-  // Helper function to build details string
-  const buildDetails = (item: typeof top | typeof bottom | typeof outerwear) => {
-    if (!item) return '';
-    const parts = [
-      ...item.mainColors,
-      ...item.materials.map(m => m.toLowerCase()),
-      item.name,
-    ];
-    if (item.description) { parts.push(item.description); }
-    return parts.join(' ');
-  };
 
   // ---- IMAGES REFERENCES ----
   const baseImageIndex = schema.images.length + 1;
@@ -67,6 +55,24 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, _outfit?: { _id: Id<
   const description = itemNames.length > 0 ? `An outfit featuring ${itemNames.join(', ')}` : schema.prompt.outfit.description;
   const outfitSize = _outfit.size ? `VERY IMPORTANT: ${_outfit.size.replaceAll('_', ' ')} fit on the subject` : undefined;
 
+  // Helper function to build details string
+  const buildDetails = (item: typeof top | typeof bottom | typeof outerwear | typeof innerLayer) => {
+    if (!item) return '';
+    const parts = [
+      ...item.mainColors,
+      ...item.materials.map(m => m.toLowerCase()),
+      item.name,
+      item.description,
+    ];
+
+    if (item.position === 'OUTERWEAR' || item.position === 'TOP'
+      || item.position === 'BOTTOM' || item.category === 'TSHIRT') {
+      if (outfitSize) parts.push(outfitSize)
+    }
+
+    return parts.filter(notEmpty).join(', ');
+  };
+
   // ---- CUSTOM OUTFIT ----
   const customOutfit = {
     description,
@@ -89,13 +95,12 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, _outfit?: { _id: Id<
       type: 'Blue jeans',
       details: 'Classic blue straight denim jeans',
     }),
-    innerLayer: innerLayer
-      ? `${innerLayer.mainColors.join(' ')} ${innerLayer.name}${innerLayer.description ? `, ${innerLayer.description}` : ''}`
-      : undefined,
+    innerLayer: innerLayer ? buildDetails(innerLayer) : undefined,
     outerwear: outerwear ? {
       type: outerwear.name,
       details: buildDetails(outerwear),
       reference: references.filter((r) => r.type === 'OUTERWEAR').map((r) => r.text).join(' '),
+      fit: outfitSize ?? 'default',
     } : undefined,
     accessories: accessories.length > 0
       ? accessories.map(acc => ({

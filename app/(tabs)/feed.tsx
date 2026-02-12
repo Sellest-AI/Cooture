@@ -1,6 +1,7 @@
 import { ROUTES, useRouter } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
 import { useQuery, useQueryCached } from "@/lib/convex/client";
+import { useFeed } from "@/modules/feed/_hooks";
 import { PremiumBlock } from "@/modules/premium/premium-block";
 import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
@@ -14,11 +15,10 @@ import { router } from "expo-router";
 import { ViewStyle } from "react-native";
 import { Colors } from "theme";
 
-const PredictionPost = ({ id, style }: { id: Id<'predictions'>, style?: ViewStyle }) => {
+const GenerationPost = ({ id, style }: { id: Id<'generations'>, style?: ViewStyle }) => {
   const { push } = useRouter('/feed');
-  const { data: post } = useQuery(api.router.post.getOne.anon, { id });
-  const predictions = post ? [post, ...post.generationPredictions.filter((p) => p.status === 'ACCEPTED')] : [];
-  const imageIds = predictions.map((p) => p.imageId).filter(notEmpty);
+  const { data: post } = useQuery(api.router.generations.getOne.anon, { id });
+  const imageIds = post?.predictions.map((p) => p.imageId).filter(notEmpty) ?? [];
   const { data: images } = useQueryCached(api.router.storage.images.getMany.anon, imageIds.length > 0 ? { imageIds } : 'skip');
 
   if (!post) return <Post.Skeleton style={{ ...style, paddingHorizontal: 12 }} />;
@@ -26,18 +26,18 @@ const PredictionPost = ({ id, style }: { id: Id<'predictions'>, style?: ViewStyl
   return (<Post
     style={{ ...style }}
     paddingHorizontal={12}
-    postedAt={post.readyAt ? new Date(post.readyAt) : undefined}
+    postedAt={post.completedAt ? new Date(post.completedAt) : undefined}
     likedAccounts={[]}
     onPress={(id) => router.push(`/post/${id}`)}
     images={images?.map((img) => ({
-      _id: predictions.find(p => p.imageId === img._id)!._id,
-      url: img.url,
+      _id: post.predictions.find(p => p.imageId === img._id)?._id ?? post.predictions[0]?._id,
+      url: img.sizes.large.url,
       contentFit: img.hasAlpha ? 'contain' : 'cover',
     }))}
-    image={post.image ? {
-      _id: post._id,
-      url: post.image.url,
-      contentFit: post.image.hasAlpha ? 'contain' : 'cover',
+    image={post.cover ? {
+      _id: post.predictions.find(p => p.imageId === post.cover!._id)?._id ?? post.predictions[0]?._id,
+      url: post.cover.sizes.large.url,
+      contentFit: post.cover.hasAlpha ? 'contain' : 'cover',
     } : undefined}
     user={post.user ? {
       name: post.user.name ?? 'Anonymous',
@@ -74,6 +74,7 @@ const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle }) => 
     _id: outfit._id,
     url: outfit.cover?.url ?? outfit.items[0].image.url,
     contentFit: 'contain' as const,
+    backgroundColor: outfit.backgroundColor,
   }
 
   return <Post
@@ -82,6 +83,7 @@ const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle }) => 
     postedAt={outfit._creationTime ? new Date(outfit._creationTime) : undefined}
     likedAccounts={[]}
     image={cover}
+    // onPress={() => }
     user={user ? {
       name: user.name ?? 'Anonymous',
       username: user.name ?? 'anon',
@@ -101,13 +103,17 @@ const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle }) => 
 }
 
 export default function Screen() {
-  const { data: feed } = useQuery(api.router.post.getFeed.anon);
+  const { feed, setSeed, isLoading, loadMore } = useFeed({ initialNumItems: 8 });
   const { top } = useSafeAreaInsets();
 
   return (
     <SafeAreaView edges={{ top: 'off', bottom: 'maximum' }} style={{ flex: 1 }}>
       <FlashList
+        refreshing={isLoading}
+        onRefresh={() => setSeed((prev) => prev + 1)}
+        onEndReached={() => loadMore(8)}
         data={(feed ?? [])}
+        keyExtractor={(i) => i?._id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingBottom: TOTAL_TABS_SPACE,
@@ -134,27 +140,29 @@ export default function Screen() {
           />
         </>}
         ListFooterComponent={<>
+          {isLoading && <>
+            <Post.Skeleton style={{ marginHorizontal: 12, marginBottom: 28 }} />
+            <Post.Skeleton style={{ marginHorizontal: 12, marginBottom: 28 }} />
+          </>}
           <Text.Base
             color={Colors.neutral[400]}
-            style={{ textAlign: 'center', maxWidth: 148, alignSelf: 'center', marginTop: 32 }}
+            style={{ textAlign: 'center', maxWidth: 148, alignSelf: 'center', marginTop: 8 }}
           >
             No more posts to show in your feed.
           </Text.Base>
         </>}
-        renderItem={({ item, index }) => {
-          const items = (feed ?? []);
-
+        renderItem={({ item }) => {
           if (item.type === 'outfit')
             return <OutfitPost
               key={item._id}
               id={item._id}
-              style={{ marginBottom: index === items.length - 1 ? 0 : 28 }}
+              style={{ marginBottom: 28 }}
             />
 
-          return <PredictionPost
+          return <GenerationPost
             key={item._id}
             id={item._id}
-            style={{ marginBottom: index === items.length - 1 ? 0 : 28 }}
+            style={{ marginBottom: 28 }}
           />
         }}
       />

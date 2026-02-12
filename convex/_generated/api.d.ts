@@ -9,9 +9,13 @@
  */
 
 import type * as auth from "../auth.js";
-import type * as cron from "../cron.js";
+import type * as cron_feedRecentUpdate from "../cron/feedRecentUpdate.js";
+import type * as crons from "../crons.js";
 import type * as env from "../env.js";
+import type * as functions_feed_index from "../functions/feed/index.js";
+import type * as functions_feed_updateFeedScore from "../functions/feed/updateFeedScore.js";
 import type * as functions_generations_getGenerationDetails from "../functions/generations/getGenerationDetails.js";
+import type * as functions_generations_getGenerationMax from "../functions/generations/getGenerationMax.js";
 import type * as functions_generations_getPrediction from "../functions/generations/getPrediction.js";
 import type * as functions_generations_index from "../functions/generations/index.js";
 import type * as functions_images_getImage from "../functions/images/getImage.js";
@@ -20,6 +24,8 @@ import type * as functions_images_saveImage from "../functions/images/saveImage.
 import type * as functions_items_createItem from "../functions/items/createItem.js";
 import type * as functions_items_extractPosition from "../functions/items/extractPosition.js";
 import type * as functions_items_getItem from "../functions/items/getItem.js";
+import type * as functions_outfits_getBackgroundColor from "../functions/outfits/getBackgroundColor.js";
+import type * as functions_outfits_index from "../functions/outfits/index.js";
 import type * as functions_subscriptions_getUserSubscription from "../functions/subscriptions/getUserSubscription.js";
 import type * as functions_subscriptions_index from "../functions/subscriptions/index.js";
 import type * as functions_subscriptions_isSubscriptionActive from "../functions/subscriptions/isSubscriptionActive.js";
@@ -29,7 +35,6 @@ import type * as functions_users_index from "../functions/users/index.js";
 import type * as http from "../http.js";
 import type * as http_replicate from "../http/replicate.js";
 import type * as http_runpod from "../http/runpod.js";
-import type * as lib_algorithms_feedSuffler from "../lib/algorithms/feedSuffler.js";
 import type * as lib_image_index from "../lib/image/index.js";
 import type * as lib_image_node from "../lib/image/node.js";
 import type * as lib_image_sanitizeImage from "../lib/image/sanitizeImage.js";
@@ -71,8 +76,11 @@ import type * as router_admin_generateOutfitsCover from "../router/admin/generat
 import type * as router_auth_linkStripeSubscription from "../router/auth/linkStripeSubscription.js";
 import type * as router_auth_postCreateOrUpdate from "../router/auth/postCreateOrUpdate.js";
 import type * as router_examples_query from "../router/examples/query.js";
+import type * as router_feed_getFromUser from "../router/feed/getFromUser.js";
+import type * as router_feed_getPaginated from "../router/feed/getPaginated.js";
 import type * as router_generations_createOne from "../router/generations/createOne.js";
 import type * as router_generations_getAll from "../router/generations/getAll.js";
+import type * as router_generations_getFromPrediction from "../router/generations/getFromPrediction.js";
 import type * as router_generations_getOne from "../router/generations/getOne.js";
 import type * as router_generations_getPaginated from "../router/generations/getPaginated.js";
 import type * as router_generations_getUser from "../router/generations/getUser.js";
@@ -89,9 +97,6 @@ import type * as router_outfits_getAll from "../router/outfits/getAll.js";
 import type * as router_outfits_getOne from "../router/outfits/getOne.js";
 import type * as router_outfits_updateCover from "../router/outfits/updateCover.js";
 import type * as router_outfits_updateCoverInternal from "../router/outfits/updateCoverInternal.js";
-import type * as router_post_getFeed from "../router/post/getFeed.js";
-import type * as router_post_getFromUser from "../router/post/getFromUser.js";
-import type * as router_post_getOne from "../router/post/getOne.js";
 import type * as router_presets_createOne from "../router/presets/createOne.js";
 import type * as router_presets_getAll from "../router/presets/getAll.js";
 import type * as router_presets_getOne from "../router/presets/getOne.js";
@@ -121,6 +126,7 @@ import type * as router_users_getFromStripeId from "../router/users/getFromStrip
 import type * as router_users_getPortraits from "../router/users/getPortraits.js";
 import type * as router_users_updatePortraits from "../router/users/updatePortraits.js";
 import type * as schema_auth from "../schema/auth.js";
+import type * as schema_feed from "../schema/feed.js";
 import type * as schema_generations from "../schema/generations.js";
 import type * as schema_images from "../schema/images.js";
 import type * as schema_items from "../schema/items.js";
@@ -137,9 +143,13 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
-  cron: typeof cron;
+  "cron/feedRecentUpdate": typeof cron_feedRecentUpdate;
+  crons: typeof crons;
   env: typeof env;
+  "functions/feed/index": typeof functions_feed_index;
+  "functions/feed/updateFeedScore": typeof functions_feed_updateFeedScore;
   "functions/generations/getGenerationDetails": typeof functions_generations_getGenerationDetails;
+  "functions/generations/getGenerationMax": typeof functions_generations_getGenerationMax;
   "functions/generations/getPrediction": typeof functions_generations_getPrediction;
   "functions/generations/index": typeof functions_generations_index;
   "functions/images/getImage": typeof functions_images_getImage;
@@ -148,6 +158,8 @@ declare const fullApi: ApiFromModules<{
   "functions/items/createItem": typeof functions_items_createItem;
   "functions/items/extractPosition": typeof functions_items_extractPosition;
   "functions/items/getItem": typeof functions_items_getItem;
+  "functions/outfits/getBackgroundColor": typeof functions_outfits_getBackgroundColor;
+  "functions/outfits/index": typeof functions_outfits_index;
   "functions/subscriptions/getUserSubscription": typeof functions_subscriptions_getUserSubscription;
   "functions/subscriptions/index": typeof functions_subscriptions_index;
   "functions/subscriptions/isSubscriptionActive": typeof functions_subscriptions_isSubscriptionActive;
@@ -157,7 +169,6 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   "http/replicate": typeof http_replicate;
   "http/runpod": typeof http_runpod;
-  "lib/algorithms/feedSuffler": typeof lib_algorithms_feedSuffler;
   "lib/image/index": typeof lib_image_index;
   "lib/image/node": typeof lib_image_node;
   "lib/image/sanitizeImage": typeof lib_image_sanitizeImage;
@@ -199,8 +210,11 @@ declare const fullApi: ApiFromModules<{
   "router/auth/linkStripeSubscription": typeof router_auth_linkStripeSubscription;
   "router/auth/postCreateOrUpdate": typeof router_auth_postCreateOrUpdate;
   "router/examples/query": typeof router_examples_query;
+  "router/feed/getFromUser": typeof router_feed_getFromUser;
+  "router/feed/getPaginated": typeof router_feed_getPaginated;
   "router/generations/createOne": typeof router_generations_createOne;
   "router/generations/getAll": typeof router_generations_getAll;
+  "router/generations/getFromPrediction": typeof router_generations_getFromPrediction;
   "router/generations/getOne": typeof router_generations_getOne;
   "router/generations/getPaginated": typeof router_generations_getPaginated;
   "router/generations/getUser": typeof router_generations_getUser;
@@ -217,9 +231,6 @@ declare const fullApi: ApiFromModules<{
   "router/outfits/getOne": typeof router_outfits_getOne;
   "router/outfits/updateCover": typeof router_outfits_updateCover;
   "router/outfits/updateCoverInternal": typeof router_outfits_updateCoverInternal;
-  "router/post/getFeed": typeof router_post_getFeed;
-  "router/post/getFromUser": typeof router_post_getFromUser;
-  "router/post/getOne": typeof router_post_getOne;
   "router/presets/createOne": typeof router_presets_createOne;
   "router/presets/getAll": typeof router_presets_getAll;
   "router/presets/getOne": typeof router_presets_getOne;
@@ -249,6 +260,7 @@ declare const fullApi: ApiFromModules<{
   "router/users/getPortraits": typeof router_users_getPortraits;
   "router/users/updatePortraits": typeof router_users_updatePortraits;
   "schema/auth": typeof schema_auth;
+  "schema/feed": typeof schema_feed;
   "schema/generations": typeof schema_generations;
   "schema/images": typeof schema_images;
   "schema/items": typeof schema_items;

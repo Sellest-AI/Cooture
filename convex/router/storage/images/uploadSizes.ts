@@ -1,12 +1,12 @@
 "use node"
 
-import { v } from "convex/values";
-import { ActionCtx, internalAction } from "../../../_generated/server";
 import { compressImage } from "@/lib/image/node";
 import { StorageCloud } from "@/lib/s3/node";
+import { retryPromise } from "@shared/utils";
+import { v } from "convex/values";
 import { api, internal } from "../../../_generated/api";
 import { Id } from "../../../_generated/dataModel";
-import { retryPromise } from "@shared/utils";
+import { ActionCtx, internalAction } from "../../../_generated/server";
 
 const uploadSizes = async (ctx: ActionCtx, imageId: Id<'images'>) => {
   const image = await ctx.runQuery(internal.router.storage.images.getOne._internal, { id: imageId });
@@ -15,20 +15,25 @@ const uploadSizes = async (ctx: ActionCtx, imageId: Id<'images'>) => {
   await StorageCloud.updateCacheControl(image.key);
 
   type Size = { px: number, quality: number };
-  const sizes: Array<Size> = [
+  const sizes: Size[] = [
     { px: 150, quality: 40 },
     { px: 336, quality: 40 },
-    { px: 600, quality: 50 }
+    { px: 600, quality: 50 },
+    { px: 1024, quality: 92 },
   ];
 
   type Data = typeof api.router.storage.images.saveSizes.server._args;
-  const data: Array<Data['images'][number]['sizes'][number]> = [];
+  const data: Data['images'][number]['sizes'][number][] = [];
 
   for (const size of sizes) {
     const { px, quality } = size;
 
     const alreadyExist = image._sizes.find((s) => Math.max(s.width, s.height) === px && s.quality === quality);
     if (alreadyExist) continue;
+
+    const threshold = px < 1000 ? px : px * 1.4;
+    const isTooSmall = Math.max(image.width, image.height) <= threshold;
+    if (isTooSmall) continue;
 
     const buffer = await compressImage(image.url, { maxSideSize: px, quality: quality })
 

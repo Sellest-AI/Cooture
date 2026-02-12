@@ -1,5 +1,4 @@
 import { v } from "convex/values";
-import { getImage } from "../../functions/images";
 import { publicQuery } from "../../procedures";
 
 export const anon = publicQuery({
@@ -18,12 +17,10 @@ export const anon = publicQuery({
         .withIndex('by_generation_id', (q) => q.eq('generationId', generation._id))
         .collect();
       const filtered = _predictions.filter((p) => p.status === 'ACCEPTED');
-      return await Promise.all(filtered.map(async (p) => ({
-        image: p.imageId ? await getImage(ctx, p.imageId) : null,
-        ...p
-      })))
+      if (filtered.length === 0) return null;
+      return generation._id;
     }));
 
-    return predictions.flat();
+    return generations.filter((g) => predictions.some((p) => p === g._id));
   }
 })

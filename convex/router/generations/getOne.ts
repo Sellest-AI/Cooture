@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+import { getGenerationMax } from "../../functions/generations";
 import { getGenerationDetails } from "../../functions/generations/getGenerationDetails";
 import { authQuery } from "../../procedures";
 
@@ -18,6 +19,21 @@ export const authed = authQuery({
     return {
       ...generation,
       ...details,
+    }
+  }
+})
+
+export const anon = authQuery({
+  args: {
+    id: v.id("generations"),
+  },
+  handler: async (ctx, { id }) => {
+    const generation = await getGenerationMax(ctx, id);
+    if (!generation) return null;
+
+    return {
+      ...generation,
+      predictions: generation.predictions.filter((p) => p.status === 'ACCEPTED'),
     }
   }
 })

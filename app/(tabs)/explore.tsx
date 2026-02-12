@@ -1,5 +1,6 @@
 import { api, Id } from "@/lib/convex/api";
 import { useQuery } from "@/lib/convex/client";
+import { useFeed } from "@/modules/feed/_hooks";
 import { PremiumBlock } from "@/modules/premium/premium-block";
 import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
@@ -56,17 +57,17 @@ const GridSkeleton = () => {
   )
 }
 
-const Prediction = ({ id, style }: { id: Id<'predictions'>, style?: ViewStyle }) => {
-  const { data: post } = useQuery(api.router.post.getOne.anon, { id });
+const Generation = ({ id, style }: { id: Id<'generations'>, style?: ViewStyle }) => {
+  const { data: post } = useQuery(api.router.generations.getOne.anon, { id });
   if (!post) return <Skeleton style={style} />;
 
   return (
     <Pressable style={{ borderRadius: 16, overflow: 'hidden', flex: 1, ...style }}
-      onPress={() => router.push(ROUTES.POST.ID(post._id))}
+      onPress={() => router.push(ROUTES.POST.ID(post.predictions[0]._id))}
     >
       <Image
         style={{ flex: 1 }}
-        source={{ uri: post.image?.sizes.medium.url }}
+        source={{ uri: post.cover?.sizes.large.url }}
       />
     </Pressable>
   )
@@ -83,30 +84,30 @@ const Outfit = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle }) => {
       onPress={() => router.push(ROUTES.OUTFIT.ID(outfit._id))}
     >
       <Image
-        style={{ flex: 1 }}
-        source={{ uri: image.url }}
+        style={{ flex: 1, backgroundColor: outfit.backgroundColor }}
+        source={{ uri: image.sizes.large.url }}
       />
     </Pressable>
   )
 }
 
-type PostProps = { style?: ViewStyle } & ({ id: Id<'predictions'> | Id<'outfits'>, type: 'post' | 'outfit' });
+type PostProps = { style?: ViewStyle } & ({ id: Id<'generations'> | Id<'outfits'>, type: 'generation' | 'outfit' });
 const Post = ({ id, type, style }: PostProps) => {
-  if (type === 'post') {
-    return <Prediction id={id as Id<'predictions'>} style={style} />;
+  if (type === 'generation') {
+    return <Generation id={id as Id<'generations'>} style={style} />;
   }
 
   return <Outfit id={id as Id<'outfits'>} style={style} />;
 }
 
 export default function Screen() {
-  const { data: feed } = useQuery(api.router.post.getFeed.anon);
+  const { feed, canLoadMore, loadMore } = useFeed({ initialNumItems: 12 });
 
   const empty = (feed ?? []).length === 0;
-  const Component = empty ? View : SafeScrollView;
 
   return (
-    <Component
+    <SafeScrollView
+      onReachEnd={() => loadMore(24)}
       edges={{ top: 'padding', bottom: 'maximum' }}
       style={{ flex: empty ? 1 : undefined }}
       showsVerticalScrollIndicator={false}
@@ -193,12 +194,12 @@ export default function Screen() {
           </View>
         )}
       </View>
-      <Text.Base
+      {!canLoadMore && <Text.Base
         style={{ textAlign: 'center', marginVertical: 32, maxWidth: 200, alignSelf: 'center' }}
         color={Colors.neutral[400]}
       >
         You have reached the end of the discover feed.
-      </Text.Base>
-    </Component>
+      </Text.Base>}
+    </SafeScrollView>
   );
 }

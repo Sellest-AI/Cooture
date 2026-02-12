@@ -1,4 +1,5 @@
-import { Id } from "@/lib/convex/api";
+import { api, Id } from "@/lib/convex/api";
+import { useQuery } from "@/lib/convex/client";
 import { downloadImageCrossPlatform } from "@/lib/image/client";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
 import { Badge } from "@ui/badge";
@@ -16,13 +17,13 @@ import { View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
-const Outfit = () => {
-  const { outfit, outfitId } = usePhotoshoot.New();
+const Outfit = ({ id }: { id: Id<'outfits'> }) => {
+  const { data: outfit } = useQuery(api.router.outfits.getOne.anon, { outfitId: id });
 
   const items = outfit?.items.slice(0, 3) || [];
   const remaining = (outfit?.items.length || 0) - items.length;
 
-  if (!outfitId) return null;
+  if (!outfit) return null;
 
   return (
     <View style={{
@@ -121,7 +122,8 @@ export default function Screen() {
   const carouselRef = useRef<ICarouselInstance>(null);
 
   const { photoshoot, preset, acceptPrediction, rejectPrediction } = usePhotoshoot(id);
-  const { outfitId } = usePhotoshoot.New();
+
+  const outfitId = photoshoot?.metadata?.outfitId;
 
   const items = (photoshoot?.predictions ?? []).map((p) => ({
     _id: p.predictionId,
@@ -181,7 +183,7 @@ export default function Screen() {
           contentFit="cover"
           contentPosition="top center"
         />
-        <Outfit />
+        {outfitId && <Outfit id={outfitId} />}
       </SafeAreaView>
       <View style={{
         marginTop: 28,

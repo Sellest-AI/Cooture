@@ -209,19 +209,19 @@ export const Slider = ({ value, label, labels, onValueChange, style, customHeigh
         {labels && <View className="absolute top-0 left-0 flex-row items-center w-full h-full">
           {labels.map((labelItem, index) => {
             const maxTranslation = width - KNOB_SIZE;
-            const position = labelItem.value * maxTranslation + KNOB_SIZE / 2;
+            const position = labelItem.value * maxTranslation;
 
             return (
               <LabelIndicator
                 key={index}
-                position={position}
+                position={position + (KNOB_SIZE / 2)}
                 translationX={translationX}
                 knobSize={KNOB_SIZE}
                 trackHeight={TRACK_HEIGHT}
                 onPress={() => {
                   // Snap to closest label
-                  translationX.value = withSpring(labelItem.value * maxTranslation);
-                  runOnJS(updateValue)(translationX.value);
+                  translationX.value = withSpring(position);
+                  runOnJS(updateValue)(position);
                 }}
               />
             );

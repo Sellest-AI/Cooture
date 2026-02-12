@@ -45,6 +45,7 @@ export function Screen() {
         return (
           <View style={{ marginBottom: 24, marginLeft, marginRight, paddingTop: 3 }}>
             <Collection
+              backgroundColor={item.backgroundColor}
               source={item.cover.sizes.small.url}
               contentFit="contain"
               title={item.name}

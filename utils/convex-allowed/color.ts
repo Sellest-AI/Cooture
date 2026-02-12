@@ -10,21 +10,21 @@ export function hslStringToHsl(hsl: string): [number, number, number] | null {
 }
 
 // Generate a darker color
-export function getDarkerHsl(hsl: [number, number, number], amount: number): [number, number, number] {
+export function getDarkerHsl(hsl: [number, number, number], amount: number, cap = 0): [number, number, number] {
   const [h, s, l] = hsl;
-  return [h, s, Math.max(l - amount, 0)]; // Reduce lightness but ensure it's >= 0
+  return [h, s, Math.max(l - amount, cap)]; // Reduce lightness but ensure it's >= 0
 }
 
 // Generate a lighter color
-export function getLighterHsl(hsl: [number, number, number], amount: number): [number, number, number] {
+export function getLighterHsl(hsl: [number, number, number], amount: number, cap = 100): [number, number, number] {
   const [h, s, l] = hsl;
-  return [h, s, Math.min(l + amount, 100)]; // Reduce lightness but ensure it's >= 0
+  return [h, s, Math.min(l + amount, cap)]; // Reduce lightness but ensure it's >= 0
 }
 
 // Generate saturated color
-export function getSaturatedHsl(hsl: [number, number, number], amount: number): [number, number, number] {
+export function getSaturatedHsl(hsl: [number, number, number], amount: number, cap = 100): [number, number, number] {
   const [h, s, l] = hsl;
-  return [h, Math.min(s + amount, 100), l]; // Increase saturation but ensure it's <= 100
+  return [h, Math.min(s + amount, cap), l]; // Increase saturation but ensure it's <= 100
 }
 
 export const hslWithAlpha = (color: string, alpha: number) => {
@@ -50,6 +50,12 @@ export function hslToHex(h: number, s: number, l: number) {
 export function parseColorToHsl(color: string): [number, number, number] | null {
   // Check if computedColor is in HEX format and convert to RGB if necessary
   let r: number, g: number, b: number;
+
+  if (color.startsWith('hsl(')) {
+    const hsl = color.match(/\d+/g)?.map(Number);
+    if (!hsl || hsl.length < 3) return null;
+    return [hsl[0]!, hsl[1]!, hsl[2]!];
+  }
 
   if (/^#[0-9A-Fa-f]{6}$/.test(color)) {
     // Parse HEX to RGB
@@ -132,4 +138,94 @@ export function parseColorToHslCanvas(color: string): [number, number, number] |
   }
 
   return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+}
+
+/**
+ * Extract the dominant vibrant color from an array of hex colors
+ * Improved version with better color clustering and selection
+ */
+export function extractDominantVibrantColor(
+  colors: string[],
+  useAverage: boolean = false // Set to true for averaged color, false for most vibrant
+): string | null {
+  if (!colors.length) return null;
+
+  // Convert all colors to HSL
+  const hslColors = colors
+    .map(color => parseColorToHsl(color))
+    .filter((hsl): hsl is [number, number, number] => hsl !== null);
+
+  if (!hslColors.length) return null;
+
+  // Filter out very light (near white) and very dark (near black) colors
+  // and very desaturated (gray) colors
+  const filteredColors = hslColors.filter(([h, s, l]) => {
+    return l > 15 && l < 85 && s > 10; // Keep colors with some saturation and reasonable lightness
+  });
+
+  if (!filteredColors.length) {
+    // Fallback to all colors if filtering removed everything
+    return hslToString(...hslColors[0]!);
+  }
+
+  // Group similar colors with tighter clustering
+  const colorGroups: { colors: [number, number, number][]; weight: number }[] = [];
+
+  for (const color of filteredColors) {
+    let addedToGroup = false;
+
+    for (const group of colorGroups) {
+      const representative = group.colors[0]!;
+      const [h1, s1, l1] = representative;
+      const [h2, s2, l2] = color;
+
+      // Calculate hue difference (accounting for circular nature)
+      let hueDiff = Math.abs(h1 - h2);
+      if (hueDiff > 180) hueDiff = 360 - hueDiff;
+
+      // For browns/oranges/reds (0-60), be more lenient with hue
+      // For other colors, be stricter
+      const hueThreshold = (h1 < 60 || h2 < 60) ? 40 : 25;
+
+      if (hueDiff < hueThreshold && Math.abs(s1 - s2) < 25 && Math.abs(l1 - l2) < 25) {
+        group.colors.push(color);
+        group.weight++;
+        addedToGroup = true;
+        break;
+      }
+    }
+
+    if (!addedToGroup) {
+      colorGroups.push({ colors: [color], weight: 1 });
+    }
+  }
+
+  // Sort groups by weight (number of similar colors)
+  colorGroups.sort((a, b) => b.weight - a.weight);
+
+  // Get the dominant group
+  const dominantGroup = colorGroups[0]!;
+
+  if (useAverage) {
+    // Calculate average color of the dominant group for more balanced representation
+    const avgHue = dominantGroup.colors.reduce((sum, [h]) => sum + h, 0) / dominantGroup.colors.length;
+    const avgSat = dominantGroup.colors.reduce((sum, [, s]) => sum + s, 0) / dominantGroup.colors.length;
+    const avgLight = dominantGroup.colors.reduce((sum, [, , l]) => sum + l, 0) / dominantGroup.colors.length;
+
+    return hslToString(Math.round(avgHue), Math.round(avgSat), Math.round(avgLight));
+  } else {
+    // From the dominant group, find the most vibrant/saturated color
+    const mostVibrant = dominantGroup.colors.reduce((best, current) => {
+      const [, s1, l1] = best;
+      const [, s2, l2] = current;
+
+      // Vibrancy score: heavily favor saturation, moderate lightness preference
+      const vibrancy1 = s1 * 1.5 + (50 - Math.abs(l1 - 50));
+      const vibrancy2 = s2 * 1.5 + (50 - Math.abs(l2 - 50));
+
+      return vibrancy2 > vibrancy1 ? current : best;
+    });
+
+    return hslToString(...mostVibrant);
+  }
 }

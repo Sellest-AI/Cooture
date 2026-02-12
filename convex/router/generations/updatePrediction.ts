@@ -1,20 +1,27 @@
 import { removeUndefinedKeys } from "@shared/utils";
 import { v } from "convex/values";
 import { Doc, Id } from "../../_generated/dataModel";
+import { upsertFeedScore } from "../../functions/feed";
 import { authMutation, internalMutation, MutationCtx } from "../../procedures";
 import { PREDICTION_STATUS } from "../../schema/generations";
 
 const updateGenerationStatus = async (ctx: MutationCtx, generationId: Id<'generations'>) => {
   const generation = await ctx.db.get(generationId);
   if (!generation) return;
-  if (generation.status === "COMPLETED") return;
 
   // Check if all predictions are completed
   const predictions = await ctx.db.query("predictions").withIndex("by_generation_id", (q) =>
     q.eq("generationId", generationId)).collect();
 
-  const COMPLETED_STATUSES = ["ACCEPTED", "REJECTED", "FAILED"];
-  const allCompleted = predictions.every(prediction => COMPLETED_STATUSES.includes(prediction.status));
+  const allRejected = predictions.every(prediction => ["REJECTED", "FAILED"].includes(prediction.status));
+  const allCompleted = predictions.every(prediction => ["ACCEPTED", "REJECTED", "FAILED"].includes(prediction.status));
+
+  // Archive the feed score if all predictions are rejected, otherwise unarchive it
+  if (allCompleted)
+    await upsertFeedScore(ctx, { generationId: generation._id, archive: allRejected });
+
+  // If the generation is already marked as completed, we don't want to change it back to loading or pending
+  if (generation.status === "COMPLETED") return;
 
   if (allCompleted)
     return ctx.db.patch(generationId, { status: "COMPLETED", completedAt: Date.now() });
@@ -22,7 +29,7 @@ const updateGenerationStatus = async (ctx: MutationCtx, generationId: Id<'genera
   const hasLoading = predictions.some(prediction => prediction.status === "LOADING");
   if (hasLoading) return ctx.db.patch(generationId, { status: "LOADING" });
 
-  return ctx.db.patch(generationId, { status: "PENDING" });
+  await ctx.db.patch(generationId, { status: "PENDING" });
 }
 
 const updatePrediction = async (ctx: MutationCtx, args: {

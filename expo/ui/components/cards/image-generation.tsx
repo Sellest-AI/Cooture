@@ -21,7 +21,6 @@ type ImageGenerationProps = {
 }
 
 export const ImageGeneration = ({ text, textScale = 1, source, disabled, loading, style, onDownload, onPresss }: ImageGenerationProps) => {
-
   const [downloading, setDownloading] = useState(false);
 
   return (

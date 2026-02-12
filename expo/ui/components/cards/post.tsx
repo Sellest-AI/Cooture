@@ -19,11 +19,13 @@ type Props = {
     _id: string;
     url: string;
     contentFit?: 'cover' | 'contain';
+    backgroundColor?: string;
   }
   images?: {
     _id: string;
     url: string;
     contentFit?: 'cover' | 'contain';
+    backgroundColor?: string;
   }[]
   likedAccounts?: string[];
   user?: {
@@ -124,7 +126,7 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
                 width: Dimensions.get('window').width - (PADDING_HORIZONTAL * 2),
                 aspectRatio: 3 / 4,
                 zIndex: pinching && pinching.index === index ? 10 : 0,
-                backgroundColor: Colors.blur.dark,
+                backgroundColor: img?.backgroundColor ?? Colors.blur.dark,
                 borderRadius: 32,
               }}>
               {img && <ZoomableImage
@@ -134,8 +136,8 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
                 width={Dimensions.get('window').width - (PADDING_HORIZONTAL * 2)}
                 aspectRatio={3 / 4}
                 style={{
-                  backgroundColor: Colors.blur.dark,
                   borderRadius: 32,
+                  backgroundColor: img?.backgroundColor ?? Colors.blur.dark,
                   borderColor: !pinching ? Colors.blur.medium : undefined,
                   borderTopWidth: 1,
                   flex: 1,

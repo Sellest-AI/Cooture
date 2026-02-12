@@ -31,8 +31,8 @@ export const Squirish = ({
       ]}
     >
       <Svg
-        width={size ?? style?.width ?? style?.height}
-        height={size ?? style?.height ?? style?.width}
+        width={size}
+        height={size}
         viewBox="0 0 86 87"
         fill="none"
       >

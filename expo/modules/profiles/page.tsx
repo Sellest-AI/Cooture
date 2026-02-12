@@ -74,7 +74,7 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
         y: Dimensions.get('screen').height - 32,
         animated: true
       });
-    }, 300);
+    }, 1000);
   };
 
   const panResponder = useRef(

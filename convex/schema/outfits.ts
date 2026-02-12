@@ -6,6 +6,7 @@ export const outfits = defineTable({
   updatedAt: v.number(),
   userId: v.id("users"),
   coverId: v.optional(v.id("images")),
+  backgroundColor: v.optional(v.string()),
 })
   .index("by_user_id", ["userId"]);
 

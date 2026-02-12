@@ -12,11 +12,10 @@ import { useCallback, useMemo } from "react";
 import { ViewStyle } from "react-native";
 import { Colors } from "theme";
 
-const UserPost = ({ postId, style }: { postId: Id<'predictions'>, style?: ViewStyle }) => {
+const UserPost = ({ postId, style }: { postId: Id<'generations'>, style?: ViewStyle }) => {
   const { push } = useRouter('/post/[id]');
-  const { data: post } = useQueryCached(api.router.post.getOne.anon, { id: postId });
-  const predictions = post ? [post, ...post.generationPredictions.filter((p) => p.status === 'ACCEPTED')] : [];
-  const imageIds = predictions.map((p) => p.imageId).filter(notEmpty);
+  const { data: post } = useQuery(api.router.generations.getOne.anon, { id: postId });
+  const imageIds = post?.predictions.map((p) => p.imageId).filter(notEmpty) ?? [];
   const { data: images } = useQueryCached(api.router.storage.images.getMany.anon, imageIds.length > 0 ? { imageIds } : 'skip');
 
   if (!post) return <Post.Skeleton style={{ ...style, paddingHorizontal: 12 }} />;
@@ -24,17 +23,17 @@ const UserPost = ({ postId, style }: { postId: Id<'predictions'>, style?: ViewSt
   return (<Post
     style={{ ...style }}
     paddingHorizontal={12}
-    postedAt={post.readyAt ? new Date(post.readyAt) : undefined}
+    postedAt={post.completedAt ? new Date(post.completedAt) : undefined}
     likedAccounts={[]}
     images={images?.map((img) => ({
-      _id: predictions.find(p => p.imageId === img._id)!._id,
+      _id: post.predictions.find(p => p.imageId === img._id)?._id ?? post.predictions[0]?._id,
       url: img.url,
       contentFit: img.hasAlpha ? 'contain' : 'cover',
     }))}
-    image={post.image ? {
-      _id: post._id,
-      url: post.image.url,
-      contentFit: post.image.hasAlpha ? 'contain' : 'cover',
+    image={post.cover ? {
+      _id: post.predictions.find(p => p.imageId === post.cover!._id)?._id ?? post.predictions[0]?._id,
+      url: post.cover.url,
+      contentFit: post.cover.hasAlpha ? 'contain' : 'cover',
     } : undefined}
     user={post.user ? {
       name: post.user.name ?? 'Anonymous',
@@ -62,18 +61,18 @@ const UserPost = ({ postId, style }: { postId: Id<'predictions'>, style?: ViewSt
 
 export default function Screen() {
   const { id } = useRoute.Params<{ id: Id<'predictions'> }>();
-  const { data: post } = useQuery(api.router.post.getOne.anon, { id });
-  const { data: postsFromUser, isPending } = useQuery(api.router.post.getFromUser.anon, post?.user?._id ? { userId: post?.user?._id } : 'skip');
+  const { data: post } = useQuery(api.router.generations.getFromPrediction.anon, { id });
+  const { data: postsFromUser, isPending } = useQuery(api.router.feed.getFromUser.anon, post?.user?._id ? { userId: post?.user?._id } : 'skip');
 
-  const posts = (postsFromUser ?? []).filter((p) => p.generationId !== post?.generationId)
-    .filter((p, _, arr) => arr.findLast(x => x.generationId === p.generationId)?._id === p._id);
+  const posts = (postsFromUser ?? []).filter((p) => p._id !== post?._id);
 
   const items = useMemo(() => [
-    { id: id },
+    { id: post?._id },
     ...posts.map((p) => ({ id: p._id })),
-  ], [id, posts]);
+  ], [post, posts]);
 
   const renderItem = useCallback(({ item }: { item: typeof items[number] }) => {
+    if (!item.id) return null;
     return <UserPost
       postId={item.id}
       style={{ marginTop: 8, marginBottom: 28 }}
@@ -95,7 +94,6 @@ export default function Screen() {
       <FlashList
         data={items}
         renderItem={renderItem}
-        removeClippedSubviews={true}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={<>
           <Post.Skeleton style={{ marginBottom: 28, marginHorizontal: 12 }} />

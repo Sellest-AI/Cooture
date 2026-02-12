@@ -13,11 +13,14 @@ const getPublicOutfits = async (ctx: QueryCtx, userId: Id<'users'>) => {
   const detailedOutfits = await Promise.all(outfits.map(async (outfit) => {
     const items = await ctx.db.query('outfitItems')
       .withIndex('by_outfit_id', q => q.eq('outfitId', outfit._id)).collect();
-    if (items.length === 0) return null;
-    const item = await ctx.db.get(items[0].itemId);
-    if (!item) return null;
-    const image = await getImage(ctx, item.imageId);
+
+    const coverId = outfit.coverId ??
+      await ctx.db.get(items[0].itemId).then(item => item?.imageId);
+
+    if (!coverId) return null;
+    const image = await getImage(ctx, coverId);
     if (!image) return null;
+
     return {
       ...outfit,
       items,

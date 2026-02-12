@@ -26,6 +26,10 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children }: Props
   const knobScale = useRef(new Animated.Value(1)).current;
   const [showLoader, setShowLoader] = useState(false);
 
+  // Keep onComplete reference up-to-date to avoid stale closures in PanResponder
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
   const onLayout = (e: any) => {
     setLayoutWidth(e.nativeEvent.layout.width);
   };
@@ -68,7 +72,7 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children }: Props
             if (finished) {
               currentX.current = max;
               setShowLoader(true);
-              onComplete?.();
+              onCompleteRef.current?.();
             }
           });
         }
@@ -94,7 +98,7 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children }: Props
             if (finished) {
               currentX.current = max;
               setShowLoader(true);
-              onComplete?.();
+              onCompleteRef.current?.();
             }
           });
           return;
@@ -111,7 +115,7 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children }: Props
             if (finished) {
               currentX.current = max;
               setShowLoader(true);
-              onComplete?.();
+              onCompleteRef.current?.();
             }
           });
         } else {

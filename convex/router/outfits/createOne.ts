@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
+import { upsertFeedScore } from "../../functions/feed";
 import { authMutation } from "../../procedures";
 
 export const authed = authMutation({
@@ -20,6 +21,8 @@ export const authed = authMutation({
         itemId,
       })
     }
+
+    await upsertFeedScore(ctx, { outfitId: outfit });
 
     await ctx.scheduler.runAfter(0, internal.router.outfits.updateCover._internal, { outfitId: outfit });
 

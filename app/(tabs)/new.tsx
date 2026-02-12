@@ -137,6 +137,7 @@ export default function Screen() {
               onPress={() => push(ROUTES.PHOTOSHOOT.NEW, {
                 params: { outfitId: item._id }
               })}
+              backgroundColor={item.backgroundColor}
               source={item.cover.sizes.small.url}
               title={item.name}
               style={{ width: 132 }}

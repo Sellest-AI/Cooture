@@ -64,8 +64,9 @@ const OutfitGrid = ({ items, style }: { items: Items, style?: ViewStyle }) => {
               marginBottom: 6
             }}>
               <Squirish color={Colors.secondary[500]}
-                size="75%"
+                size={52}
                 style={{
+                  width: '100%',
                   position: 'absolute',
                   alignSelf: 'center',
                 }} />
@@ -241,7 +242,7 @@ export default function Screen() {
           onComplete={async () => {
             if (!presetId) return;
 
-            const timer = setTimeout(() => dismissTo(ROUTES.PHOTOSHOOT.GENERATIONS.NEXT), 4000);
+            const timer = setTimeout(() => dismissTo(ROUTES.PHOTOSHOOT.GENERATIONS.NEXT), 6000);
 
             const generationId = await action({
               presetId: presetId,

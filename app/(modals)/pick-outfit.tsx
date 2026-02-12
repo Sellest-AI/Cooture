@@ -75,6 +75,7 @@ export default function PickOutfitScreen() {
               }}
               >
                 <Collection
+                  backgroundColor={outfit.backgroundColor}
                   source={outfit.cover.sizes.small.url}
                   contentFit="contain"
                   title={outfit.name}
