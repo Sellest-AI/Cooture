@@ -131,7 +131,8 @@ export const useRouter = <T extends Route = Route>(_href?: T) => {
         const newData = { ...d };
         const basePath = (toUrl as string).split('?')[0];
 
-        delete newData[toUrl as string]; // Clear existing data for the target route to avoid stale data issues. It will be replaced with merged data below.
+        // Clear existing data for the target route to avoid stale data issues. It will be replaced with merged data below.
+        delete newData[toUrl as string];
 
         // Merge params (if any) and set reset/redirect for the target URL entry
         newData[toUrl as string] = {
