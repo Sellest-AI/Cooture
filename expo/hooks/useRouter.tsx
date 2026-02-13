@@ -8,8 +8,8 @@ import { atom, getDefaultStore, useAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 type ParamsDefault<T extends Route> =
-  T extends "/photoshoot/create" ? { outfitId?: Id<'outfits'>, presetId?: Id<'presets'> } :
-  T extends "/photoshoot/create/recap" ? { outfitId?: Id<'outfits'>, presetId?: Id<'presets'> } :
+  T extends "/photoshoot/create" ? { outfitId?: Id<'outfits'> | null, presetId?: Id<'presets'> | null } :
+  T extends "/photoshoot/create/recap" ? { outfitId?: Id<'outfits'> | null, presetId?: Id<'presets'> | null } :
   T extends "/pick-outfit" ? { canSkip?: boolean, itemIds?: Id<'items'>[] } :
   T extends "/new-outfit" ? { itemIds?: Id<'items'>[] } :
   T extends "/add-item" ? { outfitId?: Id<'outfits'>, itemIds?: Id<'items'>[] } :
@@ -139,7 +139,7 @@ export const useRouter = <T extends Route = Route>(_href?: T) => {
           ...(newData[toUrl as string] ?? {}),
           ...(options?.params ?? {}),
           redirectTo: redirect,
-          reset: true,
+          reset: resetNextRoute ?? true,
         };
 
         // If resetNextRoute is true, propagate reset to nested routes (children)

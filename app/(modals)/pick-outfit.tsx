@@ -89,7 +89,8 @@ export default function PickOutfitScreen() {
 
                     redirect({
                       params: { outfitId: outfit._id },
-                      fallbackTo: ['back', ROUTES.PROFILE.OUTFITS]
+                      fallbackTo: ['back', ROUTES.PROFILE.OUTFITS],
+                      resetNextRoute: false
                     });
                   }}
                 />
@@ -110,7 +111,7 @@ export default function PickOutfitScreen() {
         <Button
           variant="blur"
           onPress={() => {
-            redirect({ params: { outfitId: undefined } });
+            redirect({ params: { outfitId: null }, resetNextRoute: false });
           }}>
           Skip
         </Button>

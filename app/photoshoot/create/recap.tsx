@@ -206,6 +206,8 @@ export default function Screen() {
   useRoute(ROUTES.PHOTOSHOOT.RECAP, {
     resetFnc: reset,
     onInit: ({ outfitId, presetId }) => {
+      if (outfitId === null) setOutfitId(null);
+      if (presetId === null) setPresetId(null);
       if (outfitId) setOutfitId(outfitId);
       if (presetId) setPresetId(presetId);
     }

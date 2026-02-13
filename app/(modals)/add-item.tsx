@@ -106,7 +106,11 @@ export default function AddItemScreen() {
             }
 
             await updateItems(innerItems);
-            redirect({ params: { itemIds: innerItems }, fallbackTo: ['back', '/'] });
+            redirect({
+              params: { itemIds: innerItems },
+              fallbackTo: ['back', '/'],
+              resetNextRoute: false
+            });
           }}
         >
           Save Selection

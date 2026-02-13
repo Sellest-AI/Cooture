@@ -118,7 +118,8 @@ export default function NewOutfitScreen() {
               const outfit = await saveOutfit();
               redirect({
                 params: { outfitId: outfit },
-                fallbackTo: ['back', ROUTES.OUTFIT.ID(outfit)]
+                fallbackTo: ['back', ROUTES.OUTFIT.ID(outfit)],
+                resetNextRoute: false
               });
             }}
           >
