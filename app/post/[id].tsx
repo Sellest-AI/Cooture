@@ -96,6 +96,7 @@ export default function Screen() {
         data={items}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
+        keyExtractor={(i, index) => i?.id ?? `${index}`}
         ListEmptyComponent={<>
           <Post.Skeleton style={{ marginBottom: 28, marginHorizontal: 12 }} />
           <Post.Skeleton style={{ marginBottom: 28, marginHorizontal: 12 }} />

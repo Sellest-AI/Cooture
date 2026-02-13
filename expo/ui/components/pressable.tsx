@@ -32,7 +32,9 @@ export const Pressable = ({ disabled, onPress, children, intensity = 0.98, style
     }).start();
   };
 
-  const { margin, marginTop, marginBottom, width, top, left, minHeight, height, ...filteredStyle } = (style ?? {}) as ViewStyle;
+  const {
+    margin, marginTop, marginBottom, width, top,
+    left, minHeight, height, position, bottom, right, ...filteredStyle } = (style ?? {}) as ViewStyle;
 
   return (
     <NativePressable
@@ -46,8 +48,11 @@ export const Pressable = ({ disabled, onPress, children, intensity = 0.98, style
         margin,
         marginTop,
         marginBottom,
+        bottom,
+        right,
         top,
-        left
+        left,
+        position
       }}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}

@@ -77,6 +77,7 @@ import type * as router_admin_generateOutfitsCover from "../router/admin/generat
 import type * as router_auth_linkStripeSubscription from "../router/auth/linkStripeSubscription.js";
 import type * as router_auth_postCreateOrUpdate from "../router/auth/postCreateOrUpdate.js";
 import type * as router_examples_query from "../router/examples/query.js";
+import type * as router_feed_getFromOutfit from "../router/feed/getFromOutfit.js";
 import type * as router_feed_getFromUser from "../router/feed/getFromUser.js";
 import type * as router_feed_getPaginated from "../router/feed/getPaginated.js";
 import type * as router_generations_createOne from "../router/generations/createOne.js";
@@ -212,6 +213,7 @@ declare const fullApi: ApiFromModules<{
   "router/auth/linkStripeSubscription": typeof router_auth_linkStripeSubscription;
   "router/auth/postCreateOrUpdate": typeof router_auth_postCreateOrUpdate;
   "router/examples/query": typeof router_examples_query;
+  "router/feed/getFromOutfit": typeof router_feed_getFromOutfit;
   "router/feed/getFromUser": typeof router_feed_getFromUser;
   "router/feed/getPaginated": typeof router_feed_getPaginated;
   "router/generations/createOne": typeof router_generations_createOne;

@@ -120,7 +120,8 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
         viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
         renderItem={({ item: img, index }) => {
           return (
-            <View
+            <Pressable
+              onPress={() => img && onPress?.(img._id)}
               key={img?.url ?? index}
               style={{
                 width: Dimensions.get('window').width - (PADDING_HORIZONTAL * 2),
@@ -179,7 +180,7 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
                     />}
                 </Pressable>}
               </View>}
-            </View>
+            </Pressable>
           )
         }}
       />

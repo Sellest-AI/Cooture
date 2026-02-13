@@ -41,6 +41,7 @@ export const anon = publicQuery({
       _id: user._id,
       _creationTime: user._creationTime,
       name: user.name,
+      username: user.name,
       image: user.image,
     }
   }

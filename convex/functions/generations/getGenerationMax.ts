@@ -35,8 +35,15 @@ export const getGenerationMax = async (ctx: QueryCtx, generationId: Id<'generati
     items: items.filter(notEmpty),
   } : null;
 
+  const sanitizedUser = user ? {
+    _id: user._id,
+    name: user.name,
+    username: user.name,
+    image: user.image,
+  } : null;
+
   return {
-    user: user || null,
+    user: sanitizedUser,
     cover: image || null,
     ...metadata,
     ...generation,

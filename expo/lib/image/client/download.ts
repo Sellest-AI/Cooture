@@ -1,6 +1,6 @@
 import { File, Paths } from 'expo-file-system';
 import { createAlbumAsync, createAssetAsync, requestPermissionsAsync } from 'expo-media-library';
-import { Alert, Platform } from 'react-native';
+import { Platform } from 'react-native';
 
 // reuse your existing web download implementation
 import { uriToImage } from './base64/uri-to-file';
@@ -46,8 +46,10 @@ export async function downloadImageCrossPlatform(source: string) {
 
   if (canSaveToLibrary) {
     const asset = await createAssetAsync(localUri);
-    try { await createAlbumAsync('Cooture', asset, false); } catch { }
-    Alert.alert('Saved', 'Image saved to your photos.', undefined, { userInterfaceStyle: 'dark' });
+    try {
+      await createAlbumAsync('Cooture', asset, false);
+    } catch { }
+    // Alert.alert('Saved', 'Image saved to your photos.', undefined, { userInterfaceStyle: 'dark' });
     return;
   }
 

@@ -74,9 +74,9 @@ const Card = ({ style, icon: Icon, title, description }: CardProps) => {
         )}
       </View>
       <View style={{ gap: 6, flex: 1 }}>
-        <Text.Lg color={Colors.neutral[50]} >
+        <Text.Base color={Colors.neutral[50]} weight={700}>
           {title}
-        </Text.Lg>
+        </Text.Base>
         {typeof description === 'string' ? (
           <Text.Base color={Colors.neutral[400]} style={{ textBalance: true }}>
             {description}
@@ -103,7 +103,7 @@ const CardPeriod = ({ onPress, title, children, extra, badge, selected }: CardPe
     <Pressable
       onPress={onPress}
       style={{
-        minHeight: 168,
+        minHeight: 164,
         flex: 1,
       }}
     >
@@ -124,7 +124,7 @@ const CardPeriod = ({ onPress, title, children, extra, badge, selected }: CardPe
           backgroundColor: selected ? Colors.primary[900] : Colors.blur.dark,
         }}
       >
-        <View style={{ marginBottom: 24 }}>
+        <View style={{ marginBottom: 20 }}>
           <Text.Base color={selected ? Colors.primary[200] : Colors.neutral[200]} style={{ marginBottom: 2 }}>
             {title}
           </Text.Base>
@@ -163,7 +163,7 @@ export default function Screen() {
           style={{ opacity: 0.3, position: 'absolute', width: '100%', height: '100%', top: 0, left: 0 }}
         />
       }
-      headerContent={<View style={{ height: 232 }} />}
+      headerContent={<View style={{ height: 224 }} />}
       contentNegativeSpace={212}
     >
       <View style={{ padding: 12, paddingBottom: 20, paddingTop: 40 }}>
@@ -208,12 +208,6 @@ export default function Screen() {
           style={{ marginBottom: 24 }}
         />
         <Card
-          icon={"🏷️"}
-          title="Reduced Fees"
-          description="30% on all generations"
-          style={{ marginBottom: 24 }}
-        />
-        <Card
           icon={"🎨"}
           title="Custom Presets"
           description="Turn any image into a replicable preset"
@@ -223,6 +217,12 @@ export default function Screen() {
           icon={"⚡"}
           title="Better Rewards"
           description="3x more credits when completing a quest."
+          style={{ marginBottom: 24 }}
+        />
+        <Card
+          icon={"🏷️"}
+          title="Reduced Fees"
+          description="30% on all generations"
           style={{ marginBottom: 24 }}
         />
       </View>

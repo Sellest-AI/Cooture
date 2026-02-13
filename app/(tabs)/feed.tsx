@@ -83,7 +83,7 @@ const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle }) => 
     postedAt={outfit._creationTime ? new Date(outfit._creationTime) : undefined}
     likedAccounts={[]}
     image={cover}
-    // onPress={() => }
+    onPress={() => push(ROUTES.OUTFIT.PATH, { pathParams: { id: outfit._id } })}
     user={user ? {
       name: user.name ?? 'Anonymous',
       username: user.name ?? 'anon',
