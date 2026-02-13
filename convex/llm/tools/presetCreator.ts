@@ -115,6 +115,8 @@ export const ImagePresetSchema = z.object({
     cameraPosition: z.string().describe("Camera position relative to subject: e.g., 'Frontal', 'Three-quarter left', 'Three-quarter right', 'Profile', 'From behind'."),
     subjectPlacement: z.string().describe("Subject position in frame: e.g., 'Centered', 'Left third of frame', 'Right side', 'Off-center right'."),
     focus: z.string().describe("Depth: e.g., 'Deep focus', 'Subject sharp, background slightly visible'."),
+    photographicTricks: z.array(z.string()).describe("List of optical illusions or camera tricks used. Examples: 'Giant hand in extreme foreground creating forced perspective illusion', 'Mirror reflection trick', 'Tilt-shift miniature effect', 'Double exposure blend'. If no special tricks are used, return empty array."),
+    backgroundOrientation: z.string().describe("Orientation of background elements (especially moving ones like trains, cars, crowds) relative to camera. E.g., 'Parallel/Horizontal - train moving left to right across frame', 'Three-quarter angle - train receding into distance', 'Perpendicular - train coming toward/away from camera'. Important for perspective lines."),
   }),
 
   // --- 6. TECHNICAL (RENDERING) ---

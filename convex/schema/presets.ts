@@ -32,6 +32,8 @@ export const PRESET_PROMPT = v.object({
     cameraAngle: v.string(),
     cameraPosition: v.string(),
     subjectPlacement: v.string(),
+    photographicTricks: v.array(v.string()),
+    backgroundOrientation: v.string(),
     focus: v.string(),
   }),
   technical: v.object({
@@ -63,7 +65,9 @@ export const presets = defineTable({
   name: v.string(),
   imageIds: v.array(v.id("images")),
   prompts: v.array(PRESET_PROMPT),
+  archived: v.boolean(),
 })
+  .index("by_archived", ["archived"])
 
 export const presetGenerations = defineTable({
   presetId: v.id("presets"),

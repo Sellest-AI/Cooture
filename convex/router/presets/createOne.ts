@@ -38,6 +38,7 @@ export const _internal_mutation = internalMutation({
       name,
       imageIds,
       prompts,
+      archived: false,
     })
 
     return presetId;
