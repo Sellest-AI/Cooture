@@ -144,11 +144,11 @@ export default function Screen() {
                   {posts.length > 0 && (
                     <Grid style={{ height: HEIGHT, gap: GAP }}>
                       <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
-                        {posts[0] ? <Post id={posts[0]._id} type={posts[0].type} style={{ flex: 1, borderTopLeftRadius: 8 }} /> : <Skeleton style={{ flex: 1 }} />}
-                        {posts[1] ? <Post id={posts[1]._id} type={posts[1].type} style={{ flex: 1 }} /> : <Skeleton style={{ flex: 1 }} />}
+                        {posts[1] ? <Post id={posts[1]._id} type={posts[1].type} style={{ flex: 1, borderTopLeftRadius: 8 }} /> : <Skeleton style={{ flex: 1 }} />}
+                        {posts[2] ? <Post id={posts[2]._id} type={posts[2].type} style={{ flex: 1 }} /> : <Skeleton style={{ flex: 1 }} />}
                       </Col>
                       <Col size={2}>
-                        {posts[2] ? <Post id={posts[2]._id} type={posts[2].type} style={{ flex: 1, borderTopRightRadius: 8 }} /> : <Skeleton style={{ flex: 1 }} />}
+                        {posts[0] ? <Post id={posts[0]._id} type={posts[0].type} style={{ flex: 1, borderTopRightRadius: 8 }} /> : <Skeleton style={{ flex: 1 }} />}
                       </Col>
                     </Grid>
                   )}
