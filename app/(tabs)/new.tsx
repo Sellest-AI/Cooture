@@ -39,13 +39,6 @@ export default function Screen() {
         }}
       />
       <Button
-        variant="primary"
-        onPress={() => push('/upgrade')}
-        style={{ marginTop: 8, marginHorizontal: 12, marginBottom: 8 }}
-      >
-        Upgrade
-      </Button>
-      <Button
         variant="blur"
         onPress={() => push('/presets/new')}
         style={{ marginTop: 8, marginHorizontal: 12, marginBottom: 8 }}

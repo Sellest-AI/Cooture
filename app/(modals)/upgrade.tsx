@@ -62,7 +62,13 @@ const Card = ({ style, icon: Icon, title, description }: CardProps) => {
         justifyContent: 'center'
       }}>
         {typeof Icon === 'string' ? (
-          <Text.Base style={{ position: 'absolute', left: '50%', transform: [{ translateX: -1 }], fontSize: 20 }}>{Icon}</Text.Base>
+          <Text.Base style={{
+            position: 'absolute',
+            left: '50%',
+            transform: [{ translateX: -1 }],
+            fontSize: 20,
+            lineHeight: 24
+          }}>{Icon}</Text.Base>
         ) : (
           <Icon size={24} color={Colors.primary[200]} />
         )}
