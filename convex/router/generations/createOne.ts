@@ -16,6 +16,7 @@ export const _internal = internalMutation({
     const generationId = await ctx.db.insert("generations", {
       userId,
       status: "LOADING",
+      publication: "DRAFT",
     });
 
     await Promise.all(predictionIds.map(predictionId => ctx.db.insert('predictions', {

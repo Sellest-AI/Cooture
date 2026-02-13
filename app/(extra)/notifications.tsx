@@ -18,9 +18,10 @@ import { Colors } from "theme";
 
 type Props = {
   generationId: Id<'generations'>;
-  status: 'PENDING' | 'COMPLETED' | 'LOADING';
+  status: 'PENDING' | 'LOADING' | 'COMPLETED';
+  completed: boolean;
 }
-const Notification = ({ generationId, status }: Props) => {
+const Notification = ({ generationId, completed, status }: Props) => {
   const { data: generation, isPending } = useQueryCached(api.router.generations.getOne.authed, { generationId: generationId });
   const presetId = generation?.metadata?.presetId;
   const { data: preset, isPending: presetPending } = useQueryCached(api.router.presets.getOne.anon, presetId ? { presetId } : 'skip');
@@ -29,7 +30,7 @@ const Notification = ({ generationId, status }: Props) => {
     style={{ height: 76, width: '100%', marginBottom: 20 }}
   />
 
-  const Component = status === 'COMPLETED' ? View : Block;
+  const Component = completed ? View : Block;
 
   return (
     <Pressable
@@ -42,8 +43,8 @@ const Notification = ({ generationId, status }: Props) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: 12,
-          paddingHorizontal: status === "COMPLETED" ? 8 : 12,
-          marginBottom: status === 'COMPLETED' ? 8 : 16,
+          paddingHorizontal: completed ? 8 : 12,
+          marginBottom: completed ? 8 : 16,
           borderRadius: 28,
           gap: 24,
           overflow: 'hidden',
@@ -59,7 +60,7 @@ const Notification = ({ generationId, status }: Props) => {
           }
           <View style={{ gap: 3, overflow: 'hidden', flex: 1, minWidth: 0 }}>
             <Text.Base color={Colors.neutral[50]} weight={600} numberOfLines={1}>
-              {status === 'COMPLETED' ? 'Your images are ready' :
+              {completed ? 'Your images are ready' :
                 status === 'PENDING' ? 'Click to approve images' :
                   'Generating your images...'}
             </Text.Base>
@@ -152,6 +153,7 @@ export default function Screen() {
           key={generation._id}
           generationId={generation._id}
           status={generation.status}
+          completed={generation.status === 'COMPLETED'}
         />
       ))}
       {pendingGenerations.length > 0 &&
@@ -163,6 +165,7 @@ export default function Screen() {
           key={generation._id}
           generationId={generation._id}
           status={generation.status}
+          completed={generation.status === 'COMPLETED'}
         />
       ))}
       {(data.status === "CanLoadMore" || data.isLoading) && <>

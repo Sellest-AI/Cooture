@@ -15,7 +15,7 @@ export const authed = authQuery({
 
     const generations = await Promise.all(result.page.map(async g => ({
       ...g,
-      ...(await getGenerationDetails(ctx, g._id))
+      ...(await getGenerationDetails(ctx, g._id)),
     })));
 
     return {
@@ -35,7 +35,7 @@ export const anon = publicQuery({
     const result = await ctx.db.query("generations")
       .withIndex("by_user_id", (q) => q.eq("userId", userId))
       .order("desc")
-      .filter(q => q.eq(q.field("status"), "COMPLETED"))
+      .filter(q => q.eq(q.field("publication"), "PUBLISHED"))
       .paginate(paginationOpts);
 
     const generations = await Promise.all(result.page.map(async g => {

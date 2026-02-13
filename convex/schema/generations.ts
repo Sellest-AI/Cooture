@@ -15,6 +15,12 @@ export const GENERATION_STATUS = v.union(
   v.literal("COMPLETED"),
 )
 
+export const PUBLICATION_STATUS = v.union(
+  v.literal("DRAFT"),
+  v.literal("PUBLISHED"),
+  v.literal("ARCHIVED"),
+)
+
 export const predictions = defineTable({
   imageId: v.optional(v.id("images")),
   generationId: v.optional(v.id("generations")),
@@ -30,6 +36,7 @@ export const generations = defineTable({
   userId: v.id("users"),
   status: GENERATION_STATUS,
   completedAt: v.optional(v.number()), // timestamp in ms
+  publication: PUBLICATION_STATUS,
 })
-  .index("by_status_and_user_id", ["status", "userId"])
+  .index("by_publication_status_and_user_id", ["publication", "userId"])
   .index("by_user_id", ["userId"]);

@@ -20,11 +20,21 @@ const updateGenerationStatus = async (ctx: MutationCtx, generationId: Id<'genera
   if (allCompleted)
     await upsertFeedScore(ctx, { generationId: generation._id, archive: allRejected });
 
-  // If the generation is already marked as completed, we don't want to change it back to loading or pending
-  if (generation.status === "COMPLETED") return;
+  // Get the latest readyAt timestamp among predictions to set as completedAt for the generation
+  const completedAt = predictions.sort((a, b) => (b.readyAt ?? 0) - (a.readyAt ?? 0))[0]?.readyAt
+    ?? generation.completedAt ?? Date.now();
 
-  if (allCompleted)
-    return ctx.db.patch(generationId, { status: "COMPLETED", completedAt: Date.now() });
+  // Archive or publish the generation depending on the predictions status
+  if (allCompleted) {
+    if (allRejected && generation.publication === "ARCHIVED") return;
+    if (!allRejected && generation.publication !== "ARCHIVED") return;
+    await ctx.db.patch(generationId, {
+      status: "COMPLETED",
+      completedAt: completedAt,
+      publication: allRejected ? "ARCHIVED" : "PUBLISHED"
+    });
+    return;
+  }
 
   const hasLoading = predictions.some(prediction => prediction.status === "LOADING");
   if (hasLoading) return ctx.db.patch(generationId, { status: "LOADING" });
