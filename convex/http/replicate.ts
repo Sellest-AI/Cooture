@@ -1,4 +1,4 @@
-import { parseReplicateOutput, parseReplicateWebhook } from "@/lib/replicate/utils";
+import { parseReplicateWebhook, parseReplicateWebhookOutput } from "@/lib/replicate/utils";
 import { internal } from "../_generated/api";
 import { httpAction } from "../_generated/server";
 
@@ -6,7 +6,7 @@ export const replicateHandler = httpAction(async (ctx, request) => {
   // Handle the Replicate webhook request here
   const json = await request.json();
   const body = parseReplicateWebhook(json);
-  const output = parseReplicateOutput(body.output);
+  const output = parseReplicateWebhookOutput(body.output);
 
   const userId = await ctx.runQuery(internal.router.generations.getUser._internal, { predictionId: body.id });
 

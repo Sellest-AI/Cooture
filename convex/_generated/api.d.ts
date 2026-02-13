@@ -62,6 +62,7 @@ import type * as llm_config_providers from "../llm/config/providers.js";
 import type * as llm_rag_rag from "../llm/rag/rag.js";
 import type * as llm_tools_itemCategorizer from "../llm/tools/itemCategorizer.js";
 import type * as llm_tools_presetCreator from "../llm/tools/presetCreator.js";
+import type * as llm_triggers_generateDepthMap from "../llm/triggers/generateDepthMap.js";
 import type * as llm_triggers_itemCategorizer from "../llm/triggers/itemCategorizer.js";
 import type * as llm_triggers_photoshoot from "../llm/triggers/photoshoot.js";
 import type * as llm_triggers_presetCreator from "../llm/triggers/presetCreator.js";
@@ -196,6 +197,7 @@ declare const fullApi: ApiFromModules<{
   "llm/rag/rag": typeof llm_rag_rag;
   "llm/tools/itemCategorizer": typeof llm_tools_itemCategorizer;
   "llm/tools/presetCreator": typeof llm_tools_presetCreator;
+  "llm/triggers/generateDepthMap": typeof llm_triggers_generateDepthMap;
   "llm/triggers/itemCategorizer": typeof llm_triggers_itemCategorizer;
   "llm/triggers/photoshoot": typeof llm_triggers_photoshoot;
   "llm/triggers/presetCreator": typeof llm_triggers_presetCreator;

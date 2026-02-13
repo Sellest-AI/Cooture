@@ -39,7 +39,7 @@ export const parseReplicateWebhook = (body: unknown) => {
   return result.data satisfies ReplicateWebhookPayload;
 };
 
-export const parseReplicateOutput = (output: unknown) => {
+export const parseReplicateWebhookOutput = (output: unknown) => {
   if (typeof output === 'string') {
     return [output];
   } else if (Array.isArray(output)) {
@@ -47,4 +47,13 @@ export const parseReplicateOutput = (output: unknown) => {
   } else {
     throw new Error('Unexpected Replicate output format');
   }
+}
+
+export const parseReplicateRunOutput = async (output: object) => {
+  // Output is an array of FileOutput objects
+  const outputs = Array.isArray(output) ? output : [output];
+  return await Promise.all(outputs.map(async (fileOutput: { blob: () => Promise<Blob> }) => {
+    const blob = await fileOutput.blob();
+    return Buffer.from(await blob.arrayBuffer());
+  }));
 }

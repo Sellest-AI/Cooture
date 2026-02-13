@@ -9,6 +9,7 @@ import { PRESET_PROMPT } from "../../schema/presets";
 
 type Schema = {
   prompt: typeof PRESET_PROMPT['type'];
+  depthMap?: Id<'images'>,
   images: { url: string; hasAlpha: boolean }[];
 }
 
@@ -201,6 +202,30 @@ const orderSchema = async (schema: Schema): Promise<Schema> => {
   }
 }
 
+const addDepthMap = async (ctx: ActionCtx, schema: Schema): Promise<Schema> => {
+  if (schema.depthMap === undefined) return schema;
+
+  const image = await ctx.runQuery(internal.router.storage.images.getOne._internal, { id: schema.depthMap })
+  if (!image) return schema;
+
+  const index = schema.images.length + 1;
+  const images = [...schema.images, { url: image.sizes.medium.url, hasAlpha: image.hasAlpha }];
+
+  const prompt = {
+    ...schema.prompt,
+    composition: {
+      ...schema.prompt.composition,
+      depthMapReference: `Use the depth map from the reference image ${index}. Use it as a guide for depth and perspective. Don't copy the exact depth map.`
+    }
+  }
+
+  return {
+    ...schema,
+    images,
+    prompt,
+  }
+}
+
 export const authed = authAction({
   args: {
     presetId: v.id("presets"),
@@ -216,11 +241,13 @@ export const authed = authAction({
     const preset = await ctx.runQuery(internal.router.presets.getOne._internal, { presetId: args.presetId });
     if (!preset) throw new Error("Preset not found");
 
-    let schema: Schema = { prompt: preset.prompts[0], images: [] }
+    let schema: Schema = { prompt: preset.prompts[0], depthMap: preset.depthMaps[0], images: [] }
     schema = await updateSubject(ctx, schema, ctx.userId);
     schema = await updateOutfit(ctx, schema, args.outfit);
     schema = await updateHeight(schema, args.subject);
     schema = await updateStyle(schema);
+    schema = await addDepthMap(ctx, schema);
+    // Last step to ensure the schema is in the correct order for the LLM prompt
     schema = await orderSchema(schema);
 
     const AMOUNT_OF_IMAGES = 2;

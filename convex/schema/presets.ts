@@ -64,6 +64,7 @@ export const PRESET_PROMPT = v.object({
 export const presets = defineTable({
   name: v.string(),
   imageIds: v.array(v.id("images")),
+  depthMaps: v.array(v.id("images")),
   prompts: v.array(PRESET_PROMPT),
   archived: v.boolean(),
 })
