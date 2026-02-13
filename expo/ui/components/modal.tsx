@@ -123,7 +123,7 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
             borderLeftWidth: 0,
             overflow: 'hidden',
             justifyContent: 'flex-end',
-            backgroundColor: Colors.blur.modal,
+            backgroundColor: Colors.blur.darkest,
             paddingHorizontal: 12,
             ...style,
             paddingBottom: 0,

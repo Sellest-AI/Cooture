@@ -34,7 +34,10 @@ export {
 } from 'phosphor-react-native';
 
 // General Icons
+export { ArrowLeft, ArrowRight, ArrowUpRight, Bell, Bookmark, Camera, Check, ChevronRight, CircleFadingArrowUp, Clock9, Compass, Download, ExternalLink, EyeClosed, Feather, Flame, Gift, Heart, Home, ImageIcon, ImageUp, LinkIcon, Lock, Palette, Pause, Pencil, Play, Plus, Rewind, ScanLine, Search, Settings, Shapes, ShareIcon, SkipBack, SkipForward, Smile, Snowflake, Star, Sun, Tags, Trash, User, X } from 'lucide-react-native';
+
+// General Icons
 export {
-  ArrowLeft, ArrowRight, ArrowUpRight, Bell, Bookmark, Camera, Check, ChevronRight, CircleFadingArrowUp, Compass, Download, ExternalLink, EyeClosed, Feather, Flame, Gem, Heart, Home, ImageIcon, ImageUp, LinkIcon, Lock, Pause, Pencil, Play, Plus, Rewind, ScanLine, Search, Settings, Shapes, ShareIcon, SkipBack, SkipForward, Smile, Snowflake, Sun, Trash, User, X
-} from 'lucide-react-native';
+  SketchLogoIcon as Gem
+} from 'phosphor-react-native';
 

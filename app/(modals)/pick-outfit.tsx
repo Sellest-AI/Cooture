@@ -32,7 +32,7 @@ export default function PickOutfitScreen() {
         showsVerticalScrollIndicator={false}
         style={{
           padding: 12,
-          backgroundColor: Colors.blur.modal,
+          backgroundColor: Colors.blur.darkest,
         }}
       >
         <ModalHeader title="Pick an outfit" />

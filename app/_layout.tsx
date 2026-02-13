@@ -34,6 +34,15 @@ export default function RootLayout() {
             }}
           >
             <Slot />
+            <Stack.Screen
+              name="(modals)"
+              options={{
+                presentation: 'formSheet',
+                sheetAllowedDetents: [0.93],
+                sheetInitialDetentIndex: 0,
+                sheetCornerRadius: 28,
+              }}
+            />
           </Stack>
         </Router>
       </View>

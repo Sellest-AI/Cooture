@@ -55,7 +55,7 @@ export const Button = ({ startIcon, startContent, endIcon, children, disabled, v
 
   const onPressWrapper = async (e: GestureResponderEvent, fnc?: (((event: GestureResponderEvent) => void | Promise<void>) | null)) => {
     if (runtimeDisabled) return;
-    const timer = setTimeout(() => { setInnerLoading(true); }, 50);
+    const timer = setTimeout(() => { setInnerLoading(true); }, 100);
     try {
       await fnc?.(e);
       if (href) push(href);
@@ -103,7 +103,7 @@ export const Button = ({ startIcon, startContent, endIcon, children, disabled, v
               opacity: runtimeDisabled ? 0.4 : 1,
             }}
           >
-            {startContent && startContent}
+            {(startContent && !isLoading) && startContent}
             {StartIcon && <StartIcon
               size={20}
               color={colors.textColor}

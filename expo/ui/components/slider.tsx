@@ -13,15 +13,15 @@ import { Colors } from "theme";
 import { Text } from './text';
 
 type Props = {
-  /** Current slider value (0-1) */
+  /** Current slider value */
   value: number;
   /** Slider label */
   label?: string;
   /** Text to be displayed when close to the value */
   labels?: { value: number; label: string }[];
   /**
-   * @param value - current slider value (0-1)
-   * @param closestValue - value of the closest label (0-1) or current value if there is no label
+   * @param value - current slider value
+   * @param closestValue - value of the closest label or current value if there is no label
    */
   onValueChange?: (value: number, closestValue: number) => void;
   style?: ViewStyle;
@@ -71,6 +71,21 @@ export const Slider = ({ value, label, labels, onValueChange, style, customHeigh
   const translationX = useSharedValue(0);
   const isDragging = useSharedValue(false);
 
+  const min = labels?.reduce((min, label) => Math.min(min, label.value), Infinity) ?? 0;
+  const max = labels?.reduce((max, label) => Math.max(max, label.value), -Infinity) ?? 1;
+
+  // Convert actual value to normalized value (0-1)
+  const valueToNormalized = useCallback((val: number) => {
+    'worklet';
+    return (val - min) / (max - min);
+  }, [min, max]);
+
+  // Convert normalized value (0-1) to actual value
+  const normalizedToValue = useCallback((normalized: number) => {
+    'worklet';
+    return min + normalized * (max - min);
+  }, [min, max]);
+
   // Find closest label to a given value
   const findClosestLabel = useCallback((val: number) => {
     'worklet';
@@ -94,11 +109,12 @@ export const Slider = ({ value, label, labels, onValueChange, style, customHeigh
   const updateValue = (translation: number) => {
     const maxTranslation = width - KNOB_SIZE;
     const clampedTranslation = Math.max(0, Math.min(translation, maxTranslation));
-    const newValue = maxTranslation > 0 ? clampedTranslation / maxTranslation : 0;
-    const closestValue = findClosestLabel(newValue);
+    const normalizedValue = maxTranslation > 0 ? clampedTranslation / maxTranslation : 0;
+    const actualValue = normalizedToValue(normalizedValue);
+    const closestValue = findClosestLabel(actualValue);
 
     if (onValueChange) {
-      onValueChange(newValue, closestValue);
+      onValueChange(actualValue, closestValue);
     }
   };
 
@@ -107,7 +123,8 @@ export const Slider = ({ value, label, labels, onValueChange, style, customHeigh
     const newWidth = event.nativeEvent.layout.width;
     setWidth(newWidth);
     const maxTranslation = newWidth - KNOB_SIZE;
-    translationX.value = value * maxTranslation;
+    const normalizedValue = valueToNormalized(value);
+    translationX.value = normalizedValue * maxTranslation;
   };
 
   // Pan gesture with modern API
@@ -138,13 +155,15 @@ export const Slider = ({ value, label, labels, onValueChange, style, customHeigh
       }, (finished) => {
         if (finished) {
           // After decay, snap to closest label
-          const currentValue = maxTranslation > 0 ? translationX.value / maxTranslation : 0;
-          const closestValue = findClosestLabel(currentValue);
-          translationX.value = withSpring(closestValue * maxTranslation, {
+          const normalizedValue = maxTranslation > 0 ? translationX.value / maxTranslation : 0;
+          const actualValue = normalizedToValue(normalizedValue);
+          const closestValue = findClosestLabel(actualValue);
+          const closestNormalized = valueToNormalized(closestValue);
+          translationX.value = withSpring(closestNormalized * maxTranslation, {
             damping: 40,
             stiffness: 300,
           });
-          runOnJS(updateValue)(closestValue * maxTranslation);
+          runOnJS(updateValue)(closestNormalized * maxTranslation);
         }
       });
 
@@ -209,7 +228,8 @@ export const Slider = ({ value, label, labels, onValueChange, style, customHeigh
         {labels && <View className="absolute top-0 left-0 flex-row items-center w-full h-full">
           {labels.map((labelItem, index) => {
             const maxTranslation = width - KNOB_SIZE;
-            const position = labelItem.value * maxTranslation;
+            const normalizedLabelValue = valueToNormalized(labelItem.value);
+            const position = normalizedLabelValue * maxTranslation;
 
             return (
               <LabelIndicator

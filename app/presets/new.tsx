@@ -22,6 +22,7 @@ export default function Screen() {
         mediaTypes: ['images'],
         allowsEditing: false,
         quality: 1,
+        allowsMultipleSelection: false,
       });
 
       if (!result.canceled && result.assets[0]) {

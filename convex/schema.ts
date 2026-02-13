@@ -7,7 +7,7 @@ import { items } from "./schema/items";
 import { outfitItems, outfits } from "./schema/outfits";
 import { presetGenerations, presets } from "./schema/presets";
 import { subscriptions, subscriptionsHistory } from "./schema/subscriptions";
-import { userImages, userPortraits, usersExtended } from "./schema/users";
+import { userImages, usersAppearance, usersExtended } from "./schema/users";
 
 export default defineSchema({
   ...authTables,
@@ -16,7 +16,7 @@ export default defineSchema({
   imageSizes,
   imageObjects,
   userImages,
-  userPortraits,
+  usersAppearance,
   subscriptions,
   subscriptionsHistory,
   items,

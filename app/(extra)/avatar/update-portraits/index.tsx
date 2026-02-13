@@ -1,18 +1,20 @@
-import { usePortraits } from "@/modules/profiles/_hooks/usePortraits";
+import { useRouter } from "@/hooks";
+import { usePortraitsLocal } from "@/modules/profiles/_hooks/useAppearance";
 import { UpdatePortraits } from "@/modules/profiles/update-portraits";
-import { router } from "expo-router";
-import { useEffect } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback } from "react";
 
 export default function Screen() {
-  const { setFrontImage, frontImage } = usePortraits.Local();
-  useEffect(() => { setFrontImage(null) }, [setFrontImage])
+  const { push } = useRouter('/avatar/update-portraits');
+  const { setFrontImage, frontImage } = usePortraitsLocal();
+  useFocusEffect(useCallback(() => { setFrontImage(null) }, [setFrontImage]))
 
   return (
     <UpdatePortraits
       imageUri={frontImage ?? undefined}
       onCapture={(photoUri) => {
         setFrontImage(photoUri);
-        setTimeout(() => { router.push('/update-portraits/smile') }, 1300);
+        setTimeout(() => { push('/avatar/update-portraits/smile', { forwardRedirect: true }) }, 1300);
       }}
       examples={{
         hint: "Make sure to be in a bright enough room. Try to keep a plain white background.",

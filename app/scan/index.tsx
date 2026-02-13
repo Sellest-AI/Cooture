@@ -37,6 +37,7 @@ export default function ScanScreen() {
   const handlePickImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
+        allowsMultipleSelection: false,
         mediaTypes: ['images'],
         allowsEditing: false,
         quality: 1,

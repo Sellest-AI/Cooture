@@ -1,13 +1,13 @@
-import { Router, useRoute, useRouter } from "@/hooks";
+import { useRoute, useRouter } from "@/hooks";
 import { api, useAction } from "@/lib/convex/client";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
-import { usePortraits } from "@/modules/profiles/_hooks/usePortraits";
+import { Portrait } from "@/modules/profiles/portrait";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
 import { ButtonSlider } from "@ui/button.slider";
 import { Col, Grid, Row } from "@ui/grid";
-import { Flame, Pencil, Squirish } from "@ui/icons";
+import { Flame, Squirish } from "@ui/icons";
 import { Image } from "@ui/image";
 import { Slider } from "@ui/slider";
 import { Text } from "@ui/text";
@@ -90,58 +90,6 @@ const OutfitGrid = ({ items, style }: { items: Items, style?: ViewStyle }) => {
     </Grid>
   )
 }
-
-const Portrait = ({ style }: { style?: ViewStyle }) => {
-  const { frontImage, sideImage, smileImage, isPending } = usePortraits();
-  const { push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
-
-  const HEIGHT = style?.height ?? 256;
-
-  if (!frontImage && !isPending) return <Router.Redirect
-    href={ROUTES.EXTRA.UPDATE_PORTRAITS}
-    redirectTo={ROUTES.PHOTOSHOOT.RECAP}
-  />
-
-  return (
-    <>
-      <Grid style={{ width: '100%', ...style, height: HEIGHT }}>
-        <Col style={{ height: HEIGHT, borderRadius: 64, backgroundColor: Colors.blur.medium }}>
-          <Image
-            source={frontImage?.sizes.large.url}
-            style={{ borderRadius: 64, flex: 1, borderWidth: 1, borderColor: Colors.blur.medium }}
-          />
-        </Col>
-        <Col style={{ height: HEIGHT, marginLeft: 12, minWidth: 120, width: 120 }}>
-          <Row style={{ marginBottom: 12, borderRadius: 48, backgroundColor: Colors.blur.medium }}>
-            <Image
-              source={sideImage?.sizes.medium.url}
-              style={{ borderRadius: 48, flex: 1, borderWidth: 1, borderColor: Colors.blur.medium }}
-            />
-          </Row>
-          <Row style={{ borderRadius: 48, backgroundColor: Colors.blur.medium }}>
-            <Image
-              source={smileImage?.sizes.medium.url}
-              style={{ borderRadius: 48, flex: 1, borderWidth: 1, borderColor: Colors.blur.medium }}
-            />
-          </Row>
-        </Col>
-      </Grid>
-      <Button
-        variant="blur"
-        startIcon={Pencil}
-        style={{ marginTop: 12 }}
-        onPress={() => {
-          push(ROUTES.EXTRA.UPDATE_PORTRAITS, {
-            redirectHere: true
-          })
-        }}
-      >
-        Edit my portraits
-      </Button>
-    </>
-  )
-}
-
 
 const OutfitComponent = () => {
   const { outfit, outfitSize, outfitSizes, setOutfitSize } = usePhotoshoot.New();

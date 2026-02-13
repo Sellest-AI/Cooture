@@ -124,8 +124,8 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, _outfit?: { _id: Id<
 }
 
 const updateSubject = async (ctx: ActionCtx, schema: Schema, userId: Id<'users'>): Promise<Schema> => {
-  const portraits = await ctx.runQuery(internal.router.users.getPortraits._internal, { userId });
-  if (!portraits) return schema;
+  const appearance = await ctx.runQuery(internal.router.users.getAppearance._internal, { userId });
+  if (!appearance) return schema;
 
   const prompt = {
     ...schema.prompt,
@@ -136,8 +136,8 @@ const updateSubject = async (ctx: ActionCtx, schema: Schema, userId: Id<'users'>
     }
   }
 
-  let image = prompt.subject.head.direction === "side" ? portraits.sideImage : portraits.frontImage;
-  if (!image) image = portraits.frontImage;
+  let image = prompt.subject.head.direction === "side" ? appearance.sideImage : appearance.frontImage;
+  if (!image) image = appearance.frontImage;
 
   const images = [...schema.images, { url: image.url, hasAlpha: image.hasAlpha }];
 
@@ -167,9 +167,46 @@ const updateStyle = async (schema: Schema): Promise<Schema> => {
   }
 }
 
+const updateHeight = async (schema: Schema, subject?: { heightCm: number }): Promise<Schema> => {
+  if (!subject) return schema;
+
+  const prompt = {
+    ...schema.prompt,
+    subject: {
+      ...schema.prompt.subject,
+      height: `${subject.heightCm}cm tall`
+    }
+  }
+
+  return {
+    ...schema,
+    prompt
+  }
+}
+
+const orderSchema = async (schema: Schema): Promise<Schema> => {
+  const { sceneDescription, style, environment, subject, composition, technical, outfit } = schema.prompt;
+
+  return {
+    ...schema,
+    prompt: {
+      sceneDescription,
+      composition,
+      subject,
+      outfit,
+      environment,
+      style,
+      technical,
+    }
+  }
+}
+
 export const authed = authAction({
   args: {
     presetId: v.id("presets"),
+    subject: v.optional(v.object({
+      heightCm: v.number()
+    })),
     outfit: v.optional(v.object({
       _id: v.id("outfits"),
       size: v.optional(OUTFIT_SIZES_ARGS),
@@ -182,7 +219,9 @@ export const authed = authAction({
     let schema: Schema = { prompt: preset.prompts[0], images: [] }
     schema = await updateSubject(ctx, schema, ctx.userId);
     schema = await updateOutfit(ctx, schema, args.outfit);
+    schema = await updateHeight(schema, args.subject);
     schema = await updateStyle(schema);
+    schema = await orderSchema(schema);
 
     const AMOUNT_OF_IMAGES = 2;
 

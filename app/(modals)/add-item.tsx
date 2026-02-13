@@ -33,7 +33,7 @@ export default function AddItemScreen() {
   return (
     <View style={{
       flex: 1,
-      backgroundColor: Colors.blur.modal,
+      backgroundColor: Colors.blur.darkest,
     }}>
       <SafeScrollView
         showsVerticalScrollIndicator={false}

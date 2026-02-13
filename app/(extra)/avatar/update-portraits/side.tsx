@@ -1,16 +1,16 @@
 import { useRouter } from "@/hooks";
 import { useUpload } from "@/lib/convex/upload";
-import { usePortraits } from "@/modules/profiles/_hooks/usePortraits";
+import { usePortraitsLocal } from "@/modules/profiles/_hooks/useAppearance";
 import { UpdatePortraits } from "@/modules/profiles/update-portraits";
-import { useEffect } from "react";
-import { ROUTES } from "routes";
+import { useFocusEffect } from "expo-router";
+import { useCallback } from "react";
 
 export default function Screen() {
-  const { redirect } = useRouter('/update-portraits/side');
+  const { push } = useRouter('/avatar/update-portraits/side');
 
-  const { uploadImage } = useUpload()
-  const { setSideImage, sideImage, frontImage, smileImage, pushToServer } = usePortraits.Local();
-  useEffect(() => { setSideImage(null) }, [setSideImage]);
+  const { uploadImage } = useUpload();
+  const { frontImage, smileImage, setSideImage, sideImage, pushImagesToServer } = usePortraitsLocal();
+  useFocusEffect(useCallback(() => { setSideImage(null) }, [setSideImage]))
 
   return (
     <UpdatePortraits
@@ -19,19 +19,19 @@ export default function Screen() {
         setSideImage(photoUri);
         if (!frontImage || !smileImage || !photoUri) return;
 
-        const [_frontImage, _smileImage, _photoUri] = await Promise.all([
+        const [_frontImage, _smileImage, _sideImage] = await Promise.all([
           uploadImage(frontImage),
           uploadImage(smileImage),
           uploadImage(photoUri)
         ])
 
-        await pushToServer({
+        await pushImagesToServer({
           frontImageId: _frontImage._id,
           smileImageId: _smileImage._id,
-          sideImageId: _photoUri._id,
+          sideImageId: _sideImage._id,
         })
 
-        redirect({ fallbackTo: ROUTES.PROFILE.PATH });
+        push('/avatar/update-appearance', { forwardRedirect: true });
       }}
       examples={{
         hint: "Make sure to be in a bright enough room. Try to keep a plain white background.",

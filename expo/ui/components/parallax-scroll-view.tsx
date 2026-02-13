@@ -155,6 +155,8 @@ export const ParallaxScrollView = ({
           { useNativeDriver: true }
         )}
         scrollEventThrottle={16}
+        bounces={false}
+        nestedScrollEnabled={true}
       >
         {/* Interactive Header Content */}
         <Animated.View

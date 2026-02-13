@@ -38,6 +38,20 @@ export default function Screen() {
           backgroundColor: Colors.background,
         }}
       />
+      <Button
+        variant="primary"
+        onPress={() => push('/upgrade')}
+        style={{ marginTop: 8, marginHorizontal: 12, marginBottom: 8 }}
+      >
+        Upgrade
+      </Button>
+      <Button
+        variant="blur"
+        onPress={() => push('/presets/new')}
+        style={{ marginTop: 8, marginHorizontal: 12, marginBottom: 8 }}
+      >
+        New preset (Admin)
+      </Button>
       <View
         style={{
           flexDirection: "row",
@@ -125,7 +139,7 @@ export default function Screen() {
           <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
         </View>}
         <FlatList
-          style={{ marginTop: 16 }}
+          style={{ marginTop: 16, marginBottom: 32 }}
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ gap: 32, paddingHorizontal: 16, paddingTop: 6 }}
@@ -146,13 +160,6 @@ export default function Screen() {
           )}
         />
       </View>
-      <Button
-        variant="blur"
-        onPress={() => push('/presets/new')}
-        style={{ marginTop: 48, marginHorizontal: 12 }}
-      >
-        New preset
-      </Button>
     </SafeScrollView>
   )
 }

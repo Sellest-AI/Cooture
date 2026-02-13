@@ -45,7 +45,10 @@ export const ROUTES = {
   EXTRA: {
     SETINGS: '/settings' as const,
     NOTIFICATIONS: '/notifications' as const,
-    UPDATE_PORTRAITS: '/update-portraits' as const,
+    AVATAR: {
+      UPDATE_PORTRAITS: '/avatar/update-portraits' as const,
+      UPDATE_HEIGHT: '/update-height' as const,
+    }
   },
   PROFILE: {
     PATH: '/profile',

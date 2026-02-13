@@ -38,6 +38,7 @@ export const CaptureButtons = ({ style, cameraRef, onCapture, backButton = "clos
         mediaTypes: ['images'],
         allowsEditing: false,
         quality: 1,
+        allowsMultipleSelection: false,
       });
 
       const photo = result.assets?.[0];
@@ -86,8 +87,8 @@ export const CaptureButtons = ({ style, cameraRef, onCapture, backButton = "clos
         variant="primary"
         style={{ padding: 20 }}
         onPress={handleCapture}
+        startContent={<Camera size={28} color={Colors.primary[900]} />}
       >
-        <Camera size={28} color={Colors.primary[900]} />
       </Button>
     </View>
   )

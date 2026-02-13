@@ -1,5 +1,7 @@
+import { useRouter } from "@/hooks";
 import { Block } from "@ui/block";
 import { ArrowUpRight, Gem } from "@ui/icons";
+import { Pressable } from "@ui/pressable";
 import { Text } from "@ui/text";
 import { View, ViewStyle } from "react-native";
 import { Colors } from "theme";
@@ -9,57 +11,66 @@ type Props = {
 }
 
 export const PremiumBlock = ({ style }: Props) => {
+  const { push } = useRouter();
   return (
-    <Block
-      variant="blur"
-      style={{
-        borderRadius: 28,
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        ...style,
-      }}
-    >
+    <Pressable onPress={() => push("/upgrade")}>
       <Block
-        variant="primary"
+        variant="blur"
         style={{
-          width: 68,
-          aspectRatio: 1,
-          alignItems: "center",
+          borderRadius: 28,
+          paddingHorizontal: 10,
+          paddingVertical: 10,
+          flexDirection: "row",
           justifyContent: "center",
-          borderRadius: 22,
+          alignItems: "center",
+          ...style,
         }}
       >
-        <Gem size={28} color={Colors.primary[900]} />
-      </Block>
-      <View style={{ flex: 1, paddingHorizontal: 12, gap: 6 }}>
-        <Text.Lg
-          color={Colors.primary[500]}
-          numberOfLines={1}
+        <Block
+          variant="primary"
+          style={{
+            width: 68,
+            aspectRatio: 1,
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: 22,
+          }}
         >
-          Unlock unlimited generations
-        </Text.Lg>
-        <View style={{
-          flexDirection: "row",
-          alignItems: "flex-end",
-          gap: 28,
-        }}>
-          <Text.Sm
-            color={Colors.primary[200]}
-            numberOfLines={2}
-            style={{ flex: 1, overflow: 'visible' }}
-            textBreakStrategy="balanced"
-          >
-            Upgrade your plan and unlock more generations.
-          </Text.Sm>
-          <ArrowUpRight
-            color={Colors.primary[200]}
-            size={24}
+          {/* <Text.H3>💎</Text.H3> */}
+          <Gem
+            size={28}
+            color={Colors.primary[900]}
+            weight="duotone"
+            duotoneColor={Colors.primary[700]}
           />
+        </Block>
+        <View style={{ flex: 1, paddingHorizontal: 12, gap: 6 }}>
+          <Text.Lg
+            color={Colors.primary[500]}
+            numberOfLines={1}
+          >
+            Unlock unlimited generations
+          </Text.Lg>
+          <View style={{
+            flexDirection: "row",
+            alignItems: "flex-end",
+            gap: 28,
+          }}>
+            <Text.Sm
+              color={Colors.primary[200]}
+              numberOfLines={2}
+              style={{ flex: 1, overflow: 'visible' }}
+              textBreakStrategy="balanced"
+            >
+              Upgrade your plan and unlock more generations.
+            </Text.Sm>
+            <ArrowUpRight
+              color={Colors.primary[200]}
+              size={24}
+            />
+          </View>
         </View>
-      </View>
-    </Block>
+      </Block>
+    </Pressable>
   )
 }

@@ -32,17 +32,22 @@ export const Pressable = ({ disabled, onPress, children, intensity = 0.98, style
     }).start();
   };
 
-  const { margin, marginTop, width, paddingBottom, ...filteredStyle } = (style ?? {}) as ViewStyle;
+  const { margin, marginTop, marginBottom, width, top, left, minHeight, height, ...filteredStyle } = (style ?? {}) as ViewStyle;
 
   return (
     <NativePressable
       {...props}
       style={{
         flex: style?.flex,
+        minHeight,
         width,
+        height,
         aspectRatio: style?.aspectRatio,
         margin,
         marginTop,
+        marginBottom,
+        top,
+        left
       }}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}

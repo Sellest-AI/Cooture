@@ -194,7 +194,7 @@ export const useRouter = <T extends Route = Route>(_href?: T) => {
     }
 
     const nextPath = nextPaths.filter((p) => p !== 'back')[0] ?? '/';
-    dismissTo(nextPath as Route, options);
+    dismissTo(nextPath as Route, { ...options, resetNextRoute: false });
   }, [dismissTo, href]);
 
   return {

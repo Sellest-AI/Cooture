@@ -122,9 +122,9 @@ import type * as router_subscriptions_endOne from "../router/subscriptions/endOn
 import type * as router_subscriptions_getUserSubscription from "../router/subscriptions/getUserSubscription.js";
 import type * as router_subscriptions_updateSubscriptionStatus from "../router/subscriptions/updateSubscriptionStatus.js";
 import type * as router_users_getAccount from "../router/users/getAccount.js";
+import type * as router_users_getAppearance from "../router/users/getAppearance.js";
 import type * as router_users_getFromStripeId from "../router/users/getFromStripeId.js";
-import type * as router_users_getPortraits from "../router/users/getPortraits.js";
-import type * as router_users_updatePortraits from "../router/users/updatePortraits.js";
+import type * as router_users_upsertAppearance from "../router/users/upsertAppearance.js";
 import type * as schema_auth from "../schema/auth.js";
 import type * as schema_feed from "../schema/feed.js";
 import type * as schema_generations from "../schema/generations.js";
@@ -256,9 +256,9 @@ declare const fullApi: ApiFromModules<{
   "router/subscriptions/getUserSubscription": typeof router_subscriptions_getUserSubscription;
   "router/subscriptions/updateSubscriptionStatus": typeof router_subscriptions_updateSubscriptionStatus;
   "router/users/getAccount": typeof router_users_getAccount;
+  "router/users/getAppearance": typeof router_users_getAppearance;
   "router/users/getFromStripeId": typeof router_users_getFromStripeId;
-  "router/users/getPortraits": typeof router_users_getPortraits;
-  "router/users/updatePortraits": typeof router_users_updatePortraits;
+  "router/users/upsertAppearance": typeof router_users_upsertAppearance;
   "schema/auth": typeof schema_auth;
   "schema/feed": typeof schema_feed;
   "schema/generations": typeof schema_generations;
