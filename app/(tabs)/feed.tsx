@@ -103,14 +103,14 @@ const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle }) => 
 }
 
 export default function Screen() {
-  const { feed, setSeed, isLoading, loadMore } = useFeed({ initialNumItems: 8 });
+  const { feed, canLoadMore, setSeed, isLoading, loadMore } = useFeed({ initialNumItems: 8 });
   const { top } = useSafeAreaInsets();
 
   return (
     <SafeAreaView edges={{ top: 'off', bottom: 'maximum' }} style={{ flex: 1 }}>
       <FlashList
         refreshing={isLoading}
-        onRefresh={() => setSeed((prev) => prev + 1)}
+        onRefresh={() => setSeed((prev) => (prev ?? 0) + 1)}
         onEndReached={() => loadMore(8)}
         data={(feed ?? [])}
         keyExtractor={(i) => i?._id}
@@ -144,12 +144,12 @@ export default function Screen() {
             <Post.Skeleton style={{ marginHorizontal: 12, marginBottom: 28 }} />
             <Post.Skeleton style={{ marginHorizontal: 12, marginBottom: 28 }} />
           </>}
-          <Text.Base
+          {!canLoadMore && <Text.Base
             color={Colors.neutral[400]}
             style={{ textAlign: 'center', maxWidth: 148, alignSelf: 'center', marginTop: 8 }}
           >
             No more posts to show in your feed.
-          </Text.Base>
+          </Text.Base>}
         </>}
         renderItem={({ item }) => {
           if (item.type === 'outfit')

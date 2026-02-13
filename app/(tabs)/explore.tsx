@@ -5,6 +5,7 @@ import { PremiumBlock } from "@/modules/premium/premium-block";
 import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Col, Grid, Row } from "@ui/grid";
+import { Loader } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { SafeScrollView } from "@ui/safe-scroll-view";
@@ -194,6 +195,9 @@ export default function Screen() {
           </View>
         )}
       </View>
+      {canLoadMore && <View style={{ marginTop: 32, marginBottom: 48, alignItems: 'center' }}>
+        <View style={{ position: 'absolute' }}><Loader color={Colors.foreground} /></View>
+      </View>}
       {!canLoadMore && <Text.Base
         style={{ textAlign: 'center', marginVertical: 32, maxWidth: 200, alignSelf: 'center' }}
         color={Colors.neutral[400]}
