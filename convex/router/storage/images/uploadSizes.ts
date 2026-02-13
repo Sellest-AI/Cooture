@@ -19,7 +19,7 @@ const uploadSizes = async (ctx: ActionCtx, imageId: Id<'images'>) => {
     { px: 150, quality: 40 },
     { px: 336, quality: 40 },
     { px: 600, quality: 50 },
-    { px: 1440, quality: 98 },
+    { px: 1440, quality: 92 },
   ];
 
   type Data = typeof api.router.storage.images.saveSizes.server._args;
