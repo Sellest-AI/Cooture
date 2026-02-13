@@ -42,12 +42,22 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, _outfit?: { _id: Id<
     innerLayer ? { ...innerLayer, url: innerLayer.image.url, hasAlpha: innerLayer.image.hasAlpha } : undefined,
     ...(accessories.map((acc) => ({ ...acc, url: acc.image.url, hasAlpha: acc.image.hasAlpha }))),
     shoes ? { ...shoes, url: shoes.image.url, hasAlpha: shoes.image.hasAlpha } : undefined,
-  ].filter(notEmpty).map((item, i) => ({
-    type: item.position,
-    url: item.url,
-    hasAlpha: item.hasAlpha,
-    text: `Use image ${baseImageIndex + i} for the ${item.position.toLowerCase()}.`
-  }));
+  ]
+    .filter(notEmpty)
+    .map((item, i) => ({
+      type: item.position,
+      url: item.url,
+      hasAlpha: item.hasAlpha,
+      text: `Use image ${baseImageIndex + i} for the ${item.position.toLowerCase()}.`
+    }))
+    .filter((i) => {
+      // If the prompt doesn't explicitly mention an item, we won't include it in the references, 
+      // to avoid confusion for the LLM
+      if (i.type === 'BOTTOM') if (!schema.prompt.outfit.bottom) return null;
+      if (i.type === 'SHOES') if (!schema.prompt.outfit.shoes) return null;
+      return i;
+    })
+    .filter(notEmpty);
 
   const images = [...schema.images, ...references]
 
@@ -74,6 +84,27 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, _outfit?: { _id: Id<
     return parts.filter(notEmpty).join(', ');
   };
 
+  const bottomObject = (() => {
+    if (!schema.prompt.outfit.bottom) return undefined;
+    if (bottom) return {
+      type: bottom.name,
+      details: buildDetails(bottom),
+      reference: references.find((r) => r.type === 'BOTTOM')?.text,
+      fit: outfitSize ?? 'default',
+    };
+    if (top?.description?.includes('dress')) return undefined;
+    return {
+      type: 'Blue jeans',
+      details: 'Classic blue straight denim jeans',
+    }
+  })()
+
+  const shoesObject = (() => {
+    if (!schema.prompt.outfit.shoes) return undefined;
+    if (shoes) return `${shoes.mainColors.join(' ')} ${shoes.materials.map(m => m.toLowerCase()).join(' ')} ${shoes.name}${shoes.description ? `, ${shoes.description}` : ''}`;
+    return schema.prompt.outfit.shoes; // Undefined
+  })()
+
   // ---- CUSTOM OUTFIT ----
   const customOutfit = {
     description,
@@ -81,26 +112,18 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, _outfit?: { _id: Id<
     top: top ? {
       type: top.name,
       details: buildDetails(top),
-      reference: references.filter((r) => r.type === 'TOP').map((r) => r.text).join(' '),
+      reference: references.find((r) => r.type === 'TOP')?.text,
       fit: outfitSize ?? 'default',
     } : {
       type: 'White t-shirt',
       details: 'A plain white cotton t-shirt',
     },
-    bottom: bottom ? {
-      type: bottom.name,
-      details: buildDetails(bottom),
-      reference: references.filter((r) => r.type === 'BOTTOM').map((r) => r.text).join(' '),
-      fit: outfitSize ?? 'default',
-    } : (top?.description?.includes('dress') ? undefined : {
-      type: 'Blue jeans',
-      details: 'Classic blue straight denim jeans',
-    }),
+    bottom: bottomObject,
     innerLayer: innerLayer ? buildDetails(innerLayer) : undefined,
     outerwear: outerwear ? {
       type: outerwear.name,
       details: buildDetails(outerwear),
-      reference: references.filter((r) => r.type === 'OUTERWEAR').map((r) => r.text).join(' '),
+      reference: references.find((r) => r.type === 'OUTERWEAR')?.text,
       fit: outfitSize ?? 'default',
     } : undefined,
     accessories: accessories.length > 0
@@ -108,9 +131,7 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, _outfit?: { _id: Id<
         [acc.name]: `${acc.mainColors.join(' ')} ${acc.materials.map(m => m.toLowerCase()).join(' ')}${acc.description ? `, ${acc.description}` : ''}`
       }))
       : schema.prompt.outfit.accessories,
-    shoes: shoes
-      ? `${shoes.mainColors.join(' ')} ${shoes.materials.map(m => m.toLowerCase()).join(' ')} ${shoes.name}${shoes.description ? `, ${shoes.description}` : ''}`
-      : schema.prompt.outfit.shoes,
+    shoes: shoesObject,
   }
 
   const prompt = {
