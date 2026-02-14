@@ -31,9 +31,12 @@ export const anon = authQuery({
     const generation = await getGenerationMax(ctx, id);
     if (!generation) return null;
 
+    const predictions = generation.predictions.filter((p) => p.status === 'ACCEPTED');
+    if (predictions.length === 0) return null;
+
     return {
       ...generation,
-      predictions: generation.predictions.filter((p) => p.status === 'ACCEPTED'),
+      predictions,
     }
   }
 })

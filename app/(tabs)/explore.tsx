@@ -1,5 +1,5 @@
 import { api, Id } from "@/lib/convex/api";
-import { useQuery } from "@/lib/convex/client";
+import { useQuery, useQueryCached } from "@/lib/convex/client";
 import { useFeed } from "@/modules/feed/_hooks";
 import { PremiumBlock } from "@/modules/premium/premium-block";
 import { Notification } from "@/modules/profiles/notification";
@@ -60,7 +60,9 @@ const GridSkeleton = () => {
 
 const Generation = ({ id, style }: { id: Id<'generations'>, style?: ViewStyle }) => {
   const { data: post } = useQuery(api.router.generations.getOne.anon, { id });
-  if (!post) return <Skeleton style={style} />;
+  const { data: image } = useQueryCached(api.router.storage.images.getOne.anon, post?.predictions[0]?.imageId ? { id: post?.predictions[0]?.imageId } : 'skip');
+
+  if (!post || !image) return <Skeleton style={style} />;
 
   return (
     <Pressable style={{ borderRadius: 16, overflow: 'hidden', flex: 1, ...style }}
@@ -68,7 +70,7 @@ const Generation = ({ id, style }: { id: Id<'generations'>, style?: ViewStyle })
     >
       <Image
         style={{ flex: 1 }}
-        source={{ uri: post.cover?.sizes.large.url }}
+        source={{ uri: image?.sizes.large.url }}
       />
     </Pressable>
   )

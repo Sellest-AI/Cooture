@@ -18,7 +18,7 @@ const UserPost = ({ postId, style, fullResolution }: { postId: Id<'generations'>
   const imageIds = post?.predictions.map((p) => p.imageId).filter(notEmpty) ?? [];
   const { data: images } = useQueryCached(api.router.storage.images.getMany.anon, imageIds.length > 0 ? { imageIds } : 'skip');
 
-  if (!post) return <Post.Skeleton style={{ ...style, paddingHorizontal: 12 }} />;
+  if (!post || !images) return <Post.Skeleton style={{ ...style, paddingHorizontal: 12 }} />;
 
   return (<Post
     style={{ ...style }}
@@ -30,11 +30,6 @@ const UserPost = ({ postId, style, fullResolution }: { postId: Id<'generations'>
       url: fullResolution ? img.url : img.sizes.large.url,
       contentFit: img.hasAlpha ? 'contain' : 'cover',
     }))}
-    image={post.cover ? {
-      _id: post.predictions.find(p => p.imageId === post.cover!._id)?._id ?? post.predictions[0]?._id,
-      url: fullResolution ? post.cover.url : post.cover.sizes.large.url,
-      contentFit: post.cover.hasAlpha ? 'contain' : 'cover',
-    } : undefined}
     user={post.user ? {
       name: post.user.name ?? 'Anonymous',
       username: post.user.name ?? 'anon',

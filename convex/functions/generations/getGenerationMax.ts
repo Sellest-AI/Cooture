@@ -22,12 +22,9 @@ export const getGenerationMax = async (ctx: QueryCtx, generationId: Id<'generati
     generation ? ctx.db.get(generation.userId) : null,
   ]) : [null, []];
 
-  const cover = predictions.find((p) => p.status === "ACCEPTED") ?? predictions[0];
-
-  const [presetCover, items, image] = await Promise.all([
+  const [presetCover, items] = await Promise.all([
     preset?.imageIds[0] ? await getImage(ctx, preset?.imageIds[0]) : null,
     itemIds ? await Promise.all(itemIds.map((i) => getItem(ctx, i.itemId))) : [],
-    cover?.imageId ? await getImage(ctx, cover.imageId) : null,
   ]);
 
   const outfit = metadata?.outfitId ? {
@@ -44,7 +41,6 @@ export const getGenerationMax = async (ctx: QueryCtx, generationId: Id<'generati
 
   return {
     user: sanitizedUser,
-    cover: image || null,
     ...metadata,
     ...generation,
     predictions,

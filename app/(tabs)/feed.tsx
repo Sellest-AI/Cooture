@@ -11,7 +11,6 @@ import { ModalHeader } from "@ui/modal";
 import { SafeAreaView, useSafeAreaInsets } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import { notEmpty } from "@utils/convex-allowed";
-import { router } from "expo-router";
 import { ViewStyle } from "react-native";
 import { Colors } from "theme";
 
@@ -21,24 +20,18 @@ const GenerationPost = ({ id, style }: { id: Id<'generations'>, style?: ViewStyl
   const imageIds = post?.predictions.map((p) => p.imageId).filter(notEmpty) ?? [];
   const { data: images } = useQueryCached(api.router.storage.images.getMany.anon, imageIds.length > 0 ? { imageIds } : 'skip');
 
-  if (!post) return <Post.Skeleton style={{ ...style, paddingHorizontal: 12 }} />;
+  if (!post || !images) return <Post.Skeleton style={{ ...style, paddingHorizontal: 12 }} />;
 
   return (<Post
     style={{ ...style }}
     paddingHorizontal={12}
     postedAt={post.completedAt ? new Date(post.completedAt) : undefined}
     likedAccounts={[]}
-    onPress={(id) => router.push(`/post/${id}`)}
     images={images?.map((img) => ({
       _id: post.predictions.find(p => p.imageId === img._id)?._id ?? post.predictions[0]?._id,
       url: img.sizes.large.url,
       contentFit: img.hasAlpha ? 'contain' : 'cover',
     }))}
-    image={post.cover ? {
-      _id: post.predictions.find(p => p.imageId === post.cover!._id)?._id ?? post.predictions[0]?._id,
-      url: post.cover.sizes.large.url,
-      contentFit: post.cover.hasAlpha ? 'contain' : 'cover',
-    } : undefined}
     user={post.user ? {
       name: post.user.name ?? 'Anonymous',
       username: post.user.name ?? 'anon',
