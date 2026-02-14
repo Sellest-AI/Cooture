@@ -1,7 +1,8 @@
 import { ROUTES, useRoute } from "@/hooks";
 import { useAccount } from "@/lib/convex/auth";
-import { api, Id, usePaginatedQueryCached, useQuery } from "@/lib/convex/client";
+import { api, Id, usePaginatedQueryCached, useQuery, useQueryCached } from "@/lib/convex/client";
 import { Screen } from "@/modules/profiles/page";
+import { notEmpty } from "@utils/convex-allowed";
 import { Redirect } from "expo-router";
 
 export const unstable_settings = {
@@ -17,7 +18,10 @@ export default function Layout() {
   const recentPosts = (_generations?.results ?? [])
     .flatMap(generation => generation.predictions)
     .sort((a, b) => b._creationTime - a._creationTime)
-    .filter((a) => a.image);
+    .filter((a) => a.imageId);
+
+  const imageIds = recentPosts.map((p) => p.imageId).filter(notEmpty);
+  const { data: images } = useQueryCached(api.router.storage.images.getMany.anon, imageIds ? { imageIds } : 'skip');
 
   const { user: account } = useAccount();
   if (id === account?._id)
@@ -31,9 +35,9 @@ export default function Layout() {
         paddingBottom: 20
       }}
       recentPosts={recentPosts.map((r) => ({
+        image: images?.find((i) => i._id === r.imageId),
         _id: r._id,
-        image: r.image!
-      }))}
+      })).filter((p) => p.image).map((p) => ({ ...p, image: p.image! }))}
     />
   )
 }

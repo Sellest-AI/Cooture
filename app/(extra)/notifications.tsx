@@ -10,6 +10,7 @@ import { Pressable } from "@ui/pressable";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
+import { notEmpty } from "@utils/convex-allowed";
 import { router } from "expo-router";
 import { View } from "react-native";
 import { ROUTES } from "routes";
@@ -23,8 +24,12 @@ type Props = {
 }
 const Notification = ({ generationId, completed, status }: Props) => {
   const { data: generation, isPending } = useQueryCached(api.router.generations.getOne.authed, { generationId: generationId });
+
   const presetId = generation?.metadata?.presetId;
   const { data: preset, isPending: presetPending } = useQueryCached(api.router.presets.getOne.anon, presetId ? { presetId } : 'skip');
+
+  const imageIds = generation?.predictions.map((p) => p.imageId).filter(notEmpty);
+  const { data: images } = useQueryCached(api.router.storage.images.getMany.anon, imageIds ? { imageIds } : 'skip')
 
   if (isPending || !generation) return <Skeleton
     style={{ height: 76, width: '100%', marginBottom: 20 }}
@@ -71,10 +76,10 @@ const Notification = ({ generationId, completed, status }: Props) => {
           </View>
         </View>
         <View style={{ flexDirection: 'row', overflow: 'hidden', flexShrink: 0 }}>
-          {generation.predictions.map((p, i, arr) => (
+          {images?.map((p, i, arr) => (
             <Image
               key={p._id}
-              source={p.image?.sizes.thumbnail.url}
+              source={p.sizes.thumbnail.url}
               style={{
                 width: 52,
                 height: 56,
@@ -87,7 +92,7 @@ const Notification = ({ generationId, completed, status }: Props) => {
               }}
             />
           ))}
-          {generation.predictions.length === 0 && <Skeleton
+          {(images ?? []).length === 0 && <Skeleton
             style={{ width: 52, height: 56, borderRadius: 8 }}
           />}
         </View>

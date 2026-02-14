@@ -16,7 +16,7 @@ const Item = ({ imageId, predictionId }: { imageId: Id<'images'>, predictionId: 
 
   return (
     <ImageGeneration
-      source={image?.sizes.small.url}
+      source={image?.sizes.medium.url}
       onPresss={() => {
         push(ROUTES.POST.PATH, {
           pathParams: { id: predictionId }
