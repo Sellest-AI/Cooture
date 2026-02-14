@@ -16,13 +16,15 @@ export const anon = publicQuery({
 
     // Return all accepted predictions
     const predictions = await Promise.all(generationIds.map(async (generationId) => {
-      const _predictions = await ctx.db.query('predictions')
+      const generation = await ctx.db.get('generations', generationId);
+      if (generation?.publication !== 'PUBLISHED') return null;
+      const predictions = await ctx.db.query('predictions')
         .withIndex('by_generation_id', (q) => q.eq('generationId', generationId))
         .collect();
-      const filtered = _predictions.filter((p) => p.status === 'ACCEPTED');
-      if (filtered.length === 0) return null;
-      return filtered;
+      return predictions.filter((p) => p.status === 'ACCEPTED');
     }));
+
+
 
     return predictions.flat()
       .filter(notEmpty)

@@ -97,7 +97,7 @@ const Generation = ({ imageId, predictionId }: { imageId: Id<'images'>, predicti
   )
 }
 
-const Generations = () => {
+const Generations = ({ customText }: { customText?: string }) => {
   const { id } = useRoute.Params<{ id: Id<'outfits'> }>();
   const { outfit } = useOutfit(id);
 
@@ -135,13 +135,13 @@ const Generations = () => {
         color={Colors.neutral[400]}
         style={{
           textAlign: 'center',
-          maxWidth: 148,
+          maxWidth: 192,
           alignSelf: 'center',
           marginTop: 24,
           marginBottom: 24
         }}
       >
-        No more previews available
+        {customText ?? 'No more previews available'}
       </Text.Base>
     </>
   )
@@ -155,15 +155,19 @@ export default function ItemScreen() {
   const { id } = useRoute.Params<{ id: Id<'outfits'> }>();
   const { outfit, updateItems, updateName, remove } = useOutfit(id);
   const { data: user } = useQuery(api.router.users.getAccount.anon, outfit ? { userId: outfit.userId } : 'skip');
-  const { data: generations } = useQuery(api.router.feed.getFromOutfit.anon, outfit ? { outfitId: outfit._id } : 'skip');
+  const { data: generations, isPending: isLoadingGenerations } = useQuery(api.router.feed.getFromOutfit.anon, outfit ? { outfitId: outfit._id } : 'skip');
 
   const [selectedItem, setSelectedItem] = useState<Id<'items'> | null>(null);
   const [items, setItems] = useStateEffect(outfit?.items ?? []);
   const [name, setName] = useStateEffect('');
 
+  const ownOutfit = outfit?.userId === me?._id;
+  const editable = isLoadingGenerations ? false :
+    ownOutfit && (generations ?? [])?.length === 0;
+
   const hasChanges = useMemo(() => {
     if (!outfit) return false;
-    if (name !== outfit.name) return true;
+    if (name.length > 0 && name !== outfit.name) return true;
     if (items.length !== outfit.items.length) return true;
     const outfitItemIds = outfit.items.map((i) => i._id).sort();
     const currentItemIds = items.map((i) => i._id).slice().sort();
@@ -180,9 +184,7 @@ export default function ItemScreen() {
     }
   }
 
-  const ownOutfit = outfit?.userId === me?._id;
-
-  if (!outfit) {
+  if (!outfit || isLoadingGenerations) {
     return <LoadingBlock style={{ height: 'auto', flex: 1 }} />
   }
 
@@ -264,7 +266,7 @@ export default function ItemScreen() {
             >
               Try on
             </Button>
-            {ownOutfit && <TextInput
+            {editable && <TextInput
               style={{ marginTop: 12 }}
               startIcon={Pencil}
               placeholder={outfit.name}
@@ -279,8 +281,7 @@ export default function ItemScreen() {
               showsVerticalScrollIndicator={false}
               renderItem={({ item }) => {
                 if (!item) {
-                  if (!ownOutfit) return null;
-                  if ((generations ?? [])?.length > 0) return null;
+                  if (!editable) return null;
                   return (
                     <SquirishPlus
                       style={{
@@ -308,6 +309,7 @@ export default function ItemScreen() {
                   }}
                   >
                     <CardItem
+                      image={item.image}
                       source={item.image.sizes.small.url}
                       title={item.name}
                       subtitle={item.category}
@@ -320,18 +322,20 @@ export default function ItemScreen() {
               masonry
             />
             <FlashList
-              data={['user', 'premium', 'generations']}
+              data={['user', 'premium', 'generations', 'cant-edit']}
               keyExtractor={(i) => i}
               renderItem={({ item }) => {
                 if (item === 'user') return <UserBlock />
                 if (item === 'premium') return <PremiumBlock style={{ marginTop: 12 }} />
-                if (item === 'generations') return <Generations />
+                if (item === 'generations') return <Generations
+                  customText={(!editable && ownOutfit) ? "This outfit has been used and is now locked to preserve your generated looks." : undefined}
+                />
                 return null;
               }}
               showsVerticalScrollIndicator={false}
               scrollEnabled={false}
             />
-            {ownOutfit && <Button
+            {editable && <Button
               style={{ marginTop: 12 }}
               variant="destructive"
               startIcon={Trash}
@@ -345,7 +349,7 @@ export default function ItemScreen() {
             </Button>}
           </SafeAreaView>
         </ParallaxScrollView>
-        {(ownOutfit && hasChanges) && <View style={{
+        {(editable && hasChanges) && <View style={{
           position: 'absolute',
           left: 12,
           right: 12,
