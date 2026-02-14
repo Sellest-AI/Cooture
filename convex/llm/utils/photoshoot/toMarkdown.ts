@@ -23,6 +23,11 @@ const sectionCreator = (title: string, content: Record<string, undefined | strin
   return sectionHeader + sectionContent;
 }
 
+/**
+ * Utility function to convert the photoshoot schema into a Markdown format that can be used as a prompt for the image generation model.
+ * @param schema 
+ * @returns Truncated and sanitized JSON in Markdown format
+ */
 export const schemaToMarkdown = (schema: PromptExtended): string => {
   const prompt: string[] = [];
 
@@ -37,30 +42,30 @@ export const schemaToMarkdown = (schema: PromptExtended): string => {
       { "Legs": subject.legs },
     ]))
 
-    // Assuming all subjects share the same outfit for now
-    if (index > 0) return;
-
     const outfit = subject.outfit;
-    prompt.push(sectionCreator(`SHARED OUTFIT (VERY IMPORTANT)`, [
-      { "Description": sliceText(outfit?.description, 75) },
-      { "References": outfit.references },
-      { "Outerwear": [outfit.outerwear?.type, sliceText(outfit.outerwear?.details, 75), outfit.outerwear?.fit, outfit.outerwear?.reference] },
-      { "Top": [outfit.top?.type, sliceText(outfit.top?.details, 75), outfit.top?.fit, outfit.top?.reference] },
-      { "Inner Layer": outfit.innerLayer },
-      { "Bottom": [outfit.bottom?.type, sliceText(outfit.bottom?.details, 75), outfit.bottom?.fit, outfit.bottom?.reference] },
-      { "Shoes": outfit.shoes },
-      ...outfit.accessories.map((accessory, i) => ({ [`Accessory ${i + 1}`]: [Object.keys(accessory)[0], Object.values(accessory)[0]] }))
-    ]))
-
-    // When multiple outfits are supported
-    //  prompt.push(sectionCreator(`SUBJECT ${index + 1} OUTFIT (VERY IMPORTANT)`, [
-    //         { "Description": [outfit?.description] },
-    //         { "References": outfit.references },
-    //         { "Top": [outfit.outerwear?.type, outfit.top?.type, outfit.innerLayer] },
-    //         { "Bottom": [outfit.bottom?.type] },
-    //         { "Shoes": outfit.shoes },
-    //         ...outfit.accessories.map((accessory, i) => ({ [`Accessory ${i + 1}`]: [Object.keys(accessory)[0], Object.values(accessory)[0]] }))
-    //       ]))
+    // If only one subject is present, we can afford to include more detailed information about the outfit, 
+    // as there is no risk of confusing the model with multiple outfits.
+    if (schema.subjects.length === 1) {
+      prompt.push(sectionCreator(`SUBJECT ${index + 1} OUTFIT (VERY IMPORTANT)`, [
+        { "Description": sliceText(outfit?.description, 125) },
+        { "References": outfit.references },
+        { "Outerwear": [outfit.outerwear?.type, outfit.outerwear?.reference] },
+        { "Top": [outfit.top?.type, outfit.top?.reference] },
+        { "Inner Layer": outfit.innerLayer },
+        { "Bottom": [outfit.bottom?.type, outfit.bottom?.reference] },
+        { "Shoes": outfit.shoes },
+        ...outfit.accessories.map((accessory, i) => ({ [`Accessory ${i + 1}`]: [Object.keys(accessory)[0], Object.values(accessory)[0]] }))
+      ]))
+    }
+    // For simplicity, when multiple subjects are present, we only include a general description of the outfit without breaking it down into layers and items, 
+    // to avoid overwhelming the model with details that may be hard to associate with the correct subject.
+    else {
+      prompt.push(sectionCreator(`SUBJECT ${index + 1} OUTFIT (VERY IMPORTANT)`, [
+        { "Description": sliceText(outfit?.description, 175) },
+        { "References": outfit.references },
+        ...outfit.accessories.map((accessory, i) => ({ [`Accessory ${i + 1}`]: [Object.keys(accessory)[0], Object.values(accessory)[0]] }))
+      ]))
+    }
   })
 
   prompt.push(sectionCreator("COMPOSITION", [

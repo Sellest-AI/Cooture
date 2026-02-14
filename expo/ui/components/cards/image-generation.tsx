@@ -35,6 +35,7 @@ export const ImageGeneration = ({ text, textScale = 1, source, disabled, loading
           aspectRatio: 3 / 4,
           width: '100%',
           pointerEvents: 'none',
+          borderColor: Colors.blur.dark,
           ...style
         }}
       >

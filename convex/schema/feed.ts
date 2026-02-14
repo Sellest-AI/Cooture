@@ -9,6 +9,6 @@ export const feedScores = defineTable({
   userId: v.id('users'),
   archived: v.boolean(),
 })
-  .index("by_score", ["score"])
+  .index("by_archived_score", ["archived", "score"])
   .index("by_generation_id", ["generationId"])
   .index("by_outfit_id", ["outfitId"])

@@ -156,10 +156,10 @@ const OutfitComponent = () => {
 
 const FriendBlock = () => {
   const { push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
-  const { preset, friendId } = usePhotoshoot.New();
+  const { hasMultipleSubjects, friendId } = usePhotoshoot.New();
   const { data: friend, isPending } = useQuery(api.router.users.getAccount.anon, friendId ? { userId: friendId } : 'skip');
 
-  if (!preset || preset.subjects < 2) return null;
+  if (!hasMultipleSubjects) return null;
 
   return (
     <Block

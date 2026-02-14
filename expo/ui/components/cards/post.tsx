@@ -107,6 +107,7 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
       </View>}
       <FlatList
         horizontal
+        scrollEnabled={!pinching}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
           gap: GAP,
@@ -139,8 +140,8 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
                 style={{
                   borderRadius: 32,
                   backgroundColor: img?.backgroundColor ?? Colors.blur.dark,
-                  borderColor: !pinching ? Colors.blur.medium : undefined,
-                  borderTopWidth: 1,
+                  borderColor: !pinching ? Colors.blur.dark : undefined,
+                  borderTopWidth: 0, // Removed borders
                   flex: 1,
                 }}
               />}

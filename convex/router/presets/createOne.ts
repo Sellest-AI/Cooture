@@ -30,17 +30,12 @@ export const admin = adminAction({
         depthMapPromises
       ]);
 
-      // Filter to only high-confidence categories
-      const allCategories = prompts.flatMap(p => p.categories);
-      const highConfidenceCategories = allCategories.filter(cat => cat.confidence >= 0.7);
-      const uniqueCategories = Array.from(new Set(highConfidenceCategories.map(cat => cat.name)));
-
       await ctx.runMutation(internal.router.presets.createOne._internal_mutation, {
         name,
         imageIds: images.map((img) => img._id),
         depthMaps: depthMaps.map((dm) => dm),
         prompts: prompts.map((p) => p.prompt),
-        categories: uniqueCategories,
+        categories: prompts.flatMap((p) => p.categories),
       })
 
     } catch {

@@ -35,10 +35,10 @@ export const ZoomableImage = ({
   }
 
   return (
-    // Simple use case
     <SnapbackZoom
       onPinchStart={() => { onPinchChange?.(true); }}
       onPinchEnd={() => { onPinchChange?.(false); }}
+      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
     >
       <Image
         source={source}

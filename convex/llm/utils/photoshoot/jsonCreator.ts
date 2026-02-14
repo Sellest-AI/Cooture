@@ -81,11 +81,6 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: SubjectExt
       ...item.materials.map(m => m.toLowerCase()).slice(0, 2),
     ];
 
-    if (item.position === 'OUTERWEAR' || item.position === 'TOP'
-      || item.position === 'BOTTOM' || item.category === 'TSHIRT') {
-      if (outfitSize) parts.push(outfitSize)
-    }
-
     return parts.filter(notEmpty).join(', ');
   };
 
@@ -95,7 +90,6 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: SubjectExt
       type: bottom.name,
       details: buildDetails(bottom),
       reference: references.find((r) => r.type === 'BOTTOM')?.text,
-      fit: outfitSize ?? 'default',
     };
     if (top?.description?.includes('dress')) return undefined;
     return {
@@ -112,13 +106,12 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: SubjectExt
 
   // ---- CUSTOM OUTFIT ----
   const customOutfit = {
-    description,
+    description: [outfitSize, description].filter(notEmpty).join('. '),
     references: references.map((ref) => ref.text),
     top: top ? {
       type: top.name,
       details: buildDetails(top),
       reference: references.find((r) => r.type === 'TOP')?.text,
-      fit: outfitSize ?? 'default',
     } : {
       type: 'White t-shirt',
       details: 'A plain white cotton t-shirt',
@@ -129,7 +122,6 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: SubjectExt
       type: outerwear.name,
       details: buildDetails(outerwear),
       reference: references.find((r) => r.type === 'OUTERWEAR')?.text,
-      fit: outfitSize ?? 'default',
     } : undefined,
     accessories: accessories.length > 0
       ? accessories.map(acc => ({
@@ -278,9 +270,9 @@ export type PromptExtended = Omit<Prompt, 'subjects' | 'style' | 'composition' |
     height?: string;
     outfit?: Outfit & {
       references?: string[];
-      top?: Outfit['top'] & { fit?: string; reference?: string };
-      bottom?: Outfit['bottom'] & { fit?: string; reference?: string };
-      outerwear?: Outfit['outerwear'] & { fit?: string; reference?: string };
+      top?: Outfit['top'] & { reference?: string };
+      bottom?: Outfit['bottom'] & { reference?: string };
+      outerwear?: Outfit['outerwear'] & { reference?: string };
     };
   })[];
 };

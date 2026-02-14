@@ -1,5 +1,3 @@
-import { File, Paths } from 'expo-file-system';
-import { createAlbumAsync, createAssetAsync, requestPermissionsAsync } from 'expo-media-library';
 import { Platform } from 'react-native';
 
 // reuse your existing web download implementation
@@ -11,6 +9,9 @@ export async function downloadImageCrossPlatform(source: string) {
     const asset = await uriToImage(source);
     return webDownload(asset.uri);
   }
+
+  const { File, Paths } = await import('expo-file-system');
+  const { createAlbumAsync, createAssetAsync, requestPermissionsAsync } = await import('expo-media-library');
 
   // native mobile
   // Try to request media library permissions, but Expo Go may not allow full library access.

@@ -8,7 +8,7 @@ import { presetCreator } from "../tools/presetCreator";
 
 type Return = {
   prompt: Awaited<ReturnType<typeof presetCreator.handler>>;
-  categories: Awaited<ReturnType<typeof imageCategorizer.handler>>;
+  categories: Awaited<ReturnType<typeof imageCategorizer.handler>>[number]['name'][];
 }
 
 export const _internal = internalAction({
@@ -38,7 +38,12 @@ export const _internal = internalAction({
         imageCategorizer.handler(toolCtx, { imageUrl: image.url }),
       ]));
 
-      return { prompt, categories };
+      // Filter to only high-confidence categories
+      const allCategories = categories.flatMap(p => p);
+      const highConfidenceCategories = allCategories.filter(cat => cat.confidence >= 0.7);
+      const uniqueCategories = Array.from(new Set(highConfidenceCategories.map(cat => cat.name)));
+
+      return { prompt, categories: uniqueCategories };
 
     } catch {
       // Cleanup uploaded image on failure

@@ -96,14 +96,14 @@ const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle }) => 
 }
 
 export default function Screen() {
-  const { feed, canLoadMore, setSeed, isLoading, loadMore } = useFeed({ initialNumItems: 8 });
+  const { feed, canLoadMore, updateSeed, isLoading, loadMore } = useFeed({ initialNumItems: 8 });
   const { top } = useSafeAreaInsets();
 
   return (
     <SafeAreaView edges={{ top: 'off', bottom: 'maximum' }} style={{ flex: 1 }}>
       <FlashList
         refreshing={isLoading}
-        onRefresh={() => setSeed((prev) => (prev ?? 0) + 1)}
+        onRefresh={() => updateSeed()}
         onEndReached={() => loadMore(8)}
         data={(feed ?? [])}
         keyExtractor={(i) => i?._id}

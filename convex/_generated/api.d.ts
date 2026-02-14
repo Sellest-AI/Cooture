@@ -79,7 +79,7 @@ import type * as llm_utils_usageHandler from "../llm/utils/usageHandler.js";
 import type * as migrations from "../migrations.js";
 import type * as procedures from "../procedures.js";
 import type * as router_admin_generateOutfitsCover from "../router/admin/generateOutfitsCover.js";
-import type * as router_admin_promptTest from "../router/admin/promptTest.js";
+import type * as router_admin_repairPreset from "../router/admin/repairPreset.js";
 import type * as router_auth_linkStripeSubscription from "../router/auth/linkStripeSubscription.js";
 import type * as router_auth_postCreateOrUpdate from "../router/auth/postCreateOrUpdate.js";
 import type * as router_examples_query from "../router/examples/query.js";
@@ -223,7 +223,7 @@ declare const fullApi: ApiFromModules<{
   migrations: typeof migrations;
   procedures: typeof procedures;
   "router/admin/generateOutfitsCover": typeof router_admin_generateOutfitsCover;
-  "router/admin/promptTest": typeof router_admin_promptTest;
+  "router/admin/repairPreset": typeof router_admin_repairPreset;
   "router/auth/linkStripeSubscription": typeof router_auth_linkStripeSubscription;
   "router/auth/postCreateOrUpdate": typeof router_auth_postCreateOrUpdate;
   "router/examples/query": typeof router_examples_query;
