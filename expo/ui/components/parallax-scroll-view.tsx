@@ -12,6 +12,7 @@ type Props = {
   contentNegativeSpace?: number;
   /** Height of the header */
   headerContent: ReactNode;
+  headerContentEdges?: ComponentProps<typeof SafeAreaView>['edges'];
   headerBackgroundImage?: ComponentProps<typeof Image>['source'];
   headerBackgroundImageStyle?: ComponentProps<typeof Image>['style'];
   headerBackgroundImagePosition?: ComponentProps<typeof Image>['contentPosition'];
@@ -30,6 +31,7 @@ export const ParallaxScrollView = ({
   scrollKey = undefined,
   contentNegativeSpace = 0,
   headerContent,
+  headerContentEdges,
   headerBackgroundImageStyle,
   headerBackgroundImagePosition,
   headerBackgroundImage,
@@ -173,7 +175,7 @@ export const ParallaxScrollView = ({
         >
           <SafeAreaView
             pointerEvents="box-none"
-            edges={{ bottom: 'off' }}
+            edges={{ bottom: 'off', ...headerContentEdges }}
           >
             {headerContent}
           </SafeAreaView>

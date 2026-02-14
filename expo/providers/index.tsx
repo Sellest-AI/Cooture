@@ -1,4 +1,5 @@
 import { KeyboardAvoiderProvider } from '@good-react-native/keyboard-avoider'
+import { SafeAreaProvider } from '@ui/safe-area-view'
 import { AsyncProviders } from "./async"
 import { ConvexClientProvider } from "./convex-client"
 import { I18nProvider } from "./i18n"
@@ -15,11 +16,13 @@ export const Providers = ({ children }: Props) => {
       <I18nProvider>
         <ThemeProvider>
           <MotionProvider>
-            <KeyboardAvoiderProvider>
-              <AsyncProviders>
-                {children}
-              </AsyncProviders>
-            </KeyboardAvoiderProvider>
+            <SafeAreaProvider>
+              <KeyboardAvoiderProvider>
+                <AsyncProviders>
+                  {children}
+                </AsyncProviders>
+              </KeyboardAvoiderProvider>
+            </SafeAreaProvider>
           </MotionProvider>
         </ThemeProvider>
       </I18nProvider>
