@@ -159,7 +159,7 @@ export default function ItemScreen() {
 
   const [selectedItem, setSelectedItem] = useState<Id<'items'> | null>(null);
   const [items, setItems] = useStateEffect(outfit?.items ?? []);
-  const [name, setName] = useStateEffect(outfit?.name ?? '');
+  const [name, setName] = useStateEffect('');
 
   const hasChanges = useMemo(() => {
     if (!outfit) return false;
@@ -267,9 +267,9 @@ export default function ItemScreen() {
             {ownOutfit && <TextInput
               style={{ marginTop: 12 }}
               startIcon={Pencil}
-              placeholder="Name your outfit..."
+              placeholder={outfit.name}
               onChangeText={setName}
-              value={name}
+              defaultValue={name}
             />}
             <FlashList
               data={[...items, undefined]}

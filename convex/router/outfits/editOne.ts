@@ -9,7 +9,7 @@ export const authed = authMutation({
     items: v.optional(v.array(v.id("items"))),
   },
   handler: async (ctx, args) => {
-    if (args.name !== undefined) {
+    if (!!args.name) {
       await ctx.db.patch(args.outfitId, {
         name: args.name,
         updatedAt: Date.now(),

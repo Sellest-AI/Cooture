@@ -105,7 +105,7 @@ export default function NewOutfitScreen() {
           }}>
           <TextInput
             startIcon={Pencil}
-            placeholder="Name your outfit..."
+            placeholder="Name your outfit (optional)"
             onChangeText={setName}
             value={name}
             style={{

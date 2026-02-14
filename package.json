@@ -24,6 +24,7 @@
     "@convex-dev/migrations": "^0.3.1",
     "@convex-dev/rag": "^0.6.1",
     "@expo/vector-icons": "^15.0.3",
+    "@faker-js/faker": "^10.3.0",
     "@good-react-native/keyboard-avoider": "^1.1.4",
     "@openrouter/ai-sdk-provider": "^1.5.4",
     "@react-navigation/bottom-tabs": "^7.4.0",

@@ -51,7 +51,7 @@ const useNewOutfit = () => {
   }, [setItems, setName]);
 
   const saveOutfit = async () => {
-    const finalName = name.trim() || 'New Outfit';
+    const finalName = name.trim() || undefined;
     const outfitId = await mutate({ name: finalName, items });
     reset();
     return outfitId;
