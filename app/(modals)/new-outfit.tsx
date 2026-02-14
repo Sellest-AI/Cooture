@@ -82,6 +82,7 @@ export default function NewOutfitScreen() {
                 return (
                   <View style={{ marginBottom: 24, paddingTop: 3, marginLeft, marginRight }}>
                     <CardItem
+                      image={item.image}
                       source={item.image.sizes.small.url}
                       title={item.name}
                       subtitle={item.category}

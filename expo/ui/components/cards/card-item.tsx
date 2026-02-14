@@ -2,7 +2,7 @@ import { Check } from '@ui/icons';
 import { ComponentProps, useEffect, useRef, useState } from 'react';
 import { Animated, LayoutChangeEvent, Pressable, Image as RNImage, View, ViewStyle } from 'react-native';
 import { Colors } from 'theme';
-import { Image } from '../image';
+import { Image, ImageObject } from '../image';
 import { Text } from '../text';
 
 type Props = {
@@ -13,19 +13,20 @@ type Props = {
   badge?: string;
   selected?: boolean;
   source: ComponentProps<typeof Image>['source'];
+  image?: ImageObject;
   onPress?: ComponentProps<typeof Pressable>['onPress'];
   onLongPress?: ComponentProps<typeof Pressable>['onLongPress'];
   animate?: boolean;
 }
 
-export const CardItem = ({ title, subtitle, selected, disabled, badge, style, source, onPress, onLongPress, animate = true }: Props) => {
+export const CardItem = ({ title, subtitle, selected, disabled, badge, style, source, onPress, onLongPress, image, animate = true }: Props) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   // Default height if we can't compute one from the image
   const DEFAULT_HEIGHT = 160;
 
   // Track intrinsic image size and layout width so we can compute the scaled height
-  const [intrinsicSize, setIntrinsicSize] = useState<{ width: number; height: number } | null>(null);
+  const [intrinsicSize, setIntrinsicSize] = useState<{ width: number; height: number } | null>(image ?? null);
   const [layoutWidth, setLayoutWidth] = useState<number | null>(null);
 
   useEffect(() => {

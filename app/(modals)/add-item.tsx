@@ -64,6 +64,7 @@ export default function AddItemScreen() {
                 marginRight: 20,
               }}>
                 <CardItem
+                  image={item.image}
                   source={item.image.sizes.small.url}
                   title={item.name}
                   subtitle={item.category}

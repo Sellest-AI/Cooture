@@ -24,6 +24,7 @@ export const SelectedItemModal = ({ itemId, onRemove, ...props }: SelectedItemMo
       {({ close }) => !item ? null : (
         <View style={{ paddingTop: 12 }}>
           <CardItem
+            image={item.image}
             source={item.image.sizes.medium.url}
             title={item.name}
             subtitle={item.category}

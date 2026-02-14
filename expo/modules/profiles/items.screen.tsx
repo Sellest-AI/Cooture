@@ -49,6 +49,7 @@ export function Screen() {
           }}
           >
             <CardItem
+              image={item.image}
               source={item.image.sizes.small.url}
               title={item.name}
               subtitle={item.category.toLowerCase()}

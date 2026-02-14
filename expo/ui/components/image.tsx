@@ -3,7 +3,7 @@ import React, { forwardRef, useEffect, useRef } from 'react';
 import { Animated } from 'react-native';
 
 // Animated wrapper around `expo-image` that fades in when the image loads.
-export const Image = forwardRef<any, ExpoImageProps>((props, ref) => {
+export const Image = forwardRef<any, ImageProps>((props, ref) => {
   const { onLoad, style, ...rest } = props;
   const opacity = useRef(new Animated.Value(0)).current;
   const prevSource = useRef(props.source);
@@ -26,10 +26,14 @@ export const Image = forwardRef<any, ExpoImageProps>((props, ref) => {
     if (onLoad) onLoad(e);
   };
 
+  const placeholderSrc = rest.image?.sizes?.thumbnail?.url;
+
   return (
     <Animated.View style={[style as any, { opacity }]}>
       <ExpoImage
         {...(rest as ExpoImageProps)}
+        source={rest.source}
+        placeholder={rest.placeholder ?? placeholderSrc}
         ref={ref}
         onLoad={handleLoad}
         cachePolicy={props.cachePolicy ?? 'memory-disk'}
@@ -42,4 +46,23 @@ export const Image = forwardRef<any, ExpoImageProps>((props, ref) => {
 
 Image.displayName = 'Image';
 
-export type ImageProps = ExpoImageProps; 
+export type ImageProps = ExpoImageProps & {
+  image?: ImageObject;
+}
+
+type ImageSize = {
+  width: number;
+  height: number;
+  url: string;
+  hasAlpha?: boolean;
+}
+
+export type ImageObject = ImageSize & {
+  sizes: {
+    thumbnail: ImageSize;
+    small: ImageSize;
+    medium: ImageSize;
+    large: ImageSize;
+    original: ImageSize;
+  }
+}
