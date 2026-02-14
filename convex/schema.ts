@@ -5,7 +5,7 @@ import { generations, predictions } from "./schema/generations";
 import { imageObjects, images, imageSizes } from "./schema/images";
 import { items } from "./schema/items";
 import { outfitItems, outfits } from "./schema/outfits";
-import { presetGenerations, presets } from "./schema/presets";
+import { presetCategories, presetGenerations, presets } from "./schema/presets";
 import { subscriptions, subscriptionsHistory } from "./schema/subscriptions";
 import { userImages, usersAppearance, usersExtended } from "./schema/users";
 
@@ -25,6 +25,7 @@ export default defineSchema({
   generations,
   predictions,
   presets,
+  presetCategories,
   presetGenerations,
   feedScores
 });

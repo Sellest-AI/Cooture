@@ -1,6 +1,40 @@
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
 
+// ===== PRESET CATEGORIES =====
+// Single source of truth for all category values
+// This array is used to generate both Convex validators and Zod schemas
+export const PRESET_CATEGORY_VALUES = [
+  // Subject count
+  "SOLO", "DUO", "TRIO", "GROUP",
+
+  // Location/Environment
+  "STUDIO", "NATURE", "CITY", "BEACH", "INDOOR", "STREET",
+
+  // Style/Aesthetic
+  "CASUAL", "FORMAL", "VINTAGE", "EDITORIAL", "CANDID", "ARTISTIC",
+
+  // Purpose
+  "ENTERPRISE", "HEADSHOT", "LIFESTYLE", "FASHION", "SOCIAL_MEDIA", "COMMERCIAL",
+
+  // Technical/Special
+  "TRICKS", "DRAMATIC_LIGHTING", "NATURAL_LIGHT", "FLASH", "BLACK_WHITE", "GOLDEN_HOUR",
+
+  // Shot Composition
+  "FULL_BODY", "HALF_BODY", "CLOSEUP", "ACTION", "POV",
+
+  // Mood
+  "MOODY", "BRIGHT", "PLAYFUL", "SERIOUS", "ROMANTIC",
+] as const;
+
+// TypeScript type derived from the array
+export type PresetCategory = typeof PRESET_CATEGORY_VALUES[number];
+
+// Convex validator derived from the array
+export const PRESET_CATEGORIES = v.union(
+  ...PRESET_CATEGORY_VALUES.map(cat => v.literal(cat))
+);
+
 export const PRESET_PROMPT = v.object({
   sceneDescription: v.string(),
   style: v.object({
@@ -14,7 +48,7 @@ export const PRESET_PROMPT = v.object({
     backgroundDetails: v.string(),
     surroundingElements: v.array(v.string()),
   }),
-  subject: v.object({
+  subjects: v.array(v.object({
     position: v.string(),
     bodyAlignment: v.string(),
     legs: v.array(v.string()),
@@ -25,13 +59,31 @@ export const PRESET_PROMPT = v.object({
       angle: v.string(),
       expression: v.string(),
       gaze: v.string(),
+    }),
+    outfit: v.object({
+      description: v.string(),
+      top: v.optional(v.object({
+        type: v.string(),
+        details: v.string(),
+      })),
+      bottom: v.optional(v.object({
+        type: v.string(),
+        details: v.string(),
+      })),
+      innerLayer: v.optional(v.string()),
+      outerwear: v.optional(v.object({
+        type: v.string(),
+        details: v.string(),
+      })),
+      accessories: v.array(v.record(v.string(), v.string())),
+      shoes: v.optional(v.string()),
     })
-  }),
+  })),
   composition: v.object({
     shotType: v.string(),
     cameraAngle: v.string(),
     cameraPosition: v.string(),
-    subjectPlacement: v.string(),
+    subjectsPlacement: v.string(),
     photographicTricks: v.array(v.string()),
     backgroundOrientation: v.string(),
     focus: v.string(),
@@ -40,24 +92,6 @@ export const PRESET_PROMPT = v.object({
     camera: v.string(),
     postProcessing: v.string(),
     focalLength: v.string(),
-  }),
-  outfit: v.object({
-    description: v.string(),
-    top: v.optional(v.object({
-      type: v.string(),
-      details: v.string(),
-    })),
-    bottom: v.optional(v.object({
-      type: v.string(),
-      details: v.string(),
-    })),
-    innerLayer: v.optional(v.string()),
-    outerwear: v.optional(v.object({
-      type: v.string(),
-      details: v.string(),
-    })),
-    accessories: v.array(v.record(v.string(), v.string())),
-    shoes: v.optional(v.string()),
   }),
 });
 
@@ -69,6 +103,13 @@ export const presets = defineTable({
   archived: v.boolean(),
 })
   .index("by_archived", ["archived"])
+
+export const presetCategories = defineTable({
+  presetId: v.id("presets"),
+  name: PRESET_CATEGORIES,
+})
+  .index("by_preset_id", ["presetId"])
+  .index("by_name", ["name"])
 
 export const presetGenerations = defineTable({
   presetId: v.id("presets"),

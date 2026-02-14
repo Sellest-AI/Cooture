@@ -7,8 +7,10 @@ import { Id } from "../../_generated/dataModel";
 import { ActionCtx, authAction } from "../../procedures";
 import { PRESET_PROMPT } from "../../schema/presets";
 
+type Prompt = typeof PRESET_PROMPT['type'];
+
 type Schema = {
-  prompt: typeof PRESET_PROMPT['type'];
+  prompt: Prompt;
   depthMap?: Id<'images'>,
   images: { url: string; hasAlpha: boolean }[];
 }
@@ -16,10 +18,17 @@ type Schema = {
 const OUTFIT_SIZES_ARGS = v.union(v.literal("TIGHT"), v.literal("DEFAULT"), v.literal("LOOSE"), v.literal("EXTRA_LOOSE"));
 type OutfitSize = 'TIGHT' | 'DEFAULT' | 'LOOSE' | 'EXTRA_LOOSE';
 
-const updateOutfit = async (ctx: ActionCtx, schema: Schema, _outfit?: { _id: Id<'outfits'>, size?: OutfitSize }): Promise<Schema> => {
-  if (!_outfit) return schema;
+type Subject = {
+  index: number;
+  prompt: Prompt['subjects'][number];
+  outfit?: { _id: Id<'outfits'>, size?: OutfitSize }
+  userId?: Id<'users'>;
+}
 
-  const outfit = await ctx.runQuery(internal.router.outfits.getOne._internal, { outfitId: _outfit._id });
+const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: Subject): Promise<Schema> => {
+  if (!subject?.outfit) return schema;
+
+  const outfit = await ctx.runQuery(internal.router.outfits.getOne._internal, { outfitId: subject.outfit._id });
   if (!outfit) return schema;
 
   // ---- EXTRACT ITEMS BY POSITION ----
@@ -53,8 +62,8 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, _outfit?: { _id: Id<
     .filter((i) => {
       // If the prompt doesn't explicitly mention an item, we won't include it in the references, 
       // to avoid confusion for the LLM
-      if (i.type === 'BOTTOM') if (!schema.prompt.outfit.bottom) return null;
-      if (i.type === 'SHOES') if (!schema.prompt.outfit.shoes) return null;
+      if (i.type === 'BOTTOM') if (!subject.prompt.outfit.bottom) return null;
+      if (i.type === 'SHOES') if (!subject.prompt.outfit.shoes) return null;
       return i;
     })
     .filter(notEmpty);
@@ -63,8 +72,8 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, _outfit?: { _id: Id<
 
   // Build outfit description
   const itemNames = outfit.items.map(item => item.name);
-  const description = itemNames.length > 0 ? `An outfit featuring ${itemNames.join(', ')}` : schema.prompt.outfit.description;
-  const outfitSize = _outfit.size ? `VERY IMPORTANT: the subject is wearing it with ${_outfit.size.replaceAll('_', ' ')} fit` : undefined;
+  const description = itemNames.length > 0 ? `An outfit featuring ${itemNames.join(', ')}` : subject.prompt.outfit.description;
+  const outfitSize = subject.outfit?.size ? `VERY IMPORTANT: the subject is wearing it with ${subject.outfit.size.replaceAll('_', ' ')} fit` : undefined;
 
   // Helper function to build details string
   const buildDetails = (item: typeof top | typeof bottom | typeof outerwear | typeof innerLayer) => {
@@ -85,7 +94,7 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, _outfit?: { _id: Id<
   };
 
   const bottomObject = (() => {
-    if (!schema.prompt.outfit.bottom) return undefined;
+    if (!subject.prompt.outfit.bottom) return undefined;
     if (bottom) return {
       type: bottom.name,
       details: buildDetails(bottom),
@@ -100,9 +109,9 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, _outfit?: { _id: Id<
   })()
 
   const shoesObject = (() => {
-    if (!schema.prompt.outfit.shoes) return undefined;
+    if (!subject.prompt.outfit.shoes) return undefined;
     if (shoes) return `${shoes.mainColors.join(' ')} ${shoes.materials.map(m => m.toLowerCase()).join(' ')} ${shoes.name}${shoes.description ? `, ${shoes.description}` : ''}`;
-    return schema.prompt.outfit.shoes; // Undefined
+    return subject.prompt.outfit.shoes; // Undefined
   })()
 
   // ---- CUSTOM OUTFIT ----
@@ -130,43 +139,49 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, _outfit?: { _id: Id<
       ? accessories.map(acc => ({
         [acc.name]: `${acc.mainColors.join(' ')} ${acc.materials.map(m => m.toLowerCase()).join(' ')}${acc.description ? `, ${acc.description}` : ''}`
       }))
-      : schema.prompt.outfit.accessories,
+      : subject.prompt.outfit.accessories,
     shoes: shoesObject,
   }
 
-  const prompt = {
+  const finalPrompt: Prompt = {
     ...schema.prompt,
-    outfit: {
-      ...schema.prompt.outfit,
-      ...customOutfit,
-    }
+    subjects: schema.prompt.subjects.map((s, i) =>
+      i === subject.index ? { ...subject.prompt, outfit: { ...subject.prompt.outfit, ...customOutfit } } : s
+    )
   }
 
-  return { ...schema, images, prompt }
+  return { ...schema, images, prompt: finalPrompt }
 }
 
-const updateSubject = async (ctx: ActionCtx, schema: Schema, userId: Id<'users'>): Promise<Schema> => {
-  const appearance = await ctx.runQuery(internal.router.users.getAppearance._internal, { userId });
+const updateSubject = async (ctx: ActionCtx, schema: Schema, subject: Subject): Promise<Schema> => {
+  if (!subject.userId) return schema;
+
+  const appearance = await ctx.runQuery(internal.router.users.getAppearance._internal, { userId: subject.userId });
   if (!appearance) return schema;
 
   const prompt = {
-    ...schema.prompt,
-    subject: {
-      ...schema.prompt.subject,
-      reference: `Use the subject face and skin tone from the reference image ${schema.images.length + 1}. Do not copy facial expression. Use the facial expression from the prompt.`,
-      gender: `Keep the gender of the subject as shown in the reference image ${schema.images.length + 1}.`,
-    }
+    ...subject.prompt,
+    reference: `Use the subject face and skin tone from the reference image ${schema.images.length + 1}. Do not copy facial expression. Use the facial expression from the prompt.`,
+    gender: `Keep the gender of the subject as shown in the reference image ${schema.images.length + 1}.`,
+    height: appearance.heightCm ? `${appearance.heightCm}cm tall` : undefined,
   }
 
-  let image = prompt.subject.head.direction === "side" ? appearance.sideImage : appearance.frontImage;
+  let image = prompt.head.direction === "side" ? appearance.sideImage : appearance.frontImage;
   if (!image) image = appearance.frontImage;
 
   const images = [...schema.images, { url: image.url, hasAlpha: image.hasAlpha }];
 
+  const finalPrompt: Prompt = {
+    ...schema.prompt,
+    subjects: schema.prompt.subjects.map((s, i) =>
+      i === subject.index ? { ...subject.prompt, ...prompt } : s
+    )
+  };
+
   return {
     ...schema,
     images,
-    prompt
+    prompt: finalPrompt
   }
 }
 
@@ -189,33 +204,15 @@ const updateStyle = async (schema: Schema): Promise<Schema> => {
   }
 }
 
-const updateHeight = async (schema: Schema, subject?: { heightCm: number }): Promise<Schema> => {
-  if (!subject) return schema;
-
-  const prompt = {
-    ...schema.prompt,
-    subject: {
-      ...schema.prompt.subject,
-      height: `${subject.heightCm}cm tall`
-    }
-  }
-
-  return {
-    ...schema,
-    prompt
-  }
-}
-
 const orderSchema = async (schema: Schema): Promise<Schema> => {
-  const { sceneDescription, style, environment, subject, composition, technical, outfit } = schema.prompt;
+  const { sceneDescription, style, environment, subjects, composition, technical } = schema.prompt;
 
   return {
     ...schema,
     prompt: {
       sceneDescription,
       composition,
-      subject,
-      outfit,
+      subjects,
       environment,
       style,
       technical,
@@ -250,22 +247,29 @@ const addDepthMap = async (ctx: ActionCtx, schema: Schema): Promise<Schema> => {
 export const authed = authAction({
   args: {
     presetId: v.id("presets"),
-    subject: v.optional(v.object({
-      heightCm: v.number()
-    })),
     outfit: v.optional(v.object({
       _id: v.id("outfits"),
       size: v.optional(OUTFIT_SIZES_ARGS),
-    }))
+    })),
+    /** Other users to be added when duo/trio shot */
+    extraUserIds: v.optional(v.array(v.id("users"))),
   },
   handler: async (ctx, args): Promise<Id<'generations'>> => {
     const preset = await ctx.runQuery(internal.router.presets.getOne._internal, { presetId: args.presetId });
     if (!preset) throw new Error("Preset not found");
 
     let schema: Schema = { prompt: preset.prompts[0], depthMap: preset.depthMaps[0], images: [] }
-    schema = await updateSubject(ctx, schema, ctx.userId);
-    schema = await updateOutfit(ctx, schema, args.outfit);
-    schema = await updateHeight(schema, args.subject);
+    for (const [index, _subject] of schema.prompt.subjects.entries()) {
+      let subject: Subject = {
+        index: index,
+        prompt: _subject,
+        outfit: index === 0 ? args.outfit : undefined,
+        userId: index === 0 ? ctx.userId : args.extraUserIds?.[index - 1],
+      }
+      schema = await updateSubject(ctx, schema, subject);
+      schema = await updateOutfit(ctx, schema, subject);
+    }
+
     schema = await updateStyle(schema);
     schema = await addDepthMap(ctx, schema);
     // Last step to ensure the schema is in the correct order for the LLM prompt

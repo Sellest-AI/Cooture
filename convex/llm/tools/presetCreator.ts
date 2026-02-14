@@ -21,24 +21,31 @@ Analyze the visual input and extract a structured JSON preset used to recreate t
 CRITICAL ARCHITECTURE RULES (STRICT ENFORCEMENT):
 This JSON is used in a pipeline where the User and the Outfit can be swapped independently. You must separate concerns:
 
-1. GENDER-NEUTRAL LANGUAGE (ABSOLUTE REQUIREMENT):
+1. MULTIPLE SUBJECTS (ARRAY HANDLING):
+   - Most scenes have ONE subject. Return a single-element array: [{ subject details }].
+   - ONLY use multiple subjects if there are 2+ clearly identifiable humans in the scene who are BOTH focal points.
+   - A crowd, blurred people in background, or partially visible bystanders are NOT subjects - they belong in 'environment.surroundingElements'.
+   - Each subject in the array gets their own complete description: position, body, head, AND outfit.
+   - Example: Two friends posing together = 2 subjects. Subject + blurred crowd behind = 1 subject (crowd in environment).
+
+2. GENDER-NEUTRAL LANGUAGE (ABSOLUTE REQUIREMENT):
    - NEVER use gendered terms: "woman", "man", "girl", "boy", "male", "female", "she", "he", "her", "him", "his", "hers".
-   - ALWAYS use: "the subject", "the person", "the individual", "they", "their".
+   - ALWAYS use: "the subject", "the person", "the individual", "they", "their", OR positional identifiers like "subject on left", "taller subject", "subject in foreground".
    - WHY: This preset will be used by people of ANY gender. Gendered descriptions will force gender transformation in the output.
    - Example: Instead of "woman leaning against wall", write "subject leaning against wall".
 
-2. NO "GHOST" CLOTHING: 
-   - NEVER describe clothing colors, specific garments, or brands in 'sceneDescription', 'subject', or 'environment'. 
+3. NO "GHOST" CLOTHING: 
+   - NEVER describe clothing colors, specific garments, or brands in 'sceneDescription' or 'environment'. 
 
-3. SUBJECT vs. OUTFIT:
+4. SUBJECT vs. OUTFIT:
    - 'subject': Describes the biological human, their pose, muscle tension, and expression.
-   - 'outfit': Contains ALL fashion information.
+   - 'outfit' (nested inside each subject): Contains ALL fashion information for that specific subject.
 
-4. PROPS vs. ACCESSORIES:
+5. PROPS vs. ACCESSORIES:
    - Worn = 'outfit.accessories'. 
    - Held/Interacted = 'subject.heldObjects' or 'environment.surroundingElements'.
 
-5. VISIBILITY & CROPPING (ABSOLUTE RULES YOU MUST FOLLOW):
+6. VISIBILITY & CROPPING (ABSOLUTE RULES YOU MUST FOLLOW):
   - If a body part or clothing item is cut off by the frame, RETURN undefined (the JavaScript token) for that optional field. Do NOT invent or describe it.
   - If shoes are not visible, shoes: undefined.
   - If top or bottom clothing is not visible, top: undefined, bottom: undefined.
@@ -71,7 +78,7 @@ Follow these rules exactly. The consumer of this object expects literal undefine
 export const ImagePresetSchema = z.object({
   // --- SCENE ---
   sceneDescription: z.string().min(300).describe(
-    `The core concept/action. MUST describe the scene as if the subject were wearing a neutral grey suit or naked. Do NOT mention specific garments except held objects. ${NO_CLOTHING}`
+    `The core concept/action. MUST describe the scene as if the subject(s) were wearing a neutral grey suit or naked. Do NOT mention specific garments except held objects. ${NO_CLOTHING}`
   ),
 
   // --- 2. STYLE (ARTISTIC DIRECTION) ---
@@ -85,14 +92,16 @@ export const ImagePresetSchema = z.object({
   // --- 3. ENVIRONMENT (WORLD) ---
   environment: z.object({
     location: z.string().describe("The setting: e.g., 'Urban street corner', 'Outside convenience store'."),
-    backgroundDetails: z.string().describe(`Specific objects behind the subject. Example: 'Sliding glass doors with neon Open signs'. ${NO_BODY}`),
+    backgroundDetails: z.string().describe(`Specific objects behind the subject(s). Example: 'Sliding glass doors with neon Open signs'. ${NO_BODY}`),
     surroundingElements: z.array(z.string()).describe(
-      "Objects captured in the background/foreground. Example: ['Green and orange convenience store sign', 'Wet asphalt']."
+      "Objects captured in the background/foreground. Example: ['Green and orange convenience store sign', 'Wet asphalt']. Include non-focal people here (crowds, blurred bystanders)."
     ),
   }),
 
-  // --- SUBJECT (PHYSICALITY) ---
-  subject: z.object({
+  // --- 4. SUBJECTS (PHYSICALITY) ---
+  // Usually contains ONE subject. Only use multiple if there are 2+ clearly identifiable focal humans.
+  // Crowds/blurred people belong in environment.surroundingElements.
+  subjects: z.array(z.object({
     position: z.string().describe("General stance: e.g., 'Sitting', 'Standing', 'Jumping'."),
     bodyAlignment: z.string().describe("Relation to camera: e.g., 'Frontal', 'Profile', 'Three-quarter turn'."),
     legs: z.array(z.string()).describe("Leg positions. Example: ['Right leg bent at knee', 'Left leg straight supporting weight']."),
@@ -105,16 +114,46 @@ export const ImagePresetSchema = z.object({
       angle: z.string().describe("Head tilt: e.g., 'Tilted to the side', 'Chin up'."),
       expression: z.string().describe("Facial emotion: e.g., 'Winking eye', 'Puckered lips', 'Playful'."),
       gaze: z.string().describe("Eye direction: e.g., 'Looking at camera'."),
-    })
-  }),
+    }),
+    // --- OUTFIT (ISOLATED FOR SWAPPING) ---
+    // Each subject has their own outfit. This allows swapping outfits independently per subject.
+    outfit: z.object({
+      description: z.string().describe("Summary of the look. REQUIRED: Include fit and vibe."),
+
+      top: z.object({
+        type: z.string().describe("Category: e.g., 'Crop top', 'T-shirt'.").optional(),
+        details: z.string().describe("Specifics: e.g., 'Black cotton, red logo graphic on chest, ultra-short fit'.")
+          .optional(),
+      }).optional().describe("If not visible, return undefined."),
+
+      bottom: z.object({
+        type: z.string().describe("Category: e.g., 'Cargo pants', 'Jeans'.").optional(),
+        details: z.string().describe("Specifics: e.g., 'Black baggy fit, low rise waist'.")
+          .optional(),
+      }).optional().describe("If not visible, return undefined."),
+
+      // Useful for managing 'tucked in' styles or visible branding on waistbands
+      innerLayer: z.string().optional().describe("Visible layers underneath: e.g., 'White elastic boxer waistband showing'."),
+
+      outerwear: z.object({
+        type: z.string().describe("Category: e.g., 'Jacket', 'Hoodie'.").optional(),
+        details: z.string().describe("Specifics: e.g., 'Black zip-up hoodie, slightly oversized fit'.")
+          .optional(),
+      }).optional().describe("If not visible, return undefined."),
+
+      accessories: z.array(z.record(z.string(), z.string())).describe("Worn items (Glasses, Necklace, Hat). If none, return []."),
+
+      shoes: z.string().optional().describe("If feet are not visible, return undefined."),
+    }),
+  })),
 
   // --- 5. COMPOSITION (FRAMING) ---
   composition: z.object({
     shotType: z.string().describe("Size: e.g., 'Medium Shot', 'POV'."),
     cameraAngle: z.string().describe("Height: e.g., 'Eye level', 'Slightly high angle'."),
-    cameraPosition: z.string().describe("Camera position relative to subject: e.g., 'Frontal', 'Three-quarter left', 'Three-quarter right', 'Profile', 'From behind'."),
-    subjectPlacement: z.string().describe("Subject position in frame: e.g., 'Centered', 'Left third of frame', 'Right side', 'Off-center right'."),
-    focus: z.string().describe("Depth: e.g., 'Deep focus', 'Subject sharp, background slightly visible'."),
+    cameraPosition: z.string().describe("Camera position relative to subject(s): e.g., 'Frontal', 'Three-quarter left', 'Three-quarter right', 'Profile', 'From behind'."),
+    subjectsPlacement: z.string().describe("Subject(s) position in frame. Single subject: 'Centered', 'Left third of frame', 'Right side'. Multiple subjects: 'Both centered', 'Left subject in left third, right subject in right third', 'Staggered - foreground subject left, background subject right'."),
+    focus: z.string().describe("Depth: e.g., 'Deep focus', 'Subject(s) sharp, background slightly visible'."),
     photographicTricks: z.array(z.string()).describe("List of optical illusions or camera tricks used. Examples: 'Giant hand in extreme foreground creating forced perspective illusion', 'Mirror reflection trick', 'Tilt-shift miniature effect', 'Double exposure blend'. If no special tricks are used, return empty array."),
     backgroundOrientation: z.string().describe("Orientation of background elements (especially moving ones like trains, cars, crowds) relative to camera. E.g., 'Parallel/Horizontal - train moving left to right across frame', 'Three-quarter angle - train receding into distance', 'Perpendicular - train coming toward/away from camera'. Important for perspective lines."),
   }),
@@ -124,36 +163,6 @@ export const ImagePresetSchema = z.object({
     camera: z.string().describe("Simulated Gear: e.g., 'iPhone camera', 'Point-and-shoot film'."),
     postProcessing: z.string().describe("Grading: e.g., 'Flash photo look', 'Slightly overexposed highlight', 'Raw'."),
     focalLength: z.string().describe("Lens: e.g., '28mm wide angle'."),
-  }),
-
-  // --- 7. OUTFIT (ISOLATED FOR SWAPPING) ---
-  outfit: z.object({
-    description: z.string().describe("Summary of the look. REQUIRED: Include fit and vibe."),
-
-    top: z.object({
-      type: z.string().describe("Category: e.g., 'Crop top', 'T-shirt'.").optional(),
-      details: z.string().describe("Specifics: e.g., 'Black cotton, red logo graphic on chest, ultra-short fit'.")
-        .optional(),
-    }).optional().describe("If not visible, return undefined."),
-
-    bottom: z.object({
-      type: z.string().describe("Category: e.g., 'Cargo pants', 'Jeans'.").optional(),
-      details: z.string().describe("Specifics: e.g., 'Black baggy fit, low rise waist'.")
-        .optional(),
-    }).optional().describe("If not visible, return undefined."),
-
-    // Useful for managing 'tucked in' styles or visible branding on waistbands
-    innerLayer: z.string().optional().describe("Visible layers underneath: e.g., 'White elastic boxer waistband showing'."),
-
-    outerwear: z.object({
-      type: z.string().describe("Category: e.g., 'Jacket', 'Hoodie'.").optional(),
-      details: z.string().describe("Specifics: e.g., 'Black zip-up hoodie, slightly oversized fit'.")
-        .optional(),
-    }).optional().describe("If not visible, return undefined."),
-
-    accessories: z.array(z.record(z.string(), z.string())).describe("Worn items (Glasses, Necklace, Hat). If none, return []."),
-
-    shoes: z.string().optional().describe("If feet are not visible, return undefined."),
   }),
 });
 
@@ -178,10 +187,12 @@ export const presetCreator = createTool({
               text: `Analyze this image to create a reusable generation preset.
               
               Follow these priorities:
-              1. DETACH the clothing from the scene description. The scene description must work even if the subject was naked.
-              2. VISIBILITY CHECK: Is the subject full body? Waist up? Headshot? If a body part or clothing item is cut off by the frame, return 'undefined'. Do NOT guess.
-              3. IDENTIFY strictly what is a 'Prop' (Environment/Subject) vs what is 'Fashion' (Outfit).
-              4. CLASSIFY the lighting and camera angle using technical photography terms.
+              1. COUNT SUBJECTS: How many clearly identifiable focal humans are in this scene? Usually 1. Only count as multiple subjects if there are 2+ people who are BOTH focal points (not crowds/blurred background people).
+              2. DETACH the clothing from the scene description. The scene description must work even if the subject(s) were wearing neutral grey suits or naked.
+              3. VISIBILITY CHECK: For each subject - Are they full body? Waist up? Headshot? If a body part or clothing item is cut off by the frame, return 'undefined'. Do NOT guess.
+              4. OUTFIT PER SUBJECT: Each subject in the array gets their own complete outfit description.
+              5. IDENTIFY strictly what is a 'Prop' (Environment/Subject) vs what is 'Fashion' (Outfit).
+              6. CLASSIFY the lighting and camera angle using technical photography terms.
               
               Fill the schema comprehensively.`
             }
@@ -192,7 +203,6 @@ export const presetCreator = createTool({
       maxRetries: 5,
       schema: ImagePresetSchema,
     }, { storageOptions: { saveMessages: 'none' } });
-
 
     // sanitize (loop through and fix any issues)
     // check for any string "undefined" or "[]" in the result and fix them
@@ -218,25 +228,32 @@ export const presetCreator = createTool({
 
     const object = sanitize(result.object);
 
-    const outfit = {
-      ...object.outfit,
-      top: object.outfit.top?.details && object.outfit.top.type ? {
-        type: object.outfit.top.type,
-        details: object.outfit.top.details,
-      } : undefined,
-      bottom: object.outfit.bottom?.details && object.outfit.bottom.type ? {
-        type: object.outfit.bottom.type,
-        details: object.outfit.bottom.details,
-      } : undefined,
-      outerwear: object.outfit.outerwear?.details && object.outfit.outerwear.type ? {
-        type: object.outfit.outerwear.type,
-        details: object.outfit.outerwear.details,
-      } : undefined,
+    const sanitizeOutfit = (subject: typeof object.subjects[number]) => {
+      const outfit = {
+        ...subject.outfit,
+        top: subject.outfit.top?.details && subject.outfit.top.type ? {
+          type: subject.outfit.top.type,
+          details: subject.outfit.top.details,
+        } : undefined,
+        bottom: subject.outfit.bottom?.details && subject.outfit.bottom.type ? {
+          type: subject.outfit.bottom.type,
+          details: subject.outfit.bottom.details,
+        } : undefined,
+        outerwear: subject.outfit.outerwear?.details && subject.outfit.outerwear.type ? {
+          type: subject.outfit.outerwear.type,
+          details: subject.outfit.outerwear.details,
+        } : undefined,
+      }
+
+      return {
+        ...subject,
+        outfit,
+      }
     }
 
     return {
       ...object,
-      outfit,
+      subjects: object.subjects.map(sanitizeOutfit),
     }
   }
 })

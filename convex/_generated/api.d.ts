@@ -60,6 +60,7 @@ import type * as llm_config_index from "../llm/config/index.js";
 import type * as llm_config_models from "../llm/config/models.js";
 import type * as llm_config_providers from "../llm/config/providers.js";
 import type * as llm_rag_rag from "../llm/rag/rag.js";
+import type * as llm_tools_imageCategorizer from "../llm/tools/imageCategorizer.js";
 import type * as llm_tools_itemCategorizer from "../llm/tools/itemCategorizer.js";
 import type * as llm_tools_presetCreator from "../llm/tools/presetCreator.js";
 import type * as llm_triggers_generateDepthMap from "../llm/triggers/generateDepthMap.js";
@@ -101,6 +102,7 @@ import type * as router_outfits_updateCover from "../router/outfits/updateCover.
 import type * as router_outfits_updateCoverInternal from "../router/outfits/updateCoverInternal.js";
 import type * as router_presets_createOne from "../router/presets/createOne.js";
 import type * as router_presets_getAll from "../router/presets/getAll.js";
+import type * as router_presets_getByCategory from "../router/presets/getByCategory.js";
 import type * as router_presets_getOne from "../router/presets/getOne.js";
 import type * as router_storage_images_deleteOne from "../router/storage/images/deleteOne.js";
 import type * as router_storage_images_deleteOneMutationInternal from "../router/storage/images/deleteOneMutationInternal.js";
@@ -196,6 +198,7 @@ declare const fullApi: ApiFromModules<{
   "llm/config/models": typeof llm_config_models;
   "llm/config/providers": typeof llm_config_providers;
   "llm/rag/rag": typeof llm_rag_rag;
+  "llm/tools/imageCategorizer": typeof llm_tools_imageCategorizer;
   "llm/tools/itemCategorizer": typeof llm_tools_itemCategorizer;
   "llm/tools/presetCreator": typeof llm_tools_presetCreator;
   "llm/triggers/generateDepthMap": typeof llm_triggers_generateDepthMap;
@@ -237,6 +240,7 @@ declare const fullApi: ApiFromModules<{
   "router/outfits/updateCoverInternal": typeof router_outfits_updateCoverInternal;
   "router/presets/createOne": typeof router_presets_createOne;
   "router/presets/getAll": typeof router_presets_getAll;
+  "router/presets/getByCategory": typeof router_presets_getByCategory;
   "router/presets/getOne": typeof router_presets_getOne;
   "router/storage/images/deleteOne": typeof router_storage_images_deleteOne;
   "router/storage/images/deleteOneMutationInternal": typeof router_storage_images_deleteOneMutationInternal;
