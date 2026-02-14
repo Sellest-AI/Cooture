@@ -1,10 +1,14 @@
 import { api, Id } from "@/lib/convex/api";
 import { useMutation, useQuery, useQueryCached } from "@/lib/convex/client";
+import { notEmpty } from "@utils/convex-allowed";
 import { atom, useAtom } from "jotai";
 
 export const usePhotoshoot = (id: Id<'generations'> | null) => {
   const { data: photoshoot } = useQuery(api.router.generations.getOne.authed, id ? { generationId: id } : 'skip');
   const { data: preset } = useQueryCached(api.router.presets.getOne.anon, photoshoot?.metadata?.presetId ? { presetId: photoshoot.metadata.presetId } : 'skip');
+
+  const imageIds = photoshoot?.predictions.map((p) => p.imageId).filter(notEmpty);
+  const { data: results } = useQueryCached(api.router.storage.images.getMany.anon, imageIds ? { imageIds } : 'skip');
 
   const { mutate } = useMutation(api.router.generations.updatePrediction.authed);
   const acceptPrediction = (predictionId: string) => {
@@ -15,6 +19,7 @@ export const usePhotoshoot = (id: Id<'generations'> | null) => {
   }
 
   return {
+    results,
     photoshoot,
     preset,
     acceptPrediction,

@@ -14,10 +14,11 @@ const updateGenerationStatus = async (ctx: MutationCtx, generationId: Id<'genera
     q.eq("generationId", generationId)).collect();
 
   const allRejected = predictions.every(prediction => ["REJECTED", "FAILED"].includes(prediction.status));
-  const allCompleted = predictions.every(prediction => ["ACCEPTED", "REJECTED", "FAILED"].includes(prediction.status));
+  const someAccepted = predictions.some(prediction => ["ACCEPTED"].includes(prediction.status));
+  const allProcessed = predictions.every(prediction => ["ACCEPTED", "REJECTED", "FAILED"].includes(prediction.status));
 
   // Archive the feed score if all predictions are rejected, otherwise unarchive it
-  if (allCompleted)
+  if (allProcessed)
     await upsertFeedScore(ctx, { generationId: generation._id, archive: allRejected });
 
   // Get the latest readyAt timestamp among predictions to set as completedAt for the generation
@@ -25,9 +26,9 @@ const updateGenerationStatus = async (ctx: MutationCtx, generationId: Id<'genera
     ?? generation.completedAt ?? Date.now();
 
   // Archive or publish the generation depending on the predictions status
-  if (allCompleted) {
+  if (allProcessed) {
     if (allRejected && generation.publication === "ARCHIVED") return;
-    if (!allRejected && generation.publication !== "ARCHIVED") return;
+    if (someAccepted && generation.publication === "PUBLISHED") return;
     await ctx.db.patch(generationId, {
       status: "COMPLETED",
       completedAt: completedAt,

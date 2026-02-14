@@ -172,15 +172,17 @@ export default function Screen() {
   const { id } = useLocalSearchParams<{ id: Id<'generations'> }>();
   const carouselRef = useRef<ICarouselInstance>(null);
 
-  const { photoshoot, preset, acceptPrediction, rejectPrediction } = usePhotoshoot(id);
+  const { photoshoot, results, preset, acceptPrediction, rejectPrediction } = usePhotoshoot(id);
 
   const outfitId = photoshoot?.metadata?.outfitId;
 
   const items = (photoshoot?.predictions ?? []).map((p) => ({
     _id: p.predictionId,
-    url: p.image?.url,
+    url: results?.find((r) => r._id === p.imageId)?.url,
     status: p.status,
   }))
+
+  const cover = results?.find((r) => r._id === photoshoot?.coverId);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [animatingItem, setAnimatingItem] = useState<{ id: string, status: 'IDLE' | 'ACCEPTING' | 'REJECTING' } | null>(null);
@@ -227,7 +229,7 @@ export default function Screen() {
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <Image
-        source={photoshoot?.cover?.sizes.large.url ?? require('assets/backgrounds/dark-gradient.png')}
+        source={cover?.sizes.large.url ?? require('assets/backgrounds/dark-gradient.png')}
         blurRadius={100}
         style={{
           opacity: 0.1,
