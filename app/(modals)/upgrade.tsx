@@ -14,11 +14,12 @@ type BadgeProps = {
   icon?: React.ComponentType<{ size?: number, color?: string }> | false,
   extra?: string,
   inverted?: boolean,
+  style?: ViewStyle,
 }
-const Badge = ({ children, icon, extra, inverted }: BadgeProps) => {
+const Badge = ({ children, icon, extra, inverted, style }: BadgeProps) => {
   const Icon = icon;
   return (
-    <View style={{
+    <View style={[{
       flexDirection: 'row',
       backgroundColor: inverted ? Colors.primary[900] : Colors.primary[500],
       paddingHorizontal: 12,
@@ -27,7 +28,7 @@ const Badge = ({ children, icon, extra, inverted }: BadgeProps) => {
       width: 'auto',
       alignSelf: 'flex-start',
       borderRadius: 99,
-    }}>
+    }, style]}>
       {Icon && <Icon color={inverted ? Colors.primary[500] : Colors.primary[900]} size={16} />}
       <Text.Sm color={inverted ? Colors.primary[500] : Colors.primary[900]}>{children}</Text.Sm>
       {extra && <Text.Sm color={inverted ? Colors.primary[200] : Colors.primary[700]}>{extra}</Text.Sm>}
@@ -52,8 +53,8 @@ const Card = ({ style, icon: Icon, title, description }: CardProps) => {
       <View style={{
         borderRadius: 99,
         padding: 12,
-        width: 50,
-        height: 50,
+        width: 48,
+        height: 48,
         backgroundColor: Colors.blur.darkest,
         borderColor: Colors.blur.dark,
         borderTopWidth: 2,
@@ -65,16 +66,16 @@ const Card = ({ style, icon: Icon, title, description }: CardProps) => {
           <Text.Base style={{
             position: 'absolute',
             left: '50%',
-            transform: [{ translateX: -1 }],
-            fontSize: 20,
-            lineHeight: 24
+            transform: [{ translateX: 0 }],
+            fontSize: 18,
+            lineHeight: 22
           }}>{Icon}</Text.Base>
         ) : (
           <Icon size={24} color={Colors.primary[200]} />
         )}
       </View>
       <View style={{ gap: 6, flex: 1 }}>
-        <Text.Base color={Colors.neutral[50]} weight={700}>
+        <Text.Base color={Colors.neutral[200]} weight={700}>
           {title}
         </Text.Base>
         {typeof description === 'string' ? (
@@ -103,7 +104,7 @@ const CardPeriod = ({ onPress, title, children, extra, badge, selected }: CardPe
     <Pressable
       onPress={onPress}
       style={{
-        minHeight: 164,
+        minHeight: 160,
         flex: 1,
       }}
     >
@@ -124,7 +125,7 @@ const CardPeriod = ({ onPress, title, children, extra, badge, selected }: CardPe
           backgroundColor: selected ? Colors.primary[900] : Colors.blur.dark,
         }}
       >
-        <View style={{ marginBottom: 20 }}>
+        <View style={{ marginBottom: 16 }}>
           <Text.Base color={selected ? Colors.primary[200] : Colors.neutral[200]} style={{ marginBottom: 2 }}>
             {title}
           </Text.Base>
@@ -160,41 +161,60 @@ export default function Screen() {
         <Image
           contentPosition="center"
           source={require('assets/backgrounds/metro-boy.jpg')}
-          style={{ opacity: 0.3, position: 'absolute', width: '100%', height: '100%', top: 0, left: 0 }}
+          style={{
+            opacity: 0.3,
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            top: 0,
+            left: 0,
+
+          }}
         />
       }
-      headerContent={<View style={{ height: 224 }} />}
-      contentNegativeSpace={212}
-    >
-      <View style={{ padding: 12, paddingBottom: 20, paddingTop: 40 }}>
+      headerContent={<View style={{ height: 276, paddingHorizontal: 20 }}>
         <Badge
+          style={{ position: 'absolute', top: 0, left: 20 }}
           icon={Clock9}
           extra="-35%"
           inverted
         >
           Limited Offer
         </Badge>
-        <Text.H1 type="alt" color={Colors.primary[200]} style={{ marginTop: 16 }}>
+      </View>}
+      contentNegativeSpace={192}
+    >
+      <View style={{ padding: 12, paddingBottom: 20, paddingTop: 0 }}>
+        <Text.H1 type="alt" color={Colors.primary[200]} style={{ marginTop: 56 }}>
           Unlock
         </Text.H1>
-        <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 16 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 2 }}>
           <View>
-            <Text.Max
-              style={{ color: Colors.primary[700], position: 'absolute', marginTop: 4 }}
-            >
-              Cooture
-            </Text.Max>
-            <Text.Max style={{ color: Colors.primary[500], position: 'relative' }}>
-              Cooture
-            </Text.Max>
+            <View style={{ transform: [{ scale: 0.95 }, { translateX: -6 }] }}>
+              <Text.Max
+                style={{ color: Colors.primary[700], position: 'absolute', marginTop: 4 }}
+              >
+                Cooture
+              </Text.Max>
+              <Text.Max style={{ color: Colors.primary[500], position: 'relative' }}>
+                Cooture
+              </Text.Max>
+            </View>
           </View>
-          <Text.H1 type="alt" color={Colors.primary[200]} style={{ marginBottom: 4 }}>
-            Max
-          </Text.H1>
+          <View style={{
+            marginBottom: 13,
+            paddingVertical: 6,
+            paddingHorizontal: 12,
+            backgroundColor: Colors.primary[500],
+            borderRadius: 99
+          }}>
+
+            <Text.Lg color={Colors.primary[900]} weight={700}>Max</Text.Lg>
+          </View>
         </View>
       </View>
       <View style={{ paddingHorizontal: 12 }}>
-        <Text.Base color={Colors.neutral[400]} style={{ marginBottom: 20 }} weight={600}>
+        <Text.Base color={Colors.neutral[400]} style={{ marginBottom: 20 }} weight={500}>
           What&apos;s included?
         </Text.Base>
         <Card
