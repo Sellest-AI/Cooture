@@ -38,6 +38,7 @@ export const usersAppearance = defineTable({
   sideImageId: v.id('images'),
   smileImageId: v.id('images'),
   heightCm: v.optional(v.number()),
+  gender: v.optional(v.union(v.literal("male"), v.literal("female")))
   // topAngleImageId: v.id('images'),
 })
   .index("by_user_id", ["userId"])

@@ -84,17 +84,19 @@ type PredictImageParams = {
 }
 
 export const predictImage = async (params: PredictImageParams) => {
-  const { prompt, aspectRatio } = params;
+  const { aspectRatio } = params;
 
   const imageUrls = await Promise.all(params.images.map(async (img) => {
     if (!img.hasAlpha) return img.url;
     return (await sanitizeImageForReplicate(img.url)).url;
   }));
 
+  const prompt = params.prompt;
+
   const prediction = await replicate.predictions.create({
     model: params.model,
     input: {
-      prompt,
+      prompt: prompt,
       image_input: imageUrls,
       max_images: 1,
       aspect_ratio: aspectRatio ?? '3:4',

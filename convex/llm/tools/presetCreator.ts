@@ -81,6 +81,10 @@ export const ImagePresetSchema = z.object({
     `The core concept/action. MUST describe the scene as if the subject(s) were wearing a neutral grey suit or naked. Do NOT mention specific garments except held objects. ${NO_CLOTHING}`
   ),
 
+  sceneDescriptionShort: z.string().min(60).describe(
+    `A consise version of the secene description. It will be used to understand the core concept of the image (Camera, Subjects Pose, Environment) without the influence of fashion details. It should be a short paragraph (1-3 sentences) that captures the essence of the scene.`
+  ),
+
   // --- 2. STYLE (ARTISTIC DIRECTION) ---
   style: z.object({
     aesthetic: z.string().describe("The vibe: e.g., 'Flash photography', 'Y2K Streetwear', 'Candid snapshot', 'Accidental Renaissance'."),

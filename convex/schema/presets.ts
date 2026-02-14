@@ -36,6 +36,7 @@ export const PRESET_CATEGORIES = v.union(
 );
 
 export const PRESET_PROMPT = v.object({
+  sceneDescriptionShort: v.optional(v.string()),
   sceneDescription: v.string(),
   style: v.object({
     aesthetic: v.string(),

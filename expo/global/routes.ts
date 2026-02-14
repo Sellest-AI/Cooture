@@ -15,6 +15,7 @@ export const ROUTES = {
     PICK_OUTFIT: '/pick-outfit' as const,
     NEW_OUTFIT: '/new-outfit' as const,
     OUTFIT_ADD_ITEM: '/add-item' as const,
+    PICK_USER: '/pick-user' as const,
   },
   POST: {
     PATH: '/post/[id]',

@@ -9,9 +9,10 @@ type Props = {
   startIcon?: ComponentProps<typeof Button>['startIcon'];
   endIcon?: ComponentProps<typeof Button>['endIcon'];
   children?: ComponentProps<typeof Button>['children'];
+  disabled?: boolean;
 };
 
-export const ButtonSlider = ({ onComplete, startIcon, endIcon, children }: Props) => {
+export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disabled }: Props) => {
   const [layoutWidth, setLayoutWidth] = useState<number | null>(null);
   const TRACK_HEIGHT = 52;
   const KNOB_WIDTH = 170; // default/fallback
@@ -30,6 +31,10 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children }: Props
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
 
+  // Track disabled state in ref for PanResponder
+  const disabledRef = useRef(disabled);
+  disabledRef.current = disabled;
+
   const onLayout = (e: any) => {
     setLayoutWidth(e.nativeEvent.layout.width);
   };
@@ -45,8 +50,8 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children }: Props
       onStartShouldSetPanResponder: () => false,
       onStartShouldSetPanResponderCapture: () => false,
       // Only become responder if horizontal movement dominates to avoid blocking vertical ScrollView
-      onMoveShouldSetPanResponder: (_, gs) => Math.abs(gs.dx) > Math.abs(gs.dy) && Math.abs(gs.dx) > 6,
-      onMoveShouldSetPanResponderCapture: (_, gs) => Math.abs(gs.dx) > Math.abs(gs.dy) && Math.abs(gs.dx) > 6,
+      onMoveShouldSetPanResponder: (_, gs) => !disabledRef.current && Math.abs(gs.dx) > Math.abs(gs.dy) && Math.abs(gs.dx) > 6,
+      onMoveShouldSetPanResponderCapture: (_, gs) => !disabledRef.current && Math.abs(gs.dx) > Math.abs(gs.dy) && Math.abs(gs.dx) > 6,
       // Prevent parent from taking over during an active horizontal drag
       onPanResponderTerminationRequest: () => false,
       onPanResponderGrant: () => {
@@ -137,8 +142,15 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children }: Props
   } as any;
 
   return (
-    <View onLayout={onLayout} style={[styles.container, { height: TRACK_HEIGHT + 8 }] as any}>
-      <View style={[styles.track, { height: TRACK_HEIGHT + GAP, backgroundColor: Colors.primary[500] }]} />
+    <View onLayout={onLayout} style={[
+      styles.container,
+      { height: TRACK_HEIGHT + 8 },
+    ]}>
+      <View style={[styles.track, {
+        height: TRACK_HEIGHT + GAP,
+        backgroundColor: disabled ? Colors.primary[700] : Colors.primary[500],
+        opacity: disabled ? 0.7 : 1,
+      }]} />
 
       {!showLoader && <View style={{
         position: "absolute",
@@ -165,6 +177,7 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children }: Props
         }}
       >
         <Button
+          disabled={disabled}
           variant="primary"
           startIcon={startIcon}
           endIcon={endIcon}

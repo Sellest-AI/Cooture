@@ -8,12 +8,16 @@ import { atom, getDefaultStore, useAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 type ParamsDefault<T extends Route> =
-  T extends "/photoshoot/create" ? { outfitId?: Id<'outfits'> | null, presetId?: Id<'presets'> | null } :
-  T extends "/photoshoot/create/recap" ? { outfitId?: Id<'outfits'> | null, presetId?: Id<'presets'> | null } :
+  T extends "/photoshoot/create" ? { outfitId?: Id<'outfits'> | null, presetId?: Id<'presets'> | null, userId?: Id<'users'> | null } :
+  T extends "/photoshoot/create/recap" ? { outfitId?: Id<'outfits'> | null, presetId?: Id<'presets'> | null, userId?: Id<'users'> | null } :
   T extends "/pick-outfit" ? { canSkip?: boolean, itemIds?: Id<'items'>[] } :
   T extends "/new-outfit" ? { itemIds?: Id<'items'>[] } :
   T extends "/add-item" ? { outfitId?: Id<'outfits'>, itemIds?: Id<'items'>[] } :
   never;
+
+const LINKED_ROUTES: { parent: Route, child: Route }[] = [
+  { parent: "/photoshoot/create", child: "/photoshoot/create/recap" },
+];
 
 type Params<T extends Route> = ParamsDefault<T> & {
   reset?: boolean,
@@ -33,19 +37,56 @@ type RouterParams<T extends Route> = NavigationOptions & {
 
 const dataAtom = atom<Record<string, object | undefined>>({});
 
+/**
+ * Get all linked routes (parents and children) for a given route
+ */
+const getLinkedRoutes = (href: string): string[] => {
+  const routes = new Set<string>();
+  routes.add(href);
+
+  // Find all parents (traverse up the chain)
+  let currentRoute = href;
+  while (true) {
+    const parentLink = LINKED_ROUTES.find(r => r.child === currentRoute);
+    if (!parentLink) break;
+    routes.add(parentLink.parent as string);
+    currentRoute = parentLink.parent as string;
+  }
+
+  // Find all children (recursively traverse down)
+  const findChildren = (route: string) => {
+    const children = LINKED_ROUTES.filter(r => r.parent === route);
+    children.forEach(childLink => {
+      routes.add(childLink.child as string);
+      findChildren(childLink.child as string);
+    });
+  };
+  findChildren(href);
+
+  return Array.from(routes);
+};
+
 const retrieveData = <T extends Route>(href: T | undefined, data: Record<string, object | undefined>): Params<T> => {
   if (!href) return {} as Params<T>;
-  // If want to retrieve data for a specific route
-  // If it's a child route, try to find parent route data TOO
-  // For example: /photoshoot/create/recap should also retrieve /photoshoot/create data
-  let params = data[href as string] ?? {};
-  const parts = href.split('/').filter(Boolean);
-  for (let i = 0; i < parts.length; i++) {
-    const path = '/' + parts.slice(0, i).join('/');
-    if (data[path]) {
-      params = { ...params, ...data[path] }
+
+  // Get all linked routes (parents and children)
+  const linkedRoutes = getLinkedRoutes(href as string);
+
+  // Sort routes by depth (parents first, children last) so child params override parent params
+  const sortedRoutes = linkedRoutes.sort((a, b) => {
+    const depthA = a.split('/').filter(Boolean).length;
+    const depthB = b.split('/').filter(Boolean).length;
+    return depthA - depthB;
+  });
+
+  // Merge params from all linked routes (child params override parent params)
+  let params = {};
+  for (const route of sortedRoutes) {
+    if (data[route]) {
+      params = { ...params, ...data[route] };
     }
   }
+
   return params as Params<T>;
 }
 
@@ -75,9 +116,19 @@ export const useRoute = <K extends Record<string, any> = EmptyObject, T extends 
     options?.resetFnc?.();
     setData((d) => {
       const newData = { ...d };
-      const newObject = { ...(newData[href as string] ?? {}), reset: false };
-      newData[href as string] = newObject;
-      setLocalData(newObject as Params<T>);
+
+      // Get all linked routes and reset them all
+      const linkedRoutes = getLinkedRoutes(href as string);
+
+      for (const linkedRoute of linkedRoutes) {
+        const newObject = { ...(newData[linkedRoute] ?? {}), reset: false };
+        newData[linkedRoute] = newObject;
+      }
+
+      // Update localData with the current route's data
+      const currentRouteData = newData[href as string];
+      setLocalData(currentRouteData as Params<T>);
+
       return newData;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -125,36 +176,45 @@ export const useRouter = <T extends Route = Route>(_href?: T) => {
 
     const resetNextRoute = options?.resetNextRoute ?? true;
 
-    // Update data for the target route and, when requested, mark nested child routes as reset too.
+    // Update data for the target route and all linked routes (parents/children)
     if (resetNextRoute || options?.params || redirect) {
       store.set(dataAtom, (d) => {
         const newData = { ...d };
         const basePath = (toUrl as string).split('?')[0];
 
-        // Clear existing data for the target route to avoid stale data issues. It will be replaced with merged data below.
-        delete newData[toUrl as string];
+        // Get all linked routes (parents and children)
+        const linkedRoutes = getLinkedRoutes(basePath);
 
-        // Merge params (if any) and set reset/redirect for the target URL entry
-        newData[toUrl as string] = {
-          ...(newData[toUrl as string] ?? {}),
-          ...(options?.params ?? {}),
-          redirectTo: redirect,
-          reset: resetNextRoute ?? true,
-        };
+        // Update all linked routes with the same params and reset state
+        for (const linkedRoute of linkedRoutes) {
+          // Clear existing data for the linked route
+          delete newData[linkedRoute];
 
-        // If resetNextRoute is true, propagate reset to nested routes (children)
+          // Set new data for the linked route
+          newData[linkedRoute] = {
+            ...(options?.params ?? {}),
+            redirectTo: redirect,
+            reset: resetNextRoute ?? true,
+          };
+        }
+
+        // If resetNextRoute is true, also clear nested routes (but not linked routes)
         if (resetNextRoute) {
-          for (const key of Object.keys(d)) {
-            const keyPath = key.split('?')[0];
-            if (keyPath === basePath) {
-              newData[key] = {
-                ...(options?.params ?? {}),
-                redirectTo: redirect,
-                reset: true,
-              };
-            }
-            else if (keyPath.startsWith(basePath + '/')) {
-              newData[key] = undefined;
+          for (const linkedRoute of linkedRoutes) {
+            for (const key of Object.keys(d)) {
+              const keyPath = key.split('?')[0];
+              // Update entries with query params that match this linked route
+              if (keyPath === linkedRoute) {
+                newData[key] = {
+                  ...(options?.params ?? {}),
+                  redirectTo: redirect,
+                  reset: true,
+                };
+              }
+              // Clear nested routes that are not themselves linked routes
+              else if (keyPath.startsWith(linkedRoute + '/') && !linkedRoutes.includes(keyPath)) {
+                newData[key] = undefined;
+              }
             }
           }
         }

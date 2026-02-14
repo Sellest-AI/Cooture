@@ -1,14 +1,17 @@
-import { useRoute, useRouter } from "@/hooks";
-import { api, useAction } from "@/lib/convex/client";
+import { useRouter } from "@/hooks";
+import { api, useAction, useQuery } from "@/lib/convex/client";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
 import { Portrait } from "@/modules/profiles/portrait";
+import { Badge } from "@ui/badge";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
 import { ButtonSlider } from "@ui/button.slider";
 import { Col, Grid, Row } from "@ui/grid";
-import { Flame, Squirish } from "@ui/icons";
+import { Flame, Plus, Squirish } from "@ui/icons";
 import { Image } from "@ui/image";
+import { Pressable } from "@ui/pressable";
+import { Skeleton } from "@ui/skeleton";
 import { Slider } from "@ui/slider";
 import { Text } from "@ui/text";
 import React, { useMemo } from "react";
@@ -92,7 +95,7 @@ const OutfitGrid = ({ items, style }: { items: Items, style?: ViewStyle }) => {
 }
 
 const OutfitComponent = () => {
-  const { outfit, outfitSize, outfitSizes, setOutfitSize } = usePhotoshoot.New();
+  const { outfit, outfitSize, outfitSizes, setOutfitSize, hasMultipleSubjects } = usePhotoshoot.New();
   const { push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
 
   const sizes = outfitSizes.map((size, i) => ({
@@ -100,6 +103,9 @@ const OutfitComponent = () => {
     label: `${size[0]}${size.slice(1).toLowerCase().replaceAll('_', ' ')}`,
     defaultLabel: size,
   }));
+
+  if (hasMultipleSubjects)
+    return null;
 
   return (
     <Block
@@ -148,20 +154,85 @@ const OutfitComponent = () => {
   )
 }
 
-export default function Screen() {
-  const { outfitId, outfitSize, presetId, setOutfitId, setPresetId, reset } = usePhotoshoot.New();
-  const { dismissTo } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
-  useRoute(ROUTES.PHOTOSHOOT.RECAP, {
-    resetFnc: reset,
-    onInit: ({ outfitId, presetId }) => {
-      if (outfitId === null) setOutfitId(null);
-      if (presetId === null) setPresetId(null);
-      if (outfitId) setOutfitId(outfitId);
-      if (presetId) setPresetId(presetId);
-    }
-  });
+const FriendBlock = () => {
+  const { push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
+  const { preset, friendId } = usePhotoshoot.New();
+  const { data: friend, isPending } = useQuery(api.router.users.getAccount.anon, friendId ? { userId: friendId } : 'skip');
 
-  const { action } = useAction(api.llm.triggers.photoshoot.authed);
+  if (!preset || preset.subjects < 2) return null;
+
+  return (
+    <Block
+      variant="blur"
+      style={{
+        marginBottom: 8,
+        borderRadius: 32,
+        paddingHorizontal: 16,
+        paddingBottom: 20,
+        paddingTop: 16,
+        gap: 12,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-end',
+      }}
+    >
+      {!friend && <>
+      </>}
+      <View style={{ gap: 8 }}>
+        <View style={{
+          paddingHorizontal: 12,
+          paddingVertical: 6,
+          backgroundColor: Colors.primary[500],
+          alignSelf: 'flex-start',
+          borderRadius: 99,
+          marginBottom: 4,
+        }}>
+          <Text.Sm color={Colors.primary[900]} weight={600}>Required</Text.Sm>
+        </View>
+        <Text.H4 color={Colors.neutral[50]}>Friend</Text.H4>
+        {(isPending && friendId) && <Skeleton style={{ width: 128, height: 18 }} />}
+        {friend && <Text.Base color={Colors.neutral[400]}>{friend.name}</Text.Base>}
+        {!friendId && <Text.Base color={Colors.neutral[400]}>
+          Select a friend to join you.
+        </Text.Base>}
+      </View>
+      {friend && <Pressable onPress={() => push(ROUTES.MODALS.PICK_USER, {
+        redirectHere: true,
+      })}>
+        <Badge
+          source={friend?.image}
+          style={{ width: 86, height: 86, borderRadius: 99 }}
+        />
+      </Pressable>}
+      {!friendId && <Pressable
+        onPress={() => push(ROUTES.MODALS.PICK_USER, {
+          redirectHere: true,
+        })}
+        style={{
+          width: 72,
+          height: 72,
+          borderRadius: 99,
+          backgroundColor: Colors.primary[500],
+          borderWidth: 2,
+          borderTopColor: Colors.primary[200],
+          borderLeftColor: Colors.primary[200],
+          borderRightColor: Colors.primary[700],
+          borderBottomColor: Colors.primary[700],
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}
+      >
+        <Plus size={32} />
+      </Pressable>}
+    </Block>
+  )
+}
+
+export default function Screen() {
+  const { outfitId, outfitSize, presetId, friendId, disabled } = usePhotoshoot.New();
+  const { dismissTo, push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
+
+  const { action, isLoading } = useAction(api.llm.triggers.photoshoot.authed);
 
   return (
     <View style={{ paddingHorizontal: 12 }}>
@@ -172,6 +243,7 @@ export default function Screen() {
       >
         Change Preset
       </Button>
+      <FriendBlock />
       <Block
         variant="blur"
         style={{
@@ -189,13 +261,16 @@ export default function Screen() {
       <View style={{ flex: 1, justifyContent: 'flex-end', marginTop: 12 }}>
         <ButtonSlider
           startIcon={Flame}
+          disabled={disabled || isLoading}
           onComplete={async () => {
             if (!presetId) return;
+            if (disabled) return;
 
-            const timer = setTimeout(() => dismissTo(ROUTES.PHOTOSHOOT.GENERATIONS.NEXT), 6000);
+            const timer = setTimeout(() => push(ROUTES.PHOTOSHOOT.GENERATIONS.NEXT), 1000);
 
             const generationId = await action({
               presetId: presetId,
+              extraUserIds: friendId ? [friendId] : undefined,
               outfit: outfitId ? {
                 _id: outfitId,
                 size: outfitSize

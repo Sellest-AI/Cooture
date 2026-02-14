@@ -19,10 +19,13 @@ export const anon = publicQuery({
     if (!preset) return null;
     const { prompts, ...rest } = preset;
 
+    const hasMultipleSubjects = prompts.some(p => p.subjects.length > 1);
+
     // Sanitize preset by removing prompts
     return {
       ...rest,
       expectedResults: prompts.length,
+      hasMultipleSubjects,
     };
   }
 })

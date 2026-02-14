@@ -11,11 +11,13 @@ export const anon = publicQuery({
 
     // Sanitize presets by removing prompts
     const sanitizedPresets = await Promise.all(presets.map(async ({ prompts, ...rest }) => {
+      const hasMultipleSubjects = prompts.some((p) => p.subjects.length > 1);
       const cover = await getImage(ctx, rest.imageIds[0]);
       if (!cover) return null;
       return {
         ...rest,
         expectedResults: prompts.length,
+        hasMultipleSubjects,
         cover,
       }
     }));

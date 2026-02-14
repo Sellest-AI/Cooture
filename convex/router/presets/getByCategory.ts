@@ -22,10 +22,12 @@ export const anon = publicQuery({
       if (!cover) return null;
 
       const { prompts, ...rest } = preset;
+      const hasMultipleSubjects = prompts.some((p) => p.subjects.length > 1);
 
       return {
         ...rest,
         expectedResults: preset.prompts.length,
+        hasMultipleSubjects,
         cover,
       }
     }));

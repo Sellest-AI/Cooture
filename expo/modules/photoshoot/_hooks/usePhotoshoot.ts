@@ -33,8 +33,10 @@ type Sizes = typeof outfitSizes[number];
 const outfitSizeAtom = atom<Sizes>("DEFAULT");
 const outfitAtom = atom<Id<"outfits"> | null>(null);
 const presetAtom = atom<Id<"presets"> | null>(null);
+const friendIdAtom = atom<Id<"users"> | null>(null);
 
 const useNew = () => {
+  const [friendId, setFriendId] = useAtom(friendIdAtom);
   const [outfitSize, setOutfitSize] = useAtom(outfitSizeAtom);
   const [outfitId, setOutfitId] = useAtom(outfitAtom);
   const [presetId, setPresetId] = useAtom(presetAtom);
@@ -46,11 +48,17 @@ const useNew = () => {
     setOutfitSize('DEFAULT');
     setOutfitId(null);
     setPresetId(null);
+    setFriendId(null);
   }
+
+  const hasMultipleSubjects = preset?.hasMultipleSubjects;
+  const disabled = !preset || (hasMultipleSubjects && !friendId);
 
   return {
     outfit,
+    hasMultipleSubjects,
     outfitId,
+    disabled,
     setOutfitId,
     preset,
     presetId,
@@ -58,6 +66,8 @@ const useNew = () => {
     outfitSize,
     outfitSizes,
     setOutfitSize,
+    setFriendId,
+    friendId,
     reset,
   }
 }

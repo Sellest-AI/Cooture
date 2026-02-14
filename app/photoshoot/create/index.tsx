@@ -18,8 +18,11 @@ const loading = false;
 
 export default function Screen() {
   const { push } = useRouter('/photoshoot/create');
-  const { setPresetId, presetId } = usePhotoshoot.New();
+  const { setPresetId, presetId, outfitId } = usePhotoshoot.New();
   const { data: presets } = useQueryCached(api.router.presets.getAll.anon);
+
+  const sanitizedPresets = outfitId ?
+    (presets ?? []).filter((p) => !p.hasMultipleSubjects) : presets;
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -39,7 +42,7 @@ export default function Screen() {
             paddingTop: 24,
             paddingBottom: presetId !== null ? 72 : 0,
           }}
-          data={(presets ?? [])}
+          data={(sanitizedPresets ?? [])}
           style={{ paddingHorizontal: 6 }}
           ListFooterComponent={
             loading ? <>

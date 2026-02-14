@@ -64,7 +64,7 @@ export const Pressable = ({ disabled, onPress, children, intensity = 0.98, style
         setTimeout(() => { setInnerDisabled(false) }, 300);
       }}
     >
-      <Animated.View style={[filteredStyle, {
+      <Animated.View style={[filteredStyle, { width, height }, {
         transform: [{ scale: scaleAnim }],
         aspectRatio: style?.aspectRatio,
       }]}>

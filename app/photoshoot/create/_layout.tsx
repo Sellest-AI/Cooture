@@ -14,14 +14,16 @@ import { View } from "react-native";
 import { Colors } from "theme";
 
 export default function Layout() {
-  const { setOutfitId, setPresetId, reset, preset } = usePhotoshoot.New();
+  const { setOutfitId, setPresetId, setFriendId, reset, preset } = usePhotoshoot.New();
   useRoute('/photoshoot/create', {
     resetFnc: reset,
-    onInit: ({ outfitId, presetId }) => {
+    onInit: ({ outfitId, presetId, userId }) => {
       if (outfitId === null) setOutfitId(null);
       if (presetId === null) setPresetId(null);
+      if (userId === null) setFriendId(null);
       if (outfitId) setOutfitId(outfitId)
       if (presetId) setPresetId(presetId)
+      if (userId) setFriendId(userId);
     }
   });
 

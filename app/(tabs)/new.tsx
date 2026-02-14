@@ -1,4 +1,5 @@
 import { useRouter } from "@/hooks";
+import { useAccount } from "@/lib/convex/auth";
 import { api, useQueryCached } from "@/lib/convex/client";
 import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
@@ -16,6 +17,8 @@ import { Colors } from "theme";
 
 export default function Screen() {
   const { push } = useRouter('/new');
+
+  const { isAdmin } = useAccount();
 
   const { data: presets } = useQueryCached(api.router.presets.getAll.anon);
   const { data: outfits } = useQueryCached(api.router.outfits.getAll.authed)
@@ -38,13 +41,13 @@ export default function Screen() {
           backgroundColor: Colors.background,
         }}
       />
-      <Button
+      {isAdmin && <Button
         variant="blur"
         onPress={() => push('/presets/new')}
         style={{ marginTop: 8, marginHorizontal: 12, marginBottom: 8 }}
       >
         New preset (Admin)
-      </Button>
+      </Button>}
       <View
         style={{
           flexDirection: "row",

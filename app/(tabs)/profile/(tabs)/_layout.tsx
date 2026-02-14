@@ -9,13 +9,11 @@ export const unstable_settings = {
 };
 
 export default function Layout() {
-  const _generations = usePaginatedQueryCached(api.router.generations.getPaginated.authed, {}, { initialNumItems: 8 });
   const { user } = useAccount();
+  const _generations = usePaginatedQueryCached(api.router.generations.getPaginated.anon, user ? { userId: user._id } : 'skip', { initialNumItems: 8 });
 
   const recentPosts = (_generations?.results ?? [])
-    .filter((g) => g.publication === 'PUBLISHED')
     .flatMap(generation => generation.predictions)
-    .filter((p) => p.status === 'ACCEPTED' && p.imageId)
     .sort((a, b) => b._creationTime - a._creationTime)
 
   const imageIds = recentPosts.map((p) => p.imageId).filter(notEmpty);
