@@ -4,27 +4,40 @@ import { Doc } from "../_generated/dataModel";
 import { FEED_CONFIG } from "../functions/feed/feed.config";
 import { internalMutation, MutationCtx } from "../procedures";
 
+const extraScore = async (ctx: MutationCtx, feedScore: Doc<'feedScores'>) => {
+  const KEYS = feedScore.generationId ?
+    ['by_generation_id', 'generationId'] as const :
+    ['by_outfit_id', 'outfitId'] as const;
+
+  const [_likes, _bookmarks] = await Promise.all([
+    ctx.db.query('likeStats')
+      .withIndex(KEYS[0], q => q.eq(KEYS[1], feedScore.generationId))
+      .first(),
+    ctx.db.query('bookmarkStats')
+      .withIndex(KEYS[0], q => q.eq(KEYS[1], feedScore.generationId))
+      .first(),
+  ]);
+  const likes = _likes ? _likes.count * FEED_CONFIG.LIKES_WEIGHT : 0;
+  const bookmarks = _bookmarks ? _bookmarks.count * FEED_CONFIG.SAVES_WEIGHT : 0;
+  return likes + bookmarks;
+}
+
 const updateScore = async (ctx: MutationCtx, feedScore: Doc<'feedScores'>) => {
   const now = Date.now();
   const ageInHours = (now - feedScore._creationTime) / (60 * 60 * 1000);
 
-  let newScore: number;
-
   // Random score between 0 and 4000 based on id
   const randomScore = parseInt(feedScore._id.toString().slice(-6), 16) % FEED_CONFIG.RANDOM_SCORE_RANGE;
+  const extra = await extraScore(ctx, feedScore);
+  const baseScore = FEED_CONFIG.DEFAULT_SCORE + randomScore + extra;
 
-  // Posts between 7-8 days old (168h-192h): freeze at configured freeze score
-  if (ageInHours >= FEED_CONFIG.FREEZE_AGE_HOURS) {
-    newScore = -1 * Math.round(FEED_CONFIG.DEFAULT_SCORE / 1.5);
-  } else {
-    // Normal decay for posts < 5 days old
-    const decayAmount = Math.floor(ageInHours * FEED_CONFIG.HOURLY_DECAY);
-    newScore = FEED_CONFIG.DEFAULT_SCORE - decayAmount;
-  }
-
-  const finalScore = Math.round(Math.max(0, newScore + randomScore));
+  // Linear percentage decay: 0% at creation → 90% at freeze time
+  const ageInHoursClamped = Math.min(ageInHours, FEED_CONFIG.FREEZE_AGE_HOURS);
+  const decayPercent = (ageInHoursClamped / FEED_CONFIG.FREEZE_AGE_HOURS) * FEED_CONFIG.FREEZE_DECAY_PERCENT;
+  const decay = Math.round(baseScore * (decayPercent / 100));
 
   // Update the score and timestamp
+  const finalScore = Math.round(Math.max(0, baseScore - decay));
   await ctx.db.patch(feedScore._id, { score: finalScore, updatedAt: now });
 }
 

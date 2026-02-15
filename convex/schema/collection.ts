@@ -27,6 +27,6 @@ export const bookmarkStats = defineTable({
   count: v.number(),
   updatedAt: v.number(),
 })
-  .index("by_generation", ["generationId"])
-  .index("by_outfit", ["outfitId"])
-  .index("by_item", ["itemId"]);
+  .index("by_generation_id", ["generationId"])
+  .index("by_outfit_id", ["outfitId"])
+  .index("by_item_id", ["itemId"]);
