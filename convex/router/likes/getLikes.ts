@@ -26,9 +26,8 @@ export const _internal_cache = internalAction({
     generationId: v.optional(v.id("generations")),
     outfitId: v.optional(v.id("outfits")),
   },
-  handler: async (ctx, args): Promise<ReturnType> => {
-    return ctx.runQuery(internal.router.likes.getLikes._internal_query, args);
-  }
+  handler: async (ctx, args): Promise<ReturnType> =>
+    ctx.runQuery(internal.router.likes.getLikes._internal_query, args)
 })
 
 /** 
@@ -52,15 +51,21 @@ export const _internal_query = internalQuery({
     }
 
     const count = stats?.count ?? 0;
-    const userIds = await ctx.db.query("likes").order("desc").take(count > 0 ? 3 : 0);
+    const userIds = await ctx.db.query("likes").order("desc").take(count > 0 ? 12 : 0);
     const users = await Promise.all(userIds.map(like => ctx.db.get("users", like.userId)));
+
+    const filteredUsers = users.filter(notEmpty)
+      .filter((u, i, self) => i === self.findIndex((p) => p._id === u._id))
+      // Shuffle
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 3);
 
     const lastUpdate = new Date();
 
     return {
       amount: count,
       lastUpdate: lastUpdate.getTime(),
-      latestLikers: users.filter(notEmpty).map((u) => ({ _id: u._id, name: u.name, image: u.image }))
+      latestLikers: filteredUsers.map((u) => ({ _id: u._id, name: u.name, image: u.image }))
     }
   }
 })

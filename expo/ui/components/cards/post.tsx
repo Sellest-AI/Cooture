@@ -1,5 +1,6 @@
 import { Badge } from '@ui/badge';
 import { Button } from '@ui/button';
+import { GhostIconWrapper } from '@ui/ghost-animation';
 import { ArrowRight, BookmarkIcon, CircleFadingArrowUp, HeartIcon, ShareIcon } from '@ui/icons';
 import { Skeleton } from '@ui/skeleton';
 import { MotiView } from 'moti';
@@ -19,7 +20,8 @@ type Props = {
   onToggleLike?: (value: boolean) => void;
   isBookmarked?: boolean;
   onToggleBookmark?: () => void;
-  onShare?: () => void;
+  onShare?: (_id: string) => void;
+  onLongPress?: (_id: string) => void;
   onPress?: (_id: string) => void;
   image?: {
     _id: string;
@@ -50,7 +52,7 @@ type Props = {
   }
 }
 
-export const Post = ({ style, postedAt, image, users, preset, outfit, images, likedAccounts, onShare, paddingHorizontal, isBookmarked, onPress, onToggleBookmark, onToggleLike, isLiked }: Props) => {
+export const Post = ({ style, postedAt, image, users, preset, outfit, images, likedAccounts, onShare, onLongPress, paddingHorizontal, isBookmarked, onPress, onToggleBookmark, onToggleLike, isLiked }: Props) => {
   const [doubleTap, setDoubleTap] = useState<number | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [pinching, setPinching] = useState<{ index: number } | false>(false);
@@ -187,6 +189,7 @@ export const Post = ({ style, postedAt, image, users, preset, outfit, images, li
                 if (!isLiked) onToggleLike?.(true);
               } : undefined}
               onPress={() => img && onPress?.(img._id)}
+              onLongPress={() => img && onLongPress?.(img._id)}
               key={img?.url ?? index}
               style={{
                 width: Dimensions.get('window').width - (PADDING_HORIZONTAL * 2),
@@ -291,7 +294,7 @@ export const Post = ({ style, postedAt, image, users, preset, outfit, images, li
       </Button>}
       <View style={{ marginTop: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: PADDING_HORIZONTAL + 4 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', gap: 8 }}>
-          <GhostAnimation
+          <GhostIconWrapper
             style={{ padding: 4 }}
             icon={HeartIcon}
             selected={isLiked}
@@ -336,7 +339,7 @@ export const Post = ({ style, postedAt, image, users, preset, outfit, images, li
           ))}
         </View>}
         <View style={{ gap: 12, flexDirection: 'row', alignItems: 'center' }}>
-          <GhostAnimation
+          <GhostIconWrapper
             style={{ padding: 4 }}
             icon={BookmarkIcon}
             selected={isBookmarked}
@@ -344,64 +347,13 @@ export const Post = ({ style, postedAt, image, users, preset, outfit, images, li
             onPress={() => { onToggleBookmark?.(); }}
             size={20}
           />
-          {onShare && <ShareIcon size={20} color={Colors.secondary[500]} onPress={() => onShare?.()} />}
+          {onShare && <ShareIcon size={20} color={Colors.secondary[500]} onPress={() => {
+            const id = images?.[currentIndex]._id ?? image?._id;
+            if (id) onShare?.(id);
+          }} />}
         </View>
       </View>
     </View>
-  )
-}
-
-type GhostAnimationProps = {
-  selected?: boolean;
-  size: number;
-  onPress?: () => void;
-  icon: React.ComponentType<{ size?: number, color?: string, style?: ViewStyle, weight?: 'fill' | undefined }>;
-  color?: string;
-  style?: ViewStyle;
-}
-const GhostAnimation = ({ icon: Icon, selected, size, color, onPress, style }: GhostAnimationProps) => {
-  const [isAnimating, setAnimating] = useState(false);
-  const [scale, setScale] = useState(2);
-
-  return (
-    <Pressable
-      style={{ ...style }}
-      onPress={() => {
-        onPress?.();
-        requestAnimationFrame(() => setAnimating(true));
-        setScale(selected ? 0 : 2);
-      }}
-    >
-      <Icon
-        color={color}
-        weight={selected ? 'fill' : undefined}
-        size={size}
-      />
-      {isAnimating && (
-        <MotiView
-          key={scale}
-          onDidAnimate={() => setAnimating(false)}
-          from={{ scale: 1, opacity: scale === 0 ? 0.4 : 1 }}
-          animate={{ scale, opacity: 0 }}
-          transition={{ type: 'timing', duration: 400 }}
-          style={{
-            position: 'absolute',
-            height: '100%',
-            width: '100%',
-            justifyContent: 'center',
-            alignItems: 'center',
-            top: style?.padding ?? 0,
-            left: style?.padding ?? 0,
-          }}
-        >
-          <Icon
-            color={color}
-            weight={'fill'}
-            size={size}
-          />
-        </MotiView>
-      )}
-    </Pressable>
   )
 }
 

@@ -12,10 +12,11 @@ export const ROUTES = {
   },
   SCAN: '/scan',
   MODALS: {
-    PICK_OUTFIT: '/pick-outfit' as const,
-    NEW_OUTFIT: '/new-outfit' as const,
-    OUTFIT_ADD_ITEM: '/add-item' as const,
-    PICK_USER: '/pick-user' as const,
+    PICK_OUTFIT: '/pick-outfit',
+    NEW_OUTFIT: '/new-outfit',
+    OUTFIT_ADD_ITEM: '/add-item',
+    PICK_USER: '/pick-user',
+    UPGRADE: '/upgrade',
   },
   POST: {
     PATH: '/post/[id]',
@@ -29,10 +30,15 @@ export const ROUTES = {
     PATH: '/outfit/[id]',
     ID: (id: string) => `/outfit/${id}` as const,
   },
+  COLLECTION: {
+    PATH: '/collection',
+    SAVED_POSTS: '/collection/saved-posts',
+    SAVED_OUTFITS: '/collection/saved-outfits',
+  },
   PHOTOSHOOT: {
-    NEW: '/photoshoot/create' as const,
-    PRESETS: '/photoshoot/create/presets' as const,
-    RECAP: '/photoshoot/create/recap' as const,
+    NEW: '/photoshoot/create',
+    PRESETS: '/photoshoot/create/presets',
+    RECAP: '/photoshoot/create/recap',
     GENERATIONS: {
       NEXT: '/photoshoot/generations/next',
       PATH: '/photoshoot/generations/[id]',
@@ -44,11 +50,11 @@ export const ROUTES = {
     ID: (id: string) => `/users/${id}` as const,
   },
   EXTRA: {
-    SETINGS: '/settings' as const,
-    NOTIFICATIONS: '/notifications' as const,
+    SETINGS: '/settings',
+    NOTIFICATIONS: '/notifications',
     AVATAR: {
-      UPDATE_PORTRAITS: '/avatar/update-portraits' as const,
-      UPDATE_HEIGHT: '/update-height' as const,
+      UPDATE_PORTRAITS: '/avatar/update-portraits',
+      UPDATE_HEIGHT: '/update-height',
     }
   },
   PROFILE: {
@@ -57,7 +63,6 @@ export const ROUTES = {
     GENERATIONS: '/profile/generations',
     OUTFITS: '/profile/outfits',
     ITEMS: '/profile/items',
-    SAVED: '/profile/saved',
   },
   WELCOME: {
     INDEX: '/welcome',

@@ -1,7 +1,7 @@
 import { useRoute, useRouter, useStateEffect } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
 import { useAccount } from "@/lib/convex/auth";
-import { useQuery, useQueryCached } from "@/lib/convex/client";
+import { useMutation, useQuery, useQueryCached } from "@/lib/convex/client";
 import { SelectedItemModal } from "@/modules/items/selected-item.modal";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { PremiumBlock } from "@/modules/premium/premium-block";
@@ -11,7 +11,8 @@ import { Button } from "@ui/button";
 import { ImageGeneration } from "@ui/cards";
 import { CardItem } from "@ui/cards/card-item";
 import { FlashList } from "@ui/flat-list";
-import { ArrowRight, ArrowUpRight, Pencil, SquirishPlus, Trash } from "@ui/icons";
+import { GhostIconWrapper } from "@ui/ghost-animation";
+import { ArrowRight, ArrowUpRight, BookmarkIcon, Pencil, ShareIcon, SquirishPlus, Trash } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
@@ -19,9 +20,10 @@ import { Pressable } from "@ui/pressable";
 import { SafeAreaView, useSafeAreaInsets } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import { TextInput } from "@ui/text-input";
+import { env } from "env";
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
-import { Keyboard, View } from "react-native";
+import { Keyboard, Share, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -156,6 +158,8 @@ export default function ItemScreen() {
   const { outfit, updateItems, updateName, remove } = useOutfit(id);
   const { data: user } = useQuery(api.router.users.getAccount.anon, outfit ? { userId: outfit.userId } : 'skip');
   const { data: generations, isPending: isLoadingGenerations } = useQuery(api.router.feed.getFromOutfit.anon, outfit ? { outfitId: outfit._id } : 'skip');
+  const { data: isBookmarked } = useQuery(api.router.collection.getBookmarked.authed, { outfitId: id });
+  const { mutate: toggleBookmark } = useMutation(api.router.collection.toggleBookmark.authed);
 
   const [selectedItem, setSelectedItem] = useState<Id<'items'> | null>(null);
   const [items, setItems] = useStateEffect(outfit?.items ?? []);
@@ -214,6 +218,16 @@ export default function ItemScreen() {
                 subtitle={outfit.name}
                 onBack={exit}
                 style={{ paddingHorizontal: 12 }}
+                endContent={
+                  <GhostIconWrapper
+                    style={{ padding: 4 }}
+                    icon={BookmarkIcon}
+                    selected={isBookmarked}
+                    color={Colors.primary[500]}
+                    onPress={() => { toggleBookmark({ outfitId: id }); }}
+                    size={24}
+                  />
+                }
               />
               {user && <Pressable
                 onPress={() => push(ROUTES.USER.PATH, { pathParams: { id: user._id } })}
@@ -322,9 +336,25 @@ export default function ItemScreen() {
               masonry
             />
             <FlashList
-              data={['user', 'premium', 'generations', 'cant-edit']}
+              data={['share', 'user', 'premium', 'generations', 'cant-edit']}
               keyExtractor={(i) => i}
               renderItem={({ item }) => {
+                if (item === 'share') return (
+                  <Button
+                    variant="secondary"
+                    style={{ marginBottom: 12 }}
+                    startIcon={ShareIcon}
+                    onPress={() => {
+                      Share.share({
+                        title: env.PUBLIC_APP_URL + ROUTES.OUTFIT.ID(id),
+                        url: env.PUBLIC_APP_URL + ROUTES.OUTFIT.ID(id),
+                        message: env.PUBLIC_APP_URL + ROUTES.OUTFIT.ID(id),
+                      })
+                    }}
+                  >
+                    Share outfit
+                  </Button>
+                )
                 if (item === 'user') return <UserBlock />
                 if (item === 'premium') return <PremiumBlock style={{ marginTop: 12 }} />
                 if (item === 'generations') return <Generations

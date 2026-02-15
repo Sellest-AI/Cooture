@@ -1,6 +1,7 @@
 import { useRouter } from "@/hooks";
 import { useAccount } from "@/lib/convex/auth";
 import { api, useQueryCached } from "@/lib/convex/client";
+import { CreditsButton } from "@/modules/premium/credits.button";
 import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Button } from "@ui/button";
@@ -34,10 +35,14 @@ export default function Screen() {
         title="Create"
         type="alt"
         size="big"
-        endContent={<Notification />}
+        endContent={<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <CreditsButton />
+          <Notification />
+        </View>}
         style={{
           paddingTop: 12,
-          paddingHorizontal: 20,
+          paddingLeft: 16,
+          paddingRight: 12,
           backgroundColor: Colors.background,
         }}
       />

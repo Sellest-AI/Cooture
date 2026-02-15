@@ -1,7 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { Id } from "../../_generated/dataModel";
 import { authMutation, MutationCtx } from "../../procedures";
-import { BOOKMARK_TYPE } from "../../schema/inventory";
+import { BOOKMARK_TYPE } from "../../schema/collection";
 
 const extractType = <T extends (typeof BOOKMARK_TYPE)['type']>(args: { generationId?: Id<'generations'>; outfitId?: Id<'outfits'>; itemId?: Id<'items'> }): T => {
   if (args.generationId) return "generation" as T;

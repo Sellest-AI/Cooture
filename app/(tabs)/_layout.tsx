@@ -126,7 +126,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="inventory"
+        name="collection"
         options={{
           tabBarIcon: ({ color, size }) => <Package color={color} size={size} />,
         }}

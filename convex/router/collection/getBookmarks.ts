@@ -1,6 +1,6 @@
 import { paginationOptsValidator } from "convex/server";
 import { authQuery } from "../../procedures";
-import { BOOKMARK_TYPE } from "../../schema/inventory";
+import { BOOKMARK_TYPE } from "../../schema/collection";
 
 export const authed = authQuery({
   args: {

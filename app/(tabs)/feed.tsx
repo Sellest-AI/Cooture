@@ -1,6 +1,7 @@
 import { useFeed } from "@/modules/feed/_hooks";
 import { GenerationPost } from "@/modules/feed/post.generation";
 import { OutfitPost } from "@/modules/feed/post.outfit";
+import { CreditsButton } from "@/modules/premium/credits.button";
 import { PremiumBlock } from "@/modules/premium/premium-block";
 import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
@@ -9,6 +10,7 @@ import { FlashList } from "@ui/flat-list";
 import { ModalHeader } from "@ui/modal";
 import { SafeAreaView, useSafeAreaInsets } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
+import { View } from "react-native";
 import { Colors } from "theme";
 
 export default function Screen() {
@@ -37,10 +39,14 @@ export default function Screen() {
             title="Feed"
             type="alt"
             size="big"
-            endContent={<Notification />}
+            endContent={<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <CreditsButton />
+              <Notification />
+            </View>}
             style={{
               paddingTop: 12,
-              paddingHorizontal: 20,
+              paddingLeft: 16,
+              paddingRight: 12,
               backgroundColor: Colors.background,
             }}
           />

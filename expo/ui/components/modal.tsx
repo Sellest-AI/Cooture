@@ -178,6 +178,7 @@ type ModalHeaderProps = {
   type?: 'default' | 'alt';
   size?: 'big' | 'normal';
   endContent?: ReactNode;
+  align?: 'auto' | 'left';
 }
 export const ModalHeader = ({ title, onBack, style, subtitle, type, size, endContent }: ModalHeaderProps) => {
   const isAlt = type === 'alt';
@@ -185,8 +186,7 @@ export const ModalHeader = ({ title, onBack, style, subtitle, type, size, endCon
 
   const Title = isBig ? Text.H1 : Text.H3;
 
-  const justify = onBack && !endContent ? 'center' :
-    endContent ? 'flex-start' : 'center';
+  const justify = onBack ? 'center' : endContent ? 'flex-start' : 'center';
 
   return (
     <View style={{
@@ -225,7 +225,7 @@ export const ModalHeader = ({ title, onBack, style, subtitle, type, size, endCon
           style={{
             textAlign: 'center',
             maxWidth: "60%",
-            marginTop: isBig ? 3 : (isAlt ? 6 : 2)
+            marginTop: isBig ? 3 : (isAlt ? 6 : 2),
           }}
         >
           {title}

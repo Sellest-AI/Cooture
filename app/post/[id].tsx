@@ -34,6 +34,7 @@ export default function Screen() {
           id={item.id}
           style={{ marginTop: 28, marginBottom: 28 }}
           imageQuality={item.id === post?._id ? 'full' : 'optimized'}
+          disableLongPress={true}
         />
       </>
       )
@@ -42,6 +43,7 @@ export default function Screen() {
       id={item.id}
       style={{ marginTop: 8, marginBottom: 28 }}
       imageQuality={item.id === post?._id ? 'full' : 'optimized'}
+      disableLongPress={true}
     />
   }, [post]);
 

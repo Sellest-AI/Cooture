@@ -1,6 +1,7 @@
 import { api, Id } from "@/lib/convex/api";
 import { useQuery, useQueryCached } from "@/lib/convex/client";
 import { useFeed } from "@/modules/feed/_hooks";
+import { CreditsButton } from "@/modules/premium/credits.button";
 import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Col, Grid, Row } from "@ui/grid";
@@ -126,10 +127,14 @@ export default function Screen() {
         title="Discover"
         type="alt"
         size="big"
-        endContent={<Notification />}
+        endContent={<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <CreditsButton />
+          <Notification />
+        </View>}
         style={{
           paddingTop: 12,
-          paddingHorizontal: 20,
+          paddingLeft: 16,
+          paddingRight: 12,
           backgroundColor: Colors.background,
         }}
       />

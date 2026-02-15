@@ -82,6 +82,9 @@ import type * as router_admin_generateOutfitsCover from "../router/admin/generat
 import type * as router_admin_repairPreset from "../router/admin/repairPreset.js";
 import type * as router_auth_linkStripeSubscription from "../router/auth/linkStripeSubscription.js";
 import type * as router_auth_postCreateOrUpdate from "../router/auth/postCreateOrUpdate.js";
+import type * as router_collection_getBookmarked from "../router/collection/getBookmarked.js";
+import type * as router_collection_getBookmarks from "../router/collection/getBookmarks.js";
+import type * as router_collection_toggleBookmark from "../router/collection/toggleBookmark.js";
 import type * as router_examples_query from "../router/examples/query.js";
 import type * as router_feed_getFromOutfit from "../router/feed/getFromOutfit.js";
 import type * as router_feed_getFromUser from "../router/feed/getFromUser.js";
@@ -93,9 +96,6 @@ import type * as router_generations_getOne from "../router/generations/getOne.js
 import type * as router_generations_getPaginated from "../router/generations/getPaginated.js";
 import type * as router_generations_getUser from "../router/generations/getUser.js";
 import type * as router_generations_updatePrediction from "../router/generations/updatePrediction.js";
-import type * as router_inventory_getBookmarked from "../router/inventory/getBookmarked.js";
-import type * as router_inventory_getBookmarks from "../router/inventory/getBookmarks.js";
-import type * as router_inventory_toggleBookmark from "../router/inventory/toggleBookmark.js";
 import type * as router_items_createOne from "../router/items/createOne.js";
 import type * as router_items_editOne from "../router/items/editOne.js";
 import type * as router_items_getAll from "../router/items/getAll.js";
@@ -142,10 +142,10 @@ import type * as router_users_getFromStripeId from "../router/users/getFromStrip
 import type * as router_users_getRelated from "../router/users/getRelated.js";
 import type * as router_users_upsertAppearance from "../router/users/upsertAppearance.js";
 import type * as schema_auth from "../schema/auth.js";
+import type * as schema_collection from "../schema/collection.js";
 import type * as schema_feed from "../schema/feed.js";
 import type * as schema_generations from "../schema/generations.js";
 import type * as schema_images from "../schema/images.js";
-import type * as schema_inventory from "../schema/inventory.js";
 import type * as schema_items from "../schema/items.js";
 import type * as schema_likes from "../schema/likes.js";
 import type * as schema_outfits from "../schema/outfits.js";
@@ -234,6 +234,9 @@ declare const fullApi: ApiFromModules<{
   "router/admin/repairPreset": typeof router_admin_repairPreset;
   "router/auth/linkStripeSubscription": typeof router_auth_linkStripeSubscription;
   "router/auth/postCreateOrUpdate": typeof router_auth_postCreateOrUpdate;
+  "router/collection/getBookmarked": typeof router_collection_getBookmarked;
+  "router/collection/getBookmarks": typeof router_collection_getBookmarks;
+  "router/collection/toggleBookmark": typeof router_collection_toggleBookmark;
   "router/examples/query": typeof router_examples_query;
   "router/feed/getFromOutfit": typeof router_feed_getFromOutfit;
   "router/feed/getFromUser": typeof router_feed_getFromUser;
@@ -245,9 +248,6 @@ declare const fullApi: ApiFromModules<{
   "router/generations/getPaginated": typeof router_generations_getPaginated;
   "router/generations/getUser": typeof router_generations_getUser;
   "router/generations/updatePrediction": typeof router_generations_updatePrediction;
-  "router/inventory/getBookmarked": typeof router_inventory_getBookmarked;
-  "router/inventory/getBookmarks": typeof router_inventory_getBookmarks;
-  "router/inventory/toggleBookmark": typeof router_inventory_toggleBookmark;
   "router/items/createOne": typeof router_items_createOne;
   "router/items/editOne": typeof router_items_editOne;
   "router/items/getAll": typeof router_items_getAll;
@@ -294,10 +294,10 @@ declare const fullApi: ApiFromModules<{
   "router/users/getRelated": typeof router_users_getRelated;
   "router/users/upsertAppearance": typeof router_users_upsertAppearance;
   "schema/auth": typeof schema_auth;
+  "schema/collection": typeof schema_collection;
   "schema/feed": typeof schema_feed;
   "schema/generations": typeof schema_generations;
   "schema/images": typeof schema_images;
-  "schema/inventory": typeof schema_inventory;
   "schema/items": typeof schema_items;
   "schema/likes": typeof schema_likes;
   "schema/outfits": typeof schema_outfits;
