@@ -48,12 +48,17 @@ export const getGenerationMax = async (ctx: QueryCtx, generationId: Id<'generati
   const sanitizedUser = sanitizeUser(user);
   const sanitizedUsers = (users ?? []).map(sanitizeUser).filter(notEmpty);
 
+  const coverId = predictions[0].imageId ?? predictions.find((x) => x.imageId)?.imageId;
+  const firstPredictionId = predictions[0]._id;
+
   return {
+    firstPredictionId,
     user: sanitizedUser,
     users: sanitizedUsers,
     ...metadata,
     ...generation,
     predictions,
+    coverId,
     preset: preset ? {
       ...preset,
       cover: presetCover || null,

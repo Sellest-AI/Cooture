@@ -1,12 +1,13 @@
 import { Badge } from '@ui/badge';
 import { Button } from '@ui/button';
-import { ArrowRight, Bookmark, CircleFadingArrowUp, Heart, ShareIcon } from '@ui/icons';
+import { ArrowRight, BookmarkIcon, CircleFadingArrowUp, HeartIcon, ShareIcon } from '@ui/icons';
 import { Skeleton } from '@ui/skeleton';
 import { MotiView } from 'moti';
 import { useCallback, useRef, useState } from 'react';
 import { Dimensions, FlatList, Pressable, View, ViewStyle } from 'react-native';
 import { Colors } from 'theme';
 import { Image } from '../image';
+import { Pressable as AnimatedPressable } from '../pressable';
 import { Text } from '../text';
 import { ZoomableImage } from '../zoomable-image';
 
@@ -14,6 +15,11 @@ type Props = {
   style?: ViewStyle;
   paddingHorizontal?: number;
   postedAt?: Date;
+  isLiked?: boolean;
+  onToggleLike?: (value: boolean) => void;
+  isBookmarked?: boolean;
+  onToggleBookmark?: () => void;
+  onShare?: () => void;
   onPress?: (_id: string) => void;
   image?: {
     _id: string;
@@ -44,15 +50,14 @@ type Props = {
   }
 }
 
-export const Post = ({ style, postedAt, image, users, preset, outfit, images, likedAccounts, paddingHorizontal, onPress }: Props) => {
+export const Post = ({ style, postedAt, image, users, preset, outfit, images, likedAccounts, onShare, paddingHorizontal, isBookmarked, onPress, onToggleBookmark, onToggleLike, isLiked }: Props) => {
+  const [doubleTap, setDoubleTap] = useState<number | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [pinching, setPinching] = useState<{ index: number } | false>(false);
   const type = preset ? 'preset' : outfit ? 'outfit' : undefined;
 
   const PADDING_HORIZONTAL = paddingHorizontal ?? 12;
   const GAP = 4;
-
-  const FALLBACK_IMAGE = image || images?.[0];
 
   const onViewableItemsChanged = useCallback(({ viewableItems }: { viewableItems: { index?: number | null }[] }) => {
     if (viewableItems.length === 0) return;
@@ -174,7 +179,13 @@ export const Post = ({ style, postedAt, image, users, preset, outfit, images, li
         viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
         renderItem={({ item: img, index }) => {
           return (
-            <Pressable
+            <AnimatedPressable
+              animated={false}
+              onDoublePress={onToggleLike ? () => {
+                const rotate = Math.random() * 40 - 20;
+                setDoubleTap(rotate);
+                if (!isLiked) onToggleLike?.(true);
+              } : undefined}
               onPress={() => img && onPress?.(img._id)}
               key={img?.url ?? index}
               style={{
@@ -234,7 +245,32 @@ export const Post = ({ style, postedAt, image, users, preset, outfit, images, li
                     />}
                 </Pressable>}
               </View>}
-            </Pressable>
+              {doubleTap && (
+                <MotiView
+                  from={{ scale: 1, opacity: 1 }}
+                  animate={{ scale: 2, opacity: 0 }}
+                  transition={{ type: 'timing', duration: 400 }}
+                  onDidAnimate={() => setDoubleTap(null)}
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <HeartIcon
+                    color={Colors.secondary[500]}
+                    weight={'fill'}
+                    size={56}
+                    style={{
+                      transform: [{ rotate: `${doubleTap}deg` }]
+                    }}
+                  />
+                </MotiView>
+              )}
+            </AnimatedPressable>
           )
         }}
       />
@@ -253,9 +289,16 @@ export const Post = ({ style, postedAt, image, users, preset, outfit, images, li
       >
         {type === 'preset' ? 'Recreate' : 'Try on'}
       </Button>}
-      <View style={{ marginTop: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: PADDING_HORIZONTAL + 4 }}>
+      <View style={{ marginTop: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: PADDING_HORIZONTAL + 4 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', gap: 8 }}>
-          <Heart size={20} color={Colors.foreground} />
+          <GhostAnimation
+            style={{ padding: 4 }}
+            icon={HeartIcon}
+            selected={isLiked}
+            color={isLiked ? Colors.secondary[500] : Colors.foreground}
+            onPress={() => { onToggleLike?.(!isLiked); }}
+            size={20}
+          />
           {likedAccounts && <View style={{ flexDirection: 'row', gap: 0, alignItems: 'center' }}>
             {likedAccounts.map((account) => (
               <Image
@@ -293,11 +336,72 @@ export const Post = ({ style, postedAt, image, users, preset, outfit, images, li
           ))}
         </View>}
         <View style={{ gap: 12, flexDirection: 'row', alignItems: 'center' }}>
-          <Bookmark size={20} color={Colors.primary[500]} />
-          {FALLBACK_IMAGE && <ShareIcon size={20} color={Colors.secondary[500]} onPress={() => onPress?.(FALLBACK_IMAGE._id)} />}
+          <GhostAnimation
+            style={{ padding: 4 }}
+            icon={BookmarkIcon}
+            selected={isBookmarked}
+            color={Colors.primary[500]}
+            onPress={() => { onToggleBookmark?.(); }}
+            size={20}
+          />
+          {onShare && <ShareIcon size={20} color={Colors.secondary[500]} onPress={() => onShare?.()} />}
         </View>
       </View>
     </View>
+  )
+}
+
+type GhostAnimationProps = {
+  selected?: boolean;
+  size: number;
+  onPress?: () => void;
+  icon: React.ComponentType<{ size?: number, color?: string, style?: ViewStyle, weight?: 'fill' | undefined }>;
+  color?: string;
+  style?: ViewStyle;
+}
+const GhostAnimation = ({ icon: Icon, selected, size, color, onPress, style }: GhostAnimationProps) => {
+  const [isAnimating, setAnimating] = useState(false);
+  const [scale, setScale] = useState(2);
+
+  return (
+    <Pressable
+      style={{ ...style }}
+      onPress={() => {
+        onPress?.();
+        requestAnimationFrame(() => setAnimating(true));
+        setScale(selected ? 0 : 2);
+      }}
+    >
+      <Icon
+        color={color}
+        weight={selected ? 'fill' : undefined}
+        size={size}
+      />
+      {isAnimating && (
+        <MotiView
+          key={scale}
+          onDidAnimate={() => setAnimating(false)}
+          from={{ scale: 1, opacity: scale === 0 ? 0.4 : 1 }}
+          animate={{ scale, opacity: 0 }}
+          transition={{ type: 'timing', duration: 400 }}
+          style={{
+            position: 'absolute',
+            height: '100%',
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+            top: style?.padding ?? 0,
+            left: style?.padding ?? 0,
+          }}
+        >
+          <Icon
+            color={color}
+            weight={'fill'}
+            size={size}
+          />
+        </MotiView>
+      )}
+    </Pressable>
   )
 }
 

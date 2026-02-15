@@ -23,6 +23,7 @@ export const env = createEnv({
     PUBLIC_POSTHOG_KEY: z.string().optional(),
     PUBLIC_POSTHOG_HOST: z.string().optional(),
     PUBLIC_AUTH_URL: z.string(),
+    PUBLIC_APP_URL: z.string(),
   },
   /*
    * Due to how Expo bundles environment variables,
@@ -38,5 +39,6 @@ export const env = createEnv({
     PUBLIC_CONVEX_URL: process.env.EXPO_PUBLIC_CONVEX_URL,
     PUBLIC_POSTHOG_KEY: process.env.EXPO_PUBLIC_POSTHOG_KEY,
     PUBLIC_POSTHOG_HOST: process.env.EXPO_PUBLIC_POSTHOG_HOST,
+    PUBLIC_APP_URL: process.env.EXPO_PUBLIC_APP_URL,
   },
 });

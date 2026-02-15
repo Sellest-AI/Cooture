@@ -1,5 +1,4 @@
 import { ROUTES, useRouter } from "@/hooks";
-import { useAccount } from "@/lib/convex/auth";
 import { api, usePaginatedQuery, useQuery, useQueryCached } from "@/lib/convex/client";
 import { PremiumBlock } from "@/modules/premium/premium-block";
 import { Notification } from "@/modules/profiles/notification";
@@ -19,25 +18,26 @@ const PADDING_HORIZONTAL = 12;
 
 const SavedPosts = ({ style }: { style?: ViewStyle }) => {
   const { push } = useRouter();
+  const { results, isLoading } = usePaginatedQuery(api.router.inventory.getBookmarks.authed, { type: 'generation' }, { initialNumItems: 6 });
 
-  const { user } = useAccount();
-  const { results: generations, isLoading } = usePaginatedQuery(api.router.generations.getPaginated.anon, user ? { userId: user._id } : 'skip', { initialNumItems: 8 });
-
-  const Item = useMemo(() => function ChildItem(props: NonNullable<typeof generations>[number]) {
-    const { userId, ...item } = props;
-    const { data: _image } = useQuery(api.router.storage.images.getOne.anon, item.coverId ? { id: item.coverId } : 'skip');
-    const { data: user } = useQuery(api.router.users.getAccount.anon, { userId });
+  const Item = useMemo(() => function ChildItem({ generationId }: NonNullable<typeof results>[number]) {
+    const { data: generation } = useQueryCached(api.router.generations.getOne.anon, { id: generationId! });
+    const { data: _image } = useQuery(api.router.storage.images.getOne.anon, generation?.coverId ? { id: generation.coverId } : 'skip');
+    const { data: user } = useQuery(api.router.users.getAccount.anon, generation ? { userId: generation.userId } : 'skip');
 
     const image = _image ? {
       ..._image,
       url: _image.sizes.small.url,
     } : undefined;
 
+    if (!generation)
+      return <PostMini.Skeleton style={{ width: 132 }} />
+
     return (
       <PostMini
         style={{ width: 132 }}
-        onPress={() => push(ROUTES.POST.PATH, { pathParams: { id: item._id } })}
-        images={item.predictions.length > 0 ? [image, image].filter(notEmpty) : undefined}
+        onPress={() => push(ROUTES.POST.PATH, { pathParams: { id: generation.firstPredictionId } })}
+        images={generation?.predictions.length > 1 ? [image, image].filter(notEmpty) : undefined}
         image={image}
         users={user ? [{
           ...user,
@@ -49,6 +49,8 @@ const SavedPosts = ({ style }: { style?: ViewStyle }) => {
       />
     )
   }, [push]);
+
+  if (!isLoading && (results.length === 0)) return null;
 
   return (
     <View style={style}>
@@ -76,7 +78,7 @@ const SavedPosts = ({ style }: { style?: ViewStyle }) => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ gap: 28, paddingLeft: PADDING_HORIZONTAL, paddingRight: PADDING_HORIZONTAL + 12, paddingTop: 10 }}
         contentOffset={{ x: 120, y: 0 }}
-        data={(generations?.slice(0, 6) || [])}
+        data={(results || [])}
         keyExtractor={(item) => item._id}
         renderItem={({ item, index }) => (
           <Item {...item} />
@@ -202,10 +204,10 @@ export default function SavedScreen() {
           paddingHorizontal: 20,
         }}
       />
-      <PremiumBlock style={{ marginTop: 0, marginHorizontal: 12 }} />
-      <SavedOutfits style={{ marginTop: 28 }} />
-      <SavedPosts style={{ marginTop: 40 }} />
-      <Quests style={{ marginTop: 36, paddingBottom: 20 }} />
+      <PremiumBlock style={{ marginTop: 0, marginHorizontal: 12, marginBottom: 28 }} />
+      <SavedOutfits style={{ marginBottom: 40 }} />
+      <SavedPosts style={{ marginBottom: 36 }} />
+      <Quests style={{ paddingBottom: 20 }} />
     </SafeScrollView>
   );
 }

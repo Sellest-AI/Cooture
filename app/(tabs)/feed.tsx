@@ -1,7 +1,6 @@
-import { ROUTES, useRouter } from "@/hooks";
-import { api, Id } from "@/lib/convex/api";
-import { useQuery, useQueryCached } from "@/lib/convex/client";
 import { useFeed } from "@/modules/feed/_hooks";
+import { GenerationPost } from "@/modules/feed/post.generation";
+import { OutfitPost } from "@/modules/feed/post.outfit";
 import { PremiumBlock } from "@/modules/premium/premium-block";
 import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
@@ -10,90 +9,7 @@ import { FlashList } from "@ui/flat-list";
 import { ModalHeader } from "@ui/modal";
 import { SafeAreaView, useSafeAreaInsets } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
-import { notEmpty } from "@utils/convex-allowed";
-import { ViewStyle } from "react-native";
 import { Colors } from "theme";
-
-const GenerationPost = ({ id, style }: { id: Id<'generations'>, style?: ViewStyle }) => {
-  const { push } = useRouter('/feed');
-  const { data: post } = useQuery(api.router.generations.getOne.anon, { id });
-  const imageIds = post?.predictions.map((p) => p.imageId).filter(notEmpty) ?? [];
-  const { data: images } = useQueryCached(api.router.storage.images.getMany.anon, imageIds.length > 0 ? { imageIds } : 'skip');
-
-  if (!post || !images) return <Post.Skeleton style={{ ...style, paddingHorizontal: 12 }} />;
-
-  return (<Post
-    style={{ ...style }}
-    paddingHorizontal={12}
-    postedAt={post.completedAt ? new Date(post.completedAt) : undefined}
-    likedAccounts={[]}
-    images={images?.map((img) => ({
-      _id: post.predictions.find(p => p.imageId === img._id)?._id ?? post.predictions[0]?._id,
-      url: img.sizes.large.url,
-      contentFit: img.hasAlpha ? 'contain' : 'cover',
-    }))}
-    users={post.users.map((user) => ({
-      name: user.name ?? 'Anonymous',
-      username: user.name ?? 'anon',
-      imageUrl: user.image,
-      onPress: () => push(ROUTES.USER.PATH, {
-        pathParams: { id: user!._id }
-      })
-    }))}
-    preset={post.preset?.cover ? {
-      imageUrl: post.preset.cover.sizes.thumbnail.url,
-      onPress: () => push(ROUTES.PHOTOSHOOT.RECAP, {
-        params: { presetId: post.preset?._id, outfitId: post.outfit?._id }
-      })
-    } : undefined}
-    outfit={post.outfit ? {
-      itemUrls: post.outfit.items.map(i => i.image.sizes.thumbnail.url),
-      onPress: () => push(ROUTES.OUTFIT.PATH, {
-        pathParams: { id: post.outfit!._id }
-      })
-    } : undefined}
-  />
-  )
-}
-
-const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle }) => {
-  const { push } = useRouter('/feed');
-  const { data: outfit } = useQuery(api.router.outfits.getOne.anon, { outfitId: id });
-  const { data: user } = useQuery(api.router.users.getAccount.anon, outfit ? { userId: outfit.userId } : 'skip');
-
-  if (!outfit) return <Post.Skeleton style={{ ...style, paddingHorizontal: 12 }} />;
-
-  const cover = {
-    _id: outfit._id,
-    url: outfit.cover?.sizes.large.url ?? outfit.items[0].image.sizes.large.url,
-    contentFit: 'contain' as const,
-    backgroundColor: outfit.backgroundColor,
-  }
-
-  return <Post
-    style={style}
-    paddingHorizontal={12}
-    postedAt={outfit._creationTime ? new Date(outfit._creationTime) : undefined}
-    likedAccounts={[]}
-    image={cover}
-    onPress={() => push(ROUTES.OUTFIT.PATH, { pathParams: { id: outfit._id } })}
-    users={user ? [{
-      name: user.name ?? 'Anonymous',
-      username: user.name ?? 'anon',
-      imageUrl: user.image,
-      onPress: () => push(ROUTES.USER.PATH, {
-        pathParams: { id: user!._id }
-      })
-    }] : undefined}
-    outfit={{
-      itemUrls: outfit.items.map((i) => i.image.sizes.thumbnail.url),
-      onPress: () => push(ROUTES.PHOTOSHOOT.NEW, {
-        params: { outfitId: outfit._id }
-      })
-    }}
-  // user={outfit.}
-  />;
-}
 
 export default function Screen() {
   const { feed, canLoadMore, updateSeed, isLoading, loadMore } = useFeed({ initialNumItems: 8 });

@@ -3,7 +3,9 @@ import { authTables } from "./schema/auth";
 import { feedScores } from "./schema/feed";
 import { generations, predictions } from "./schema/generations";
 import { imageObjects, images, imageSizes } from "./schema/images";
+import { bookmarks, bookmarkStats } from "./schema/inventory";
 import { items } from "./schema/items";
+import { likes, likeStats } from "./schema/likes";
 import { outfitItems, outfits } from "./schema/outfits";
 import { presetCategories, presetGenerations, presets } from "./schema/presets";
 import { subscriptions, subscriptionsHistory } from "./schema/subscriptions";
@@ -27,5 +29,9 @@ export default defineSchema({
   presets,
   presetCategories,
   presetGenerations,
-  feedScores
+  feedScores,
+  bookmarks,
+  bookmarkStats,
+  likes,
+  likeStats,
 });

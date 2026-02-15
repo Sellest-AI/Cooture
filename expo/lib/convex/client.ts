@@ -3,7 +3,8 @@ import { useQueries } from "convex-helpers/react/cache";
 
 import { useAction as useConvexAction, useMutation as useConvexMutation } from "convex/react";
 
-import { useCallback, useState } from 'react';
+import { atom, useAtom } from "jotai";
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export * from './api';
 
@@ -56,4 +57,33 @@ export const useAction = <T extends ActionPath>(path: T) => {
   const action = useConvexAction(path);
   const { execute, isLoading, isSuccess, isError } = useWithLoader(action);
   return { action: execute as ActionFn<T>, isLoading, isSuccess, isError };
+}
+
+const cachedAtom = atom({} as Record<string, any>);
+
+type Params<T extends ActionPath> = T['_args'] & { key: string };
+export const useQueryCachedData = <T extends ActionPath>(path: T, params: Params<T>) => {
+  const { key, ...actionParams } = params;
+  const action = useConvexAction(path);
+  const { execute, isLoading, isSuccess, isError } = useWithLoader(action);
+
+  const [cached, setCached] = useAtom(cachedAtom);
+
+  // Generate a cache key based on the path and params
+  // The json will be sorted by key asc to ensure consistent keys for same params with different order
+  const cacheKey = useMemo(() => `${key}:${JSON.stringify(actionParams, Object.keys(actionParams || {}).sort())}`, [key, actionParams]);
+  const [data, setData] = useState<Awaited<ReturnType<ActionFn<T>>> | undefined>(cached[cacheKey]);
+
+  const reload = useCallback(async () => {
+    const result = await execute(actionParams as T['_args']);
+    setData(result);
+    setCached((prev) => ({ ...prev, [cacheKey]: result }));
+  }, [execute, actionParams, cacheKey, setCached]);
+
+  useEffect(() => {
+    if (!!data) return;
+    reload();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  return { data, isLoading, isSuccess, isError, reload };
 }

@@ -40,7 +40,12 @@ export const PostMini = ({ style, onPress, image, images, users }: Props) => {
         ...style
       }}
     >
-      <Pressable onPress={onPress}>
+      <Pressable onPress={onPress}
+        style={{
+          borderRadius: 16,
+          backgroundColor: _image?.backgroundColor || Colors.blur.dark,
+        }}
+      >
         {images?.[1] && <Image
           source={images[1]?.url}
           style={{
@@ -63,8 +68,8 @@ export const PostMini = ({ style, onPress, image, images, users }: Props) => {
             shadowOffset: { width: 3, height: -3 },
             shadowRadius: 12,
             shadowColor: 'black',
+            opacity: 1,
             shadowOpacity: hasMultiple ? 0.3 : 0,
-            backgroundColor: _image?.backgroundColor || Colors.blur.dark,
           }}
         />
       </Pressable>

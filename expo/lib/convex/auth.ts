@@ -84,7 +84,8 @@ export const useAccount = () => {
 }
 
 export const useIsAdmin = () => {
-  const { data: user } = useQueryCached(api.router.users.getAccount.authed);
+  const token = useAuthToken();
+  const { data: user } = useQueryCached(api.router.users.getAccount.authed, !!token ? undefined : 'skip');
   const isAdmin = user?.role === 'ADMIN';
   return isAdmin;
 }
