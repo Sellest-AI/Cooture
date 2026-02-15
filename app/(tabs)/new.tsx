@@ -105,7 +105,6 @@ export default function Screen() {
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ gap: 32, paddingHorizontal: 16, paddingTop: 6 }}
-          contentOffset={{ x: 120, y: 0 }}
           data={(presets?.slice(0, 6) || [])}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
@@ -139,7 +138,6 @@ export default function Screen() {
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ gap: 32, paddingHorizontal: 16, paddingTop: 6 }}
-          contentOffset={{ x: 120, y: 0 }}
           data={(outfits?.slice(0, 6) || [])}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (

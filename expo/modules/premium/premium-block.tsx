@@ -1,6 +1,6 @@
 import { useRouter } from "@/hooks";
 import { Block } from "@ui/block";
-import { ArrowUpRight, Gem } from "@ui/icons";
+import { ArrowUpRight, Credits } from "@ui/icons";
 import { Pressable } from "@ui/pressable";
 import { Text } from "@ui/text";
 import { View, ViewStyle } from "react-native";
@@ -18,7 +18,8 @@ export const PremiumBlock = ({ style }: Props) => {
         variant="blur"
         style={{
           borderRadius: 28,
-          paddingHorizontal: 10,
+          paddingLeft: 10,
+          paddingRight: 4,
           paddingVertical: 10,
           flexDirection: "row",
           justifyContent: "center",
@@ -37,11 +38,22 @@ export const PremiumBlock = ({ style }: Props) => {
           }}
         >
           {/* <Text.H3>💎</Text.H3> */}
-          <Gem
+          <Credits
+            size={32}
+            blurRadius={10}
+            style={{
+              position: 'absolute',
+              opacity: 0.2,
+            }}
+          // color={Colors.primary[900]}
+          // weight="duotone"
+          // duotoneColor={Colors.primary[700]}
+          />
+          <Credits
             size={28}
-            color={Colors.primary[900]}
-            weight="duotone"
-            duotoneColor={Colors.primary[700]}
+          // color={Colors.primary[900]}
+          // weight="duotone"
+          // duotoneColor={Colors.primary[700]}
           />
         </Block>
         <View style={{ flex: 1, paddingHorizontal: 12, gap: 6 }}>
@@ -49,7 +61,7 @@ export const PremiumBlock = ({ style }: Props) => {
             color={Colors.primary[500]}
             numberOfLines={1}
           >
-            Unlock unlimited generations
+            Unlock Cooture Max
           </Text.Lg>
           <View style={{
             flexDirection: "row",
@@ -62,7 +74,7 @@ export const PremiumBlock = ({ style }: Props) => {
               style={{ flex: 1, overflow: 'visible' }}
               textBreakStrategy="balanced"
             >
-              Upgrade your plan and unlock more generations.
+              Exclusive features, free credits and more every week.
             </Text.Sm>
             <ArrowUpRight
               color={Colors.primary[200]}

@@ -1,6 +1,6 @@
 import { ROUTES, useRouter } from "@/hooks";
 import { useAccount } from "@/lib/convex/auth";
-import { api, Id, useQuery, useQueryCached } from "@/lib/convex/client";
+import { api, Id, useQueryCached } from "@/lib/convex/client";
 import { EmptyBlock } from "@ui/block.empty";
 import { LoadingBlock } from "@ui/block.loading";
 import { ImageGeneration } from "@ui/cards";
@@ -30,7 +30,7 @@ export function Screen() {
   const { user } = useAccount();
   const { push } = useRouter();
   const { userId } = useProfileContext();
-  const { data: generations } = useQuery(api.router.generations.getAll.anon, { userId });
+  const { data: generations } = useQueryCached(api.router.generations.getAll.anon, { userId });
 
   const isOwnProfile = user?._id === userId;
 

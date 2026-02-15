@@ -221,7 +221,7 @@ export const ModalHeader = ({ title, onBack, style, subtitle, type, size, endCon
         </Pressable>}
         <Title
           type={isAlt ? 'alt' : undefined}
-          color={isAlt ? Colors.primary[200] : Colors.foreground}
+          color={isAlt ? Colors.primary[500] : Colors.foreground}
           style={{
             textAlign: 'center',
             maxWidth: "60%",

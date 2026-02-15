@@ -34,6 +34,7 @@ export const SafeScrollView = ({ style, children, contentContainerStyle, onReach
       keyboardVerticalOffset={insets.top + fallbackPadding}
     >
       <SafeAreaView
+        style={{ flex: Platform.OS === 'web' ? 1 : undefined }}
         edges={{
           top: edges?.top === 'padding' ? 'off' : (edges?.top ?? 'additive'),
           left: edges?.left ?? 'additive',

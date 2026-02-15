@@ -1,5 +1,5 @@
 import { useAccount } from "@/lib/convex/auth";
-import { api, useQuery } from "@/lib/convex/client";
+import { api, useQueryCached } from "@/lib/convex/client";
 import { EmptyBlock } from "@ui/block.empty";
 import { LoadingBlock } from "@ui/block.loading";
 import { Collection } from "@ui/cards";
@@ -13,7 +13,7 @@ import { useProfileContext } from "./page";
 export function Screen() {
   const { user } = useAccount();
   const { userId } = useProfileContext();
-  const { data: outfits } = useQuery(api.router.outfits.getAll.anon, { userId });
+  const { data: outfits } = useQueryCached(api.router.outfits.getAll.anon, { userId });
 
   const isOwnProfile = user?._id === userId;
 

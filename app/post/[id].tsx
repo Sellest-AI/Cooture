@@ -1,6 +1,7 @@
 import { ROUTES, useRoute, useRouter } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
 import { useQuery, useQueryCached } from "@/lib/convex/client";
+import { PremiumBlock } from "@/modules/premium/premium-block";
 import { Post } from "@ui/cards";
 import { FlashList } from "@ui/flat-list";
 import { ModalHeader } from "@ui/modal";
@@ -66,8 +67,19 @@ export default function Screen() {
     ...posts.map((p) => ({ id: p._id })),
   ], [post, posts]);
 
-  const renderItem = useCallback(({ item }: { item: typeof items[number] }) => {
+  const renderItem = useCallback(({ item, index }: { item: typeof items[number], index: number }) => {
     if (!item.id) return null;
+    if (index % 6 === 0 && index > 0) {
+      return (<>
+        <PremiumBlock />
+        <UserPost
+          postId={item.id}
+          style={{ marginTop: 28, marginBottom: 28 }}
+          fullResolution={item.id === post?._id}
+        />
+      </>
+      )
+    }
     return <UserPost
       postId={item.id}
       style={{ marginTop: 8, marginBottom: 28 }}

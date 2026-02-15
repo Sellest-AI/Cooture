@@ -1,7 +1,6 @@
 import { api, Id } from "@/lib/convex/api";
 import { useQuery, useQueryCached } from "@/lib/convex/client";
 import { useFeed } from "@/modules/feed/_hooks";
-import { PremiumBlock } from "@/modules/premium/premium-block";
 import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Col, Grid, Row } from "@ui/grid";
@@ -135,9 +134,6 @@ export default function Screen() {
         }}
       />
       <View>
-        <PremiumBlock
-          style={{ marginBottom: 20, marginHorizontal: 12 }}
-        />
         {empty && <GridSkeleton />}
         {!empty && feed && (
           <View style={{ paddingHorizontal: 4, gap: GAP }}>
