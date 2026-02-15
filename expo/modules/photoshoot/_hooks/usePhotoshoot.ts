@@ -5,7 +5,7 @@ import { atom, useAtom } from "jotai";
 
 export const usePhotoshoot = (id: Id<'generations'> | null) => {
   const { data: photoshoot } = useQuery(api.router.generations.getOne.authed, id ? { generationId: id } : 'skip');
-  const { data: preset } = useQueryCached(api.router.presets.getOne.anon, photoshoot?.metadata?.presetId ? { presetId: photoshoot.metadata.presetId } : 'skip');
+  const { data: preset } = useQueryCached(api.router.presets.getOne.anon, photoshoot?.presetId ? { presetId: photoshoot.presetId } : 'skip');
 
   const imageIds = photoshoot?.predictions.map((p) => p.imageId).filter(notEmpty);
   const { data: results } = useQueryCached(api.router.storage.images.getMany.anon, imageIds ? { imageIds } : 'skip');

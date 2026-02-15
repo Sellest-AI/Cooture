@@ -25,7 +25,7 @@ type Props = {
 const Notification = ({ generationId, completed, status }: Props) => {
   const { data: generation, isPending } = useQueryCached(api.router.generations.getOne.authed, { generationId: generationId });
 
-  const presetId = generation?.metadata?.presetId;
+  const presetId = generation?.presetId;
   const { data: preset, isPending: presetPending } = useQueryCached(api.router.presets.getOne.anon, presetId ? { presetId } : 'skip');
 
   const imageIds = generation?.predictions.map((p) => p.imageId).filter(notEmpty);

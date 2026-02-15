@@ -28,12 +28,12 @@ type Props = {
     backgroundColor?: string;
   }[]
   likedAccounts?: string[];
-  user?: {
+  users?: {
     onPress?: () => void;
     imageUrl?: string;
     name: string;
     username: string;
-  }
+  }[]
   preset?: {
     onPress?: () => void;
     imageUrl: string;
@@ -44,7 +44,7 @@ type Props = {
   }
 }
 
-export const Post = ({ style, postedAt, image, user, preset, outfit, images, likedAccounts, paddingHorizontal, onPress }: Props) => {
+export const Post = ({ style, postedAt, image, users, preset, outfit, images, likedAccounts, paddingHorizontal, onPress }: Props) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [pinching, setPinching] = useState<{ index: number } | false>(false);
   const type = preset ? 'preset' : outfit ? 'outfit' : undefined;
@@ -68,42 +68,95 @@ export const Post = ({ style, postedAt, image, user, preset, outfit, images, lik
     },
   ]);
 
+  const user = users?.[0];
+
   return (
     <View style={[{}, style]}>
-      {user && <View style={{
+      {users && users.length > 0 && <View style={{
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-end',
         marginBottom: 12,
         paddingHorizontal: PADDING_HORIZONTAL
       }}>
-        {user && <Pressable
-          onPress={user.onPress}
+        {users && users.length > 1 && <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'flex-start',
-            gap: 10
-          }}>
-          <View style={{
-            width: 32, height: 32,
-            borderRadius: 99,
-            borderColor: Colors.blur.medium,
-            borderWidth: 1,
-            backgroundColor: Colors.blur.dark,
-            overflow: 'hidden'
-          }}>
-            <Image
-              source={user.imageUrl}
-              style={{ flex: 1 }}
-            />
-          </View>
+            gap: 24
+          }}
+        >
           <View>
-            <Text.Sm color={Colors.neutral[50]} weight={600}>{user.name}</Text.Sm>
-            <Text.Sm color={Colors.neutral[400]} style={{ marginTop: 2 }}>@{user.username}</Text.Sm>
+            <View style={{
+              top: 0, left: 2,
+              width: 28, height: 28,
+              borderRadius: 99,
+              borderColor: Colors.blur.medium,
+              borderWidth: 1,
+              backgroundColor: Colors.blur.dark,
+              overflow: 'hidden'
+            }}>
+              <Image
+                source={users[0]?.imageUrl}
+                style={{ flex: 1 }}
+              />
+            </View>
+            <View style={{
+              position: 'absolute',
+              top: 8, left: 12,
+              width: 28, height: 28,
+              borderRadius: 99,
+              borderColor: Colors.blur.medium,
+              borderWidth: 1,
+              backgroundColor: Colors.blur.dark,
+              overflow: 'hidden'
+            }}>
+              <Image
+                source={users[1]?.imageUrl}
+                style={{ flex: 1 }}
+              />
+            </View>
           </View>
-        </Pressable>}
-        {postedAt && <Text.Sm color={Colors.neutral[400]}>{postedAt.toDateString()}</Text.Sm>}
+          <Text.Sm color={Colors.neutral[200]} style={{ marginTop: 8 }}>
+            <Text.Sm color={Colors.neutral[50]} weight={600} style={{ marginRight: 6 }}>
+              {users[0]?.name}
+            </Text.Sm>
+            x
+            <Text.Sm color={Colors.neutral[50]} weight={600} style={{ marginLeft: 6 }}>
+              {users[1]?.name}
+            </Text.Sm>
+          </Text.Sm>
+        </View>}
+        {(user && users.length < 2) &&
+          <Pressable
+            onPress={user.onPress}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              gap: 10
+            }}>
+            <View style={{
+              width: 32, height: 32,
+              borderRadius: 99,
+              borderColor: Colors.blur.medium,
+              borderWidth: 1,
+              backgroundColor: Colors.blur.dark,
+              overflow: 'hidden'
+            }}>
+              <Image
+                source={user.imageUrl}
+                style={{ flex: 1 }}
+              />
+            </View>
+            <View>
+              <Text.Sm color={Colors.neutral[50]} weight={600}>{user.name}</Text.Sm>
+              <Text.Sm color={Colors.neutral[400]} style={{ marginTop: 2 }}>@{user.username}</Text.Sm>
+            </View>
+          </Pressable>
+        }
+        {(postedAt && users.length < 2) && <Text.Sm color={Colors.neutral[400]}>{postedAt.toDateString()}</Text.Sm>}
       </View>}
       <FlatList
         horizontal

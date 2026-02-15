@@ -49,6 +49,7 @@ export const authed = authAction({
 
     const generationId = await ctx.runMutation(internal.router.generations.createOne._internal, {
       userId: ctx.userId,
+      extraUserIds: subjects.map(s => s.userId),
       predictionIds: predictions.map(p => p.id),
       preset: {
         presetId: preset._id,

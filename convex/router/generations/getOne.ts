@@ -1,6 +1,5 @@
 import { v } from "convex/values";
 import { getGenerationMax } from "../../functions/generations";
-import { getGenerationDetails } from "../../functions/generations/getGenerationDetails";
 import { authQuery } from "../../procedures";
 
 export const authed = authQuery({
@@ -8,18 +7,10 @@ export const authed = authQuery({
     generationId: v.id("generations"),
   },
   handler: async (ctx, { generationId }) => {
-    const [generation, details] = await Promise.all([
-      ctx.db.get(generationId),
-      getGenerationDetails(ctx, generationId)
-    ]);
+    const generation = await getGenerationMax(ctx, generationId);
+    if (!generation) return null;
 
-    if (!generation)
-      throw new Error(`Generation with id ${generationId} not found`);
-
-    return {
-      ...generation,
-      ...details,
-    }
+    return generation;
   }
 })
 

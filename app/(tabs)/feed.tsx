@@ -32,14 +32,14 @@ const GenerationPost = ({ id, style }: { id: Id<'generations'>, style?: ViewStyl
       url: img.sizes.large.url,
       contentFit: img.hasAlpha ? 'contain' : 'cover',
     }))}
-    user={post.user ? {
-      name: post.user.name ?? 'Anonymous',
-      username: post.user.name ?? 'anon',
-      imageUrl: post.user.image,
+    users={post.users.map((user) => ({
+      name: user.name ?? 'Anonymous',
+      username: user.name ?? 'anon',
+      imageUrl: user.image,
       onPress: () => push(ROUTES.USER.PATH, {
-        pathParams: { id: post.user!._id }
+        pathParams: { id: user!._id }
       })
-    } : undefined}
+    }))}
     preset={post.preset?.cover ? {
       imageUrl: post.preset.cover.sizes.thumbnail.url,
       onPress: () => push(ROUTES.PHOTOSHOOT.RECAP, {
@@ -77,14 +77,14 @@ const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle }) => 
     likedAccounts={[]}
     image={cover}
     onPress={() => push(ROUTES.OUTFIT.PATH, { pathParams: { id: outfit._id } })}
-    user={user ? {
+    users={user ? [{
       name: user.name ?? 'Anonymous',
       username: user.name ?? 'anon',
       imageUrl: user.image,
       onPress: () => push(ROUTES.USER.PATH, {
         pathParams: { id: user!._id }
       })
-    } : undefined}
+    }] : undefined}
     outfit={{
       itemUrls: outfit.items.map((i) => i.image.sizes.thumbnail.url),
       onPress: () => push(ROUTES.PHOTOSHOOT.NEW, {

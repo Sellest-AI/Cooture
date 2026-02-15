@@ -117,6 +117,7 @@ export const presetGenerations = defineTable({
   generationId: v.id("generations"),
   outfitId: v.optional(v.id("outfits")),
   prompts: v.array(v.string()),
+  userIds: v.optional(v.array(v.id("users"))),
 })
   .index("by_generation_id", ["generationId"])
   .index("by_outfit_id", ["outfitId"])

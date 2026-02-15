@@ -15,11 +15,16 @@ export const getGenerationMax = async (ctx: QueryCtx, generationId: Id<'generati
     .withIndex("by_generation_id", (q) => q.eq("generationId", generation._id))
     .unique() : null;
 
-  const [preset, itemIds, user] = metadata ? await Promise.all([
+  // If there is metadata, we need to fetch the users, otherwise we can skip it
+  const usersPromise = Promise.all(Array.from(new Set([
+    generation.userId, ...(metadata?.userIds ?? []),
+  ])).map(id => ctx.db.get(id)));
+
+  const [preset, itemIds, users] = metadata ? await Promise.all([
     metadata.presetId ? ctx.db.get(metadata.presetId) : null,
     metadata.outfitId ? ctx.db.query('outfitItems').withIndex('by_outfit_id',
       (q) => q.eq("outfitId", metadata.outfitId!)).collect() : [],
-    generation ? ctx.db.get(generation.userId) : null,
+    usersPromise,
   ]) : [null, []];
 
   const [presetCover, items] = await Promise.all([
@@ -32,15 +37,20 @@ export const getGenerationMax = async (ctx: QueryCtx, generationId: Id<'generati
     items: items.filter(notEmpty),
   } : null;
 
-  const sanitizedUser = user ? {
-    _id: user._id,
-    name: user.name,
-    username: user.name,
-    image: user.image,
+  const user = (users ?? []).find(u => u?._id === generation.userId);
+  const sanitizeUser = (_user: typeof user) => _user ? {
+    _id: _user._id,
+    name: _user.name,
+    username: _user.name,
+    image: _user.image,
   } : null;
+
+  const sanitizedUser = sanitizeUser(user);
+  const sanitizedUsers = (users ?? []).map(sanitizeUser).filter(notEmpty);
 
   return {
     user: sanitizedUser,
+    users: sanitizedUsers,
     ...metadata,
     ...generation,
     predictions,

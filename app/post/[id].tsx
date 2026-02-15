@@ -30,14 +30,14 @@ const UserPost = ({ postId, style, fullResolution }: { postId: Id<'generations'>
       url: fullResolution ? img.url : img.sizes.large.url,
       contentFit: img.hasAlpha ? 'contain' : 'cover',
     }))}
-    user={post.user ? {
-      name: post.user.name ?? 'Anonymous',
-      username: post.user.name ?? 'anon',
-      imageUrl: post.user.image,
+    users={post.users.map((user) => ({
+      name: user.name ?? 'Anonymous',
+      username: user.name ?? 'anon',
+      imageUrl: user.image,
       onPress: () => push(ROUTES.USER.PATH, {
-        pathParams: { id: post.user!._id }
+        pathParams: { id: user!._id }
       })
-    } : undefined}
+    }))}
     preset={post.preset?.cover ? {
       imageUrl: post.preset.cover.sizes.thumbnail.url,
       onPress: () => push(ROUTES.PHOTOSHOOT.RECAP, {
