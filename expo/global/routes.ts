@@ -49,8 +49,8 @@ export const ROUTES = {
   USER: {
     PATH: '/users/[id]',
     ID: (id: string) => `/users/${id}` as const,
-    FOLLOWERS: '/users/[id]/followers',
-    FOLLOWING: '/users/[id]/following',
+    FOLLOWERS: '/users/u/[id]/followers',
+    FOLLOWING: '/users/u/[id]/following',
   },
   EXTRA: {
     SETINGS: '/settings',
