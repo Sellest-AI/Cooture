@@ -11,6 +11,7 @@ import { outfitItems, outfits } from "./schema/outfits";
 import { presetCategories, presetGenerations, presets } from "./schema/presets";
 import { subscriptions, subscriptionsHistory } from "./schema/subscriptions";
 import { userImages, usersAppearance, usersExtended } from "./schema/users";
+import { creditTransactions, userWallets } from "./schema/wallets";
 
 export default defineSchema({
   ...authTables,
@@ -37,4 +38,6 @@ export default defineSchema({
   likeStats,
   follows,
   followStats,
+  userWallets,
+  creditTransactions,
 });

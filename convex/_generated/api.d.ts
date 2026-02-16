@@ -12,6 +12,11 @@ import type * as auth from "../auth.js";
 import type * as cron_feedRecentUpdate from "../cron/feedRecentUpdate.js";
 import type * as crons from "../crons.js";
 import type * as env from "../env.js";
+import type * as functions_credits_createUserWallet from "../functions/credits/createUserWallet.js";
+import type * as functions_credits_deductCredits from "../functions/credits/deductCredits.js";
+import type * as functions_credits_getUserWallet from "../functions/credits/getUserWallet.js";
+import type * as functions_credits_grantCredits from "../functions/credits/grantCredits.js";
+import type * as functions_credits_index from "../functions/credits/index.js";
 import type * as functions_feed_index from "../functions/feed/index.js";
 import type * as functions_feed_updateFeedScore from "../functions/feed/updateFeedScore.js";
 import type * as functions_generations_getGenerationDetails from "../functions/generations/getGenerationDetails.js";
@@ -85,6 +90,12 @@ import type * as router_auth_postCreateOrUpdate from "../router/auth/postCreateO
 import type * as router_collection_getBookmarked from "../router/collection/getBookmarked.js";
 import type * as router_collection_getBookmarks from "../router/collection/getBookmarks.js";
 import type * as router_collection_toggleBookmark from "../router/collection/toggleBookmark.js";
+import type * as router_credits_canPay from "../router/credits/canPay.js";
+import type * as router_credits_claimDaily from "../router/credits/claimDaily.js";
+import type * as router_credits_deductCredits from "../router/credits/deductCredits.js";
+import type * as router_credits_getTransactionsPaginated from "../router/credits/getTransactionsPaginated.js";
+import type * as router_credits_getUserWallet from "../router/credits/getUserWallet.js";
+import type * as router_credits_refundCredits from "../router/credits/refundCredits.js";
 import type * as router_examples_query from "../router/examples/query.js";
 import type * as router_feed_getFromOutfit from "../router/feed/getFromOutfit.js";
 import type * as router_feed_getPaginated from "../router/feed/getPaginated.js";
@@ -157,6 +168,7 @@ import type * as schema_outfits from "../schema/outfits.js";
 import type * as schema_presets from "../schema/presets.js";
 import type * as schema_subscriptions from "../schema/subscriptions.js";
 import type * as schema_users from "../schema/users.js";
+import type * as schema_wallets from "../schema/wallets.js";
 
 import type {
   ApiFromModules,
@@ -169,6 +181,11 @@ declare const fullApi: ApiFromModules<{
   "cron/feedRecentUpdate": typeof cron_feedRecentUpdate;
   crons: typeof crons;
   env: typeof env;
+  "functions/credits/createUserWallet": typeof functions_credits_createUserWallet;
+  "functions/credits/deductCredits": typeof functions_credits_deductCredits;
+  "functions/credits/getUserWallet": typeof functions_credits_getUserWallet;
+  "functions/credits/grantCredits": typeof functions_credits_grantCredits;
+  "functions/credits/index": typeof functions_credits_index;
   "functions/feed/index": typeof functions_feed_index;
   "functions/feed/updateFeedScore": typeof functions_feed_updateFeedScore;
   "functions/generations/getGenerationDetails": typeof functions_generations_getGenerationDetails;
@@ -242,6 +259,12 @@ declare const fullApi: ApiFromModules<{
   "router/collection/getBookmarked": typeof router_collection_getBookmarked;
   "router/collection/getBookmarks": typeof router_collection_getBookmarks;
   "router/collection/toggleBookmark": typeof router_collection_toggleBookmark;
+  "router/credits/canPay": typeof router_credits_canPay;
+  "router/credits/claimDaily": typeof router_credits_claimDaily;
+  "router/credits/deductCredits": typeof router_credits_deductCredits;
+  "router/credits/getTransactionsPaginated": typeof router_credits_getTransactionsPaginated;
+  "router/credits/getUserWallet": typeof router_credits_getUserWallet;
+  "router/credits/refundCredits": typeof router_credits_refundCredits;
   "router/examples/query": typeof router_examples_query;
   "router/feed/getFromOutfit": typeof router_feed_getFromOutfit;
   "router/feed/getPaginated": typeof router_feed_getPaginated;
@@ -314,6 +337,7 @@ declare const fullApi: ApiFromModules<{
   "schema/presets": typeof schema_presets;
   "schema/subscriptions": typeof schema_subscriptions;
   "schema/users": typeof schema_users;
+  "schema/wallets": typeof schema_wallets;
 }>;
 
 /**

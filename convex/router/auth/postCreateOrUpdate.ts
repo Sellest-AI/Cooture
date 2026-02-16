@@ -1,7 +1,8 @@
-import { v } from "convex/values";
-import { internalAction, internalMutation } from "../../_generated/server";
-import { internal } from "../../_generated/api";
 import { createCustomer } from "@/lib/stripe";
+import { v } from "convex/values";
+import { internal } from "../../_generated/api";
+import { internalAction, internalMutation } from "../../_generated/server";
+import { createUserWallet } from "../../functions/credits";
 
 export const _private = internalMutation({
   args: { userId: v.id("users"), stripeCustomerId: v.string() },
@@ -20,6 +21,9 @@ export const _private = internalMutation({
         accountStatus: "ACTIVE",
         role: "USER"
       }),
+
+      // Create user wallet with starting credits
+      createUserWallet(ctx, userId),
     ])
 
     return true;

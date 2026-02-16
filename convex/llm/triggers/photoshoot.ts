@@ -4,6 +4,7 @@ import { sliceText } from "@shared/utils";
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { Id } from "../../_generated/dataModel";
+import { CREDITS_CONFIG } from "../../functions/credits";
 import { authAction } from "../../procedures";
 import { createPhotoshootSchema, schemaToMarkdown } from "../utils/photoshoot";
 
@@ -18,8 +19,21 @@ export const authed = authAction({
     })),
     /** Other users to be added when duo/trio shot */
     extraUserIds: v.optional(v.array(v.id("users"))),
+    numberToGeneration: v.optional(v.number())
   },
   handler: async (ctx, args): Promise<Id<'generations'>> => {
+    const AMOUNT_OF_IMAGES = args.numberToGeneration ?? 1;
+    const COST = CREDITS_CONFIG.COST_PER_GENERATION * AMOUNT_OF_IMAGES;
+
+    // 1. Check if can pay
+    const canPay = await ctx.runQuery(internal.router.credits.canPay._internal, {
+      userId: ctx.userId,
+      amount: COST,
+    });
+
+    if (!canPay) throw new Error("Not enough credits to start generation.");
+
+    // 2. Proceed with generation
     const preset = await ctx.runQuery(internal.router.presets.getOne._internal, { presetId: args.presetId });
     if (!preset) throw new Error("Preset not found");
 
@@ -39,8 +53,6 @@ export const authed = authAction({
     // so we need to shrink the prompt if it's too long
     const shrinkedPrompt = sliceText(prompt, 2000);
 
-    const AMOUNT_OF_IMAGES = 2;
-
     const predictions = await Promise.all(Array.from({ length: AMOUNT_OF_IMAGES }).map(async () => predictImage({
       model: 'bytedance/seedream-4.5',
       images: schema.images,
@@ -57,6 +69,13 @@ export const authed = authAction({
         prompts: [JSON.stringify(schema.prompt), prompt],
       }
     })
+
+    // 3. Update transaction with generationId (optional - for better tracking)
+    await ctx.runMutation(internal.router.credits.deductCredits._internal, {
+      amount: CREDITS_CONFIG.COST_PER_GENERATION * 2,
+      userId: ctx.userId,
+      generationId,
+    });
 
     return generationId;
   }
