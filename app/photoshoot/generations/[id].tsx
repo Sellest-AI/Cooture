@@ -6,7 +6,7 @@ import { Badge } from "@ui/badge";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
 import { ImageGeneration } from "@ui/cards";
-import { Check, Heart, Loader, X } from "@ui/icons";
+import { Check, HeartIcon, Loader, X } from "@ui/icons";
 import { Image } from "@ui/image";
 import { SafeAreaView, useSafeAreaInsets } from "@ui/safe-area-view";
 import { Carousel, ICarouselInstance } from "@ui/screen-carousel";
@@ -106,7 +106,7 @@ const Buttons = ({ onNext, currentItem, items }: Props) => {
         </Button>
         <Button
           variant="primary"
-          startIcon={Heart}
+          startIcon={HeartIcon}
           onPress={async () => {
             if (!currentItem?.url) return;
             try {
@@ -174,7 +174,7 @@ export default function Screen() {
 
   const { photoshoot, results, preset, acceptPrediction, rejectPrediction } = usePhotoshoot(id);
 
-  const outfitId = photoshoot?.metadata?.outfitId;
+  const outfitId = photoshoot?.outfitId;
 
   const items = (photoshoot?.predictions ?? []).map((p) => ({
     _id: p.predictionId,
