@@ -1,6 +1,6 @@
 import { useRoute } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
-import { useQuery } from "@/lib/convex/client";
+import { usePaginatedQuery, useQuery } from "@/lib/convex/client";
 import { GenerationPost } from "@/modules/feed/post.generation";
 import { PremiumBlock } from "@/modules/premium/premium-block";
 import { Post } from "@ui/cards";
@@ -16,7 +16,7 @@ import { Colors } from "theme";
 export default function Screen() {
   const { id } = useRoute.Params<{ id: Id<'predictions'> }>();
   const { data: post } = useQuery(api.router.generations.getFromPrediction.anon, { id });
-  const { data: postsFromUser, isPending } = useQuery(api.router.feed.getFromUser.anon, post?.user?._id ? { userId: post?.user?._id } : 'skip');
+  const { results: postsFromUser, isLoading, loadMore } = usePaginatedQuery(api.router.generations.getPaginated.anon, post?.user?._id ? { userId: post?.user?._id } : 'skip', { initialNumItems: 8 });
 
   const posts = (postsFromUser ?? []).filter((p) => p._id !== post?._id);
 
@@ -62,6 +62,7 @@ export default function Screen() {
       <FlashList
         data={items}
         renderItem={renderItem}
+        onEndReached={() => loadMore(8)}
         showsVerticalScrollIndicator={false}
         keyExtractor={(i, index) => i?.id ?? `${index}`}
         ListEmptyComponent={<>
@@ -70,7 +71,7 @@ export default function Screen() {
         </>}
         ListFooterComponent={
           <>
-            {isPending && <>
+            {isLoading && <>
               <Post.Skeleton style={{ marginBottom: 28, marginHorizontal: 12 }} />
               <Post.Skeleton style={{ marginBottom: 28, marginHorizontal: 12 }} />
             </>}

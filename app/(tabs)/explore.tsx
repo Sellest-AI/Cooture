@@ -1,13 +1,13 @@
 import { api, Id } from "@/lib/convex/api";
 import { useQuery, useQueryCached } from "@/lib/convex/client";
 import { useFeed } from "@/modules/feed/_hooks";
-import { CreditsButton } from "@/modules/premium/credits.button";
-import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
+import { Block } from "@ui/block";
 import { Col, Grid, Row } from "@ui/grid";
-import { Loader } from "@ui/icons";
+import { Loader, Search } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
+import { Pressable as AnimatedPressable } from "@ui/pressable";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
@@ -127,10 +127,19 @@ export default function Screen() {
         title="Discover"
         type="alt"
         size="big"
-        endContent={<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <CreditsButton />
-          <Notification />
-        </View>}
+        endContent={
+          <AnimatedPressable>
+            <Block
+              variant="blur"
+              style={{
+                borderRadius: 99,
+                padding: 10,
+              }}
+            >
+              <Search size={24} color={Colors.foreground} />
+            </Block>
+          </AnimatedPressable>
+        }
         style={{
           paddingTop: 12,
           paddingLeft: 16,

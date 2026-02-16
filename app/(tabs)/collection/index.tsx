@@ -2,7 +2,6 @@ import { SavedOutfits } from "@/modules/collection/saved-outfits";
 import { SavedPosts } from "@/modules/collection/saved-posts";
 import { CreditsButton } from "@/modules/premium/credits.button";
 import { PremiumBlock } from "@/modules/premium/premium-block";
-import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Quest } from "@ui/cards";
 import { Check } from "@ui/icons";
@@ -77,9 +76,8 @@ export default function SavedScreen() {
         title="Collection"
         type="alt"
         size="big"
-        endContent={<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        endContent={<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, height: 48 }}>
           <CreditsButton />
-          <Notification />
         </View>}
         style={{
           paddingTop: 12,

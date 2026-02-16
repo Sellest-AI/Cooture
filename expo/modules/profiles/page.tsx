@@ -1,7 +1,5 @@
 import { useRouter } from "@/hooks";
 import { Id } from "@/lib/convex/client";
-import { PremiumBlock } from "@/modules/premium/premium-block";
-import { Notification } from "@/modules/profiles/notification";
 import { Block } from "@ui/block";
 import { Settings } from "@ui/icons";
 import { Image } from "@ui/image";
@@ -14,7 +12,7 @@ import { Tabs } from "@ui/tabs";
 import { Text } from "@ui/text";
 import { Href, router, Slot, useSegments } from "expo-router";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { Dimensions, LayoutRectangle, PanResponder, Platform, ScrollView, View, ViewStyle } from "react-native";
+import { LayoutRectangle, PanResponder, Platform, ScrollView, View, ViewStyle } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 import { FollowersFollowing } from "./followers-following";
@@ -71,7 +69,7 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
     // Scroll to the beginning of the slot content
     setTimeout(() => {
       scrollRef.current?.scrollTo({
-        y: Dimensions.get('screen').height - 32,
+        y: 500,
         animated: true
       });
     }, 1000);
@@ -126,7 +124,7 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
               type="alt"
               size="big"
               endContent={isSelf ? <View style={{ flexDirection: 'row', gap: 8 }}>
-                <Notification />
+                {/* <Notification /> */}
                 <Pressable onPress={() => router.push(ROUTES.PROFILE.SETTINGS)}>
                   <Block
                     variant="blur"
@@ -208,12 +206,9 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
               )
             })}
           </Block>}
-          <PremiumBlock
-            style={{ marginBottom: 32 }}
-          />
           <StickyView
             topOffset={Platform.OS === 'web' ? -48 : -12}
-            style={{ marginBottom: 24 }}
+            style={{ marginBottom: 24, marginTop: 16 }}
             onLayout={(e) => {
               slotRef.current = e.nativeEvent.layout;
             }}

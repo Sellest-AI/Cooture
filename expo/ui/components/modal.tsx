@@ -180,13 +180,15 @@ type ModalHeaderProps = {
   endContent?: ReactNode;
   align?: 'auto' | 'left';
 }
-export const ModalHeader = ({ title, onBack, style, subtitle, type, size, endContent }: ModalHeaderProps) => {
+export const ModalHeader = ({ title, onBack, style, subtitle, type, size, align, endContent }: ModalHeaderProps) => {
   const isAlt = type === 'alt';
   const isBig = size === 'big';
 
   const Title = isBig ? Text.H1 : Text.H3;
 
-  const justify = onBack ? 'center' : endContent ? 'flex-start' : 'center';
+  const justify =
+    align === 'left' ? 'flex-start' :
+      onBack ? 'center' : endContent ? 'flex-start' : 'center';
 
   return (
     <View style={{

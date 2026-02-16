@@ -266,7 +266,11 @@ export default function Screen() {
             if (!presetId) return;
             if (disabled) return;
 
-            const timer = setTimeout(() => push(ROUTES.PHOTOSHOOT.GENERATIONS.NEXT), 1000);
+            let cancel = false;
+            const timer = setTimeout(() => {
+              push(ROUTES.PHOTOSHOOT.GENERATIONS.NEXT);
+              cancel = true;
+            }, 1000);
 
             const generationId = await action({
               presetId: presetId,
@@ -278,6 +282,8 @@ export default function Screen() {
             });
 
             clearTimeout(timer);
+
+            if (cancel) return;
 
             dismissTo(ROUTES.PHOTOSHOOT.GENERATIONS.PATH, {
               pathParams: { id: generationId },

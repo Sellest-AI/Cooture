@@ -107,18 +107,18 @@ export const FollowersFollowing = ({ style, userId }: Props) => {
       >
         <Block
           style={{ ...styles.SharedButtons }}
-          variant={isFollowing ? "blur" : "primary"}
+          variant={isFollowing ? "secondary" : "primary"}
         >
           <View>
             <Text.H4
-              color={isFollowing ? Colors.neutral[50] : Colors.primary[900]}
+              color={isFollowing ? Colors.secondary[900] : Colors.primary[900]}
               style={{ textAlign: 'center' }}
               weight={600}
             >
               {isFollowing ? 'Unfollow' : 'Follow'}
             </Text.H4>
             <Text.Sm
-              color={isFollowing ? Colors.neutral[400] : Colors.primary[700]}
+              color={isFollowing ? Colors.secondary[700] : Colors.primary[700]}
               style={{ textAlign: 'center', marginTop: 1 }}
               weight={600}
             >

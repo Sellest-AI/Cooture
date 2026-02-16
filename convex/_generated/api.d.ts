@@ -87,7 +87,6 @@ import type * as router_collection_getBookmarks from "../router/collection/getBo
 import type * as router_collection_toggleBookmark from "../router/collection/toggleBookmark.js";
 import type * as router_examples_query from "../router/examples/query.js";
 import type * as router_feed_getFromOutfit from "../router/feed/getFromOutfit.js";
-import type * as router_feed_getFromUser from "../router/feed/getFromUser.js";
 import type * as router_feed_getPaginated from "../router/feed/getPaginated.js";
 import type * as router_generations_createOne from "../router/generations/createOne.js";
 import type * as router_generations_getAll from "../router/generations/getAll.js";
@@ -245,7 +244,6 @@ declare const fullApi: ApiFromModules<{
   "router/collection/toggleBookmark": typeof router_collection_toggleBookmark;
   "router/examples/query": typeof router_examples_query;
   "router/feed/getFromOutfit": typeof router_feed_getFromOutfit;
-  "router/feed/getFromUser": typeof router_feed_getFromUser;
   "router/feed/getPaginated": typeof router_feed_getPaginated;
   "router/generations/createOne": typeof router_generations_createOne;
   "router/generations/getAll": typeof router_generations_getAll;
