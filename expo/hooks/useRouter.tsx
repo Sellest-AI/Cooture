@@ -180,7 +180,7 @@ export const useRouter = <T extends Route = Route>(_href?: T) => {
     if (resetNextRoute || options?.params || redirect) {
       store.set(dataAtom, (d) => {
         const newData = { ...d };
-        const basePath = (toUrl as string).split('?')[0];
+        const basePath = (to as string).split('?')[0];
 
         // Get all linked routes (parents and children)
         const linkedRoutes = getLinkedRoutes(basePath);

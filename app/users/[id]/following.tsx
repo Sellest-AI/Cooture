@@ -13,7 +13,7 @@ import { Colors } from "theme";
 
 export default function Screen() {
   const { id } = useRoute.Params<{ id: Id<'users'> }>();
-  const { push } = useRouter(ROUTES.USER.FOLLOWING);
+  const { dismissTo, replace } = useRouter(ROUTES.USER.FOLLOWING);
   const { results, isLoading, loadMore } = usePaginatedQuery(api.router.users.follows.getFollowingPaginated.anon,
     id ? { userId: id } : "skip", { initialNumItems: 20 });
 
@@ -35,7 +35,7 @@ export default function Screen() {
             description="Follow other users to see their content!"
             cta={{
               label: "Explore content",
-              onPress: () => push(ROUTES.TABS.DISCOVER),
+              onPress: () => dismissTo(ROUTES.TABS.DISCOVER),
             }}
           />
         }
@@ -46,7 +46,7 @@ export default function Screen() {
         contentContainerStyle={{ paddingHorizontal: 12 }}
         renderItem={({ item }) => (
           <Pressable
-            onPress={() => push(ROUTES.USER.PATH, { pathParams: { id: item._id } })}
+            onPress={() => replace(ROUTES.USER.PATH, { pathParams: { id: item._id } })}
             style={{
               marginHorizontal: 12,
               marginBottom: 32,

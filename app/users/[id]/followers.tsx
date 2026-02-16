@@ -13,7 +13,7 @@ import { Colors } from "theme";
 
 export default function Screen() {
   const { id } = useRoute.Params<{ id: Id<'users'> }>();
-  const { push } = useRouter(ROUTES.USER.FOLLOWERS);
+  const { replace, dismissTo } = useRouter(ROUTES.USER.FOLLOWERS);
   const { results, isLoading, loadMore } = usePaginatedQuery(api.router.users.follows.getFollowersPaginated.anon,
     id ? { userId: id } : "skip", { initialNumItems: 20 });
 
@@ -35,7 +35,7 @@ export default function Screen() {
             description="Post your creations and share them to get followers!"
             cta={{
               label: "Create something",
-              onPress: () => push(ROUTES.TABS.NEW),
+              onPress: () => dismissTo(ROUTES.TABS.NEW),
             }}
           />
         }
@@ -46,7 +46,7 @@ export default function Screen() {
         contentContainerStyle={{ paddingHorizontal: 12 }}
         renderItem={({ item }) => (
           <Pressable
-            onPress={() => push(ROUTES.USER.PATH, { pathParams: { id: item._id } })}
+            onPress={() => replace(ROUTES.USER.PATH, { pathParams: { id: item._id } })}
             style={{
               marginHorizontal: 12,
               marginBottom: 32,
