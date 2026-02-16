@@ -7,8 +7,10 @@ import { ModalHeader } from "@ui/modal";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { TextInput } from "@ui/text-input";
 import { launchImageLibraryAsync } from "expo-image-picker";
+import { router } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
+import { ROUTES } from "routes";
 
 export default function Screen() {
   const [name, setName] = useState('');
@@ -69,6 +71,8 @@ export default function Screen() {
             name,
             base64: await compressedImage.toBase64(),
           })
+
+          router.push(ROUTES.TABS.NEW);
         }}
       >
         Generate

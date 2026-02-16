@@ -14,11 +14,11 @@ export default function PickOutfitScreen() {
   const { push, redirect } = useRouter("/pick-outfit");
   const { canSkip, itemIds, redirectTo } = useRoute("/pick-outfit");
 
-  const { data: outfits } = useQueryCached(api.router.outfits.getAll.authed);
+  const { data: outfits, isPending } = useQueryCached(api.router.outfits.getAll.authed);
   const filteredOutfits = outfits?.filter((outfit) => !outfit.items.some((item) => itemIds?.includes(item.itemId)));
 
-  // Redirect to new outfit if no outfits available
-  if (filteredOutfits && filteredOutfits.length === 0) {
+  // Redirect to new outfit if no outfits available (but only after data is loaded)
+  if (!isPending && filteredOutfits && filteredOutfits.length === 0) {
     return <Router.Redirect
       redirectTo={redirectTo}
       href={ROUTES.MODALS.NEW_OUTFIT}
