@@ -2,6 +2,7 @@ import { defineSchema } from "convex/server";
 import { authTables } from "./schema/auth";
 import { bookmarks, bookmarkStats } from "./schema/collection";
 import { feedScores } from "./schema/feed";
+import { follows, followStats } from "./schema/follows";
 import { generations, predictions } from "./schema/generations";
 import { imageObjects, images, imageSizes } from "./schema/images";
 import { items } from "./schema/items";
@@ -34,4 +35,6 @@ export default defineSchema({
   bookmarkStats,
   likes,
   likeStats,
+  follows,
+  followStats,
 });

@@ -13,7 +13,8 @@ export const Portrait = ({ style }: { style?: ViewStyle }) => {
 
   const HEIGHT = style?.height ?? 256;
 
-  if (!frontImage && !isPending) return <Router.Redirect
+  // Only redirect if we're certain there's no image (not during loading)
+  if (!isPending && frontImage === null) return <Router.Redirect
     href={ROUTES.EXTRA.AVATAR.UPDATE_PORTRAITS}
     redirectTo={ROUTES.PHOTOSHOOT.RECAP}
   />

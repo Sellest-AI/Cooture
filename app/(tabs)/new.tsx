@@ -3,6 +3,7 @@ import { useAccount } from "@/lib/convex/auth";
 import { api, useQueryCached } from "@/lib/convex/client";
 import { CreditsButton } from "@/modules/premium/credits.button";
 import { Notification } from "@/modules/profiles/notification";
+import { QuickActions } from "@/modules/profiles/quick-actions";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Button } from "@ui/button";
 import { Collection } from "@ui/cards";
@@ -53,6 +54,7 @@ export default function Screen() {
       >
         New preset (Admin)
       </Button>}
+      {isAdmin && <QuickActions style={{ paddingHorizontal: 8, marginBottom: 8 }} />}
       <View
         style={{
           flexDirection: "row",

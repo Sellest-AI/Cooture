@@ -2,7 +2,6 @@ import { useRouter } from "@/hooks";
 import { Id } from "@/lib/convex/client";
 import { PremiumBlock } from "@/modules/premium/premium-block";
 import { Notification } from "@/modules/profiles/notification";
-import { QuickActions } from "@/modules/profiles/quick-actions";
 import { Block } from "@ui/block";
 import { Settings } from "@ui/icons";
 import { Image } from "@ui/image";
@@ -18,6 +17,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Dimensions, LayoutRectangle, PanResponder, Platform, ScrollView, View, ViewStyle } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
+import { FollowersFollowing } from "./followers-following";
 
 const TABS = ['generations', 'outfits', 'items'] as const;
 
@@ -152,7 +152,7 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
           </Text.Base>
         </View>
         <View style={{ paddingHorizontal: 8, gap: 8, marginTop: 16 }}>
-          {isSelf && <QuickActions />}
+          <FollowersFollowing userId={user._id} />
           {(recentPosts ?? []).length > 3 && <Block
             variant="blur"
             style={{

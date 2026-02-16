@@ -136,6 +136,11 @@ import type * as router_subscriptions_createSubscription from "../router/subscri
 import type * as router_subscriptions_endOne from "../router/subscriptions/endOne.js";
 import type * as router_subscriptions_getUserSubscription from "../router/subscriptions/getUserSubscription.js";
 import type * as router_subscriptions_updateSubscriptionStatus from "../router/subscriptions/updateSubscriptionStatus.js";
+import type * as router_users_follows_checkFollowing from "../router/users/follows/checkFollowing.js";
+import type * as router_users_follows_getFollowStats from "../router/users/follows/getFollowStats.js";
+import type * as router_users_follows_getFollowersPaginated from "../router/users/follows/getFollowersPaginated.js";
+import type * as router_users_follows_getFollowingPaginated from "../router/users/follows/getFollowingPaginated.js";
+import type * as router_users_follows_toggleFollow from "../router/users/follows/toggleFollow.js";
 import type * as router_users_getAccount from "../router/users/getAccount.js";
 import type * as router_users_getAppearance from "../router/users/getAppearance.js";
 import type * as router_users_getFromStripeId from "../router/users/getFromStripeId.js";
@@ -144,6 +149,7 @@ import type * as router_users_upsertAppearance from "../router/users/upsertAppea
 import type * as schema_auth from "../schema/auth.js";
 import type * as schema_collection from "../schema/collection.js";
 import type * as schema_feed from "../schema/feed.js";
+import type * as schema_follows from "../schema/follows.js";
 import type * as schema_generations from "../schema/generations.js";
 import type * as schema_images from "../schema/images.js";
 import type * as schema_items from "../schema/items.js";
@@ -288,6 +294,11 @@ declare const fullApi: ApiFromModules<{
   "router/subscriptions/endOne": typeof router_subscriptions_endOne;
   "router/subscriptions/getUserSubscription": typeof router_subscriptions_getUserSubscription;
   "router/subscriptions/updateSubscriptionStatus": typeof router_subscriptions_updateSubscriptionStatus;
+  "router/users/follows/checkFollowing": typeof router_users_follows_checkFollowing;
+  "router/users/follows/getFollowStats": typeof router_users_follows_getFollowStats;
+  "router/users/follows/getFollowersPaginated": typeof router_users_follows_getFollowersPaginated;
+  "router/users/follows/getFollowingPaginated": typeof router_users_follows_getFollowingPaginated;
+  "router/users/follows/toggleFollow": typeof router_users_follows_toggleFollow;
   "router/users/getAccount": typeof router_users_getAccount;
   "router/users/getAppearance": typeof router_users_getAppearance;
   "router/users/getFromStripeId": typeof router_users_getFromStripeId;
@@ -296,6 +307,7 @@ declare const fullApi: ApiFromModules<{
   "schema/auth": typeof schema_auth;
   "schema/collection": typeof schema_collection;
   "schema/feed": typeof schema_feed;
+  "schema/follows": typeof schema_follows;
   "schema/generations": typeof schema_generations;
   "schema/images": typeof schema_images;
   "schema/items": typeof schema_items;

@@ -8,7 +8,7 @@ import { ItemCategory } from "@/modules/items/category.item";
 import { WeatherCategory } from "@/modules/items/category.weather";
 import { Block } from "@ui/block";
 import { LoadingBlock } from "@ui/block.loading";
-import { Button } from "@ui/button";
+import { Button, BUTTON_HEIGHT } from "@ui/button";
 import { LinkIcon } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
@@ -105,7 +105,7 @@ export default function ItemScreen() {
             </View>
           }
         >
-          <View style={{ padding: 8, gap: 8 }}>
+          <View style={{ padding: 8, gap: 8, marginBottom: BUTTON_HEIGHT + 8 }}>
             <Block
               variant="blur"
               style={{
@@ -152,20 +152,26 @@ export default function ItemScreen() {
               <FeelCategory title={item.materialFeel} onPress={(materialFeel) => update({ materialFeel })} />
               <GenderCategory title={item.gender} onPress={(gender) => update({ gender })} />
             </View>
-            <Button
-              style={{ marginTop: 4 }}
-              variant="primary"
-              onPress={() => {
-                push(ROUTES.MODALS.PICK_OUTFIT, {
-                  redirectTo: ROUTES.PROFILE.OUTFITS,
-                  params: { itemIds: [item._id] }
-                })
-              }}
-            >
-              Save to collection
-            </Button>
           </View>
         </ParallaxScrollView>
+        <View style={{
+          position: 'absolute',
+          bottom: 8,
+          left: 8,
+          right: 8,
+        }}>
+          <Button
+            variant="primary"
+            onPress={() => {
+              push(ROUTES.MODALS.PICK_OUTFIT, {
+                redirectTo: ROUTES.PROFILE.OUTFITS,
+                params: { itemIds: [item._id] }
+              })
+            }}
+          >
+            Add to outfit
+          </Button>
+        </View>
       </SafeAreaView>
     </>
   )

@@ -5,6 +5,8 @@ import { Block, getBlockColors } from './block';
 import { Loader } from './icons';
 import { Text } from './text';
 
+export const BUTTON_HEIGHT = 56;
+
 type Props = {
   children?: React.ReactNode;
   startContent?: React.ReactNode;

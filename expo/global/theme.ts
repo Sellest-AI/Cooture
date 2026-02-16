@@ -90,6 +90,7 @@ export const Colors = {
   secondary: {
     200: 'hsl(311, 100%, 82%)',
     500: 'hsl(314, 100%, 68%)',
+    700: 'hsl(314, 63%, 28%)',
     900: 'hsl(300, 100%, 3%)',
   },
   destructive: {

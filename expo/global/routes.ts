@@ -9,6 +9,7 @@ export const ROUTES = {
   TABS: {
     FEED: '/feed',
     NEW: '/new',
+    DISCOVER: '/explore',
   },
   SCAN: '/scan',
   MODALS: {
@@ -48,6 +49,8 @@ export const ROUTES = {
   USER: {
     PATH: '/users/[id]',
     ID: (id: string) => `/users/${id}` as const,
+    FOLLOWERS: '/users/[id]/followers',
+    FOLLOWING: '/users/[id]/following',
   },
   EXTRA: {
     SETINGS: '/settings',

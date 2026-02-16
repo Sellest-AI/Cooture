@@ -83,17 +83,17 @@ async function updateBookmarkStats(
   if (generationId) {
     existingStats = await ctx.db
       .query("bookmarkStats")
-      .withIndex("by_generation", (q) => q.eq("generationId", generationId))
+      .withIndex("by_generation_id", (q) => q.eq("generationId", generationId))
       .first();
   } else if (outfitId) {
     existingStats = await ctx.db
       .query("bookmarkStats")
-      .withIndex("by_outfit", (q) => q.eq("outfitId", outfitId))
+      .withIndex("by_outfit_id", (q) => q.eq("outfitId", outfitId))
       .first();
   } else if (itemId) {
     existingStats = await ctx.db
       .query("bookmarkStats")
-      .withIndex("by_item", (q) => q.eq("itemId", itemId))
+      .withIndex("by_item_id", (q) => q.eq("itemId", itemId))
       .first();
   }
 
