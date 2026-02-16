@@ -93,6 +93,7 @@ import type * as router_collection_toggleBookmark from "../router/collection/tog
 import type * as router_credits_canPay from "../router/credits/canPay.js";
 import type * as router_credits_claimDaily from "../router/credits/claimDaily.js";
 import type * as router_credits_deductCredits from "../router/credits/deductCredits.js";
+import type * as router_credits_getCost from "../router/credits/getCost.js";
 import type * as router_credits_getTransactionsPaginated from "../router/credits/getTransactionsPaginated.js";
 import type * as router_credits_getUserWallet from "../router/credits/getUserWallet.js";
 import type * as router_credits_refundCredits from "../router/credits/refundCredits.js";
@@ -262,6 +263,7 @@ declare const fullApi: ApiFromModules<{
   "router/credits/canPay": typeof router_credits_canPay;
   "router/credits/claimDaily": typeof router_credits_claimDaily;
   "router/credits/deductCredits": typeof router_credits_deductCredits;
+  "router/credits/getCost": typeof router_credits_getCost;
   "router/credits/getTransactionsPaginated": typeof router_credits_getTransactionsPaginated;
   "router/credits/getUserWallet": typeof router_credits_getUserWallet;
   "router/credits/refundCredits": typeof router_credits_refundCredits;

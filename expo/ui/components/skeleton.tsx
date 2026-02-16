@@ -7,6 +7,8 @@ type Props = {
 }
 
 export const Skeleton = ({ style }: Props) => {
+  const opacity = Number(style?.opacity ?? 1);
+
   return (
     <MotiView style={{
       backgroundColor: Colors.blur.dark,
@@ -14,7 +16,7 @@ export const Skeleton = ({ style }: Props) => {
       ...style,
     }}
       from={{ opacity: 0 }}
-      animate={{ opacity: [0.5, 1, 0.5] }}
+      animate={{ opacity: [0.5 * opacity, 1 * opacity, 0.5 * opacity] }}
       transition={{ loop: true, duration: 500 }}
     />
   )

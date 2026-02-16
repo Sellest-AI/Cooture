@@ -5,7 +5,7 @@ import { Button } from "./button";
 import { ChevronRight, Loader } from "./icons";
 
 type Props = {
-  onComplete?: () => void;
+  onComplete?: () => Promise<void> | void;
   startIcon?: ComponentProps<typeof Button>['startIcon'];
   endIcon?: ComponentProps<typeof Button>['endIcon'];
   children?: ComponentProps<typeof Button>['children'];
@@ -73,11 +73,12 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
             Animated.timing(translateX, { toValue: max, duration: 180, useNativeDriver: false }),
             Animated.timing(knobOpacity, { toValue: 0, duration: 180, useNativeDriver: false }),
             Animated.timing(knobScale, { toValue: 1.1, duration: 180, useNativeDriver: false }),
-          ]).start(({ finished }) => {
+          ]).start(async ({ finished }) => {
             if (finished) {
               currentX.current = max;
               setShowLoader(true);
-              onCompleteRef.current?.();
+              await onCompleteRef.current?.();
+              setShowLoader(false);
             }
           });
         }

@@ -60,7 +60,6 @@ export default function Layout() {
                 style={{ width: "90%", maxWidth: 280, alignSelf: 'center', marginTop: 12, paddingBottom: 2 }}
                 value={step}
               />
-
             </View>
             {(step > 1) && <View style={{
               alignItems: 'center',

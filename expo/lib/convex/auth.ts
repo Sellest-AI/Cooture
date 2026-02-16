@@ -90,3 +90,11 @@ export const useIsAdmin = () => {
   const isAdmin = user?.role === 'ADMIN';
   return isAdmin;
 }
+
+const useWallet = () => {
+  const token = useAuthToken();
+  const { data: wallet } = useQueryCached(api.router.credits.getUserWallet.authed, !!token ? undefined : 'skip');
+  return { wallet };
+}
+
+useAccount.Wallet = useWallet;

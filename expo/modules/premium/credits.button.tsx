@@ -1,7 +1,9 @@
 import { ROUTES, useRouter } from "@/hooks"
-import { Credits } from "@ui/icons"
+import { useAccount } from "@/lib/convex/auth"
+import { Credits, Loader } from "@ui/icons"
 import { LinearGradient } from "@ui/linear-gradient"
 import { Pressable } from "@ui/pressable"
+import { Skeleton } from "@ui/skeleton"
 import { Text } from "@ui/text"
 import { ViewStyle } from "react-native"
 import { Colors } from "theme"
@@ -12,6 +14,7 @@ type Props = {
 }
 
 export const CreditsButton = ({ style, onPress }: Props) => {
+  const { wallet } = useAccount.Wallet();
   const { push } = useRouter();
 
   return (
@@ -44,16 +47,22 @@ export const CreditsButton = ({ style, onPress }: Props) => {
           opacity: style?.opacity
         }}
       />
-      <Credits
-        size={20}
-      />
-      <Text.Lg
-        color={Colors.primary[900]}
-        style={{ opacity: 0.8 }}
-        weight={700}
-      >
-        200
-      </Text.Lg>
+      {wallet ? <Credits size={20} /> :
+        <Loader size={20} />}
+      {!wallet ? <Skeleton
+        style={{
+          opacity: 0.3,
+          width: 36,
+          height: 18,
+        }}
+      /> :
+        <Text.Lg
+          color={Colors.primary[900]}
+          style={{ opacity: 0.8 }}
+          weight={700}
+        >
+          {wallet?.credits}
+        </Text.Lg>}
     </Pressable>
   )
 }

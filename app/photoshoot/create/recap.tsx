@@ -1,5 +1,5 @@
 import { useRouter } from "@/hooks";
-import { api, useAction, useQuery } from "@/lib/convex/client";
+import { api, useAction, useQuery, useQueryCached } from "@/lib/convex/client";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
 import { Portrait } from "@/modules/profiles/portrait";
@@ -8,14 +8,14 @@ import { Block } from "@ui/block";
 import { Button } from "@ui/button";
 import { ButtonSlider } from "@ui/button.slider";
 import { Col, Grid, Row } from "@ui/grid";
-import { Flame, Plus, Squirish } from "@ui/icons";
+import { Credits, Flame, Plus, Squirish } from "@ui/icons";
 import { Image } from "@ui/image";
 import { Pressable } from "@ui/pressable";
 import { Skeleton } from "@ui/skeleton";
 import { Slider } from "@ui/slider";
 import { Text } from "@ui/text";
-import React, { useMemo } from "react";
-import { Platform, View, ViewStyle } from "react-native";
+import React, { useMemo, useState } from "react";
+import { View, ViewStyle } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -229,6 +229,9 @@ const FriendBlock = () => {
 }
 
 export default function Screen() {
+  const [numberToGenerate] = useState(1);
+  const { data: cost } = useQueryCached(api.router.credits.getCost.anon, { type: 'GENERATION_COST', amount: numberToGenerate });
+  const { data: canPay } = useQueryCached(api.router.credits.canPay.authed, cost ? { amount: cost } : 'skip');
   const { outfitId, outfitSize, presetId, friendId, disabled } = usePhotoshoot.New();
   const { dismissTo, push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
 
@@ -266,6 +269,11 @@ export default function Screen() {
             if (!presetId) return;
             if (disabled) return;
 
+            if (!canPay) {
+              push(ROUTES.MODALS.UPGRADE, { redirectHere: true });
+              return;
+            }
+
             let cancel = false;
             const timer = setTimeout(() => {
               push(ROUTES.PHOTOSHOOT.GENERATIONS.NEXT);
@@ -292,8 +300,31 @@ export default function Screen() {
         >
           Slide to generate
         </ButtonSlider>
+        <View>
+          {cost && <Text.Sm
+            style={{
+              textAlign: 'center',
+              marginTop: 12,
+              maxWidth: 172,
+              marginHorizontal: 'auto',
+              marginBottom: 2,
+            }}
+            color={Colors.neutral[400]}
+          >
+            You will generate {numberToGenerate} image{numberToGenerate > 1 ? 's' : ''} for
+          </Text.Sm>}
+          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 4 }}>
+            <Credits size={12} />
+            <Text.Base
+              color={Colors.primary[200]} weight={600}
+              style={{ marginLeft: 2 }}
+            >
+              {cost}
+            </Text.Base>
+          </View>
+        </View>
       </View>
-      {Platform.OS !== 'web' && <View style={{ height: 12 }} />}
+      <View style={{ height: 12 }} />
     </View>
   );
 }

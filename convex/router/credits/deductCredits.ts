@@ -1,6 +1,6 @@
 import { v } from "convex/values";
-import { internalMutation } from "../../procedures";
 import { deductCredits } from "../../functions/credits";
+import { internalMutation } from "../../procedures";
 
 /**
  * Internal mutation to deduct credits for a generation
