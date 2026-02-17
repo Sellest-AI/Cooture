@@ -1,11 +1,58 @@
 import { Block } from "@ui/block";
+import CurvedText from "@ui/curved-text";
 import { Check, Credits } from "@ui/icons";
 import { Skeleton } from "@ui/skeleton";
 import { ComponentProps } from "react";
 import { View, ViewStyle } from "react-native";
-import { Colors } from "theme";
+import { Colors, Texts } from "theme";
 import { Image } from "../image";
 import { Text } from '../text';
+
+const QuestBadge = (props: { source?: ComponentProps<typeof Image>['source'], amount: number }) => {
+  const amount = props.amount;
+  const textLength = amount.toString().length;
+  const startOffset = 45 - (textLength - 1) * 7; // Adjust the startOffset based on the number of digits
+  const marginTop = textLength === 1 ? 51 : 67;
+  const curvature = textLength === 1 ? 0 : 0.3;
+
+  return (
+    <View style={{
+      width: 100,
+      height: 100,
+    }}>
+      <Image
+        source={props.source}
+        contentFit={"contain"}
+        style={{
+          width: '100%',
+          height: '100%',
+        }}
+      />
+      <View style={{
+        flex: 1,
+        width: '100%',
+        height: 30,
+        marginLeft: -2,
+        marginTop: marginTop,
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'absolute',
+      }}>
+        <CurvedText
+          text={amount.toString()}
+          width={150}
+          height={100}
+          fontSize={22}
+          fontWeight={700}
+          curvature={curvature}
+          fill={Colors.primary[900]}
+          fontFamily={Texts.h3.alt.fontFamily}
+          startOffset={`${startOffset}%`}
+        />
+      </View>
+    </View>
+  )
+}
 
 type Props = {
   style?: ViewStyle;
@@ -26,22 +73,33 @@ export const Quest = ({ style, source, title, description, progress, credits, cl
       alignItems: 'center',
       ...style,
     }}>
-      <Image
+      <QuestBadge
+        source={source}
+        amount={progress.total}
+      />
+      {/* <Image
         source={source}
         contentFit={"contain"}
         style={{
           width: 100,
           height: 100,
         }}
-      />
+      /> */}
       <Text.Base color={Colors.neutral[50]} weight={600} style={{ marginTop: 12, width: '95%', textAlign: 'center' }} numberOfLines={1}>
         {title}
       </Text.Base>
-      <Text.Sm color={Colors.neutral[400]} style={{ marginTop: 6, width: '95%', textAlign: 'center' }} numberOfLines={2}>
+      <Text.Sm color={Colors.neutral[400]} style={{
+        marginTop: 6,
+        width: '95%',
+        textAlign: 'center',
+        paddingBottom: 2,
+      }}
+        numberOfLines={2}
+      >
         {progress.completed} / {progress.total} {description}
       </Text.Sm>
       <View style={{
-        marginTop: 12,
+        marginTop: 10,
         maxWidth: 85,
         width: '100%',
         height: 4,

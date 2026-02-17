@@ -4,11 +4,15 @@ import { Button } from '@ui/button';
 import { Collection } from '@ui/cards';
 import { Plus } from '@ui/icons';
 import { Text } from '@ui/text';
+import { router } from 'expo-router';
+import { useState } from 'react';
 import { View } from 'react-native';
+import { ROUTES } from 'routes';
 import { Colors } from 'theme';
 
 export default function Screen() {
   const { isLoading, signInGoogle } = useAuthActions();
+  const [innerLoading, setInnerLoading] = useState(isLoading);
 
   return (
     <View
@@ -118,10 +122,15 @@ export default function Screen() {
         </View>
       </View>
       <Button
-        isLoading={isLoading}
+        isLoading={innerLoading}
         style={{ alignSelf: 'stretch', marginTop: 28 }}
         variant="primary"
-        onPress={async () => { signInGoogle(); }}
+        onPress={async () => {
+          setInnerLoading(true);
+          const success = await signInGoogle();
+          if (success) setTimeout(() => { router.replace(ROUTES.TABS.FEED) }, 3000);
+          if (!success) setInnerLoading(false);
+        }}
       >
         Begin the Journey
       </Button>

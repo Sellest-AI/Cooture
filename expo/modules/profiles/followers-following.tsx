@@ -139,7 +139,7 @@ export const FollowersFollowing = ({ style, userId }: Props) => {
       >
         <Pressable
           style={{ flex: 1 }}
-          onPress={() => push(ROUTES.USER.FOLLOWERS, { pathParams: { id: userId } })}
+          animated={false}
         >
           <Block variant="blur"
             style={{

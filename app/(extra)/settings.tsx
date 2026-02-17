@@ -5,7 +5,7 @@ import { Button } from "@ui/button";
 import { ArrowLeft } from "@ui/icons";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
-import { fetchUpdateAsync, useUpdates } from 'expo-updates';
+import { fetchUpdateAsync, reloadAsync, useUpdates } from 'expo-updates';
 import { Pressable, ScrollView, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
@@ -100,13 +100,16 @@ export default function SettingsScreen() {
         <Button
           style={{ marginTop: 34 }}
           variant="blur"
-          onPress={() => { fetchUpdateAsync(); }}
+          onPress={async () => {
+            await fetchUpdateAsync();
+            await reloadAsync();
+          }}
         >
           Update
         </Button>
 
         <Text.Base color={Colors.neutral[400]} style={{ marginTop: 4 }}>
-          {currentlyRunning.runtimeVersion} - {currentlyRunning.createdAt?.getDate()}
+          {currentlyRunning.runtimeVersion} - {currentlyRunning.createdAt?.toLocaleDateString()}
         </Text.Base>
       </View>
     </ScrollView>

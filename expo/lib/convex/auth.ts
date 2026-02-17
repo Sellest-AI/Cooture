@@ -31,8 +31,8 @@ export const useAuthActions = () => {
       // Don't auto redirect, the router will do it on its own
       // router.replace(route || ROUTES.TABS.DISCOVER);
     }
-
     setIsLoading(false);
+    return result.type === "success";
   }, [convex]);
 
   const signInEmail = useCallback((data: FormData) => {

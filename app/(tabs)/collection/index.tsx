@@ -1,4 +1,4 @@
-import { api, Id, useQuery, useQueryCached } from "@/lib/convex/client";
+import { api, Doc, Id, useQuery, useQueryCached } from "@/lib/convex/client";
 import { SavedOutfits } from "@/modules/collection/saved-outfits";
 import { SavedPosts } from "@/modules/collection/saved-posts";
 import { CreditsButton } from "@/modules/premium/credits.button";
@@ -14,6 +14,32 @@ import { FlatList, View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 
 const PADDING_HORIZONTAL = 12;
+
+const QUEST_TYPE_IMAGES: Record<(Doc<'quests'>['type']), string> = {
+  "posts_published": require("assets/placeholders/quests/posted_pics.webp"),
+  "outfits_created": require("assets/placeholders/quests/outfit_mastery.webp"),
+  "presets_used": require("assets/placeholders/quests/preset_collector.webp"),
+  "posts_liked": require("assets/placeholders/quests/social_butterfly.webp"),
+  "photos_generated": require("assets/placeholders/quests/photography.webp"),
+  "posts_shared": require("assets/placeholders/quests/viral_spreader.webp"),
+  "likes_received": require("assets/placeholders/quests/received_likes.webp"),
+  "followers_gained": require("assets/placeholders/quests/welcome_to_the_club.webp"),
+}
+
+const QUEST_CATEGORY_IMAGES: Partial<Record<Doc<'quests'>['category'], string>> = {
+  'onboarding': require("assets/placeholders/quests/welcome_to_the_club.webp"),
+}
+
+const TYPE_TO_TEXT: Record<Doc<'quests'>['type'], string> = {
+  "posts_liked": "liked posts",
+  "posts_published": "published posts",
+  "outfits_created": "created outfits",
+  "presets_used": "used presets",
+  "posts_shared": "shared posts",
+  "photos_generated": "photos generated",
+  "likes_received": "received likes",
+  "followers_gained": "gained followers",
+}
 
 const capitalizeFirstLetter = (string: string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -36,13 +62,15 @@ const Quests = ({ style }: { style?: ViewStyle }) => {
       />
 
     const progress = quest.progress?.currentAmount ?? 0;
+    const image = QUEST_TYPE_IMAGES[quest.type] || QUEST_CATEGORY_IMAGES[quest.category] || require('assets/placeholders/quests/unknown.webp');
+    const description = TYPE_TO_TEXT[quest.type] || "progress";
 
     return (
       <Quest
         style={{ width: 132 }}
-        source={require('assets/placeholders/quests/heart.png')}
+        source={image}
         title={quest.title}
-        description="published posts"
+        description={description}
         progress={{ completed: progress, total: quest.target }}
         credits={quest.rewardCredits}
       />
