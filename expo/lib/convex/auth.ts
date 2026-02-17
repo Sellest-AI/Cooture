@@ -26,7 +26,10 @@ export const useAuthActions = () => {
       const code = new URL(url).searchParams.get("code")!;
       await convex.signIn("google", { code });
 
-      router.replace(route || ROUTES.TABS.DISCOVER);
+      if (route) router.replace(route);
+
+      // Don't auto redirect, the router will do it on its own
+      // router.replace(route || ROUTES.TABS.DISCOVER);
     }
 
     setIsLoading(false);

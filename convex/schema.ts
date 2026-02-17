@@ -9,6 +9,7 @@ import { items } from "./schema/items";
 import { likes, likeStats } from "./schema/likes";
 import { outfitItems, outfits } from "./schema/outfits";
 import { presetCategories, presetGenerations, presets } from "./schema/presets";
+import { quests, userQuestProgress } from "./schema/quests";
 import { subscriptions, subscriptionsHistory } from "./schema/subscriptions";
 import { userImages, usersAppearance, usersExtended } from "./schema/users";
 import { creditTransactions, userWallets } from "./schema/wallets";
@@ -31,6 +32,8 @@ export default defineSchema({
   presets,
   presetCategories,
   presetGenerations,
+  quests,
+  userQuestProgress,
   feedScores,
   bookmarks,
   bookmarkStats,

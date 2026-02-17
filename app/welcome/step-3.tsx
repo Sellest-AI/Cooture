@@ -5,7 +5,6 @@ import { Collection } from '@ui/cards';
 import { Plus } from '@ui/icons';
 import { Text } from '@ui/text';
 import { View } from 'react-native';
-import { ROUTES } from 'routes';
 import { Colors } from 'theme';
 
 export default function Screen() {
@@ -122,7 +121,7 @@ export default function Screen() {
         isLoading={isLoading}
         style={{ alignSelf: 'stretch', marginTop: 28 }}
         variant="primary"
-        onPress={async () => { signInGoogle(ROUTES.TABS.NEW); }}
+        onPress={async () => { signInGoogle(); }}
       >
         Begin the Journey
       </Button>

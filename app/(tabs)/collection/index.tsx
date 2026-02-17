@@ -1,3 +1,4 @@
+import { api, Id, useQuery, useQueryCached } from "@/lib/convex/client";
 import { SavedOutfits } from "@/modules/collection/saved-outfits";
 import { SavedPosts } from "@/modules/collection/saved-posts";
 import { CreditsButton } from "@/modules/premium/credits.button";
@@ -8,26 +9,50 @@ import { Check } from "@ui/icons";
 import { ModalHeader } from "@ui/modal";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { Text } from "@ui/text";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FlatList, View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 
 const PADDING_HORIZONTAL = 12;
 
+const capitalizeFirstLetter = (string: string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 const Quests = ({ style }: { style?: ViewStyle }) => {
-  const Item = useMemo(() => function ChildItem() {
+  const { data: _quests, isPending } = useQueryCached(api.router.quests.getAll.anon);
+  const [completed, setCompleted] = useState<Id<"quests">[]>([]);
+
+  const Item = useMemo(() => function ChildItem({ id }: { id: Id<"quests"> }) {
+    const { data: quest } = useQuery(api.router.quests.getOne.authed, { questId: id });
+
+    useEffect(() => {
+      if (quest?.progress?.isCompleted) { setCompleted((prev) => Array.from(new Set([...prev, id]))); }
+    }, [id, quest])
+
+    if (!quest)
+      return <Quest.Skeleton
+        style={{ width: 132 }}
+      />
+
+    const progress = quest.progress?.currentAmount ?? 0;
+
     return (
       <Quest
         style={{ width: 132 }}
         source={require('assets/placeholders/quests/heart.png')}
-        title="Look at my pic!"
+        title={quest.title}
         description="published posts"
-        progress={{ completed: 1, total: 8 }}
+        progress={{ completed: progress, total: quest.target }}
+        credits={quest.rewardCredits}
       />
     )
   }, []);
 
-  const categories = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary'];
+  const quests = (_quests || []);
+  const categories = Array.from(new Set(quests.map((q) => q.category)));
+
+  if (isPending) return null;
 
   return (
     <View style={style}>
@@ -36,10 +61,10 @@ const Quests = ({ style }: { style?: ViewStyle }) => {
           Quests
         </Text.H4>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <Text.Base color={Colors.primary[200]} weight={600}>
-            0 / 38
+          <Text.Base color={completed.length > 1 ? Colors.primary[200] : Colors.neutral[400]} weight={600}>
+            {completed.length} / {quests.length}
           </Text.Base>
-          <Check color={Colors.primary[500]} size={20} />
+          {completed.length > 1 && <Check color={Colors.primary[500]} size={20} />}
         </View>
       </View>
       {categories.map((category, i) => (
@@ -48,16 +73,21 @@ const Quests = ({ style }: { style?: ViewStyle }) => {
             style={{ marginLeft: PADDING_HORIZONTAL, marginTop: i === 0 ? 24 : 32 }}
             color={Colors.neutral[400]}
           >
-            {category}
+            {capitalizeFirstLetter(category).replaceAll("_", " ")}
           </Text.Lg>
           <FlatList
             style={{ marginTop: 24 }}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ gap: 8, paddingHorizontal: 0, paddingRight: PADDING_HORIZONTAL }}
-            data={[{ _id: 1 }, { _id: 2 }, { _id: 3 }]}
+            contentContainerStyle={{
+              gap: 8,
+              paddingLeft: 4,
+              paddingRight: PADDING_HORIZONTAL
+            }}
+            data={quests.filter((q) => q.category === category)
+              .sort((a, b) => a.target - b.target)}
             keyExtractor={(item) => item._id.toString()}
-            renderItem={({ item }) => (<Item />)}
+            renderItem={({ item }) => (<Item id={item._id} />)}
           />
         </View>
       ))}
@@ -98,7 +128,7 @@ export default function SavedScreen() {
         direction="horizontal"
         header={true}
       />
-      <Quests style={{ paddingBottom: 20 }} />
+      <Quests />
     </SafeScrollView>
   );
 }
