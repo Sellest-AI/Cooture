@@ -8,7 +8,7 @@ import { Animated, Pressable, StyleSheet, View } from "react-native";
 import { Colors } from "theme";
 
 export const unstable_settings = {
-  initialRouteName: 'index',
+  initialRouteName: 'feed',
 };
 
 function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {

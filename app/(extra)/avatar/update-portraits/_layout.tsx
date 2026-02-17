@@ -7,7 +7,7 @@ import { View } from "react-native";
 import { Colors } from "theme";
 
 export const unstable_settings = {
-  initialRouteName: 'front',
+  initialRouteName: 'index',
 };
 
 export default function ProfileLayout() {

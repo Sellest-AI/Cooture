@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 import { Colors } from "theme";
 
 export const unstable_settings = {
-  initialRouteName: '(tabs)/outfits',
+  initialRouteName: 'index',
 };
 
 export default function ProfileLayout() {

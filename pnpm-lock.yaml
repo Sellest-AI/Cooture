@@ -246,6 +246,9 @@ importers:
         specifier: ^4.3.5
         version: 4.3.5
     devDependencies:
+      '@babel/plugin-transform-react-jsx':
+        specifier: ^7.28.6
+        version: 7.28.6(@babel/core@7.28.6)
       '@types/mime-types':
         specifier: ^3.0.1
         version: 3.0.1
@@ -258,6 +261,9 @@ importers:
       babel-plugin-react-compiler:
         specifier: ^1.0.0
         version: 1.0.0
+      babel-preset-expo:
+        specifier: ^54.0.10
+        version: 54.0.10(@babel/core@7.28.6)(@babel/runtime@7.28.6)(expo@54.0.33)(react-refresh@0.14.2)
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
