@@ -18,6 +18,7 @@ export const ROUTES = {
     OUTFIT_ADD_ITEM: '/add-item',
     PICK_USER: '/pick-user',
     UPGRADE: '/upgrade',
+    DAILY_STREAK: '/daily-streak',
   },
   POST: {
     PATH: '/post/[id]',

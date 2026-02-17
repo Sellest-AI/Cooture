@@ -1,10 +1,12 @@
 import { ROUTES, useRouter } from "@/hooks"
 import { useAccount } from "@/lib/convex/auth"
+import { useNumberIncrement } from "@ui/hooks/use-number-increment"
 import { Credits, Loader } from "@ui/icons"
 import { LinearGradient } from "@ui/linear-gradient"
 import { Pressable } from "@ui/pressable"
 import { Skeleton } from "@ui/skeleton"
 import { Text } from "@ui/text"
+import { useState } from "react"
 import { ViewStyle } from "react-native"
 import { Colors } from "theme"
 
@@ -16,6 +18,13 @@ type Props = {
 export const CreditsButton = ({ style, onPress }: Props) => {
   const { wallet } = useAccount.Wallet();
   const { push } = useRouter();
+
+  const [wasInit] = useState(!!wallet);
+  const { displayedValue } = useNumberIncrement(wallet?.credits, {
+    duration: 2000,
+    initialValue: wasInit ? wallet?.credits ?? 0 :
+      (wallet ? wallet.credits * 0.7 : undefined),
+  });
 
   return (
     <Pressable
@@ -48,7 +57,7 @@ export const CreditsButton = ({ style, onPress }: Props) => {
         }}
       />
       {wallet ? <Credits size={20} /> :
-        <Loader size={20} />}
+        <Loader size={20} style={{ opacity: 0.5 }} />}
       {!wallet ? <Skeleton
         style={{
           opacity: 0.3,
@@ -61,7 +70,7 @@ export const CreditsButton = ({ style, onPress }: Props) => {
           style={{ opacity: 0.8 }}
           weight={700}
         >
-          {wallet?.credits}
+          {displayedValue}
         </Text.Lg>}
     </Pressable>
   )

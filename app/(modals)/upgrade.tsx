@@ -6,7 +6,7 @@ import { Pressable } from "@ui/pressable"
 import { Text } from "@ui/text"
 import { MotiView } from "moti"
 import { ReactNode, useState } from "react"
-import { View, ViewStyle } from "react-native"
+import { Platform, View, ViewStyle } from "react-native"
 import { Colors } from "theme"
 
 type BadgeProps = {
@@ -66,7 +66,10 @@ const Card = ({ style, icon: Icon, title, description }: CardProps) => {
           <Text.Base style={{
             position: 'absolute',
             left: '50%',
-            transform: [{ translateX: 0 }],
+            transform: [
+              { translateX: Platform.OS === 'web' ? "-50%" : 0 },
+              { translateY: Platform.OS === 'web' ? -3 : 0 },
+            ],
             fontSize: 18,
             lineHeight: 22
           }}>{Icon}</Text.Base>

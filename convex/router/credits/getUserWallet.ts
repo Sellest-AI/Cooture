@@ -1,4 +1,4 @@
-import { CREDITS_CONFIG, getUserWallet } from "../../functions/credits";
+import { calculateDailyReward, CREDITS_CONFIG, getUserWallet } from "../../functions/credits";
 import { authQuery } from "../../procedures";
 
 /**
@@ -21,9 +21,16 @@ export const authed = authQuery({
       ? now
       : lastClaim + (MIN_HOURS * 60 * 60 * 1000);
 
+    const currentReward = calculateDailyReward(wallet.streak.dailyClaimStreak);
+
+    const streak = {
+      ...wallet.streak,
+      currentReward
+    }
+
     return {
       credits: wallet.credits,
-      streak: wallet.streak,
+      streak: streak,
       canClaimNow,
       nextClaimAt,
     };

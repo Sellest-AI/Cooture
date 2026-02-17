@@ -1,5 +1,6 @@
 import "@/global.css";
 import { useAccount } from "@/lib/convex/auth";
+import { StreakProvider } from "@/modules/credits/streak-provider";
 import { Providers } from '@/providers';
 import { Redirect, Slot, Stack, usePathname } from 'expo-router';
 import { ReactNode } from "react";
@@ -25,25 +26,27 @@ export default function RootLayout() {
     <Providers>
       <View style={{ flex: 1, backgroundColor: Colors.background }}>
         <Router>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { backgroundColor: Colors.background },
-              animation: 'simple_push',
-              presentation: 'pageSheet'
-            }}
-          >
-            <Slot />
-            <Stack.Screen
-              name="(modals)"
-              options={{
-                presentation: 'formSheet',
-                sheetAllowedDetents: [0.93],
-                sheetInitialDetentIndex: 0,
-                sheetCornerRadius: 28,
+          <StreakProvider>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: Colors.background },
+                animation: 'simple_push',
+                presentation: 'pageSheet'
               }}
-            />
-          </Stack>
+            >
+              <Slot />
+              <Stack.Screen
+                name="(modals)"
+                options={{
+                  presentation: 'formSheet',
+                  sheetAllowedDetents: [0.93],
+                  sheetInitialDetentIndex: 0,
+                  sheetCornerRadius: 28,
+                }}
+              />
+            </Stack>
+          </StreakProvider>
         </Router>
       </View>
     </Providers>
