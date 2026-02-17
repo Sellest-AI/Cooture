@@ -45,6 +45,26 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
     return Math.max(0, w - kw + GAP);
   };
 
+  const reset = () => {
+    completed.current = false;
+    Animated.parallel([
+      Animated.timing(translateX, { toValue: 0, duration: 180, useNativeDriver: false }),
+      Animated.timing(knobOpacity, { toValue: 1, duration: 180, useNativeDriver: false }),
+      Animated.timing(knobScale, { toValue: 1, duration: 180, useNativeDriver: false }),
+    ]).start(({ finished }) => {
+      if (finished) currentX.current = 0;
+    });
+  }
+
+  const sharedFinish = async ({ finished, max }: { finished: boolean, max: number }) => {
+    if (finished) {
+      currentX.current = max;
+      setShowLoader(true);
+      await onCompleteRef.current?.();
+      requestAnimationFrame(() => { setShowLoader(false); reset(); })
+    }
+  }
+
   const pan = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => false,
@@ -73,14 +93,7 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
             Animated.timing(translateX, { toValue: max, duration: 180, useNativeDriver: false }),
             Animated.timing(knobOpacity, { toValue: 0, duration: 180, useNativeDriver: false }),
             Animated.timing(knobScale, { toValue: 1.1, duration: 180, useNativeDriver: false }),
-          ]).start(async ({ finished }) => {
-            if (finished) {
-              currentX.current = max;
-              setShowLoader(true);
-              await onCompleteRef.current?.();
-              setShowLoader(false);
-            }
-          });
+          ]).start(async ({ finished }) => sharedFinish({ finished, max }));
         }
       },
       onPanResponderRelease: (_, gestureState) => {
@@ -100,13 +113,7 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
             Animated.timing(translateX, { toValue: max, duration: 220, useNativeDriver: false }),
             Animated.timing(knobOpacity, { toValue: 0, duration: 220, useNativeDriver: false }),
             Animated.timing(knobScale, { toValue: 1.1, duration: 220, useNativeDriver: false }),
-          ]).start(({ finished }) => {
-            if (finished) {
-              currentX.current = max;
-              setShowLoader(true);
-              onCompleteRef.current?.();
-            }
-          });
+          ]).start(async ({ finished }) => sharedFinish({ finished, max }));
           return;
         }
 
@@ -117,13 +124,7 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
             Animated.timing(translateX, { toValue: max, duration: 180, useNativeDriver: false }),
             Animated.timing(knobOpacity, { toValue: 0, duration: 180, useNativeDriver: false }),
             Animated.timing(knobScale, { toValue: 1.1, duration: 180, useNativeDriver: false }),
-          ]).start(({ finished }) => {
-            if (finished) {
-              currentX.current = max;
-              setShowLoader(true);
-              onCompleteRef.current?.();
-            }
-          });
+          ]).start(async ({ finished }) => sharedFinish({ finished, max }));
         } else {
           Animated.parallel([
             Animated.spring(translateX, { toValue: 0, useNativeDriver: false }),

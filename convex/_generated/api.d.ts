@@ -96,6 +96,7 @@ import type * as router_credits_deductCredits from "../router/credits/deductCred
 import type * as router_credits_getCost from "../router/credits/getCost.js";
 import type * as router_credits_getTransactionsPaginated from "../router/credits/getTransactionsPaginated.js";
 import type * as router_credits_getUserWallet from "../router/credits/getUserWallet.js";
+import type * as router_credits_grantCredits from "../router/credits/grantCredits.js";
 import type * as router_credits_refundCredits from "../router/credits/refundCredits.js";
 import type * as router_examples_query from "../router/examples/query.js";
 import type * as router_feed_getFromOutfit from "../router/feed/getFromOutfit.js";
@@ -266,6 +267,7 @@ declare const fullApi: ApiFromModules<{
   "router/credits/getCost": typeof router_credits_getCost;
   "router/credits/getTransactionsPaginated": typeof router_credits_getTransactionsPaginated;
   "router/credits/getUserWallet": typeof router_credits_getUserWallet;
+  "router/credits/grantCredits": typeof router_credits_grantCredits;
   "router/credits/refundCredits": typeof router_credits_refundCredits;
   "router/examples/query": typeof router_examples_query;
   "router/feed/getFromOutfit": typeof router_feed_getFromOutfit;

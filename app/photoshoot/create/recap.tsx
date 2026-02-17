@@ -301,14 +301,17 @@ export default function Screen() {
         >
           Slide to generate
         </ButtonSlider>
-        <View>
+        <View style={{
+          gap: 4,
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          marginTop: 12,
+        }}>
           {cost && <Text.Sm
             style={{
               textAlign: 'center',
-              marginTop: 12,
               maxWidth: 172,
-              marginHorizontal: 'auto',
-              marginBottom: 2,
             }}
             color={Colors.neutral[400]}
           >
