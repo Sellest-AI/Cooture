@@ -1,4 +1,4 @@
-import { calculateDailyReward, CREDITS_CONFIG, getUserWallet } from "../../functions/credits";
+import { calculateDailyReward, CREDITS_CONFIG, getAllDailyRewards, getUserWallet } from "../../functions/credits";
 import { authQuery } from "../../procedures";
 
 /**
@@ -17,15 +17,19 @@ export const authed = authQuery({
 
     const MIN_HOURS = CREDITS_CONFIG.MIN_HOURS_BETWEEN_CLAIMS;
     const canClaimNow = hoursSinceLastClaim >= MIN_HOURS;
-    const nextClaimAt = canClaimNow
-      ? now
-      : lastClaim + (MIN_HOURS * 60 * 60 * 1000);
+    const nextClaimAt = canClaimNow ? now : lastClaim + (MIN_HOURS * 60 * 60 * 1000);
 
-    const currentReward = calculateDailyReward(wallet.streak.dailyClaimStreak);
+    const streakContinues = hoursSinceLastClaim < CREDITS_CONFIG.MAX_HOURS_TO_MAINTAIN_STREAK;
+    const currentStreakDay = streakContinues ? wallet.streak.dailyClaimStreak : 0;
+
+    const nextReward = calculateDailyReward(currentStreakDay + 1);
+    const weeklyRewards = getAllDailyRewards();
 
     const streak = {
       ...wallet.streak,
-      currentReward
+      nextReward,
+      weeklyRewards,
+      dailyClaimStreak: currentStreakDay
     }
 
     return {

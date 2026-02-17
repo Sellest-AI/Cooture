@@ -64,12 +64,22 @@ export function PrimaryRadialGradient({ style }: { style?: ViewStyle }) {
   )
 }
 
+const getDaysArray = (currentIndex: number) => {
+  const days = ["S", "M", "T", "W", "T", "F", "S"];
+  // Calculate which day the streak started on and rotate the array to start from that day
+  const currentDay = new Date().getDay(); // 0 (Sun) to 6 (Sat)
+  const startDayIndex = (currentDay - currentIndex + 7) % 7;
+  const rotatedDays = [...days.slice(startDayIndex), ...days.slice(0, startDayIndex)];
+  return rotatedDays;
+}
+
 type Props = {
   style?: ViewStyle;
 }
 const Calendar = ({ style }: Props) => {
   const { wallet } = useAccount.Wallet();
-  const currentIndex = wallet?.streak.dailyClaimStreak ?? 0;
+  const nextIndex = (wallet?.streak.dailyClaimStreak ?? 0) + 1;
+  const normalizedIndex = nextIndex > 0 ? (nextIndex - 1) % 7 : 0;
 
   return (
     <MotiView
@@ -91,12 +101,12 @@ const Calendar = ({ style }: Props) => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           width: 294,
-          gap: 12
+          gap: 18
         }}>
           <MotiView
             from={{ width: 0 }}
-            animate={{ width: (currentIndex + 1) * 26 + currentIndex * 12 }}
-            transition={{ delay: DELAYS.calendar, duration: (currentIndex + 1) * 850 }}
+            animate={{ width: (normalizedIndex + 1) * 26 + normalizedIndex * 18 }}
+            transition={{ delay: DELAYS.calendar, duration: (normalizedIndex) * 850 }}
             style={{
               backgroundColor: Colors.primary[500],
               position: 'absolute',
@@ -107,8 +117,11 @@ const Calendar = ({ style }: Props) => {
               left: 0,
             }}
           />
-          {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => {
-            const showCheck = i <= currentIndex;
+          {getDaysArray(normalizedIndex).map((d, i) => {
+            const showCheck = i <= normalizedIndex;
+            const isPrevious = i < normalizedIndex;
+            const isCurrent = i === normalizedIndex;
+            const dayReward = wallet?.streak.weeklyRewards[i] ?? 0;
             return (
               <View key={`${d}-${i}`} style={{
                 justifyContent: 'center',
@@ -139,18 +152,32 @@ const Calendar = ({ style }: Props) => {
                     style={{
                       inset: 0,
                       position: 'absolute',
-                      opacity: currentIndex === i ? 1 : 0.1,
-                      backgroundColor: currentIndex < i ?
+                      opacity: normalizedIndex === i ? 1 : 0.1,
+                      backgroundColor: normalizedIndex < i ?
                         Colors.neutral[400] : Colors.primary[500],
                     }}
                   />
                   {showCheck && <Check
                     style={{ position: 'relative' }}
-                    color={currentIndex === i ?
+                    color={normalizedIndex === i ?
                       Colors.primary[900] : Colors.primary[500]}
                     size={16}
                   />}
                 </MotiView>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 4,
+                    marginTop: 12,
+                    opacity: isPrevious ? 0.8 : isCurrent ? 1 : 0.2,
+                  }}
+                >
+                  <Credits size={10} />
+                  <Text.Sm color={Colors.primary[200]} weight={600}>
+                    {dayReward}
+                  </Text.Sm>
+                </View>
               </View>
             )
           })}
@@ -168,7 +195,7 @@ const Calendar = ({ style }: Props) => {
           </Text.Base>
           <Credits size={16} />
           <Text.Base color={Colors.primary[200]} weight={600}>
-            {wallet?.streak.currentReward}
+            {wallet?.streak.nextReward}
           </Text.Base>
           <Text.Base color={Colors.neutral[50]} weight={600}>
             today
@@ -380,7 +407,7 @@ export default function Screen() {
           onComplete={async () => {
             setClaimed(true);
             // Await delay 500ms;
-            await new Promise(resolve => setTimeout(resolve, 800));
+            await new Promise(resolve => setTimeout(resolve, 500));
 
             if (router.canGoBack()) { router.back(); }
             else { router.replace(ROUTES.TABS.FEED); }

@@ -25,7 +25,7 @@ export function calculateDailyReward(streakDay: number): number {
 
   // Map streak day to the 7-day cycle (1-7)
   // Example: day 1 → 1, day 7 → 7, day 8 → 1, day 15 → 1, day 100 → 2
-  const cycleDay = ((streakDay - 1) % STREAK_DAYS) + 1;
+  const cycleDay = Math.max(0, ((streakDay - 1) % STREAK_DAYS) + 1);
 
   // Formula: progressive distribution that sums to WEEKLY_REWARDS
   // Uses a weighted distribution: base + (cycleDay - 1) * increment
