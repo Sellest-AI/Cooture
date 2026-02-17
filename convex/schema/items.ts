@@ -75,6 +75,7 @@ export const ITEMS_SCHEMA = {
   materialFeel: ITEM_MATERIAL_FEEL,
   materials: v.array(ITEM_MATERIALS),
   gender: ITEM_GENDERS,
+  isNFSW: v.boolean(),
 }
 
 export const items = defineTable({

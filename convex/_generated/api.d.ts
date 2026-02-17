@@ -32,6 +32,7 @@ import type * as functions_items_getItem from "../functions/items/getItem.js";
 import type * as functions_outfits_getBackgroundColor from "../functions/outfits/getBackgroundColor.js";
 import type * as functions_outfits_getOutfit from "../functions/outfits/getOutfit.js";
 import type * as functions_outfits_index from "../functions/outfits/index.js";
+import type * as functions_outfits_isOutfitNFSW from "../functions/outfits/isOutfitNFSW.js";
 import type * as functions_subscriptions_getUserSubscription from "../functions/subscriptions/getUserSubscription.js";
 import type * as functions_subscriptions_index from "../functions/subscriptions/index.js";
 import type * as functions_subscriptions_isSubscriptionActive from "../functions/subscriptions/isSubscriptionActive.js";
@@ -210,6 +211,7 @@ declare const fullApi: ApiFromModules<{
   "functions/outfits/getBackgroundColor": typeof functions_outfits_getBackgroundColor;
   "functions/outfits/getOutfit": typeof functions_outfits_getOutfit;
   "functions/outfits/index": typeof functions_outfits_index;
+  "functions/outfits/isOutfitNFSW": typeof functions_outfits_isOutfitNFSW;
   "functions/subscriptions/getUserSubscription": typeof functions_subscriptions_getUserSubscription;
   "functions/subscriptions/index": typeof functions_subscriptions_index;
   "functions/subscriptions/isSubscriptionActive": typeof functions_subscriptions_isSubscriptionActive;

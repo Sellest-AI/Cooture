@@ -7,6 +7,7 @@ export const outfits = defineTable({
   userId: v.id("users"),
   coverId: v.optional(v.id("images")),
   backgroundColor: v.optional(v.string()),
+  isNSFW: v.boolean(),
 })
   .index("by_user_id", ["userId"]);
 

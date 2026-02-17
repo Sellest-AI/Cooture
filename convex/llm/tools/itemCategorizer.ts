@@ -57,6 +57,8 @@ export const itemCategorizer = createTool({
         Do not add the materials from the openings or buttons of clothing and accessories.
         `),
 
+      isNFSW: z.boolean().describe("Whether the item is Not Safe For Work (NSFW). This includes items that are overly revealing, lingery, fetish wear, or have explicit imagery."),
+
       gender: z.enum([
         "UNISEX", "MALE", "FEMALE",
       ]).describe("Target gender/age group. Use UNISEX for items that work for anyone"),

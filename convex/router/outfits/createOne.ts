@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { upsertFeedScore } from "../../functions/feed";
+import { isOutfitNFSW } from '../../functions/outfits';
 import { authMutation } from "../../procedures";
 
 export const authed = authMutation({
@@ -16,10 +17,13 @@ export const authed = authMutation({
       faker.animal.petName(),
     ].filter(Boolean).join(' ');
 
+    const isNSFW = await isOutfitNFSW(ctx, args.items);
+
     const outfit = await ctx.db.insert('outfits', {
       name: args.name || fallbackName,
       userId: ctx.userId,
       updatedAt: Date.now(),
+      isNSFW
     })
 
     for (const itemId of args.items) {
