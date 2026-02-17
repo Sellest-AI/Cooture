@@ -22,6 +22,7 @@ export default function Screen() {
         onBack={router.canGoBack() ? () => router.back() : undefined}
         title="New outfit"
         subtitle="Choose a source for your clothes"
+        type="alt"
       />
       <View style={{
         marginTop: 8,
