@@ -156,6 +156,7 @@ const updateSubjects = async (ctx: ActionCtx, schema: Schema, subjects: SubjectE
       reference: `Image ${images.length + 1}. Use facial expression from prompt.`,
       gender: appearance.gender,
       height: appearance.heightCm ? `${appearance.heightCm}cm tall` : undefined,
+      size: appearance.size,
     }
 
     let image = prompt.head.direction === "side" ? appearance.sideImage : appearance.frontImage;
@@ -267,6 +268,7 @@ export type PromptExtended = Omit<Prompt, 'subjects' | 'style' | 'composition' |
   subjects: (Prompt['subjects'][number] & {
     reference: string;
     gender: string;
+    size?: string;
     height?: string;
     outfit?: Outfit & {
       references?: string[];

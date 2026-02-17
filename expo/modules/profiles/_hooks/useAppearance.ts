@@ -1,4 +1,4 @@
-import { api, useMutation, useQueryCached } from "@/lib/convex/client";
+import { api, Doc, useMutation, useQueryCached } from "@/lib/convex/client";
 import { atom, useAtom } from "jotai";
 
 export const useAppearance = () => {
@@ -9,13 +9,19 @@ export const useAppearance = () => {
     await mutate({ heightCm: height })
   }
 
+  const updateSize = async (size: NonNullable<Doc<'usersAppearance'>['size']>) => {
+    await mutate({ size })
+  }
+
   return {
     isPending,
     frontImage: appearance?.frontImage,
     sideImage: appearance?.sideImage,
     smileImage: appearance?.smileImage,
     heightCm: appearance?.heightCm,
-    updateHeight
+    size: appearance?.size,
+    updateHeight,
+    updateSize
   }
 }
 

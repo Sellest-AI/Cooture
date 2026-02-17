@@ -35,7 +35,7 @@ export const schemaToMarkdown = (schema: PromptExtended): string => {
     prompt.push(sectionCreator(`SUBJECT ${index + 1}`, [
       { "Reference": subject.reference },
       { "Body Position": [subject.position, subject.bodyAlignment] },
-      { "Appearance": [subject.height, subject.gender] },
+      { "Appearance": [subject.height, subject.size, subject.gender] },
       { "Head": [subject.head.angle, subject.head.expression, subject.head.gaze] },
       { "Hands": subject.hands },
       { "Held Objects": subject.heldObjects },

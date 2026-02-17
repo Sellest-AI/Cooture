@@ -14,6 +14,15 @@ const accountStatus = v.union(
   v.literal("SUSPENDED"),
 );
 
+export const userSizes = v.union(
+  v.literal("lean"),
+  v.literal("average"),
+  v.literal("athletic"),
+  v.literal("muscular"),
+  v.literal("heavy"),
+  v.literal("heavyset"),
+);
+
 export const usersExtended = defineTable({
   userId: v.id('users'),
   canTakeFreeTrial: v.boolean(),
@@ -38,7 +47,8 @@ export const usersAppearance = defineTable({
   sideImageId: v.id('images'),
   smileImageId: v.id('images'),
   heightCm: v.optional(v.number()),
-  gender: v.optional(v.union(v.literal("male"), v.literal("female")))
+  gender: v.optional(v.union(v.literal("male"), v.literal("female"))),
+  size: v.optional(userSizes),
   // topAngleImageId: v.id('images'),
 })
   .index("by_user_id", ["userId"])

@@ -2,6 +2,7 @@ import { removeUndefinedKeys } from "@shared/utils";
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { authMutation } from "../../procedures";
+import { userSizes } from "../../schema/users";
 
 export const authed = authMutation({
   args: {
@@ -9,11 +10,12 @@ export const authed = authMutation({
     sideImageId: v.optional(v.id("images")),
     smileImageId: v.optional(v.id("images")),
     heightCm: v.optional(v.number()),
+    size: v.optional(userSizes)
     // topAngleImageId: v.id("images"),
   },
   handler: async (ctx, args) => {
     const { userId } = ctx;
-    const { frontImageId, sideImageId, smileImageId, heightCm } = args
+    const { frontImageId, sideImageId, smileImageId, heightCm, size } = args
 
     const existingPortraits = await ctx.db.query("usersAppearance")
       .withIndex("by_user_id", (q) => q.eq("userId", userId)).first();
@@ -23,6 +25,7 @@ export const authed = authMutation({
       sideImageId,
       smileImageId,
       heightCm,
+      size,
     })
 
     if (existingPortraits) {
@@ -55,6 +58,7 @@ export const authed = authMutation({
       sideImageId,
       smileImageId,
       heightCm,
+      size,
       // topAngleImageId,
     });
   }
