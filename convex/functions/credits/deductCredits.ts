@@ -1,29 +1,10 @@
-import { Id } from "../../_generated/dataModel";
+import { Doc, Id } from "../../_generated/dataModel";
 import { MutationCtx } from "../../_generated/server";
 import { TRANSACTION_TYPE } from "../../schema/wallets";
 
 type TransactionType = typeof TRANSACTION_TYPE['type'];
 
-type TransactionMetadata = {
-  claim?: {
-    streakDay: number;
-  };
-  generation?: {
-    generationId: Id<"generations">;
-  };
-  admin?: {
-    reason: string;
-    adminId: Id<"users">;
-  };
-  refund?: {
-    originalTransactionId?: Id<"creditTransactions">;
-    reason: string;
-  };
-  transfer?: {
-    message?: string;
-  };
-};
-
+type TransactionMetadata = Doc<"creditTransactions">["metadata"];
 /**
  * Deduct credits from a user (remove credits)
  * Creates a transaction record and updates the user's wallet

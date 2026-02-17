@@ -18,9 +18,7 @@ export const _internal = internalMutation({
       amount: args.amount,
       type: "GENERATION_COST",
       metadata: args.generationId ? {
-        generation: {
-          generationId: args.generationId,
-        },
+        generationId: args.generationId,
       } : undefined,
     });
 

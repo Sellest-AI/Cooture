@@ -229,7 +229,7 @@ const FriendBlock = () => {
 }
 
 export default function Screen() {
-  const [numberToGenerate] = useState(1);
+  const [numberToGenerate] = useState(2);
   const { data: cost } = useQueryCached(api.router.credits.getCost.anon, { type: 'GENERATION_COST', amount: numberToGenerate });
   const { data: canPay } = useQueryCached(api.router.credits.canPay.authed, cost ? { amount: cost } : 'skip');
   const { outfitId, outfitSize, presetId, friendId, disabled } = usePhotoshoot.New();
@@ -282,6 +282,7 @@ export default function Screen() {
 
             const generationId = await action({
               presetId: presetId,
+              numberToGenerate: numberToGenerate,
               extraUserIds: friendId ? [friendId] : undefined,
               outfit: outfitId ? {
                 _id: outfitId,

@@ -47,14 +47,6 @@ export default function Screen() {
           backgroundColor: Colors.background,
         }}
       />
-      {isAdmin && <Button
-        variant="blur"
-        onPress={() => push('/presets/new')}
-        style={{ marginTop: 8, marginHorizontal: 12, marginBottom: 8 }}
-      >
-        New preset (Admin)
-      </Button>}
-      {isAdmin && <QuickActions style={{ paddingHorizontal: 8, marginBottom: 8 }} />}
       <View
         style={{
           flexDirection: "row",
@@ -161,6 +153,21 @@ export default function Screen() {
           )}
         />
       </View>
+      {isAdmin && <Button
+        variant="blur"
+        onPress={() => push('/presets/new')}
+        style={{ marginTop: 8, marginHorizontal: 12, marginBottom: 8 }}
+      >
+        New preset (Admin)
+      </Button>}
+      {isAdmin && <Button
+        variant="blur"
+        onPress={() => push('/photoshoot/generations/next')}
+        style={{ marginHorizontal: 12, marginBottom: 8 }}
+      >
+        Generation next
+      </Button>}
+      {isAdmin && <QuickActions style={{ paddingHorizontal: 8, marginBottom: 8 }} />}
     </SafeScrollView>
   )
 }

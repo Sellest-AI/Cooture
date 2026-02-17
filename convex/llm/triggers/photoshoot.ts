@@ -19,10 +19,10 @@ export const authed = authAction({
     })),
     /** Other users to be added when duo/trio shot */
     extraUserIds: v.optional(v.array(v.id("users"))),
-    numberToGeneration: v.optional(v.number())
+    numberToGenerate: v.optional(v.number())
   },
   handler: async (ctx, args): Promise<Id<'generations'>> => {
-    const AMOUNT_OF_IMAGES = args.numberToGeneration ?? 1;
+    const AMOUNT_OF_IMAGES = args.numberToGenerate ?? 1;
     const COST = CREDITS_CONFIG.COST_PER_GENERATION * AMOUNT_OF_IMAGES;
 
     // 1. Check if can pay
@@ -72,7 +72,7 @@ export const authed = authAction({
 
     // 3. Update transaction with generationId (optional - for better tracking)
     await ctx.runMutation(internal.router.credits.deductCredits._internal, {
-      amount: CREDITS_CONFIG.COST_PER_GENERATION * 2,
+      amount: CREDITS_CONFIG.COST_PER_GENERATION * AMOUNT_OF_IMAGES,
       userId: ctx.userId,
       generationId,
     });

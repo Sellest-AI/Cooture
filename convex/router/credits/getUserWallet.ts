@@ -29,6 +29,7 @@ export const authed = authQuery({
     }
 
     return {
+      _creationTime: wallet._creationTime,
       credits: wallet.credits,
       streak: streak,
       canClaimNow,

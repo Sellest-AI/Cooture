@@ -73,7 +73,7 @@ export const SavedOutfits = ({ style, direction, numColumns, header, itemWidth, 
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: 10,
-          paddingLeft: PADDING_HORIZONTAL + 4,
+          paddingLeft: PADDING_HORIZONTAL + 6,
           paddingRight: PADDING_HORIZONTAL + 12,
           gap: GAP,
         }}

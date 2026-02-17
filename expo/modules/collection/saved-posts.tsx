@@ -87,7 +87,7 @@ export const SavedPosts = ({ style, direction, numColumns, header, itemWidth, in
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: 10,
-          paddingLeft: PADDING_HORIZONTAL,
+          paddingLeft: PADDING_HORIZONTAL + 2,
           paddingRight: PADDING_HORIZONTAL + 12,
           gap: GAP,
         }}

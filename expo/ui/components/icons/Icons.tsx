@@ -7,6 +7,8 @@ export { Roundish } from './roundish';
 export { Squirish } from './squirish';
 export { SquirishPlus } from './squirishPlus';
 
+export { LogoLoading } from './logo-loading';
+
 // Category Icons
 export {
   WatchIcon as Accessory, HandbagIcon as Bag, PantsIcon as Bottom, BaseballCapIcon as Cap, CoatHangerIcon as Coat, DressIcon, EyeglassesIcon as Glasses,

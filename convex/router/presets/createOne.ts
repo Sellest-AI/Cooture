@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
+import { Id } from "../../_generated/dataModel";
 import { adminAction, internalMutation } from "../../procedures";
 import { PRESET_CATEGORIES, PRESET_PROMPT } from "../../schema/presets";
 
@@ -8,7 +9,7 @@ export const admin = adminAction({
     name: v.string(),
     base64: v.string(),
   },
-  handler: async (ctx, { name, base64 }): Promise<void> => {
+  handler: async (ctx, { name, base64 }): Promise<Id<'presets'> | null> => {
     const images = await ctx.runAction(internal.router.storage.images.uploadMany._internal, {
       images: [{ base64 }],
       userId: null
@@ -30,7 +31,7 @@ export const admin = adminAction({
         depthMapPromises
       ]);
 
-      await ctx.runMutation(internal.router.presets.createOne._internal_mutation, {
+      const presetId = await ctx.runMutation(internal.router.presets.createOne._internal_mutation, {
         name,
         imageIds: images.map((img) => img._id),
         depthMaps: depthMaps.map((dm) => dm),
@@ -38,12 +39,16 @@ export const admin = adminAction({
         categories: prompts.flatMap((p) => p.categories),
       })
 
+      return presetId;
+
     } catch {
       // Cleanup uploaded image on failure
       for (const img of images) {
         await ctx.scheduler.runAfter(10000,
           internal.router.storage.images.deleteOne._internal, { imageId: img._id });
       }
+
+      return null;
     }
   }
 })

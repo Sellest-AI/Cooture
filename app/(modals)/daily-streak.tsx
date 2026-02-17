@@ -380,12 +380,12 @@ export default function Screen() {
           onComplete={async () => {
             setClaimed(true);
             // Await delay 500ms;
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 800));
 
             if (router.canGoBack()) { router.back(); }
             else { router.replace(ROUTES.TABS.FEED); }
 
-            setTimeout(() => { claim(); }, 1000);
+            setTimeout(() => { claim().catch(() => null); }, 800);
           }}
         >
           Slide to claim

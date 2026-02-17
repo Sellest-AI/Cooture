@@ -1,3 +1,4 @@
+import { useRouter } from "@/hooks";
 import { api, useAction } from "@/lib/convex/client";
 import { compressImage } from "@/lib/image/client/editing";
 import { Button } from "@ui/button";
@@ -7,12 +8,13 @@ import { ModalHeader } from "@ui/modal";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { TextInput } from "@ui/text-input";
 import { launchImageLibraryAsync } from "expo-image-picker";
-import { router } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
 import { ROUTES } from "routes";
 
 export default function Screen() {
+  const { push } = useRouter();
+
   const [name, setName] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
 
@@ -67,12 +69,14 @@ export default function Screen() {
         onPress={async () => {
           if (!imageUri || name.length < 3) return;
           const compressedImage = await compressImage(imageUri);
-          await createPreset({
+          const presetId = await createPreset({
             name,
             base64: await compressedImage.toBase64(),
           })
 
-          router.push(ROUTES.TABS.NEW);
+          push(ROUTES.PHOTOSHOOT.NEW, {
+            params: { presetId }
+          })
         }}
       >
         Generate
