@@ -1,13 +1,10 @@
 import { useRouter } from "@/hooks";
-import { useAccount } from "@/lib/convex/auth";
-import { api, useQueryCached } from "@/lib/convex/client";
+import { api, useQueryCached, useQueryCachedData } from "@/lib/convex/client";
 import { CreditsButton } from "@/modules/premium/credits.button";
 import { Notification } from "@/modules/profiles/notification";
-import { QuickActions } from "@/modules/profiles/quick-actions";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
-import { Button } from "@ui/button";
 import { Collection } from "@ui/cards";
-import { ArrowUpRight, ScanLine } from "@ui/icons";
+import { ArrowUpRight, Camera } from "@ui/icons";
 import { ModalHeader } from "@ui/modal";
 import { Pressable } from "@ui/pressable";
 import { SafeScrollView } from "@ui/safe-scroll-view";
@@ -17,13 +14,52 @@ import { FlatList, StyleSheet, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
+const Actions = () => {
+  const { push } = useRouter('/new');
+
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingHorizontal: 8,
+        gap: 8,
+      }}
+    >
+      <Pressable
+        onPress={() => { push(ROUTES.PHOTOSHOOT.NEW); }}
+        style={{
+          borderTopColor: Colors.primary[200],
+          backgroundColor: Colors.primary[500],
+          ...styles.headerButtons,
+        }}
+      >
+        <Camera size={40} color={Colors.primary[900]} />
+        <Text.Lg color={Colors.primary[900]} style={{ textAlign: 'center' }}>Photoshoot</Text.Lg>
+      </Pressable>
+      <Pressable
+        style={{
+          ...styles.headerButtons,
+          borderTopColor: Colors.secondary[200],
+          backgroundColor: Colors.secondary[500],
+        }}
+        onPress={() => {
+          push(ROUTES.OUTFIT.NEW);
+        }}
+      >
+        <ArrowUpRight size={40} color={Colors.primary[900]} />
+        <Text.Lg color={Colors.secondary[900]} style={{ textAlign: 'center' }}>New Outfit</Text.Lg>
+      </Pressable>
+    </View>
+  )
+}
+
 export default function Screen() {
   const { push } = useRouter('/new');
 
-  const { isAdmin } = useAccount();
-
   const { data: presets } = useQueryCached(api.router.presets.getAll.anon);
-  const { data: outfits } = useQueryCached(api.router.outfits.getAll.authed)
+  const { data: outfits } = useQueryCachedData(api.router.outfits.getLatest.anon, { key: 'latestOutfits' });
 
   return (
     <SafeScrollView
@@ -47,44 +83,7 @@ export default function Screen() {
           backgroundColor: Colors.background,
         }}
       />
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          paddingHorizontal: 8,
-          gap: 8,
-        }}
-      >
-        <Pressable
-          onPress={() => {
-            push(ROUTES.SCAN);
-          }}
-          style={{
-            borderTopColor: Colors.primary[200],
-            backgroundColor: Colors.primary[500],
-            ...styles.headerButtons,
-          }}
-        >
-          <ScanLine size={40} color={Colors.primary[900]} />
-          <Text.Lg color={Colors.primary[900]} style={{ textAlign: 'center' }}>Scan an item</Text.Lg>
-        </Pressable>
-        <Pressable
-          style={{
-            ...styles.headerButtons,
-            borderTopColor: Colors.secondary[200],
-            backgroundColor: Colors.secondary[500],
-          }}
-          onPress={() => {
-            push(ROUTES.MODALS.NEW_OUTFIT, {
-              redirectTo: ROUTES.PROFILE.OUTFITS,
-            });
-          }}
-        >
-          <ArrowUpRight size={40} color={Colors.primary[900]} />
-          <Text.Lg color={Colors.secondary[900]} style={{ textAlign: 'center' }}>New Outfit</Text.Lg>
-        </Pressable>
-      </View>
+      <Actions />
       <View style={{ marginTop: 32 }}>
         <Text.H4 color={Colors.foreground} style={{ marginLeft: 12 }}>
           Trending styles
@@ -133,7 +132,7 @@ export default function Screen() {
           <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
         </View>}
         <FlatList
-          style={{ marginTop: 16, marginBottom: 32 }}
+          style={{ marginTop: 16, marginBottom: 8 }}
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ gap: 32, paddingHorizontal: 16, paddingTop: 6 }}
@@ -153,21 +152,6 @@ export default function Screen() {
           )}
         />
       </View>
-      {isAdmin && <Button
-        variant="blur"
-        onPress={() => push('/presets/new')}
-        style={{ marginTop: 8, marginHorizontal: 12, marginBottom: 8 }}
-      >
-        New preset (Admin)
-      </Button>}
-      {isAdmin && <Button
-        variant="blur"
-        onPress={() => push('/photoshoot/generations/next')}
-        style={{ marginHorizontal: 12, marginBottom: 8 }}
-      >
-        Generation next
-      </Button>}
-      {isAdmin && <QuickActions style={{ paddingHorizontal: 8, marginBottom: 8 }} />}
     </SafeScrollView>
   )
 }

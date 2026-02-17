@@ -1,4 +1,5 @@
 import { useRouter } from "@/hooks";
+import { useAccount } from "@/lib/convex/auth";
 import { api, useQueryCached } from "@/lib/convex/client";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
 import { Button } from "@ui/button";
@@ -17,6 +18,7 @@ import { Colors } from "theme";
 const loading = false;
 
 export default function Screen() {
+  const { isPremium, isAdmin } = useAccount();
   const { push } = useRouter('/photoshoot/create');
   const { setPresetId, presetId, outfitId } = usePhotoshoot.New();
   const { data: presets } = useQueryCached(api.router.presets.getAll.anon);
@@ -42,7 +44,8 @@ export default function Screen() {
             paddingTop: 24,
             paddingBottom: presetId !== null ? 72 : 0,
           }}
-          data={(sanitizedPresets ?? [])}
+          data={[undefined, ...(sanitizedPresets ?? [])]}
+          keyExtractor={(item, index) => `${item?._id ?? 'empty'}-${index}`}
           style={{ paddingHorizontal: 6 }}
           ListFooterComponent={
             loading ? <>
@@ -61,14 +64,25 @@ export default function Screen() {
             </> : undefined
           }
           renderItem={({ item, index }) => {
+            const sharedStyle = { marginBottom: 24, paddingTop: 3, marginLeft: 20, marginRight: 20 }
+
+            if (item === undefined) return (
+              <View style={sharedStyle}>
+                <Collection
+                  style={{}}
+                  title="New preset"
+                  onPress={() => {
+                    if (isPremium || isAdmin) push('/presets/new', { redirectHere: true })
+                    else push(ROUTES.MODALS.UPGRADE);
+                  }}
+                />
+              </View>
+            )
+
             const selected = presetId === item._id;
+
             return (
-              <View style={{
-                marginBottom: 24,
-                paddingTop: 3,
-                marginLeft: 20,
-                marginRight: 20
-              }}>
+              <View style={sharedStyle}>
                 <Collection
                   selected={selected}
                   source={item.cover.sizes.medium.url}

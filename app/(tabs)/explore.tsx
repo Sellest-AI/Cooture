@@ -215,7 +215,7 @@ export default function Screen() {
         <View style={{ position: 'absolute' }}><Loader color={Colors.foreground} /></View>
       </View>}
       {!canLoadMore && <Text.Base
-        style={{ textAlign: 'center', marginVertical: 32, maxWidth: 200, alignSelf: 'center' }}
+        style={{ textAlign: 'center', marginTop: 32, maxWidth: 200, alignSelf: 'center' }}
         color={Colors.neutral[400]}
       >
         You have reached the end of the discover feed.

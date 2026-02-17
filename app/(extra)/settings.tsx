@@ -13,7 +13,7 @@ import { Colors } from "theme";
 export default function SettingsScreen() {
   const { signOut } = useAuthActions();
 
-  const { currentlyRunning } = useUpdates();
+  const { currentlyRunning, isUpdateAvailable } = useUpdates();
 
   return (
     <ScrollView
@@ -109,7 +109,7 @@ export default function SettingsScreen() {
         </Button>
 
         <Text.Base color={Colors.neutral[400]} style={{ marginTop: 4 }}>
-          {currentlyRunning.runtimeVersion} - {currentlyRunning.createdAt?.toLocaleDateString()}
+          {currentlyRunning.runtimeVersion} - {currentlyRunning.createdAt?.toLocaleDateString()} - {isUpdateAvailable ? "Update available" : "App is up to date"}
         </Text.Base>
       </View>
     </ScrollView>

@@ -30,6 +30,7 @@ import type * as functions_items_createItem from "../functions/items/createItem.
 import type * as functions_items_extractPosition from "../functions/items/extractPosition.js";
 import type * as functions_items_getItem from "../functions/items/getItem.js";
 import type * as functions_outfits_getBackgroundColor from "../functions/outfits/getBackgroundColor.js";
+import type * as functions_outfits_getOutfit from "../functions/outfits/getOutfit.js";
 import type * as functions_outfits_index from "../functions/outfits/index.js";
 import type * as functions_subscriptions_getUserSubscription from "../functions/subscriptions/getUserSubscription.js";
 import type * as functions_subscriptions_index from "../functions/subscriptions/index.js";
@@ -120,6 +121,7 @@ import type * as router_outfits_createOne from "../router/outfits/createOne.js";
 import type * as router_outfits_deleteOne from "../router/outfits/deleteOne.js";
 import type * as router_outfits_editOne from "../router/outfits/editOne.js";
 import type * as router_outfits_getAll from "../router/outfits/getAll.js";
+import type * as router_outfits_getLatest from "../router/outfits/getLatest.js";
 import type * as router_outfits_getOne from "../router/outfits/getOne.js";
 import type * as router_outfits_updateCover from "../router/outfits/updateCover.js";
 import type * as router_outfits_updateCoverInternal from "../router/outfits/updateCoverInternal.js";
@@ -206,6 +208,7 @@ declare const fullApi: ApiFromModules<{
   "functions/items/extractPosition": typeof functions_items_extractPosition;
   "functions/items/getItem": typeof functions_items_getItem;
   "functions/outfits/getBackgroundColor": typeof functions_outfits_getBackgroundColor;
+  "functions/outfits/getOutfit": typeof functions_outfits_getOutfit;
   "functions/outfits/index": typeof functions_outfits_index;
   "functions/subscriptions/getUserSubscription": typeof functions_subscriptions_getUserSubscription;
   "functions/subscriptions/index": typeof functions_subscriptions_index;
@@ -296,6 +299,7 @@ declare const fullApi: ApiFromModules<{
   "router/outfits/deleteOne": typeof router_outfits_deleteOne;
   "router/outfits/editOne": typeof router_outfits_editOne;
   "router/outfits/getAll": typeof router_outfits_getAll;
+  "router/outfits/getLatest": typeof router_outfits_getLatest;
   "router/outfits/getOne": typeof router_outfits_getOne;
   "router/outfits/updateCover": typeof router_outfits_updateCover;
   "router/outfits/updateCoverInternal": typeof router_outfits_updateCoverInternal;

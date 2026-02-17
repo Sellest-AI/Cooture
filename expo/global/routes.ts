@@ -29,6 +29,7 @@ export const ROUTES = {
     ID: (id: string) => `/item/${id}` as const,
   },
   OUTFIT: {
+    NEW: '/outfit/new',
     PATH: '/outfit/[id]',
     ID: (id: string) => `/outfit/${id}` as const,
   },

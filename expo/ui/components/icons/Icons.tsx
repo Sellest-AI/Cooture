@@ -39,8 +39,8 @@ export {
 // General Icons
 export {
   ArrowLeft, ArrowRight, ArrowUpRight, Bell, Camera, Check, ChevronRight, CircleFadingArrowUp, Clock9,
-  Compass, Download, ExternalLink, EyeClosed, Feather, Flame, Gift, Home, ImageIcon, ImageUp, LinkIcon,
-  Lock, Package, Palette, Pause, Pencil, Play, Plus, Rewind, ScanLine, Search, Settings, Shapes, ShareIcon,
+  Compass, Download, ExternalLink, EyeClosed, Feather, Flame, Gift, Globe, Home, ImageIcon, ImageUp, LinkIcon,
+  Lock, Package, Palette, Pause, Pencil, Play, Plus, Puzzle, Rewind, ScanLine, Search, Settings, Shapes, ShareIcon,
   SkipBack, SkipForward, Smile, Snowflake, Star, Sun, Tags, Trash, User, UserRoundCheck, UserRoundPlus, X
 } from 'lucide-react-native';
 

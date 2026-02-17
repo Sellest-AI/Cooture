@@ -127,7 +127,7 @@ export default function SavedScreen() {
   return (
     <SafeScrollView
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: TOTAL_TABS_SPACE + 20 }}
+      contentContainerStyle={{ paddingBottom: TOTAL_TABS_SPACE }}
       edges={{ top: 'padding', bottom: 'maximum' }}
     >
       <ModalHeader
@@ -152,7 +152,7 @@ export default function SavedScreen() {
       />
       <SavedPosts
         itemWidth={132}
-        style={{ marginBottom: 36 }}
+        style={{ marginBottom: 0 }}
         direction="horizontal"
         header={true}
       />
