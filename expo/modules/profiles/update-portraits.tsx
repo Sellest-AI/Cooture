@@ -1,7 +1,7 @@
 import { Image } from "@ui/image";
 import { Text } from "@ui/text";
 import { CameraView } from "expo-camera";
-import { ComponentProps, useRef, useState } from "react";
+import { ComponentProps, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { Colors } from "theme";
 import { CameraPermission } from "../camera/camera-permission";
@@ -21,6 +21,12 @@ type Props = {
 export const UpdatePortraits = ({ imageUri, onCapture, examples }: Props) => {
   const cameraRef = useRef<CameraView>(null);
   const [hasPermission, setHasPermission] = useState(false);
+  const [showCamera, setShowCamera] = useState(imageUri ? false : true);
+
+  useEffect(() => {
+    console.log("imageUri changed:", imageUri);
+    if (imageUri) { setShowCamera(false); }
+  }, [imageUri])
 
   if (!hasPermission) {
     return <CameraPermission onSuccess={() => setHasPermission(true)} />
@@ -46,15 +52,15 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples }: Props) => {
           borderBottomRightRadius: 64,
           overflow: 'hidden',
         }}>
-          <CameraView
+          {showCamera && <CameraView
             ref={cameraRef}
             style={{ flex: 1 }}
             mirror={true}
             animateShutter={false}
             facing="front"
             flash="off"
-          />
-          {imageUri && <Image
+          />}
+          {(imageUri && !showCamera) && <Image
             source={imageUri}
             style={{ flex: 1, position: 'absolute', inset: 0 }}
           />}
@@ -68,6 +74,7 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples }: Props) => {
           }}
           showBackButton={false}
           cameraRef={cameraRef}
+          onDelete={!showCamera ? () => setShowCamera(true) : undefined}
           onCapture={async (photo) => {
             await onCapture?.(photo.uri);
           }}

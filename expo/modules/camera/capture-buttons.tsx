@@ -4,6 +4,7 @@ import { ArrowLeft, Camera, ImageIcon, X } from "@ui/icons"
 import { CameraCapturedPicture, CameraView } from "expo-camera"
 import { launchImageLibraryAsync } from "expo-image-picker"
 import { router } from "expo-router"
+import { useState } from "react"
 import { View, ViewStyle } from "react-native"
 import { ROUTES } from "routes"
 import { Colors } from "theme"
@@ -15,21 +16,26 @@ type Props = {
   style?: ViewStyle;
   cameraRef: React.RefObject<CameraView | null>;
   onCapture: (photo: CameraCapturePictureExtended) => void;
+  onDelete?: () => void;
   backButton?: "close" | "back";
   showBackButton?: boolean;
 }
 
-export const CaptureButtons = ({ style, cameraRef, onCapture, backButton = "close", showBackButton = true }: Props) => {
+export const CaptureButtons = ({ style, cameraRef, onCapture, onDelete, backButton = "close", showBackButton = true }: Props) => {
+  const [innerLoading, setInnerLoading] = useState(false);
   const handleCapture = async () => {
     if (!cameraRef.current) return;
 
     try {
+      setInnerLoading(true);
       const photo = await cameraRef.current.takePictureAsync();
       const photoCompressed = await compressImage(photo.uri);
       await onCapture({ ...photo, ...photoCompressed, uri: photoCompressed.uri });
     } catch (error) {
       console.error('Failed to capture image:', error);
     }
+
+    setInnerLoading(false);
   };
 
   const handlePickImage = async () => {
@@ -74,22 +80,32 @@ export const CaptureButtons = ({ style, cameraRef, onCapture, backButton = "clos
         {backButton === "back" ? <ArrowLeft color={Colors.foreground} size={24} /> :
           <X color={Colors.foreground} size={24} />}
       </Button>}
-      <Button
-        size="rounded"
-        variant="blur"
-        style={{ padding: 12 }}
-        onPress={handlePickImage}
-      >
-        <ImageIcon color={Colors.foreground} size={24} />
-      </Button>
-      <Button
-        size="rounded"
-        variant="primary"
-        style={{ padding: 20 }}
-        onPress={handleCapture}
-        startContent={<Camera size={28} color={Colors.primary[900]} />}
-      >
-      </Button>
+      {!onDelete && <>
+        <Button
+          size="rounded"
+          variant="blur"
+          style={{ padding: 12 }}
+          onPress={handlePickImage}
+          startContent={<ImageIcon color={Colors.foreground} size={24} />}
+        />
+        <Button
+          size="rounded"
+          variant="primary"
+          style={{ padding: 20 }}
+          isLoading={innerLoading}
+          onPress={handleCapture}
+          startContent={<Camera color={Colors.primary[900]} size={28} />}
+        />
+      </>}
+      {onDelete &&
+        <Button
+          size="rounded"
+          variant="blur"
+          style={{ padding: 12 }}
+          isLoading={innerLoading}
+          onPress={onDelete}
+          startContent={<X color={Colors.foreground} size={24} />}
+        />}
     </View>
   )
 }

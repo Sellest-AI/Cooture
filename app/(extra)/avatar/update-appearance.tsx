@@ -36,7 +36,12 @@ export default function Screen() {
 
   return (
     <View style={{ flex: 1 }}>
-      <SafeScrollView style={{ flex: 1, paddingHorizontal: 12, paddingTop: 12, paddingBottom: BUTTON_HEIGHT + 24 }}>
+      <SafeScrollView style={{
+        paddingHorizontal: 12,
+        paddingTop: 12,
+        paddingBottom: BUTTON_HEIGHT + 24
+
+      }}>
         <ModalHeader
           title="Update your appearance"
         />
