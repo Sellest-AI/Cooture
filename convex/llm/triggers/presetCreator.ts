@@ -9,6 +9,7 @@ import { presetCreator } from "../tools/presetCreator";
 type Return = {
   prompt: Awaited<ReturnType<typeof presetCreator.handler>>;
   categories: Awaited<ReturnType<typeof imageCategorizer.handler>>[number]['name'][];
+  contentRating: Awaited<ReturnType<typeof presetCreator.handler>>['contentRating'];
 }
 
 export const _internal = internalAction({
@@ -43,7 +44,9 @@ export const _internal = internalAction({
       const highConfidenceCategories = allCategories.filter(cat => cat.confidence >= 0.7);
       const uniqueCategories = Array.from(new Set(highConfidenceCategories.map(cat => cat.name)));
 
-      return { prompt, categories: uniqueCategories };
+      const contentRating = prompt.contentRating;
+
+      return { prompt, categories: uniqueCategories, contentRating };
 
     } catch {
       // Cleanup uploaded image on failure

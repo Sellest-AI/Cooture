@@ -19,6 +19,13 @@ For categories, choose the MOST SPECIFIC category that applies FROM THE AVAILABL
 For weather tags, select ALL applicable weather conditions.
 For materials, identify the PRIMARY materials visible or typical for the item.
 
+FOR CONTENT RATING:
+- SAFE: Appropriate for all audiences (e.g., t-shirts, jeans, sneakers) (all audience)
+- SUGGESTIVE: Revealing but not explicit (e.g., short skirt, low-cut top) (all audience)
+- EXPLICIT: Highly revealing or explicit (e.g., lingerie, swimwear) (15+ audience)
+- NSFW: Use only for items that are highly revealing, fetish wear, or explicit in nature. (18+ audience)
+When in doubt about content rating, default to the most conservative option.
+
 The order of the fields in the arrays ARE VERY IMPORTANT and should reflect the prominence of each attribute in the item.
 
 RETURN THE DATA IN JSON FORMAT ONLY.
@@ -57,7 +64,9 @@ export const itemCategorizer = createTool({
         Do not add the materials from the openings or buttons of clothing and accessories.
         `),
 
-      isNFSW: z.boolean().describe("Whether the item is Not Safe For Work (NSFW). This includes items that are overly revealing, lingery, fetish wear, or have explicit imagery."),
+      contentRating: z.enum([
+        "SAFE", "SUGGESTIVE", "EXPLICIT", "NSFW"
+      ]).describe("The content rating of the item. Fallback to the most conservative rating if unsure."),
 
       gender: z.enum([
         "UNISEX", "MALE", "FEMALE",

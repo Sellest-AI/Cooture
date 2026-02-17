@@ -124,7 +124,8 @@ export default function Screen() {
         {!outfits && <View style={{
           marginTop: 16,
           flexDirection: 'row',
-          paddingHorizontal: 16, gap: 32
+          paddingHorizontal: 16,
+          gap: 32
         }}
         >
           <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
@@ -132,7 +133,7 @@ export default function Screen() {
           <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
         </View>}
         <FlatList
-          style={{ marginTop: 16, marginBottom: 8 }}
+          style={{ marginTop: 16, marginBottom: 28 }}
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ gap: 32, paddingHorizontal: 16, paddingTop: 6 }}

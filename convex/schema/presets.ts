@@ -1,5 +1,6 @@
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
+import { CONTENT_RATINGS } from "./constants";
 
 // ===== PRESET CATEGORIES =====
 // Single source of truth for all category values
@@ -101,6 +102,7 @@ export const presets = defineTable({
   imageIds: v.array(v.id("images")),
   depthMaps: v.array(v.id("images")),
   prompts: v.array(PRESET_PROMPT),
+  contentRating: CONTENT_RATINGS,
   archived: v.boolean(),
 })
   .index("by_archived", ["archived"])

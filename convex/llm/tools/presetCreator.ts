@@ -55,6 +55,13 @@ This JSON is used in a pipeline where the User and the Outfit can be swapped ind
   - Use the literal JavaScript tokens: undefined (unquoted) for missing optionals, and [] for empty lists.
   - Do NOT guess. If you cannot confidently see it, set it to undefined or [] as required.
 
+CONTENT RATING FOR THE SCENE:
+- SAFE = Appropriate for all audiences
+- SUGGESTIVE = Implicit posing or clothing, but not explicit.
+- EXPLICIT = Highly revealing or explicit poses or clothing. Still safe to share online.
+- NSFW = When the image contains highly revealing, fetish wear, or explicit content. Use this rating only for images that are clearly adult in nature.
+When in doubt about content rating, default to the most conservative option.
+
 OUTPUT FORMAT (VERY IMPORTANT):
 - Return a JSON object that exactly matches the schema structure.
 - Use plain strings for textual fields, arrays for lists, nested objects only when visible and describable.
@@ -168,6 +175,11 @@ export const ImagePresetSchema = z.object({
     postProcessing: z.string().describe("Grading: e.g., 'Flash photo look', 'Slightly overexposed highlight', 'Raw'."),
     focalLength: z.string().describe("Lens: e.g., '28mm wide angle'."),
   }),
+
+  // ---- 7. CONTENT RATING (SAFETY) ----
+  contentRating: z.enum([
+    "SAFE", "SUGGESTIVE", "EXPLICIT", "NSFW"
+  ]).describe("The content rating of the scene. Fallback to the most conservative rating if unsure."),
 });
 
 export const presetCreator = createTool({

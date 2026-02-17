@@ -17,13 +17,13 @@ export const authed = authMutation({
       faker.animal.petName(),
     ].filter(Boolean).join(' ');
 
-    const isNSFW = await isOutfitNFSW(ctx, args.items);
+    const contentRating = await isOutfitNFSW(ctx, args.items);
 
     const outfit = await ctx.db.insert('outfits', {
       name: args.name || fallbackName,
       userId: ctx.userId,
       updatedAt: Date.now(),
-      isNSFW
+      contentRating
     })
 
     for (const itemId of args.items) {

@@ -167,6 +167,7 @@ import type * as router_users_getRelated from "../router/users/getRelated.js";
 import type * as router_users_upsertAppearance from "../router/users/upsertAppearance.js";
 import type * as schema_auth from "../schema/auth.js";
 import type * as schema_collection from "../schema/collection.js";
+import type * as schema_constants from "../schema/constants.js";
 import type * as schema_feed from "../schema/feed.js";
 import type * as schema_follows from "../schema/follows.js";
 import type * as schema_generations from "../schema/generations.js";
@@ -346,6 +347,7 @@ declare const fullApi: ApiFromModules<{
   "router/users/upsertAppearance": typeof router_users_upsertAppearance;
   "schema/auth": typeof schema_auth;
   "schema/collection": typeof schema_collection;
+  "schema/constants": typeof schema_constants;
   "schema/feed": typeof schema_feed;
   "schema/follows": typeof schema_follows;
   "schema/generations": typeof schema_generations;

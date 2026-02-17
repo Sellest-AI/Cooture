@@ -152,7 +152,7 @@ export default function SavedScreen() {
       />
       <SavedPosts
         itemWidth={132}
-        style={{ marginBottom: 0 }}
+        style={{ marginBottom: 24 }}
         direction="horizontal"
         header={true}
       />

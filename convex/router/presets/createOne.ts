@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { Id } from "../../_generated/dataModel";
 import { adminAction, internalMutation } from "../../procedures";
+import { CONTENT_RATINGS, CONTENT_RATINGS_ORDER } from "../../schema/constants";
 import { PRESET_CATEGORIES, PRESET_PROMPT } from "../../schema/presets";
 
 export const admin = adminAction({
@@ -31,12 +32,16 @@ export const admin = adminAction({
         depthMapPromises
       ]);
 
+      // Sort from most to least restrictive and take the most restrictive one as the preset content rating
+      const contentRating = prompts.map((x) => x.contentRating).sort((a, b) => CONTENT_RATINGS_ORDER[b] - CONTENT_RATINGS_ORDER[a])[0];
+
       const presetId = await ctx.runMutation(internal.router.presets.createOne._internal_mutation, {
         name,
         imageIds: images.map((img) => img._id),
         depthMaps: depthMaps.map((dm) => dm),
         prompts: prompts.map((p) => p.prompt),
         categories: prompts.flatMap((p) => p.categories),
+        contentRating: contentRating,
       })
 
       return presetId;
@@ -60,13 +65,15 @@ export const _internal_mutation = internalMutation({
     depthMaps: v.array(v.id("images")),
     prompts: v.array(PRESET_PROMPT),
     categories: v.array(PRESET_CATEGORIES),
+    contentRating: CONTENT_RATINGS,
   },
-  handler: async (ctx, { name, imageIds, depthMaps, prompts, categories }) => {
+  handler: async (ctx, { name, imageIds, depthMaps, prompts, categories, contentRating }) => {
     const presetId = await ctx.db.insert("presets", {
       name,
       imageIds,
       depthMaps,
       prompts,
+      contentRating,
       archived: false,
     })
 

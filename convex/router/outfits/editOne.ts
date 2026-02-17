@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
-import { isOutfitNFSW } from "../../functions/outfits";
+import { ContentRating, isOutfitNFSW } from "../../functions/outfits";
 import { authMutation } from "../../procedures";
 
 export const authed = authMutation({
@@ -10,7 +10,7 @@ export const authed = authMutation({
     items: v.optional(v.array(v.id("items"))),
   },
   handler: async (ctx, args) => {
-    let isNSFW: boolean | undefined = undefined;
+    let contentRating: ContentRating | undefined = undefined;
 
     if (args.items !== undefined) {
       const existingOutfitItems = await ctx.db.query('outfitItems')
@@ -27,7 +27,7 @@ export const authed = authMutation({
 
       // Check if the outfit is NSFW after the changes
       const remainingItems = [...existingOutfitItems.map((i) => i.itemId), ...itemsToAdd].filter(oi => !itemsToRemove.some(r => r.itemId === oi));
-      isNSFW = await isOutfitNFSW(ctx, remainingItems);
+      contentRating = await isOutfitNFSW(ctx, remainingItems);
 
       if (itemsToAdd.length > 0 || itemsToRemove.length > 0) {
         await ctx.scheduler.runAfter(0, internal.router.outfits.updateCover._internal, { outfitId: args.outfitId });
@@ -38,7 +38,7 @@ export const authed = authMutation({
       await ctx.db.patch(args.outfitId, {
         name: args.name,
         updatedAt: Date.now(),
-        isNSFW
+        contentRating
       })
     }
 

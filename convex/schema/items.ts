@@ -1,5 +1,6 @@
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
+import { CONTENT_RATINGS } from "./constants";
 
 export const ITEM_CATEGORIES = v.union(
   v.literal("TOP"),
@@ -75,7 +76,7 @@ export const ITEMS_SCHEMA = {
   materialFeel: ITEM_MATERIAL_FEEL,
   materials: v.array(ITEM_MATERIALS),
   gender: ITEM_GENDERS,
-  isNFSW: v.boolean(),
+  contentRating: CONTENT_RATINGS,
 }
 
 export const items = defineTable({
