@@ -109,6 +109,7 @@ import type * as router_generations_getFromPrediction from "../router/generation
 import type * as router_generations_getOne from "../router/generations/getOne.js";
 import type * as router_generations_getPaginated from "../router/generations/getPaginated.js";
 import type * as router_generations_getUser from "../router/generations/getUser.js";
+import type * as router_generations_newPredictions from "../router/generations/newPredictions.js";
 import type * as router_generations_updatePrediction from "../router/generations/updatePrediction.js";
 import type * as router_items_createOne from "../router/items/createOne.js";
 import type * as router_items_deleteOne from "../router/items/deleteOne.js";
@@ -291,6 +292,7 @@ declare const fullApi: ApiFromModules<{
   "router/generations/getOne": typeof router_generations_getOne;
   "router/generations/getPaginated": typeof router_generations_getPaginated;
   "router/generations/getUser": typeof router_generations_getUser;
+  "router/generations/newPredictions": typeof router_generations_newPredictions;
   "router/generations/updatePrediction": typeof router_generations_updatePrediction;
   "router/items/createOne": typeof router_items_createOne;
   "router/items/deleteOne": typeof router_items_deleteOne;

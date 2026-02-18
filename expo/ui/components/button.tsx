@@ -70,6 +70,7 @@ export const Button = ({ startIcon, startContent, endIcon, children, disabled, v
     <Pressable
       {...props}
       style={{
+        width: style?.width,
         flex: style?.flex,
         borderRadius: isRounded ? 99 : undefined,
         alignSelf: defaultAlign === "stretch" ? 'stretch' :

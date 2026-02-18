@@ -12,6 +12,7 @@ const OUTFIT_SIZES_ARGS = v.union(v.literal("TIGHT"), v.literal("DEFAULT"), v.li
 
 export const authed = authAction({
   args: {
+    generationId: v.optional(v.id("generations")),
     presetId: v.id("presets"),
     outfit: v.optional(v.object({
       _id: v.id("outfits"),
@@ -59,16 +60,23 @@ export const authed = authAction({
       prompt: shrinkedPrompt,
     })));
 
-    const generationId = await ctx.runMutation(internal.router.generations.createOne._internal, {
-      userId: ctx.userId,
-      extraUserIds: subjects.map(s => s.userId),
-      predictionIds: predictions.map(p => p.id),
-      preset: {
-        presetId: preset._id,
-        outfitId: args.outfit?._id,
-        prompts: [JSON.stringify(schema.prompt), prompt],
-      }
-    })
+    const generationId = args.generationId ?
+      // Add new predictions to existing generation (for multi-step photoshoot)
+      await ctx.runMutation(internal.router.generations.newPredictions._internal, {
+        generationId: args.generationId,
+        predictionIds: predictions.map(p => p.id),
+      }) :
+      // Create new generation
+      await ctx.runMutation(internal.router.generations.createOne._internal, {
+        userId: ctx.userId,
+        extraUserIds: subjects.map(s => s.userId),
+        predictionIds: predictions.map(p => p.id),
+        preset: {
+          presetId: preset._id,
+          outfitId: args.outfit?._id,
+          prompts: [JSON.stringify(schema.prompt), prompt],
+        }
+      })
 
     // 3. Update transaction with generationId (optional - for better tracking)
     await ctx.runMutation(internal.router.credits.deductCredits._internal, {
