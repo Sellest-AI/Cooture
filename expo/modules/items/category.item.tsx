@@ -14,7 +14,7 @@ import {
   Skirt,
   Sweater,
   Top,
-  TShirtIcon,
+  TShirt,
 } from "@ui/icons";
 import { ComponentProps } from "react";
 import { Categories } from "./categories";
@@ -30,7 +30,7 @@ const categories = [
   { icon: Accessory, value: 'ACCESSORY' as const },
   { icon: HoodieIcon, value: 'HOODIE' as const },
   { icon: Sweater, value: 'SWEATER' as const },
-  { icon: TShirtIcon, value: 'TSHIRT' as const },
+  { icon: TShirt, value: 'TSHIRT' as const },
   { icon: Jeans, value: 'JEANS' as const },
   { icon: Skirt, value: 'SKIRT' as const },
   { icon: Hat, value: 'HAT' as const },

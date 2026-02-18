@@ -12,7 +12,7 @@ export { LogoLoading } from './logo-loading';
 // Category Icons
 export {
   WatchIcon as Accessory, HandbagIcon as Bag, PantsIcon as Bottom, BaseballCapIcon as Cap, CoatHangerIcon as Coat, DressIcon, EyeglassesIcon as Glasses,
-  BaseballCapIcon as Hat, HoodieIcon, CoatHangerIcon as Jacket, PantsIcon as Jeans, CoatHangerIcon as Outerwear, Pants, SneakerIcon as Shoes, DressIcon as Skirt, HoodieIcon as Sweater, CoatHangerIcon as Top, TShirtIcon
+  BaseballCapIcon as Hat, HoodieIcon, CoatHangerIcon as Jacket, PantsIcon as Jeans, CoatHangerIcon as Outerwear, Pants, SneakerIcon as Shoes, DressIcon as Skirt, HoodieIcon as Sweater, CoatHangerIcon as Top
 } from 'phosphor-react-native';
 
 // Weather Icons
@@ -38,10 +38,9 @@ export {
 
 // General Icons
 export {
-  ArrowLeft, ArrowRight, ArrowUpRight, Bell, Camera, Check, ChevronRight, CircleFadingArrowUp, Clock9,
-  Compass, Download, ExternalLink, EyeClosed, Feather, Flame, Gift, Globe, Home, ImageIcon, ImageUp, LinkIcon,
+  ArrowLeft, ArrowRight, ArrowUpRight, Bell, Camera, Check, ChevronRight, CircleFadingArrowUp, Clock9, Compass, Download, ExternalLink, EyeClosed, Feather, Flame, Gift, Globe, Home, ImageIcon, ImageUp, LinkIcon,
   Lock, Package, Palette, Pause, Pencil, Play, Plus, Puzzle, Rewind, ScanLine, Search, Settings, Shapes, ShareIcon,
-  SkipBack, SkipForward, Smile, Snowflake, Star, Sun, Tags, Trash, User, UserRoundCheck, UserRoundPlus, X
+  SkipBack, SkipForward, Smile, Snowflake, Star, Sun, Tags, Trash, Shirt as TShirt, User, UserRoundCheck, UserRoundPlus, X
 } from 'lucide-react-native';
 
 // General Icons

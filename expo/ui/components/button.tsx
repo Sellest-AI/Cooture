@@ -70,6 +70,7 @@ export const Button = ({ startIcon, startContent, endIcon, children, disabled, v
     <Pressable
       {...props}
       style={{
+        flex: style?.flex,
         borderRadius: isRounded ? 99 : undefined,
         alignSelf: defaultAlign === "stretch" ? 'stretch' :
           defaultAlign === "center" ? 'center' :
@@ -89,6 +90,7 @@ export const Button = ({ startIcon, startContent, endIcon, children, disabled, v
           style={{
             borderRadius: isRounded ? 99 : 18,
             ...style,
+            flex: undefined,
           }}
         >
           <View

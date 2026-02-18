@@ -4,7 +4,7 @@ import { EmptyBlock } from "@ui/block.empty";
 import { LoadingBlock } from "@ui/block.loading";
 import { CardItem } from "@ui/cards/card-item";
 import { FlashList } from "@ui/flat-list";
-import { TShirtIcon } from "@ui/icons";
+import { TShirt } from "@ui/icons";
 import { router } from "expo-router";
 import { View } from "react-native";
 import { ROUTES } from "routes";
@@ -24,7 +24,7 @@ export function Screen() {
       <EmptyBlock
         variant="secondary"
         style={{ paddingVertical: 72 }}
-        icon={TShirtIcon}
+        icon={TShirt}
         title="No Items Yet"
         description="You haven't added any items yet. Start scanning to see your items here."
         cta={isOwnProfile && {

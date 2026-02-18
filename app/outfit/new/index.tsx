@@ -92,9 +92,7 @@ export default function Screen() {
               borderTopColor: Colors.secondary[200],
               backgroundColor: Colors.secondary[500],
             }}
-            disabled
-            animated={false}
-            onPress={() => { replace(ROUTES.SCAN); }}
+            onPress={() => { replace(ROUTES.OUTFIT.BROWSER); }}
           >
             <Globe size={40} color={Colors.secondary[900]} />
             <Text.Lg color={Colors.secondary[900]} style={{ textAlign: 'center', marginBottom: 4 }}>
