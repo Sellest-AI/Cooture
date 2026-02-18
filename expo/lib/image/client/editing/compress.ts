@@ -1,13 +1,14 @@
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { Platform } from 'react-native';
-import { uriToImage } from '../base64/uri-to-file';
+import { urlToImage } from '../base64/url-to-file';
 
 const convertUrl = async (url: string) => {
-  const file = await uriToImage(url);
+  // Local URI - process directly
+  const file = await urlToImage(url);
   return file;
 }
 
-type File = Awaited<ReturnType<typeof uriToImage>>;
+type File = Awaited<ReturnType<typeof urlToImage>>;
 
 type Options = {
   progress?: (progress: number) => void,

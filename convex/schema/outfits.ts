@@ -15,4 +15,6 @@ export const outfits = defineTable({
 export const outfitItems = defineTable({
   outfitId: v.id("outfits"),
   itemId: v.id("items"),
-}).index("by_outfit_id", ["outfitId"]);
+})
+  .index("by_item_id", ["itemId"])
+  .index("by_outfit_id", ["outfitId"]);

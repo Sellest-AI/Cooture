@@ -9,6 +9,13 @@ export const authed = authAction({
     base64: v.optional(v.string()),
     url: v.optional(v.string()),
     nextStep: v.union(v.literal('SAVE_IMAGE'), v.literal('CREATE_ITEM')),
+    nextArgs: v.optional(v.object({
+      CREATE_ITEM: v.optional(v.object({
+        name: v.optional(v.string()),
+        description: v.optional(v.string()),
+        itemUrl: v.optional(v.string()),
+      })),
+    }))
   },
   handler: async (ctx, args) => {
     // If we have a base64 image, check if it has an alpha channel before starting the remove background task
@@ -31,6 +38,7 @@ export const authed = authAction({
       callback: {
         userId: ctx.userId,
         nextStep: args.nextStep,
+        nextArgs: args.nextArgs,
       }
     })
 

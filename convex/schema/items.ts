@@ -77,6 +77,7 @@ export const ITEMS_SCHEMA = {
   materials: v.array(ITEM_MATERIALS),
   gender: ITEM_GENDERS,
   contentRating: CONTENT_RATINGS,
+  link: v.optional(v.string()),
 }
 
 export const items = defineTable({

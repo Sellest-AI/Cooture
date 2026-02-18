@@ -1,4 +1,4 @@
-import { retryPromise } from "@shared/utils";
+import { notEmpty, retryPromise } from "@shared/utils";
 import { z } from "zod";
 import { defaultAgent } from "../agents/default";
 import { models } from "../config";
@@ -35,7 +35,11 @@ export const itemCategorizer = createTool({
   description: "Extracts item information from a given image.",
   args: z.object({
     imageUrl: z.string(),
-    extractText: z.optional(z.boolean().default(false))
+    extractText: z.optional(z.boolean().default(false)),
+    metadata: z.optional(z.object({
+      name: z.optional(z.string()),
+      description: z.optional(z.string()),
+    })),
   }),
   handler: async (ctx, args) => {
     const schema = z.object({
@@ -90,12 +94,17 @@ export const itemCategorizer = createTool({
           {
             role: 'user',
             content: [
-              { type: 'image', image: args.imageUrl },
+              { type: 'image' as const, image: args.imageUrl },
+              args.metadata ? {
+                type: 'text' as const,
+                text: `The following metadata has been extracted: ${JSON.stringify(args.metadata)}.
+Use this information to help you analyze the item, but do not include it in the final output if it doesn't match the visual characteristics of the item. If there is a conflict between the metadata and the image, prioritize the visual analysis.`
+              } : undefined,
               {
-                type: 'text',
+                type: 'text' as const,
                 text: 'Analyze this clothing item and provide detailed classification information. IMPORTANT: Use ONLY the exact category values from the schema. If unsure, pick the closest general category.'
               }
-            ]
+            ].filter(notEmpty)
           }
         ],
         output: "object",

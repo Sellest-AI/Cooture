@@ -1,5 +1,7 @@
 import { useRoute, useRouter } from "@/hooks";
-import { Id } from "@/lib/convex/api";
+import { api, Id } from "@/lib/convex/api";
+import { useAccount } from "@/lib/convex/auth";
+import { useMutation } from "@/lib/convex/client";
 import { useItem } from "@/modules/items/_hooks/useItem";
 import { ColorCategory } from "@/modules/items/category.color";
 import { FeelCategory } from "@/modules/items/category.feel";
@@ -15,6 +17,7 @@ import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
+import { useState } from "react";
 import { Platform, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
@@ -52,6 +55,32 @@ const ColorsBlock = () => {
         ))}
       </View>
     </Block>
+  )
+}
+
+const DeleteOutfitButton = () => {
+  const [disabled, setDisabled] = useState(false);
+
+  const { user } = useAccount();
+  const { item } = useItem();
+
+  const { dismissTo } = useRouter('/item/[id]');
+  const { mutate } = useMutation(api.router.items.deleteOne.authed);
+
+  if (!item || item.userId !== user?._id) return null;
+
+  return (
+    <Button
+      variant="destructive"
+      disabled={disabled}
+      onLongPress={async () => {
+        const { success } = await mutate({ itemId: item._id });
+        if (success) dismissTo(ROUTES.PROFILE.ITEMS);
+        else setDisabled(true);
+      }}
+    >
+      Long press to delete
+    </Button>
   )
 }
 
@@ -152,6 +181,7 @@ export default function ItemScreen() {
               <FeelCategory title={item.materialFeel} onPress={(materialFeel) => update({ materialFeel })} />
               <GenderCategory title={item.gender} onPress={(gender) => update({ gender })} />
             </View>
+            <DeleteOutfitButton />
           </View>
         </ParallaxScrollView>
         <View style={{

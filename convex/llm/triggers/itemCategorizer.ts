@@ -10,8 +10,12 @@ export const _internal = internalAction({
     userId: v.id("users"),
     imageId: v.id("images"),
     extractText: v.optional(v.boolean()),
+    metadata: v.optional(v.object({
+      name: v.optional(v.string()),
+      description: v.optional(v.string()),
+    })),
   },
-  handler: async (ctx, { imageId, userId, extractText }) => {
+  handler: async (ctx, { imageId, userId, extractText, metadata }) => {
     const image = await ctx.runQuery(internal.router.storage.images.getOne._internal, { id: imageId });
     if (!image) { throw new Error("Image not found"); }
 
@@ -26,7 +30,7 @@ export const _internal = internalAction({
       userId: userId,
     }
 
-    const object = await itemCategorizer.handler(toolCtx, { imageUrl: image.url, extractText });
+    const object = await itemCategorizer.handler(toolCtx, { imageUrl: image.url, extractText, metadata });
     const colors = await extractMainColors(image.url)
 
     return {

@@ -1,4 +1,4 @@
-import { File } from 'expo-file-system';
+import { File, Paths } from "expo-file-system";
 import { getImageDimensions } from '../metadata';
 
 const randomId = () => Math.random().toString(36).slice(2, 12);
@@ -56,7 +56,7 @@ function getMimeType(uri: string) {
  * @param {string} uri - local file URI (from ImagePicker, DocumentPicker, etc.)
  * @returns {Promise<object>} File-like object
  */
-export async function uriToImage(uri: string) {
+async function uriToImage(uri: string) {
   // 1️⃣ Get file info
   const _file = new File(uri);
   const fileInfo = _file.info();
@@ -82,11 +82,12 @@ export async function uriToImage(uri: string) {
     format: getExtensionFromMimeType(type),
     width,
     height,
-    // Optional: convert to Blob if needed
     toBase64: async () => {
       const base64 = await (new File(uri)).base64();
-      return base64;
+      const base64WithHeader = `data:${type};base64,${base64}`;
+      return base64WithHeader;
     },
+    // Optional: convert to Blob if needed
     toBlob: async () => {
       const base64 = await (new File(uri)).base64();
       const byteArray = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
@@ -95,4 +96,16 @@ export async function uriToImage(uri: string) {
   };
 
   return file;
+}
+
+export const urlToImage = async (url: string) => {
+  // Check if URL is external (http/https)
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    // Download to cache directory with unique filename
+    const downloadedFile = await File.downloadFileAsync(url, Paths.cache, { idempotent: true });
+    const file = await uriToImage(downloadedFile.uri);
+    return file;
+  }
+
+  return await uriToImage(url);
 }

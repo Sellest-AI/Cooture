@@ -5,6 +5,11 @@ import { ActionCtx } from "../../procedures";
 type Args = {
   imageId: Id<"images">;
   userId: Id<"users">;
+  metadata?: {
+    name?: string;
+    description?: string;
+    itemUrl?: string;
+  }
 }
 
 export const createItem = async (ctx: ActionCtx, data: Args): Promise<Id<"items">> => {
@@ -12,6 +17,10 @@ export const createItem = async (ctx: ActionCtx, data: Args): Promise<Id<"items"
     imageId: data.imageId,
     userId: data.userId,
     extractText: true,
+    metadata: data.metadata ? {
+      name: data.metadata.name,
+      description: data.metadata.description,
+    } : undefined,
   })
 
   const item = await ctx.runMutation(internal.router.items.createOne._internal_mutation, {
@@ -21,6 +30,7 @@ export const createItem = async (ctx: ActionCtx, data: Args): Promise<Id<"items"
     description: schema.description || undefined,
     mainColors: schema.mainColors,
     imageId: data.imageId,
+    link: data.metadata?.itemUrl,
   });
 
   return item;

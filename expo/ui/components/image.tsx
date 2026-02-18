@@ -2,6 +2,8 @@ import { Image as ExpoImage, ImageProps as ExpoImageProps } from 'expo-image';
 import React, { forwardRef, useEffect, useRef } from 'react';
 import { Animated } from 'react-native';
 
+export const prefetch = ExpoImage.prefetch;
+
 // Animated wrapper around `expo-image` that fades in when the image loads.
 export const Image = forwardRef<any, ImageProps>((props, ref) => {
   const { onLoad, style, ...rest } = props;
@@ -58,7 +60,7 @@ type ImageSize = {
 }
 
 export type ImageObject = ImageSize & {
-  sizes: {
+  sizes?: {
     thumbnail: ImageSize;
     small: ImageSize;
     medium: ImageSize;

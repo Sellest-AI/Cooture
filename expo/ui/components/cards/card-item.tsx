@@ -78,7 +78,7 @@ export const CardItem = ({ title, subtitle, selected, disabled, badge, style, so
       onPressOut={handlePressOut}
       onPress={(e) => { onPress?.(e); }}
       onLongPress={(e) => { onLongPress?.(e); }}
-      style={{ flex: 1 }}
+      style={{ flex: 1, opacity: style?.opacity }}
     >
       <Animated.View
         onLayout={(e: LayoutChangeEvent) => {

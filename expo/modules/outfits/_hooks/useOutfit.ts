@@ -36,7 +36,6 @@ export const useOutfit = (_id?: Id<'outfits'> | null) => {
   }
 }
 
-
 const nameAtom = atom('');
 const itemsAtom = atom<Id<'items'>[]>([]);
 const useNewOutfit = () => {

@@ -1,13 +1,11 @@
 import { Platform } from 'react-native';
 
 // reuse your existing web download implementation
-import { uriToImage } from './base64/uri-to-file';
 import { download as webDownload } from './download.web';
 
 export async function downloadImageCrossPlatform(source: string) {
   if (Platform.OS === 'web') {
-    const asset = await uriToImage(source);
-    return webDownload(asset.uri);
+    return webDownload(source);
   }
 
   const { File, Paths } = await import('expo-file-system');

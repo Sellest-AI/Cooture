@@ -111,10 +111,12 @@ import type * as router_generations_getPaginated from "../router/generations/get
 import type * as router_generations_getUser from "../router/generations/getUser.js";
 import type * as router_generations_updatePrediction from "../router/generations/updatePrediction.js";
 import type * as router_items_createOne from "../router/items/createOne.js";
+import type * as router_items_deleteOne from "../router/items/deleteOne.js";
 import type * as router_items_editOne from "../router/items/editOne.js";
 import type * as router_items_getAll from "../router/items/getAll.js";
 import type * as router_items_getMany from "../router/items/getMany.js";
 import type * as router_items_getOne from "../router/items/getOne.js";
+import type * as router_items_getPaginated from "../router/items/getPaginated.js";
 import type * as router_likes_getLiked from "../router/likes/getLiked.js";
 import type * as router_likes_getLikes from "../router/likes/getLikes.js";
 import type * as router_likes_toggleLike from "../router/likes/toggleLike.js";
@@ -291,10 +293,12 @@ declare const fullApi: ApiFromModules<{
   "router/generations/getUser": typeof router_generations_getUser;
   "router/generations/updatePrediction": typeof router_generations_updatePrediction;
   "router/items/createOne": typeof router_items_createOne;
+  "router/items/deleteOne": typeof router_items_deleteOne;
   "router/items/editOne": typeof router_items_editOne;
   "router/items/getAll": typeof router_items_getAll;
   "router/items/getMany": typeof router_items_getMany;
   "router/items/getOne": typeof router_items_getOne;
+  "router/items/getPaginated": typeof router_items_getPaginated;
   "router/likes/getLiked": typeof router_likes_getLiked;
   "router/likes/getLikes": typeof router_likes_getLikes;
   "router/likes/toggleLike": typeof router_likes_toggleLike;

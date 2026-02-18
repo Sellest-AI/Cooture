@@ -12,7 +12,7 @@ export const getOutfit = async (ctx: QueryCtx, _outfit: Outfit) => {
     .withIndex('by_outfit_id', q => q.eq('outfitId', outfit._id)).collect();
 
   const coverId = outfit.coverId ??
-    await ctx.db.get(items[0].itemId).then(item => item?.imageId);
+    (items[0] ? await ctx.db.get(items[0]?.itemId).then(item => item?.imageId) : undefined);
 
   if (!coverId) return null;
   const image = await getImage(ctx, coverId);

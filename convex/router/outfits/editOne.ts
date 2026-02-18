@@ -1,3 +1,4 @@
+import { removeUndefinedKeys } from "@shared/utils";
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { ContentRating, isOutfitNFSW } from "../../functions/outfits";
@@ -35,11 +36,11 @@ export const authed = authMutation({
     }
 
     if (!!args.name) {
-      await ctx.db.patch(args.outfitId, {
+      await ctx.db.patch(args.outfitId, removeUndefinedKeys({
         name: args.name,
         updatedAt: Date.now(),
         contentRating
-      })
+      }))
     }
 
     return true;
