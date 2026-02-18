@@ -276,9 +276,10 @@ export default function Screen() {
 
             let cancel = false;
             const timer = setTimeout(() => {
-              push(ROUTES.PHOTOSHOOT.GENERATIONS.NEXT);
+              if (!outfitId) return;
+              dismissTo(ROUTES.PHOTOSHOOT.GENERATIONS.NEXT);
               cancel = true;
-            }, 1000);
+            }, 500);
 
             const generationId = await action({
               presetId: presetId,
