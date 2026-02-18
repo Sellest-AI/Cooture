@@ -93,8 +93,8 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: SubjectExt
     };
     if (top?.description?.includes('dress')) return undefined;
     return {
-      type: 'Blue jeans',
-      details: 'Classic blue straight denim jeans',
+      type: 'Jeans',
+      details: 'Classic straight denim jeans',
     }
   })()
 
@@ -113,8 +113,8 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: SubjectExt
       details: buildDetails(top),
       reference: references.find((r) => r.type === 'TOP')?.text,
     } : {
-      type: 'White t-shirt',
-      details: 'A plain white cotton t-shirt',
+      type: 'T-shirt',
+      details: 'A cotton t-shirt',
     },
     bottom: bottomObject,
     innerLayer: innerLayer ? buildDetails(innerLayer) : undefined,
