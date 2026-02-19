@@ -3,7 +3,6 @@ import { Block } from "@ui/block";
 import { Button, BUTTON_HEIGHT } from "@ui/button";
 import { Copy, LogoLoading } from "@ui/icons";
 import { ModalHeader } from "@ui/modal";
-import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import { setStringAsync } from 'expo-clipboard';
 import { router } from "expo-router";
@@ -72,8 +71,7 @@ export default function Screen() {
     </View>
 
   return (
-    <SafeAreaView
-      edges={{ top: 'off' }}
+    <View
       style={{
         flex: 1,
         padding: 12,
@@ -103,6 +101,6 @@ export default function Screen() {
       >
         Close
       </Button>
-    </SafeAreaView>
+    </View>
   )
 }

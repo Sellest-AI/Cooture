@@ -137,7 +137,8 @@ export default function Screen() {
           </Text.Max>
         </View>
       </SafeAreaView>
-      <View
+      <SafeAreaView
+        edges={{ top: 'off' }}
         className="relative w-full"
         style={{
           maxWidth: 456,
@@ -173,7 +174,7 @@ export default function Screen() {
           Create your outfits and turn yourself into a professional model.
         </Text.H4>
         <LoginButtons />
-      </View>
+      </SafeAreaView>
     </View>
   );
 }
