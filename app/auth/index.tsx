@@ -1,0 +1,179 @@
+import { ROUTES } from '@/hooks';
+import { useAuthActions } from '@/lib/convex/auth';
+import { Button } from '@ui/button';
+import { Image } from '@ui/image';
+import { LinearGradient } from '@ui/linear-gradient';
+import { SafeAreaView } from '@ui/safe-area-view';
+import { Text } from '@ui/text';
+import { useEffect, useRef, useState } from 'react';
+import { Animated, Platform, View } from 'react-native';
+import { Colors } from 'theme';
+
+const BackgroundImage = () => {
+  const fadeAnim = useRef(new Animated.Value(0.6));
+
+  useEffect(() => {
+    Animated.timing(fadeAnim.current, {
+      toValue: 1,
+      duration: 2000,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  return (
+    <Animated.View
+      style={{
+        top: 0,
+        left: 0,
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        opacity: fadeAnim.current,
+      }}
+    >
+      <Image
+        source={require('assets/placeholders/home-model.png')}
+        contentFit="cover"
+        style={{
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          opacity: 0.9,
+        }}
+      />
+      <LinearGradient
+        colors={['rgba(0, 0, 0, 0.6)', 'transparent']}
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: 0,
+          height: '50%'
+        }}
+      />
+      <LinearGradient
+        colors={['transparent', 'rgba(0, 0, 0, 0.8)', 'rgba(0, 0, 0, 0.8)']}
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: '50%'
+        }}
+      />
+    </Animated.View>
+  )
+}
+
+const LoginButtons = () => {
+  const [init, setInit] = useState(false);
+  useEffect(() => { setTimeout(() => setInit(true), 500) }, [])
+
+  const { isLoading, signInGoogle } = useAuthActions();
+  const [innerLoading, setInnerLoading] = useState<"google" | "apple" | null>(null);
+
+  const disableRuntime = isLoading || innerLoading !== null;
+
+  const list: ("google" | "apple")[]
+    = Platform.OS === "ios" ? ["apple", "google"] : ["google", "apple"];
+
+  return (
+    <>
+      {list.map(((item, i) => {
+        return (
+          <Button
+            key={item}
+            isLoading={innerLoading === item}
+            disabled={disableRuntime || !init}
+            style={{
+              alignSelf: 'stretch',
+              backgroundColor: i === 0 ? undefined : "white",
+              marginTop: 8
+            }}
+            variant={i === 0 ? "primary" : "ghost"}
+            onPress={async () => {
+              setInnerLoading(item);
+              const success = await signInGoogle(ROUTES.WELCOME.INDEX);
+              if (!success) setInnerLoading(null);
+            }}
+            startContent={
+              <Image
+                style={{ width: 20, height: 20 }}
+                contentFit='contain'
+                source={item === "apple" ? require('assets/logos/apple.webp') :
+                  require('assets/logos/google.webp')}
+              />
+            }
+          >
+            <Text.Base style={{ color: "black" }} weight={600}>
+              Sign in with {item.slice(0, 1).toUpperCase() + item.slice(1)}
+            </Text.Base>
+          </Button>
+        )
+      }))}
+    </>
+  )
+}
+
+export default function Screen() {
+  return (
+    <View style={{ flex: 1 }}>
+      <BackgroundImage />
+      <SafeAreaView
+        edges={{ bottom: 'off' }}
+        style={{
+          alignItems: 'center',
+          marginTop: 24,
+        }}
+      >
+        <View>
+          <Text.Max
+            style={{ color: Colors.primary[700], position: 'absolute', marginTop: 4 }}
+          >
+            Cooture
+          </Text.Max>
+          <Text.Max style={{ color: Colors.primary[500], position: 'relative' }}>
+            Cooture
+          </Text.Max>
+        </View>
+      </SafeAreaView>
+      <View
+        className="relative w-full"
+        style={{
+          maxWidth: 456,
+          padding: 8,
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          flex: 1,
+        }}
+      >
+        <Text.H1
+          style={{
+            marginInline: 'auto',
+            textBalance: true,
+            textAlign: 'center',
+            color: Colors.foreground,
+            marginBottom: 24,
+            maxWidth: 280
+          }}
+        >
+          The Future of Digital Influencers
+        </Text.H1>
+        <Text.H4
+          style={{
+            textBalance: true,
+            textAlign: 'center',
+            color: Colors.neutral[200],
+            maxWidth: 280,
+            marginInline: 'auto',
+            marginBottom: 40,
+          }}
+        >
+          Create your outfits and turn yourself into a professional model.
+        </Text.H4>
+        <LoginButtons />
+      </View>
+    </View>
+  );
+}

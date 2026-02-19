@@ -39,6 +39,8 @@ import type * as functions_subscriptions_isSubscriptionActive from "../functions
 import type * as functions_users_getAccount from "../functions/users/getAccount.js";
 import type * as functions_users_getPortraits from "../functions/users/getPortraits.js";
 import type * as functions_users_index from "../functions/users/index.js";
+import type * as functions_waitlist_index from "../functions/waitlist/index.js";
+import type * as functions_waitlist_updateWaitlist from "../functions/waitlist/updateWaitlist.js";
 import type * as http from "../http.js";
 import type * as http_replicate from "../http/replicate.js";
 import type * as http_runpod from "../http/runpod.js";
@@ -85,8 +87,8 @@ import type * as llm_utils_sanitizeAiText from "../llm/utils/sanitizeAiText.js";
 import type * as llm_utils_usageHandler from "../llm/utils/usageHandler.js";
 import type * as migrations from "../migrations.js";
 import type * as procedures from "../procedures.js";
-import type * as router_admin_generateOutfitsCover from "../router/admin/generateOutfitsCover.js";
-import type * as router_admin_repairPreset from "../router/admin/repairPreset.js";
+import type * as router_admin_outfits_regenerateCovers from "../router/admin/outfits/regenerateCovers.js";
+import type * as router_admin_presets_repairOne from "../router/admin/presets/repairOne.js";
 import type * as router_auth_linkStripeSubscription from "../router/auth/linkStripeSubscription.js";
 import type * as router_auth_postCreateOrUpdate from "../router/auth/postCreateOrUpdate.js";
 import type * as router_collection_getBookmarked from "../router/collection/getBookmarked.js";
@@ -168,6 +170,10 @@ import type * as router_users_getAppearance from "../router/users/getAppearance.
 import type * as router_users_getFromStripeId from "../router/users/getFromStripeId.js";
 import type * as router_users_getRelated from "../router/users/getRelated.js";
 import type * as router_users_upsertAppearance from "../router/users/upsertAppearance.js";
+import type * as router_waitlist_enterCode from "../router/waitlist/enterCode.js";
+import type * as router_waitlist_generateCodes from "../router/waitlist/generateCodes.js";
+import type * as router_waitlist_getCodes from "../router/waitlist/getCodes.js";
+import type * as router_waitlist_getStatistics from "../router/waitlist/getStatistics.js";
 import type * as schema_auth from "../schema/auth.js";
 import type * as schema_collection from "../schema/collection.js";
 import type * as schema_constants from "../schema/constants.js";
@@ -182,6 +188,7 @@ import type * as schema_presets from "../schema/presets.js";
 import type * as schema_quests from "../schema/quests.js";
 import type * as schema_subscriptions from "../schema/subscriptions.js";
 import type * as schema_users from "../schema/users.js";
+import type * as schema_waitlist from "../schema/waitlist.js";
 import type * as schema_wallets from "../schema/wallets.js";
 
 import type {
@@ -222,6 +229,8 @@ declare const fullApi: ApiFromModules<{
   "functions/users/getAccount": typeof functions_users_getAccount;
   "functions/users/getPortraits": typeof functions_users_getPortraits;
   "functions/users/index": typeof functions_users_index;
+  "functions/waitlist/index": typeof functions_waitlist_index;
+  "functions/waitlist/updateWaitlist": typeof functions_waitlist_updateWaitlist;
   http: typeof http;
   "http/replicate": typeof http_replicate;
   "http/runpod": typeof http_runpod;
@@ -268,8 +277,8 @@ declare const fullApi: ApiFromModules<{
   "llm/utils/usageHandler": typeof llm_utils_usageHandler;
   migrations: typeof migrations;
   procedures: typeof procedures;
-  "router/admin/generateOutfitsCover": typeof router_admin_generateOutfitsCover;
-  "router/admin/repairPreset": typeof router_admin_repairPreset;
+  "router/admin/outfits/regenerateCovers": typeof router_admin_outfits_regenerateCovers;
+  "router/admin/presets/repairOne": typeof router_admin_presets_repairOne;
   "router/auth/linkStripeSubscription": typeof router_auth_linkStripeSubscription;
   "router/auth/postCreateOrUpdate": typeof router_auth_postCreateOrUpdate;
   "router/collection/getBookmarked": typeof router_collection_getBookmarked;
@@ -351,6 +360,10 @@ declare const fullApi: ApiFromModules<{
   "router/users/getFromStripeId": typeof router_users_getFromStripeId;
   "router/users/getRelated": typeof router_users_getRelated;
   "router/users/upsertAppearance": typeof router_users_upsertAppearance;
+  "router/waitlist/enterCode": typeof router_waitlist_enterCode;
+  "router/waitlist/generateCodes": typeof router_waitlist_generateCodes;
+  "router/waitlist/getCodes": typeof router_waitlist_getCodes;
+  "router/waitlist/getStatistics": typeof router_waitlist_getStatistics;
   "schema/auth": typeof schema_auth;
   "schema/collection": typeof schema_collection;
   "schema/constants": typeof schema_constants;
@@ -365,6 +378,7 @@ declare const fullApi: ApiFromModules<{
   "schema/quests": typeof schema_quests;
   "schema/subscriptions": typeof schema_subscriptions;
   "schema/users": typeof schema_users;
+  "schema/waitlist": typeof schema_waitlist;
   "schema/wallets": typeof schema_wallets;
 }>;
 

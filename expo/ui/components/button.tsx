@@ -7,11 +7,13 @@ import { Text } from './text';
 
 export const BUTTON_HEIGHT = 56;
 
+type IconStyle = ViewStyle & { strokeWidth?: number }
+
 type Props = {
   children?: React.ReactNode;
   startContent?: React.ReactNode;
-  startIcon?: React.ComponentType<{ size?: number, color?: string, style?: ViewStyle }> | false;
-  endIcon?: React.ComponentType<{ size?: number, color?: string, style?: ViewStyle }> | false;
+  startIcon?: React.ComponentType<{ size?: number, color?: string, style?: IconStyle }> | false;
+  endIcon?: React.ComponentType<{ size?: number, color?: string, style?: IconStyle }> | false;
   disabled?: boolean;
   href?: Parameters<ReturnType<typeof useRouter>['push']>[0];
   size?: "rounded",

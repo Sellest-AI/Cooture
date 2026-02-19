@@ -29,7 +29,7 @@ export default function Screen() {
     if (!item.id) return null;
     if (index % 6 === 0 && index > 0) {
       return (<>
-        <PremiumBlock />
+        <PremiumBlock style={{ marginHorizontal: 12 }} />
         <GenerationPost
           id={item.id}
           style={{ marginTop: 28, marginBottom: 28 }}

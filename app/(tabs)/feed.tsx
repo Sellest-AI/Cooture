@@ -2,9 +2,9 @@ import { useFeed } from "@/modules/feed/_hooks";
 import { GenerationPost } from "@/modules/feed/post.generation";
 import { OutfitPost } from "@/modules/feed/post.outfit";
 import { CreditsButton } from "@/modules/premium/credits.button";
-import { PremiumBlock } from "@/modules/premium/premium-block";
 import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
+import { WaitlistBlock } from "@/modules/waitlist/walitlist-block";
 import { Post } from "@ui/cards";
 import { FlashList } from "@ui/flat-list";
 import { ModalHeader } from "@ui/modal";
@@ -50,7 +50,7 @@ export default function Screen() {
               backgroundColor: Colors.background,
             }}
           />
-          <PremiumBlock
+          <WaitlistBlock
             style={{ marginBottom: 24, marginHorizontal: 12 }}
           />
         </>}

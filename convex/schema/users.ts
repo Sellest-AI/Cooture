@@ -12,6 +12,7 @@ const accountStatus = v.union(
   v.literal("INACTIVE"),
   v.literal("FLAGGED"),
   v.literal("SUSPENDED"),
+  v.literal("WAITLIST"),
 );
 
 export const userSizes = v.union(

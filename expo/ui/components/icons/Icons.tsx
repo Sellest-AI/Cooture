@@ -38,8 +38,8 @@ export {
 
 // General Icons
 export {
-  ArrowLeft, ArrowRight, ArrowUpRight, Bell, Camera, Check, ChevronRight, CircleFadingArrowUp, Clock9, Compass, Download, ExternalLink, EyeClosed, Feather, Flame, Gift, Globe, Home, ImageIcon, ImageUp, LinkIcon,
-  Lock, Package, Palette, Pause, Pencil, Play, Plus, Puzzle, Rewind, ScanLine, Search, Settings, Shapes, ShareIcon, SkipBack, SkipForward, Smile, Snowflake, Star, Sun, Tags, Trash, Shirt as TShirt, User, UserRoundCheck, UserRoundPlus, X
+  ArrowLeft, ArrowRight, ArrowUpRight, Bell, Camera, Check, ChevronRight, CircleFadingArrowUp, Clock9, Compass, Copy, Download, ExternalLink, EyeClosed, Feather, Flame, Gift, Globe, Home, ImageIcon, ImageUp, LinkIcon,
+  Lock, Package, Palette, Pause, Pencil, Play, Plus, Puzzle, QrCode, Rewind, ScanLine, Search, Settings, Shapes, ShareIcon, SkipBack, SkipForward, Smile, Snowflake, Star, Sun, Tags, Trash, Shirt as TShirt, User, UserRoundCheck, UserRoundPlus, Users, X
 } from 'lucide-react-native';
 
 // General Icons

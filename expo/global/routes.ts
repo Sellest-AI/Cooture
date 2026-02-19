@@ -71,10 +71,10 @@ export const ROUTES = {
     ITEMS: '/profile/items',
   },
   WELCOME: {
-    INDEX: '/welcome',
-    STEP_1: '/welcome/step-1',
+    INDEX: '/welcome/step-1',
     STEP_2: '/welcome/step-2',
     STEP_3: '/welcome/step-3',
+    WAIT_LIST: '/welcome/wait-list',
   },
   AUTH: '/auth',
   PRICING: '/pricing',

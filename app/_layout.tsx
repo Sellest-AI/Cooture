@@ -1,31 +1,16 @@
 import "@/global.css";
-import { useAccount } from "@/lib/convex/auth";
 import { StreakProvider } from "@/modules/credits/streak-provider";
 import { Providers } from '@/providers';
-import { Redirect, Slot, Stack, usePathname } from 'expo-router';
-import { ReactNode } from "react";
+import { AuthProvider } from "@/providers/auth";
+import { Slot, Stack } from 'expo-router';
 import { View } from "react-native";
-import { ROUTES } from "routes";
 import { Colors } from "theme";
-
-const Router = ({ children }: { children: ReactNode }) => {
-  const { isAuthenticated } = useAccount();
-  const pathname = usePathname();
-
-  if (!pathname.startsWith('/welcome'))
-    if (!isAuthenticated) return <Redirect href={ROUTES.WELCOME.INDEX} />
-
-  if (pathname.startsWith('/welcome'))
-    if (isAuthenticated) return <Redirect href={ROUTES.TABS.FEED} />
-
-  return children
-}
 
 export default function RootLayout() {
   return (
     <Providers>
-      <View style={{ flex: 1, backgroundColor: Colors.background }}>
-        <Router>
+      <AuthProvider>
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
           <StreakProvider>
             <Stack
               screenOptions={{
@@ -47,8 +32,8 @@ export default function RootLayout() {
               />
             </Stack>
           </StreakProvider>
-        </Router>
-      </View>
+        </View>
+      </AuthProvider>
     </Providers>
   );
 }

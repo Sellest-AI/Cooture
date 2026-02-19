@@ -15,6 +15,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { LayoutRectangle, PanResponder, Platform, ScrollView, View, ViewStyle } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
+import { WaitlistBlock } from "../waitlist/walitlist-block";
 import { FollowersFollowing } from "./followers-following";
 
 const TABS = ['generations', 'outfits', 'items'] as const;
@@ -206,6 +207,9 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
               )
             })}
           </Block>}
+          {isSelf && <WaitlistBlock
+            style={{ marginBottom: 24 }}
+          />}
           <StickyView
             topOffset={Platform.OS === 'web' ? -48 : -12}
             style={{ marginBottom: 24, marginTop: 16 }}

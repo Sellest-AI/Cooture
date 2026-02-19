@@ -15,9 +15,13 @@ export const LogoLoading = ({ style, size, variant = "primary" }: Props) => {
   const [init, setInit] = useState(false);
   const videoSource = variant === 'primary' ? videoSourcePrimary : videoSourceDark;
   const player = useVideoPlayer(videoSource, player => {
-    player.loop = true;
-    player.muted = true;
-    requestAnimationFrame(() => { player.play(); setInit(true); })
+    try {
+      player.loop = true;
+      player.muted = true;
+      requestAnimationFrame(() => {
+        try { player.play(); setInit(true); } catch { }
+      })
+    } catch { }
   });
 
   return (

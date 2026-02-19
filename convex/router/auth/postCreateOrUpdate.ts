@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { internalAction, internalMutation } from "../../_generated/server";
 import { createUserWallet } from "../../functions/credits";
+import { updateWaitlist } from "../../functions/waitlist";
 
 export const _private = internalMutation({
   args: { userId: v.id("users"), stripeCustomerId: v.string() },
@@ -18,12 +19,15 @@ export const _private = internalMutation({
         userId,
         canTakeFreeTrial: true,
         stripeCustomerId: stripeCustomerId,
-        accountStatus: "ACTIVE",
+        accountStatus: "WAITLIST",
         role: "USER"
       }),
 
       // Create user wallet with starting credits
       createUserWallet(ctx, userId),
+
+      // increment waitlist users count
+      updateWaitlist(ctx, { addUsers: 1 })
     ])
 
     return true;

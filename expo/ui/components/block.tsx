@@ -7,7 +7,7 @@ import { LinearGradient } from './linear-gradient';
 
 type Props = {
   className?: string;
-  variant: 'primary' | 'secondary' | 'blur' | 'destructive';
+  variant: 'primary' | 'secondary' | 'blur' | 'destructive' | 'ghost';
   style?: ViewStyle;
   children?: React.ReactNode;
   disabled?: boolean;
@@ -70,7 +70,10 @@ export const Block = ({ className = "", children, variant, style, disabled, blur
         borderTopWidth: disabled ? 0 : 1,
         borderLeftWidth: disabled ? 0 : 2,
         borderRadius: 18,
-      }, style]}
+      }, {
+        ...style,
+        backgroundColor: style?.backgroundColor ?? VariantColors.backgroundColor,
+      }]}
       className={cn(className)}
     >
       {showTopBorder && <LinearGradient

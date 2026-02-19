@@ -1,5 +1,5 @@
-import { internal } from "../../_generated/api";
-import { internalMutation } from "../../procedures";
+import { internal } from "../../../_generated/api";
+import { internalMutation } from "../../../procedures";
 
 export const _internal = internalMutation({
   handler: async (ctx) => {

@@ -2,7 +2,6 @@
 
 import { SplashScreen } from "expo-router";
 import { useEffect, useState } from "react";
-import { AuthProvider } from "./auth";
 import { FontsProvider } from "./fonts";
 
 SplashScreen.preventAutoHideAsync();
@@ -12,7 +11,7 @@ type Props = {
 }
 
 export const AsyncProviders = ({ children }: Props) => {
-  const [loadedLeft, setLoadedLeft] = useState(2);
+  const [loadedLeft, setLoadedLeft] = useState(1);
 
   useEffect(() => {
     if (loadedLeft <= 0) SplashScreen.hideAsync();
@@ -23,7 +22,6 @@ export const AsyncProviders = ({ children }: Props) => {
       {/* BLOCK RENDERING UNTIL ALL ASYNC TASKS ARE DONE */}
       {loadedLeft <= 0 ? children : null}
       <FontsProvider onComplete={() => setLoadedLeft((p) => p - 1)} />
-      <AuthProvider onComplete={() => setLoadedLeft((p) => p - 1)} />
       {/* <ThemeProvider /> */}
     </>
   )

@@ -1,7 +1,7 @@
 import { v } from "convex/values";
-import { internal } from "../../_generated/api";
-import { internalAction, internalMutation } from "../../_generated/server";
-import { PRESET_CATEGORIES, PRESET_PROMPT } from "../../schema/presets";
+import { internal } from "../../../_generated/api";
+import { internalAction, internalMutation } from "../../../_generated/server";
+import { PRESET_CATEGORIES, PRESET_PROMPT } from "../../../schema/presets";
 
 export const _internal = internalAction({
   args: {
@@ -18,7 +18,7 @@ export const _internal = internalAction({
       imageId: img
     })))
 
-    await ctx.runMutation(internal.router.admin.repairPreset._internal_mutation, {
+    await ctx.runMutation(internal.router.admin.presets.repairOne._internal_mutation, {
       presetId,
       prompts: prompts.map((p) => p.prompt),
       categories: prompts.flatMap(p => p.categories),

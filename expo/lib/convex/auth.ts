@@ -1,6 +1,7 @@
 import { useAuthToken, useAuthActions as useConvexAuthActions } from "@convex-dev/auth/react";
 import { makeRedirectUri } from "expo-auth-session";
 import { Href, router } from "expo-router";
+import { reloadAsync } from "expo-updates";
 import { openAuthSessionAsync } from "expo-web-browser";
 import { useCallback, useState } from "react";
 import { Platform } from "react-native";
@@ -26,7 +27,7 @@ export const useAuthActions = () => {
       const code = new URL(url).searchParams.get("code")!;
       await convex.signIn("google", { code });
 
-      if (route) router.replace(route);
+      if (route) router.dismissTo(route);
 
       // Don't auto redirect, the router will do it on its own
       // router.replace(route || ROUTES.TABS.DISCOVER);
@@ -40,15 +41,14 @@ export const useAuthActions = () => {
   }, [convex]);
 
   const signOut = useCallback(() => {
-    router.push(ROUTES.WELCOME.INDEX);
+    router.push(ROUTES.AUTH);
     setTimeout(() => {
       convex.signOut();
       // posthog.reset();
-      setTimeout(() => {
+      setTimeout(async () => {
         convexAuthStorage.clear();
         try {
-          router.replace(ROUTES.WELCOME.INDEX);
-          router.reload();
+          await reloadAsync();
         } catch { }
         // window.localStorage.clear();
         // window.location.reload();
@@ -78,12 +78,15 @@ export const useAccount = () => {
     "SUSPENDED" : user?.accountStatus ?? "INACTIVE";
   const isSuspended = accountStatus === "SUSPENDED";
 
+  const isInWaitlist = user?.accountStatus === "WAITLIST";
+
   return {
     user,
     isAuthenticated,
     isPremium,
     isAdmin,
-    isSuspended
+    isSuspended,
+    isInWaitlist
   };
 }
 
