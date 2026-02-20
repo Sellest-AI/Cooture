@@ -57,45 +57,56 @@ function getMimeType(uri: string) {
  * @returns {Promise<object>} File-like object
  */
 async function uriToImage(uri: string) {
-  // 1️⃣ Get file info
-  const _file = new File(uri);
-  const fileInfo = _file.info();
-  if (!fileInfo.exists) throw new Error('File does not exist');
+  try {
+    // 1️⃣ Get file info
+    const _file = new File(uri);
 
-  // 2️⃣ Get file name
-  const name = uri.split('/').pop() ?? randomId();
+    if (!_file) { throw new Error('File instance is null or undefined'); }
 
-  // 3️⃣ Detect MIME type
-  let type = getMimeType(uri) || 'application/octet-stream';
+    const fileInfo = _file.info();
+    if (!fileInfo.exists) throw new Error('File does not exist');
 
-  // 4️⃣ For images, get dimensions
-  const { width, height } = await getImageDimensions(uri);
+    // 2️⃣ Get file name
+    const name = uri.split('/').pop() ?? randomId();
 
-  if (!fileInfo.size) throw new Error('Could not determine file size');
+    // 3️⃣ Detect MIME type
+    let type = getMimeType(uri) || 'application/octet-stream';
 
-  // 5️⃣ Build the File-like object
-  const file = {
-    uri,
-    name,
-    type,
-    size: fileInfo.size,
-    format: getExtensionFromMimeType(type),
-    width,
-    height,
-    toBase64: async () => {
-      const base64 = await (new File(uri)).base64();
-      const base64WithHeader = `data:${type};base64,${base64}`;
-      return base64WithHeader;
-    },
-    // Optional: convert to Blob if needed
-    toBlob: async () => {
-      const base64 = await (new File(uri)).base64();
-      const byteArray = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-      return new Blob([byteArray], { type });
-    },
-  };
+    // 4️⃣ For images, get dimensions
+    const { width, height } = await getImageDimensions(uri);
 
-  return file;
+    if (!fileInfo.size) throw new Error('Could not determine file size');
+
+    // 5️⃣ Build the File-like object
+    const file = {
+      uri,
+      name,
+      type,
+      size: fileInfo.size,
+      format: getExtensionFromMimeType(type),
+      width,
+      height,
+      toBase64: async () => {
+        const fileInstance = new File(uri);
+        if (!fileInstance || typeof fileInstance.base64 !== 'function') {
+          throw new Error('File.base64 is not available');
+        }
+        const base64 = await fileInstance.base64();
+        const base64WithHeader = `data:${type};base64,${base64}`;
+        return base64WithHeader;
+      },
+      // Optional: convert to Blob if needed
+      toBlob: async () => {
+        const base64 = await (new File(uri)).base64();
+        const byteArray = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+        return new Blob([byteArray], { type });
+      },
+    };
+
+    return file;
+  } catch (error) {
+    throw error;
+  }
 }
 
 export const urlToImage = async (url: string) => {

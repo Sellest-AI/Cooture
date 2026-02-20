@@ -9,21 +9,14 @@ export const useUpload = () => {
   const uploadImage = async (uri: string) => {
     try {
       setLoading(true);
-      console.time('compressImage');
       const file = await compressImage(uri);
-      console.timeEnd('compressImage');
-      console.time('toBase64');
       const base64 = await file.toBase64();
-      console.timeEnd('toBase64');
-      console.time('uploadImageConvex');
       const imageId = await uploadImageConvex({
         base64,
         tags: ['IMAGE'],
       });
-      console.timeEnd('uploadImageConvex');
 
       return imageId;
-
     } finally {
       setLoading(false);
     }

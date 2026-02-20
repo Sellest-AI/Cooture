@@ -22,10 +22,15 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples }: Props) => {
   const cameraRef = useRef<CameraView>(null);
   const [hasPermission, setHasPermission] = useState(false);
   const [showCamera, setShowCamera] = useState(imageUri ? false : true);
+  const [internalImageUri, setInternalImageUri] = useState<string | undefined>(imageUri);
+  const isProcessingRef = useRef(false);
 
   useEffect(() => {
-    console.log("imageUri changed:", imageUri);
-    if (imageUri) { setShowCamera(false); }
+    // Only update internal state if not currently processing
+    if (!isProcessingRef.current) {
+      setInternalImageUri(imageUri);
+      if (imageUri) { setShowCamera(false); }
+    }
   }, [imageUri])
 
   if (!hasPermission) {
@@ -60,8 +65,8 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples }: Props) => {
             facing="front"
             flash="off"
           />}
-          {(imageUri && !showCamera) && <Image
-            source={imageUri}
+          {(internalImageUri && !showCamera) && <Image
+            source={internalImageUri}
             style={{ flex: 1, position: 'absolute', inset: 0 }}
           />}
         </View>
@@ -74,9 +79,19 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples }: Props) => {
           }}
           showBackButton={false}
           cameraRef={cameraRef}
-          onDelete={!showCamera ? () => setShowCamera(true) : undefined}
+          onDelete={!showCamera ? () => {
+            setShowCamera(true);
+            setInternalImageUri(undefined);
+          } : undefined}
           onCapture={async (photo) => {
-            await onCapture?.(photo.uri);
+            try {
+              isProcessingRef.current = true;
+              setInternalImageUri(photo.uri);
+              setShowCamera(false);
+              await onCapture?.(photo.uri);
+            } finally {
+              isProcessingRef.current = false;
+            }
           }}
         />
       </View>

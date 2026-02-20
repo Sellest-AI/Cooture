@@ -17,19 +17,20 @@ export default function Screen() {
       imageUri={sideImage ?? undefined}
       onCapture={async (photoUri) => {
         setSideImage(photoUri);
+
         if (!frontImage || !smileImage || !photoUri) return;
 
         const [_frontImage, _smileImage, _sideImage] = await Promise.all([
           uploadImage(frontImage),
           uploadImage(smileImage),
           uploadImage(photoUri)
-        ])
+        ]);
 
         await pushImagesToServer({
           frontImageId: _frontImage._id,
           smileImageId: _smileImage._id,
           sideImageId: _sideImage._id,
-        })
+        });
 
         push('/avatar/update-appearance', { forwardRedirect: true });
       }}
