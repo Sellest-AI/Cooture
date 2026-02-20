@@ -53,6 +53,12 @@ export const admin = adminAction({
           internal.router.storage.images.deleteOne._internal, { imageId: img._id });
       }
 
+      // Cleanup generated depth maps on failure
+      for (const dm of await depthMapPromises) {
+        await ctx.scheduler.runAfter(10000,
+          internal.router.storage.images.deleteOne._internal, { imageId: dm });
+      }
+
       return null;
     }
   }

@@ -28,6 +28,7 @@ EXAMPLE PROMPT STRUCTURE:
 
 Remember: The prompt should read like a professional photography brief, not a structured document.`;
 
+/** @deprecated It alters the original JSON details, so we don't use it for now. */
 export const photoshootPrompter = createTool({
   description: "Take a schema and return a detailed prompt for generating a photoshoot preset image that fits the schema.",
   args: z.object({

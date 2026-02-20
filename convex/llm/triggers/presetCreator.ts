@@ -1,4 +1,5 @@
 "use node"
+import { removeUndefinedKeys } from "@shared/utils";
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { Doc } from "../../_generated/dataModel";
@@ -6,11 +7,15 @@ import { internalAction } from "../../_generated/server";
 import { imageCategorizer } from "../tools/imageCategorizer";
 import { presetCreator } from "../tools/presetCreator";
 
+type Prompt = Awaited<ReturnType<typeof presetCreator.handler>>;
+type SanitizedPrompt = Omit<Prompt, 'contentRating'>;
+
 type Return = {
-  prompt: Awaited<ReturnType<typeof presetCreator.handler>>;
+  prompt: SanitizedPrompt;
   categories: Awaited<ReturnType<typeof imageCategorizer.handler>>[number]['name'][];
   contentRating: Awaited<ReturnType<typeof presetCreator.handler>>['contentRating'];
 }
+
 
 export const _internal = internalAction({
   args: {
@@ -46,7 +51,9 @@ export const _internal = internalAction({
 
       const contentRating = prompt.contentRating;
 
-      return { prompt, categories: uniqueCategories, contentRating };
+      const sanitizedPrompt = removeUndefinedKeys({ ...prompt, contentRating: undefined }) as SanitizedPrompt;
+
+      return { prompt: sanitizedPrompt, categories: uniqueCategories, contentRating };
 
     } catch {
       // Cleanup uploaded image on failure

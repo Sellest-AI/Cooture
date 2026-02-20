@@ -189,8 +189,8 @@ export const presetCreator = createTool({
   }),
   handler: async (ctx, args) => {
     const result = await defaultAgent.generateObject(ctx, { userId: ctx.userId }, {
-      providerOptions: models.vision.smartest.providerOptions({ effort: 'high' }),
-      model: models.vision.smartest.model,
+      providerOptions: models.vision.smart.providerOptions({ effort: 'max' }),
+      model: models.vision.smart.model,
       system: INSTRUCTIONS,
       prompt: [
         {

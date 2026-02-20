@@ -7,7 +7,7 @@ const openrouter = createOpenRouter({
 });
 
 // Perfect
-const gemini3pro = openrouter.chat("google/gemini-3-pro-preview");
+const gemini31pro = openrouter.chat("google/gemini-3-pro-preview");
 const gemini3flash = openrouter.chat("google/gemini-3-flash-preview");
 
 // Best Price / Performance balance
@@ -34,8 +34,8 @@ export const models = {
   },
   vision: {
     smartest: {
-      model: gemini3pro,
-      ...providerOptions.openrouter.gemini3pro,
+      model: gemini31pro,
+      ...providerOptions.openrouter.gemini31pro,
     },
     smart: {
       model: gemini3flash,

@@ -56,10 +56,10 @@ const openrouterGrok41fast = {
   }
 }
 
-const openrouterGemini3pro = {
+const openrouterGemini31pro = {
   pricing: {
-    inputTokens: 0.5,
-    outputTokens: 3,
+    inputTokens: 2,
+    outputTokens: 12,
   },
   providerOptions: (options: { effort: 'none' | 'medium' | "high" }) => ({
     openrouter: {
@@ -74,8 +74,8 @@ const openrouterGemini3pro = {
         effort: "medium"
       }),
       provider: {
-        only: ["google-ai-studio", "google-vertex"],
-        order: ["google-ai-studio", "google-vertex"],
+        only: ["google-vertex", "google-ai-studio"],
+        order: ["google-vertex", "google-ai-studio"],
         allow_fallbacks: true,
       }
     }
@@ -87,18 +87,21 @@ const openrouterGemini3flash = {
     inputTokens: 0.5,
     outputTokens: 3,
   },
-  providerOptions: (options: { effort: 'none' | 'medium' | "high" }) => ({
+  providerOptions: (options: { effort: 'none' | 'medium' | "high" | "max" }) => ({
     openrouter: {
       reasoning: options.effort === 'none' ? {
         enabled: false,
         effort: 'none'
+      } : ((options.effort === 'max' ? {
+        enabled: true,
+        effort: "xhigh"
       } : (options.effort === 'high' ? {
         enabled: true,
         effort: "high"
       } : {
         enabled: true,
         effort: "medium"
-      }),
+      }))),
       provider: {
         only: ["google-ai-studio", "google-vertex"],
         order: ["google-ai-studio", "google-vertex"],
@@ -108,30 +111,10 @@ const openrouterGemini3flash = {
   })
 }
 
-const openrouterGemini25flash = {
-  pricing: {
-    inputTokens: 0.3,
-    outputTokens: 2.5,
-  },
-  providerOptions: {
-    openrouter: {
-      reasoning: {
-        enabled: true,
-        effort: "medium"
-      },
-      provider: {
-        only: ["google-vertex/global", "google-vertex"],
-        order: ["google-vertex/global", "google-vertex"],
-        allow_fallbacks: true,
-      }
-    }
-  }
-}
 export const providerOptions = {
   openrouter: {
-    gemini3pro: openrouterGemini3pro,
+    gemini31pro: openrouterGemini31pro,
     gemini3flash: openrouterGemini3flash,
-    gemini25flash: openrouterGemini25flash,
     gptOss120b: openrouterGptOss120b,
     qwen3vl8b: openrouterQwen3vl8b,
     grok41fast: openrouterGrok41fast,
