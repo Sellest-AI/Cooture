@@ -1,5 +1,6 @@
 import { notEmpty, retryPromise } from "@shared/utils";
 import { z } from "zod";
+import { ITEM_STYLES } from "../../schema/items";
 import { defaultAgent } from "../agents/default";
 import { models } from "../config";
 import { createTool } from "../utils";
@@ -67,6 +68,9 @@ export const itemCategorizer = createTool({
       ])).min(1).describe(`ONLY Primary materials the item is made from or appears to be made from.
         Do not add the materials from the openings or buttons of clothing and accessories.
         `),
+
+      styles: z.array(z.enum(ITEM_STYLES))
+        .describe(`The style(s) of the item. Can include multiple styles if the item clearly incorporates elements of each.`),
 
       contentRating: z.enum([
         "SAFE", "SUGGESTIVE", "EXPLICIT", "NSFW"

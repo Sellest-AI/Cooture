@@ -2,6 +2,22 @@ import { defineTable } from "convex/server";
 import { v } from "convex/values";
 import { CONTENT_RATINGS } from "./constants";
 
+export const ITEM_STYLES = [
+  "CASUAL",
+  "FORMAL",
+  "SPORTY",
+  "VINTAGE",
+  "BOHO",
+  "EDGY",
+  "CHIC",
+  "PREPPY",
+  "GOTHIC",
+  "MINIMALIST",
+  "ECLECTIC",
+] as const;
+
+const V_ITEM_STYLES = v.union(...ITEM_STYLES.map(v.literal));
+
 export const ITEM_CATEGORIES = v.union(
   v.literal("TOP"),
   v.literal("BOTTOM"),
@@ -76,6 +92,7 @@ export const ITEMS_SCHEMA = {
   colorTones: v.array(ITEM_COLOR_TONES),
   materialFeel: ITEM_MATERIAL_FEEL,
   materials: v.array(ITEM_MATERIALS),
+  styles: v.array(V_ITEM_STYLES),
   gender: ITEM_GENDERS,
   contentRating: CONTENT_RATINGS,
   link: v.optional(v.string()),
