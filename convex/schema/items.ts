@@ -67,6 +67,7 @@ export const ITEM_GENDERS = v.union(
 
 export const ITEMS_SCHEMA = {
   name: v.string(),
+  brand: v.optional(v.string()),
   description: v.optional(v.string()),
   imageId: v.id("images"),
   category: ITEM_CATEGORIES,

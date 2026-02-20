@@ -79,6 +79,7 @@ export const itemCategorizer = createTool({
       ...(args.extractText ? {
         description: z.string().max(400).describe("A brief text description (max 30 words) suitable for an online store."),
         name: z.string().max(40).describe("A short name for the item."),
+        brand: z.string().max(40).optional().describe("The brand of the item, if identifiable from the image or metadata."),
       } : {})
     });
 
@@ -120,6 +121,7 @@ Use this information to help you analyze the item, but do not include it in the 
       ...result,
       name: result.name as string | undefined,
       description: result.description as string | undefined,
+      brand: result.brand as string | undefined,
     }
   }
 })
