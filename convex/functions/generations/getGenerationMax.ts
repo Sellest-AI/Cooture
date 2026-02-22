@@ -3,6 +3,7 @@ import { Id } from "../../_generated/dataModel";
 import { QueryCtx } from "../../procedures";
 import { getImage } from "../images";
 import { getItem } from "../items/getItem";
+import { getUserPublic } from "../users";
 
 export const getGenerationMax = async (ctx: QueryCtx, generationId: Id<'generations'>) => {
   const generation = await ctx.db.get(generationId);
@@ -18,7 +19,7 @@ export const getGenerationMax = async (ctx: QueryCtx, generationId: Id<'generati
   // If there is metadata, we need to fetch the users, otherwise we can skip it
   const usersPromise = Promise.all(Array.from(new Set([
     generation.userId, ...(metadata?.userIds ?? []),
-  ])).map(id => ctx.db.get(id)));
+  ])).map(id => getUserPublic(ctx, id)));
 
   const [preset, itemIds, users] = metadata ? await Promise.all([
     metadata.presetId ? ctx.db.get(metadata.presetId) : null,
@@ -41,7 +42,7 @@ export const getGenerationMax = async (ctx: QueryCtx, generationId: Id<'generati
   const sanitizeUser = (_user: typeof user) => _user ? {
     _id: _user._id,
     name: _user.name,
-    username: _user.name,
+    username: _user.username,
     image: _user.image,
   } : null;
 

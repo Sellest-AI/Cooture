@@ -28,10 +28,16 @@ export const usersExtended = defineTable({
   userId: v.id('users'),
   canTakeFreeTrial: v.boolean(),
   stripeCustomerId: v.string(),
-  firstName: v.optional(v.string()),
-  lastName: v.optional(v.string()),
   accountStatus: accountStatus,
   role: role,
+  // Profile
+  firstName: v.optional(v.string()),
+  lastName: v.optional(v.string()),
+  name: v.optional(v.string()),
+  username: v.optional(v.string()),
+  // Image
+  imageId: v.optional(v.id('images')),
+  imageUrl: v.optional(v.string()),
 }).index("by_user_id", ["userId"])
   .index("by_stripe_customer_id", ["stripeCustomerId"]);
 

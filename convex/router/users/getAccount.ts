@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { getAccount } from "../../functions/users";
+import { getAccount, getUserPublic } from "../../functions/users";
 import { adminQuery, authQuery, internalQuery, publicQuery, serverQuery } from "../../procedures";
 
 export const authed = authQuery({
@@ -34,15 +34,6 @@ export const _internal = internalQuery({
 export const anon = publicQuery({
   args: { userId: v.id('users') },
   handler: async (ctx, args) => {
-    const user = await ctx.db.get(args.userId);
-    if (!user) return null;
-
-    return {
-      _id: user._id,
-      _creationTime: user._creationTime,
-      name: user.name,
-      username: user.name,
-      image: user.image,
-    }
+    return getUserPublic(ctx, args.userId);
   }
 })

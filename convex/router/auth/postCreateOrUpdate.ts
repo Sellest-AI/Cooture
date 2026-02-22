@@ -10,6 +10,8 @@ export const _private = internalMutation({
   handler: async (ctx, args): Promise<boolean> => {
     const { userId, stripeCustomerId } = args;
 
+    const user = await ctx.db.get(userId);
+
     await Promise.all([
       // ctx.runMutation(internal.router.subscription.createFreeSubscription._internal, { userId }),
 
@@ -20,6 +22,8 @@ export const _private = internalMutation({
         canTakeFreeTrial: true,
         stripeCustomerId: stripeCustomerId,
         accountStatus: "WAITLIST",
+        name: user?.name,
+        imageUrl: user?.image,
         role: "USER"
       }),
 
