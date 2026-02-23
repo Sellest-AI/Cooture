@@ -1,7 +1,7 @@
 import { Image, ImageStyle } from "expo-image";
 
 type Props = {
-  size: number;
+  size?: number;
   style?: ImageStyle;
   blurRadius?: number;
 }

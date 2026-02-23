@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LayoutChangeEvent, Pressable, View, ViewStyle } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -71,6 +71,8 @@ export const Slider = ({ value, label, labels, onValueChange, style, customHeigh
   const translationX = useSharedValue(0);
   const isDragging = useSharedValue(false);
 
+  const innerValue = useRef(value);
+
   const min = labels?.reduce((min, label) => Math.min(min, label.value), Infinity) ?? 0;
   const max = labels?.reduce((max, label) => Math.max(max, label.value), -Infinity) ?? 1;
 
@@ -112,6 +114,8 @@ export const Slider = ({ value, label, labels, onValueChange, style, customHeigh
     const normalizedValue = maxTranslation > 0 ? clampedTranslation / maxTranslation : 0;
     const actualValue = normalizedToValue(normalizedValue);
     const closestValue = findClosestLabel(actualValue);
+
+    innerValue.current = actualValue;
 
     if (onValueChange) {
       onValueChange(actualValue, closestValue);
@@ -166,8 +170,14 @@ export const Slider = ({ value, label, labels, onValueChange, style, customHeigh
           runOnJS(updateValue)(closestNormalized * maxTranslation);
         }
       });
-
     });
+
+  useEffect(() => {
+    if (innerValue.current === value) return;
+    const maxTranslation = width - KNOB_SIZE;
+    const normalizedValue = valueToNormalized(value);
+    translationX.value = normalizedValue * maxTranslation;
+  }, [KNOB_SIZE, translationX, value, valueToNormalized, width])
 
   // Animated styles for the knob
   const knobStyle = useAnimatedStyle(() => {
