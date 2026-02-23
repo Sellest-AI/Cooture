@@ -6,6 +6,10 @@ export const _internal = internalMutation({
   args: {
     userId: v.id("users"),
     amount: v.number(),
+    metadata: v.optional(v.object({
+      reason: v.string(),
+      adminId: v.optional(v.id("users")),
+    })),
   },
   handler: async (ctx, args) => {
     const { userId, amount } = args;
@@ -14,6 +18,7 @@ export const _internal = internalMutation({
       userId,
       amount,
       type: "ADMIN_GRANT",
+      metadata: args.metadata,
     });
   }
 })

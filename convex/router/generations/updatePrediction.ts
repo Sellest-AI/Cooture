@@ -2,7 +2,7 @@ import { removeUndefinedKeys } from "@shared/utils";
 import { v } from "convex/values";
 import { Doc, Id } from "../../_generated/dataModel";
 import { upsertFeedScore } from "../../functions/feed";
-import { authMutation, internalMutation, MutationCtx } from "../../procedures";
+import { adminMutation, authMutation, internalMutation, MutationCtx } from "../../procedures";
 import { PREDICTION_STATUS } from "../../schema/generations";
 
 const updateGenerationStatus = async (ctx: MutationCtx, generationId: Id<'generations'>) => {
@@ -84,6 +84,16 @@ export const _internal = internalMutation({
 })
 
 export const authed = authMutation({
+  args: {
+    predictionId: v.string(),
+    status: v.optional(v.union(v.literal('ACCEPTED'), v.literal('REJECTED'))),
+  },
+  handler: async (ctx, args) => {
+    return updatePrediction(ctx, args);
+  }
+})
+
+export const admin = adminMutation({
   args: {
     predictionId: v.string(),
     status: v.optional(v.union(v.literal('ACCEPTED'), v.literal('REJECTED'))),
