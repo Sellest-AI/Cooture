@@ -46,7 +46,7 @@ export const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle
     onLongPress={() => push(ROUTES.OUTFIT.PATH, { pathParams: { id: outfit._id } })}
     users={user ? [{
       name: user.name ?? 'Anonymous',
-      username: user.name ?? 'anon',
+      username: user.username ?? 'anon',
       imageUrl: user.image,
       onPress: () => push(ROUTES.USER.PATH, {
         pathParams: { id: user!._id }

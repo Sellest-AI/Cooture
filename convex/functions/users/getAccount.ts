@@ -21,7 +21,6 @@ export const getUserPublic = async (ctx: QueryCtx, userId: Id<'users'>) => {
   if (!user.username) return null;
   if (!user.name) return null;
 
-
   return {
     _id: userId,
     _creationTime: user._creationTime,

@@ -54,7 +54,7 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
     }))}
     users={post.users.map((user) => ({
       name: user.name ?? 'Anonymous',
-      username: user.name ?? 'anon',
+      username: user.username ?? 'anon',
       imageUrl: user.image,
       onPress: () => push(ROUTES.USER.PATH, {
         pathParams: { id: user!._id }

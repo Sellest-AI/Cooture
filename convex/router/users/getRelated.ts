@@ -1,4 +1,5 @@
 import { paginationOptsValidator } from "convex/server";
+import { getUserPublic } from "../../functions/users";
 import { authQuery } from "../../procedures";
 
 export const authed = authQuery({
@@ -9,12 +10,9 @@ export const authed = authQuery({
     const result = await ctx.db.query("users")
       .paginate(args.paginationOpts);
 
-    const users = result.page
+    const users = await Promise.all(result.page
       .filter((user) => user._id !== ctx.userId)
-      .map((user) => ({
-        ...user,
-        username: user.name,
-      }))
+      .map((user) => getUserPublic(ctx, user._id)))
 
     return {
       ...result,
