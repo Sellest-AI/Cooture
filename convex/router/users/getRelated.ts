@@ -1,3 +1,4 @@
+import { notEmpty } from "@shared/utils";
 import { paginationOptsValidator } from "convex/server";
 import { getUserPublic } from "../../functions/users";
 import { authQuery } from "../../procedures";
@@ -16,7 +17,7 @@ export const authed = authQuery({
 
     return {
       ...result,
-      page: users
+      page: users.filter(notEmpty)
     }
   }
 })

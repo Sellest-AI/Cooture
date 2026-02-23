@@ -25,18 +25,20 @@ export default function Screen() {
       }} />
       <ModalHeader
         title="Select a friend"
-        style={{ marginBottom: 20 }}
+        style={{ marginBottom: 12 }}
       />
       <FlatList
+        contentContainerStyle={{ paddingTop: 8 }}
         onEndReached={() => loadMore(20)}
         data={results}
         keyExtractor={item => item._id}
-        numColumns={2}
+        numColumns={3}
         // style={{ paddingHorizontal: 12 }}
         renderItem={({ item }) => (
           <Pressable
             onPress={() => redirect({ params: { userId: item._id } })}
             style={{
+              marginBottom: 40,
               marginHorizontal: 12,
               justifyContent: 'center',
               alignItems: 'center',
@@ -45,23 +47,24 @@ export default function Screen() {
           >
             <Badge
               source={item.image ?? require('assets/backgrounds/dark-gradient.png')}
-              style={{ width: 96, height: 96, marginBottom: 16 }}
+              style={{ width: 92, height: 92, marginBottom: 16 }}
             />
             <Text.Sm
               color={Colors.neutral[400]}
-              style={{ textAlign: 'center' }}
+              style={{ textAlign: 'center', maxWidth: '90%' }}
               numberOfLines={1}
               weight={600}
             >
               @{item.username}
             </Text.Sm>
-            <Text.Lg
+            <Text.Base
               color={Colors.foreground}
-              style={{ textAlign: 'center' }}
+              style={{ textAlign: 'center', maxWidth: '90%' }}
               numberOfLines={1}
+              weight={600}
             >
               {item.name}
-            </Text.Lg>
+            </Text.Base>
           </Pressable>
         )}
       />

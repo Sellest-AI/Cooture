@@ -7,9 +7,10 @@ import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
 import { AnimatedGeneration } from "@/modules/photoshoot/animated-generation";
 import { GenerationButtons } from "@/modules/photoshoot/generation-buttons";
 import { Badge } from "@ui/badge";
+import { Block } from "@ui/block";
 import { Button } from "@ui/button";
 import { ImageGeneration } from "@ui/cards";
-import { Check, Lock, X } from "@ui/icons";
+import { ArrowLeft, Check, Lock, X } from "@ui/icons";
 import { Image } from "@ui/image";
 import { Pressable } from "@ui/pressable";
 import { SafeAreaView } from "@ui/safe-area-view";
@@ -266,12 +267,28 @@ export default function Screen() {
           alignItems: 'center',
         }}
       >
-        <Badge
-          source={preset?.cover?.sizes.thumbnail.url
-            ?? require('assets/backgrounds/dark-gradient.png')}
-          contentFit="cover"
-          contentPosition="top center"
-        />
+        <View style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: outfitId ? 'flex-start' : 'center',
+          width: outfitId ? undefined : '100%',
+          gap: 8,
+        }}>
+          <Pressable onPress={() => router.back()}
+            style={{ position: outfitId ? 'relative' : 'absolute', left: outfitId ? undefined : 0 }}
+          >
+            <Block variant="blur"
+              style={{ borderRadius: 99, padding: 12 }}>
+              <ArrowLeft size={24} color={Colors.foreground} />
+            </Block>
+          </Pressable>
+          <Badge
+            source={preset?.cover?.sizes.thumbnail.url
+              ?? require('assets/backgrounds/dark-gradient.png')}
+            contentFit="cover"
+            contentPosition="top center"
+          />
+        </View>
         {outfitId && <Outfit id={outfitId} />}
       </SafeAreaView>
       <View style={{
