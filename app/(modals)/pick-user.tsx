@@ -11,7 +11,7 @@ import { Colors } from "theme";
 
 export default function Screen() {
   const { redirect } = useRouter('/pick-user');
-  const { results, isLoading, loadMore } = usePaginatedQuery(api.router.users.getRelated.authed, {}, { initialNumItems: 20 });
+  const { results, loadMore } = usePaginatedQuery(api.router.users.getRelated.authed, {}, { initialNumItems: 20 });
 
   return (
     <View style={{ padding: 12, flex: 1 }}>
@@ -50,6 +50,7 @@ export default function Screen() {
             <Text.Sm
               color={Colors.neutral[400]}
               style={{ textAlign: 'center' }}
+              numberOfLines={1}
               weight={600}
             >
               @{item.username}
@@ -57,6 +58,7 @@ export default function Screen() {
             <Text.Lg
               color={Colors.foreground}
               style={{ textAlign: 'center' }}
+              numberOfLines={1}
             >
               {item.name}
             </Text.Lg>

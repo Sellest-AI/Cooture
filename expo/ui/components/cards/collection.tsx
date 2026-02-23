@@ -220,6 +220,7 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
           alignItems: 'center',
           alignSelf: 'center',
           marginTop: 12,
+          maxWidth: '100%',
         }}
       >
         {(loading && !selected) ? <Loader color={Colors.foreground} size={14} /> : <>
@@ -237,6 +238,7 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
           {subtitle && <Text.Sm
             numberOfLines={1}
             style={{
+              maxWidth: '100%',
               fontWeight: 700,
               color: selected ? Colors.primary[900] : Colors.neutral[400],
               opacity: selected ? 0.5 : 1,
