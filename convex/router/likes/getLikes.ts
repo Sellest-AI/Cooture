@@ -51,14 +51,14 @@ export const _internal_query = internalQuery({
     }
 
     const count = stats?.count ?? 0;
-    const userIds = await ctx.db.query("likes").order("desc").take(count > 0 ? 12 : 0);
+    const userIds = await ctx.db.query("likes").order("desc").take(count > 0 ? 200 : 0);
     const users = await Promise.all(userIds.map(like => ctx.db.get("users", like.userId)));
 
     const filteredUsers = users.filter(notEmpty)
       .filter((u, i, self) => i === self.findIndex((p) => p._id === u._id))
       // Shuffle
       .sort(() => 0.5 - Math.random())
-      .slice(0, 3);
+      .slice(0, 5);
 
     const lastUpdate = new Date();
 

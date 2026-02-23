@@ -91,7 +91,7 @@ export const Post = ({ style, postedAt, image, users, preset, outfit, images, li
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'flex-start',
-            gap: 24
+            gap: 32
           }}
         >
           <View>
@@ -111,7 +111,7 @@ export const Post = ({ style, postedAt, image, users, preset, outfit, images, li
             </View>
             <View style={{
               position: 'absolute',
-              top: 8, left: 12,
+              top: 0, left: 20,
               width: 28, height: 28,
               borderRadius: 99,
               borderColor: Colors.blur.medium,
@@ -125,15 +125,21 @@ export const Post = ({ style, postedAt, image, users, preset, outfit, images, li
               />
             </View>
           </View>
-          <Text.Sm color={Colors.neutral[200]} style={{ marginTop: 8 }}>
-            <Text.Sm color={Colors.neutral[50]} weight={600} style={{ marginRight: 6 }}>
-              {users[0]?.name}
+          <View style={{ gap: 6, marginTop: 4, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+            <Pressable onPress={users[0]?.onPress}>
+              <Text.Sm color={Colors.neutral[50]} weight={600}>
+                {users[0]?.name}
+              </Text.Sm>
+            </Pressable>
+            <Text.Sm color={Colors.neutral[200]}>
+              x
             </Text.Sm>
-            x
-            <Text.Sm color={Colors.neutral[50]} weight={600} style={{ marginLeft: 6 }}>
-              {users[1]?.name}
-            </Text.Sm>
-          </Text.Sm>
+            <Pressable onPress={users[1]?.onPress}>
+              <Text.Sm color={Colors.neutral[50]} weight={600}>
+                {users[1]?.name}
+              </Text.Sm>
+            </Pressable>
+          </View>
         </View>}
         {(user && users.length < 2) &&
           <Pressable
@@ -303,7 +309,7 @@ export const Post = ({ style, postedAt, image, users, preset, outfit, images, li
             size={20}
           />
           {likedAccounts && <View style={{ flexDirection: 'row', gap: 0, alignItems: 'center' }}>
-            {likedAccounts.map((account) => (
+            {likedAccounts.slice(0, 3).map((account) => (
               <Image
                 style={{
                   width: 24,

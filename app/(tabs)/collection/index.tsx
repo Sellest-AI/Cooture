@@ -127,7 +127,7 @@ export default function SavedScreen() {
   return (
     <SafeScrollView
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: TOTAL_TABS_SPACE }}
+      contentContainerStyle={{ paddingBottom: TOTAL_TABS_SPACE + 32 }}
       edges={{ top: 'padding', bottom: 'maximum' }}
     >
       <ModalHeader

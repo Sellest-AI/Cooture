@@ -24,9 +24,14 @@ export const anon = authQuery({
     const predictions = generation.predictions.filter((p) => p.status === 'ACCEPTED');
     if (predictions.length === 0) return null;
 
+    const firstPredictionId = predictions[0]._id;
+    const coverId = predictions[0].imageId;
+
     return {
       ...generation,
       predictions,
+      firstPredictionId,
+      coverId,
     }
   }
 })

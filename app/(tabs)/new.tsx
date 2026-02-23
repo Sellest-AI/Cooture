@@ -133,7 +133,7 @@ export default function Screen() {
           <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
         </View>}
         <FlatList
-          style={{ marginTop: 16, marginBottom: 28 }}
+          style={{ marginTop: 16, marginBottom: 32 }}
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ gap: 32, paddingHorizontal: 16, paddingTop: 6 }}

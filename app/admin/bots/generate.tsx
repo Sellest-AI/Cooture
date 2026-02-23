@@ -181,6 +181,7 @@ const Outfits = ({ onSelect, outfitId }: { onSelect: (outfitId: Id<'outfits'> | 
 
 export default function Screen() {
   const [showDuo, setShowDuo] = useState(false);
+  const [showOutfit, setShowOutfit] = useState(false);
 
   const { userId } = useRoute('/admin/bots/generate');
   const [presetId, setPresetId] = useState<Id<'presets'> | null>(null);
@@ -204,12 +205,14 @@ export default function Screen() {
         <Presets onSelect={(args) => {
           setPresetId(args.presetId);
           if (args.type === 'single') setDuoId(null);
+          if (args.type === 'duo') setOutfitId(null);
           setShowDuo(args.type === 'duo');
+          setShowOutfit(args.type === 'single');
         }}
           presetId={presetId}
         />
         {showDuo && <Duo onSelect={setDuoId} userId={duoId} />}
-        <Outfits onSelect={setOutfitId} outfitId={outfitId} />
+        {showOutfit && <Outfits onSelect={setOutfitId} outfitId={outfitId} />}
       </ScrollView>
       <SafeAreaView
         edges={{ top: 'off' }}
@@ -245,6 +248,5 @@ export default function Screen() {
         </ButtonSlider>
       </SafeAreaView>
     </SafeAreaView>
-
   )
 }

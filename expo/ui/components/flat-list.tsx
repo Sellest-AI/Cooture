@@ -1,2 +1,2 @@
-export { FlashList } from "@shopify/flash-list";
+export { FlashList, FlashListProps, FlashListRef } from "@shopify/flash-list";
 

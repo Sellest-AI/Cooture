@@ -6,10 +6,11 @@ import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { WaitlistBlock } from "@/modules/waitlist/walitlist-block";
 import { Post } from "@ui/cards";
-import { FlashList } from "@ui/flat-list";
+import { FlashList, FlashListRef } from "@ui/flat-list";
 import { ModalHeader } from "@ui/modal";
 import { SafeAreaView, useSafeAreaInsets } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
+import { useRef } from "react";
 import { View } from "react-native";
 import { Colors } from "theme";
 
@@ -17,11 +18,14 @@ export default function Screen() {
   const { feed, canLoadMore, updateSeed, isLoading, loadMore } = useFeed({ initialNumItems: 8 });
   const { top } = useSafeAreaInsets();
 
+  const listRef = useRef<FlashListRef<NonNullable<typeof feed>[number]>>(null);
+
   return (
     <SafeAreaView edges={{ top: 'off', bottom: 'maximum' }} style={{ flex: 1 }}>
       <FlashList
+        ref={listRef}
         refreshing={isLoading}
-        onRefresh={() => updateSeed()}
+        onRefresh={() => { updateSeed(); listRef.current?.scrollToOffset({ offset: 0 }) }}
         onEndReached={() => loadMore(8)}
         data={(feed ?? [])}
         keyExtractor={(i) => i?._id}

@@ -68,18 +68,19 @@ const Container = ({ title, subtitle, children, style, headerStyle }: ContainerP
   )
 }
 
-const PressableButton = ({ startIcon, text, onPress, selected }: {
+const PressableButton = ({ startIcon, text, onPress, selected, style }: {
   onPress: () => void,
   selected?: boolean,
   startIcon?: ComponentProps<typeof Button>['startIcon'],
   text: string,
+  style?: ViewStyle,
 }) => {
   const StartIcon = startIcon;
   return (
     <Pressable style={{ flex: 1 }} onPress={onPress}>
       <Block
         variant={selected ? "primary" : "blur"}
-        style={{ padding: 24, justifyContent: 'center', alignItems: 'center', gap: 12 }}
+        style={{ padding: 24, justifyContent: 'center', alignItems: 'center', gap: 12, ...style }}
       >
         {StartIcon && <StartIcon
           size={40}
@@ -130,6 +131,7 @@ const Appearance = () => {
             text={`${age}`}
             onPress={() => setAppearance((p) => p ? ({ ...p, age: age }) : null)}
             selected={appearance.age === age}
+            style={{ paddingHorizontal: 8 }}
           />
         ))}
       </View>
