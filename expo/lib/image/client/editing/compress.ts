@@ -218,9 +218,9 @@ const compress = async (
       }
 
       // Reduce quality for next iteration (aggressive decay)
-      // If size is still 2x target, drop quality faster
+      // If size is still 1.8x target, drop quality faster
       const overageRatio = compressedFile.size / targetSizeBytes;
-      currentQuality -= overageRatio > 2 ? 0.15 : 0.08;
+      currentQuality -= overageRatio > 1.8 ? 0.15 : 0.08;
 
       if (currentQuality <= 0.05) break; // Diminishing returns
     }
