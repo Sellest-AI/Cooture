@@ -11,7 +11,7 @@ import { Colors } from "theme";
 
 export default function Screen() {
   const { redirect } = useRouter('/pick-user');
-  const { results, loadMore } = usePaginatedQuery(api.router.users.getRelated.authed, {}, { initialNumItems: 20 });
+  const { results, loadMore } = usePaginatedQuery(api.router.users.follows.getRelatedPaginated.authed, {}, { initialNumItems: 20 });
 
   return (
     <View style={{ padding: 12, flex: 1 }}>

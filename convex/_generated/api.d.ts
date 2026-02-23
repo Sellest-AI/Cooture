@@ -172,11 +172,11 @@ import type * as router_users_follows_checkFollowing from "../router/users/follo
 import type * as router_users_follows_getFollowStats from "../router/users/follows/getFollowStats.js";
 import type * as router_users_follows_getFollowersPaginated from "../router/users/follows/getFollowersPaginated.js";
 import type * as router_users_follows_getFollowingPaginated from "../router/users/follows/getFollowingPaginated.js";
+import type * as router_users_follows_getRelatedPaginated from "../router/users/follows/getRelatedPaginated.js";
 import type * as router_users_follows_toggleFollow from "../router/users/follows/toggleFollow.js";
 import type * as router_users_getAccount from "../router/users/getAccount.js";
 import type * as router_users_getAppearance from "../router/users/getAppearance.js";
 import type * as router_users_getFromStripeId from "../router/users/getFromStripeId.js";
-import type * as router_users_getRelated from "../router/users/getRelated.js";
 import type * as router_users_upsertAppearance from "../router/users/upsertAppearance.js";
 import type * as router_waitlist_enterCode from "../router/waitlist/enterCode.js";
 import type * as router_waitlist_generateCodes from "../router/waitlist/generateCodes.js";
@@ -370,11 +370,11 @@ declare const fullApi: ApiFromModules<{
   "router/users/follows/getFollowStats": typeof router_users_follows_getFollowStats;
   "router/users/follows/getFollowersPaginated": typeof router_users_follows_getFollowersPaginated;
   "router/users/follows/getFollowingPaginated": typeof router_users_follows_getFollowingPaginated;
+  "router/users/follows/getRelatedPaginated": typeof router_users_follows_getRelatedPaginated;
   "router/users/follows/toggleFollow": typeof router_users_follows_toggleFollow;
   "router/users/getAccount": typeof router_users_getAccount;
   "router/users/getAppearance": typeof router_users_getAppearance;
   "router/users/getFromStripeId": typeof router_users_getFromStripeId;
-  "router/users/getRelated": typeof router_users_getRelated;
   "router/users/upsertAppearance": typeof router_users_upsertAppearance;
   "router/waitlist/enterCode": typeof router_waitlist_enterCode;
   "router/waitlist/generateCodes": typeof router_waitlist_generateCodes;

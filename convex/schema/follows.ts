@@ -2,7 +2,9 @@ import { defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export const follows = defineTable({
+  /** The person who is following */
   followerId: v.id("users"),
+  /** The person being followed */
   followingId: v.id("users"),
   createdAt: v.number(),
 })
