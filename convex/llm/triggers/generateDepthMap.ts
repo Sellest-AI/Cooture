@@ -21,7 +21,8 @@ export const _internal = internalAction({
     );
 
     const outputs = await parseReplicateRunOutput(output);
-    const base64 = outputs[0] ? bufferToBase64(outputs[0]) : null;
+    const buffer = await outputs[0]?.toBuffer();
+    const base64 = buffer ? bufferToBase64(buffer) : null;
 
     if (!base64) { throw new Error("Failed to generate depth map"); }
 
