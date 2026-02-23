@@ -13,6 +13,7 @@ type ParamsDefault<T extends Route> =
   T extends "/pick-outfit" ? { canSkip?: boolean, itemIds?: Id<'items'>[] } :
   T extends "/new-outfit" ? { itemIds?: Id<'items'>[] } :
   T extends "/add-item" ? { outfitId?: Id<'outfits'>, itemIds?: Id<'items'>[] } :
+  T extends "/admin/bots/generate" ? { userId?: Id<'users'> | null } :
   never;
 
 const LINKED_ROUTES: { parent: Route, child: Route }[] = [

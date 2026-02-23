@@ -4,20 +4,21 @@ import { useAccount } from "@/lib/convex/auth";
 import { useAction, useQuery, useQueryCached } from "@/lib/convex/client";
 import { downloadImageCrossPlatform } from "@/lib/image/client";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
+import { AnimatedGeneration } from "@/modules/photoshoot/animated-generation";
+import { GenerationButtons } from "@/modules/photoshoot/generation-buttons";
 import { Badge } from "@ui/badge";
-import { Block } from "@ui/block";
 import { Button } from "@ui/button";
 import { ImageGeneration } from "@ui/cards";
-import { Check, HeartIcon, Loader, Lock, X } from "@ui/icons";
+import { Check, Lock, X } from "@ui/icons";
 import { Image } from "@ui/image";
 import { Pressable } from "@ui/pressable";
-import { SafeAreaView, useSafeAreaInsets } from "@ui/safe-area-view";
+import { SafeAreaView } from "@ui/safe-area-view";
 import { Carousel, ICarouselInstance } from "@ui/screen-carousel";
 import { Text } from "@ui/text";
 import { notEmpty } from "@utils/convex-allowed";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { ReactNode, useEffect, useRef, useState } from "react";
-import { Animated, Dimensions, Platform, View } from "react-native";
+import React, { useRef, useState } from "react";
+import { Dimensions, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -45,84 +46,6 @@ const Outfit = ({ id }: { id: Id<'outfits'> }) => {
       ))}
       {remaining > 0 && <Badge text={`+${remaining}`} />}
     </View>
-  )
-}
-
-type Generation = {
-  _id: string,
-  url?: string,
-  status: string,
-}
-
-type Props = {
-  onNext: (validated: boolean) => void;
-  currentItem: Generation | undefined;
-  items: Generation[];
-}
-const Buttons = ({ onNext, currentItem, items }: Props) => {
-  const isCurrentLoading = currentItem?.status === 'LOADING';
-  const processed = items.filter((i) => i.status !== 'LOADING').length;
-  const loading = items.filter((i) => i.status === 'LOADING').length;
-
-  const { bottom } = useSafeAreaInsets();
-
-  return (
-    <SafeAreaView
-      edges={{ top: 'off', bottom: 'off' }}
-      style={{
-        paddingBottom: bottom + 28,
-        alignItems: 'center',
-      }}>
-      {isCurrentLoading && <Block
-        variant="blur"
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: 12,
-          paddingHorizontal: 24,
-          borderRadius: 99,
-          gap: 12,
-        }}
-      >
-        <Loader color={Colors.primary[500]} />
-        <Text.Base color={Colors.neutral[50]}>
-          Please be patient...
-        </Text.Base>
-        <Text.Sm color={Colors.neutral[400]} weight={600} style={{ marginLeft: 12 }}>
-          {processed} / {processed + loading}
-        </Text.Sm>
-      </Block>}
-      {!isCurrentLoading && <View style={{
-        flexDirection: 'row',
-        gap: 12,
-      }}
-      >
-        <Button
-          variant="blur"
-          startIcon={X}
-          onPress={() => {
-            if (!currentItem) return;
-            onNext(false);
-          }}
-        >
-          Archive
-        </Button>
-        <Button
-          variant="primary"
-          startIcon={HeartIcon}
-          onPress={async () => {
-            if (!currentItem?.url) return;
-            try {
-              await downloadImageCrossPlatform(currentItem.url);
-            } catch { }
-            onNext(true);
-          }}
-        >
-          Save
-        </Button>
-      </View>}
-    </SafeAreaView>
   )
 }
 
@@ -259,52 +182,6 @@ const UnlockMore = () => {
         <Lock size={18} color={Colors.primary[500]} />
       </View>
     </View>
-  )
-}
-
-
-type AnimatedProps = {
-  children: ReactNode;
-  status: 'IDLE' | 'ACCEPTING' | 'REJECTING';
-  onAnimationComplete?: () => void;
-}
-const AnimatedGeneration = ({ children, status, onAnimationComplete }: AnimatedProps) => {
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-  const opacityAnim = useRef(new Animated.Value(1)).current;
-  const transformAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    if (status === 'IDLE') return;
-    Animated.parallel([
-      Animated.timing(transformAnim, {
-        toValue: status === 'ACCEPTING' ? -50 : 75,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacityAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scaleAnim, {
-        toValue: status === 'ACCEPTING' ? 1.05 : 0.9,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      onAnimationComplete?.();
-    });
-  }, [onAnimationComplete, scaleAnim, opacityAnim, status, transformAnim]);
-
-  return (
-    <Animated.View
-      style={{
-        width: Platform.OS === 'web' ? '100%' : undefined,
-        opacity: opacityAnim,
-        transform: [{ scale: scaleAnim }, { translateY: transformAnim }]
-      }}>
-      {children}
-    </Animated.View>
   )
 }
 
@@ -464,7 +341,7 @@ export default function Screen() {
           />}
         </View>
       </View>
-      <Buttons
+      <GenerationButtons
         items={visibleItems}
         currentItem={visibleItems[currentIndex]}
         onNext={next}

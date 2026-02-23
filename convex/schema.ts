@@ -11,13 +11,14 @@ import { outfitItems, outfits } from "./schema/outfits";
 import { presetCategories, presetGenerations, presets } from "./schema/presets";
 import { quests, userQuestProgress } from "./schema/quests";
 import { subscriptions, subscriptionsHistory } from "./schema/subscriptions";
-import { userImages, usersAppearance, usersExtended } from "./schema/users";
+import { bots, userImages, usersAppearance, usersExtended } from "./schema/users";
 import { waitlist, waitlistCodes } from "./schema/waitlist";
 import { creditTransactions, userWallets } from "./schema/wallets";
 
 export default defineSchema({
   ...authTables,
   usersExtended,
+  bots,
   images,
   imageSizes,
   imageObjects,

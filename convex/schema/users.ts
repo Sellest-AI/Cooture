@@ -5,6 +5,7 @@ const role = v.union(
   v.literal("ADMIN"),
   v.literal("USER"),
   v.literal("GUEST"),
+  v.literal("BOT"),
 );
 
 const accountStatus = v.union(
@@ -57,5 +58,12 @@ export const usersAppearance = defineTable({
   gender: v.optional(v.union(v.literal("male"), v.literal("female"))),
   size: v.optional(userSizes),
   // topAngleImageId: v.id('images'),
+})
+  .index("by_user_id", ["userId"])
+
+export const bots = defineTable({
+  userId: v.id('users'),
+  age: v.number(),
+  cronFunctionId: v.optional(v.id("_scheduled_functions")),
 })
   .index("by_user_id", ["userId"])

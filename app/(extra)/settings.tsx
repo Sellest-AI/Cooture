@@ -89,6 +89,15 @@ export default function SettingsScreen() {
         </Block>
 
         <Button
+          variant="blur"
+          onPress={() => {
+            router.push('/admin/bots');
+          }}
+        >
+          Admin
+        </Button>
+
+        <Button
           variant="destructive"
           onPress={() => {
             signOut();
