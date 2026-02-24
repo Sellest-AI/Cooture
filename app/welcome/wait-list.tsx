@@ -3,7 +3,6 @@ import { Block } from "@ui/block";
 import { Button } from "@ui/button";
 import { QrCode } from "@ui/icons";
 import { Image } from "@ui/image";
-import { SafeAreaView } from "@ui/safe-area-view";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
 import { TextInput } from "@ui/text-input";
@@ -11,7 +10,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import { View } from "react-native";
 import { Colors } from "theme";
-
 export default function Screen() {
   const [code, setCode] = useState("");
 
@@ -38,7 +36,7 @@ export default function Screen() {
           height: 500
         }}
       />
-      <SafeAreaView style={{
+      <View style={{
         justifyContent: 'flex-end',
         padding: 12,
         flex: 1,
@@ -60,7 +58,7 @@ export default function Screen() {
           style={{
             marginTop: 16,
             marginHorizontal: 'auto',
-            width: '65%',
+            width: '95%'
           }}
         >
           <Text.H1
@@ -105,7 +103,7 @@ export default function Screen() {
               people are waiting
             </Text.Base>
           </View> : <Skeleton width={132} height={14} style={{ marginHorizontal: 'auto', marginTop: 8 }} />}
-      </SafeAreaView>
+      </View>
     </View >
   )
 }
