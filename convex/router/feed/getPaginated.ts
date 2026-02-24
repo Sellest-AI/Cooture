@@ -9,10 +9,12 @@ type Post<T extends Type> = T extends 'generation' ? {
   type: 'generation';
   _id: Id<'generations'>;
   _creationTime: number;
+  userId: Id<'users'>;
 } : T extends 'outfit' ? {
   type: 'outfit';
   _id: Id<'outfits'>;
   _creationTime: number;
+  userId: Id<'users'>;
 } : never;
 
 export const anon = publicQuery({
@@ -47,6 +49,7 @@ export const anon = publicQuery({
           type: 'generation' as const,
           _id: item.generationId,
           _creationTime: item._creationTime,
+          userId: item.userId,
         }
 
       if (item.outfitId)
@@ -54,6 +57,7 @@ export const anon = publicQuery({
           type: 'outfit' as const,
           _id: item.outfitId,
           _creationTime: item._creationTime,
+          userId: item.userId,
         }
 
       return null;

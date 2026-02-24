@@ -1,47 +1,48 @@
 import { ConvexError, v } from "convex/values";
 import { Id } from "../../../_generated/dataModel";
-import { authMutation, MutationCtx } from "../../../procedures";
+import { authMutation, internalMutation, MutationCtx } from "../../../procedures";
 
-export const authed = authMutation({
+const toggleFollow = async (
+  ctx: MutationCtx,
   args: {
-    targetUserId: v.id("users"),
-    value: v.optional(v.boolean()),
-  },
-  handler: async (ctx, args) => {
-    const { targetUserId } = args;
+    userId: Id<'users'>,
+    targetUserId: Id<'users'>,
+    value?: boolean
+  }
+) => {
+  const { targetUserId } = args;
 
-    // Cannot follow yourself
-    if (ctx.userId === targetUserId) {
-      throw new ConvexError("Cannot follow yourself");
-    }
+  // Cannot follow yourself
+  if (args.userId === targetUserId) {
+    throw new ConvexError("Cannot follow yourself");
+  }
 
-    // Check if already following
-    const existing = await ctx.db
-      .query("follows")
-      .withIndex("by_follower_following", (q) =>
-        q.eq("followerId", ctx.userId).eq("followingId", targetUserId)
-      )
-      .first();
+  // Check if already following
+  const existing = await ctx.db
+    .query("follows")
+    .withIndex("by_follower_following", (q) =>
+      q.eq("followerId", args.userId).eq("followingId", targetUserId)
+    )
+    .first();
 
-    if (existing && args.value === true) return { following: true };
+  if (existing && args.value === true) return { following: true };
 
-    if (existing) {
-      // Unfollow
-      await ctx.db.delete(existing._id);
-      await updateStats(ctx, ctx.userId, targetUserId, -1);
-      return { following: false };
-    } else {
-      // Follow
-      await ctx.db.insert("follows", {
-        followerId: ctx.userId,
-        followingId: targetUserId,
-        createdAt: Date.now(),
-      });
-      await updateStats(ctx, ctx.userId, targetUserId, 1);
-      return { following: true };
-    }
-  },
-});
+  if (existing) {
+    // Unfollow
+    await ctx.db.delete(existing._id);
+    await updateStats(ctx, args.userId, targetUserId, -1);
+    return { following: false };
+  } else {
+    // Follow
+    await ctx.db.insert("follows", {
+      followerId: args.userId,
+      followingId: targetUserId,
+      createdAt: Date.now(),
+    });
+    await updateStats(ctx, args.userId, targetUserId, 1);
+    return { following: true };
+  }
+}
 
 async function updateStats(
   ctx: MutationCtx,
@@ -89,3 +90,20 @@ async function updateStats(
     });
   }
 }
+
+export const authed = authMutation({
+  args: {
+    targetUserId: v.id("users"),
+    value: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => toggleFollow(ctx, { ...args, userId: ctx.userId })
+});
+
+export const _internal = internalMutation({
+  args: {
+    userId: v.id("users"),
+    targetUserId: v.id("users"),
+    value: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => toggleFollow(ctx, args)
+});
