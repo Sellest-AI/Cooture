@@ -3,8 +3,8 @@ import { Button } from "@ui/button";
 import { Image } from "@ui/image";
 import { Text } from "@ui/text";
 import { useCameraPermissions } from "expo-camera";
-import { useEffect } from "react";
-import { View, ViewStyle } from "react-native";
+import { useEffect, useState } from "react";
+import { Linking, View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 
 type Props = {
@@ -13,9 +13,18 @@ type Props = {
 }
 
 export const CameraPermission = ({ style, onSuccess }: Props) => {
+  const [init, setInit] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
 
   useEffect(() => { if (permission?.granted) { onSuccess?.() } }, [onSuccess, permission]);
+
+  useEffect(() => {
+    if (init) return;
+    if (!permission) return;
+    if (permission.granted) return;
+    if (permission.canAskAgain) requestAnimationFrame(() => requestPermission());
+    setInit(true);
+  }, [init, permission, requestPermission])
 
   if (!permission) return null;
 
@@ -49,7 +58,10 @@ export const CameraPermission = ({ style, onSuccess }: Props) => {
             We need your permission to show the camera
           </Text.Base>
           <Button
-            onPress={requestPermission}
+            onPress={async () => {
+              if (!permission.canAskAgain) Linking.openSettings();
+              else await requestPermission();
+            }}
             variant="primary"
           >
             Grant Permission
@@ -59,4 +71,5 @@ export const CameraPermission = ({ style, onSuccess }: Props) => {
     );
   }
 
+  return null;
 }

@@ -22,14 +22,14 @@ const GenerationNotification = ({ generationId, onPress }: { generationId: Id<'g
   const imageIds = generation?.predictions.map((p) => p.imageId).filter(notEmpty);
   const { data: images } = useQueryCached(api.router.storage.images.getMany.anon, imageIds ? { imageIds } : 'skip')
 
-  const completed = generation?.status === 'COMPLETED';
+  const ready = generation?.status !== 'LOADING';
 
   const imagesLoaded = (imageIds?.length === 0) || images;
   if (!preset || !generation || !imagesLoaded) return <Notification.Skeleton />
 
   return (
     <Notification
-      read={completed}
+      read={generation.status === 'COMPLETED'}
       onPress={() => {
         onPress?.();
         router.push(ROUTES.PHOTOSHOOT.GENERATIONS.ID(generationId));
@@ -41,8 +41,8 @@ const GenerationNotification = ({ generationId, onPress }: { generationId: Id<'g
       {(DateComponent) => <Text.Base color={Colors.neutral[50]}>
         {"Your photoshoot"}
         <Text.Base color={Colors.foreground} weight={600}> {`"${preset.name}" `}</Text.Base>
-        {completed ? "is ready!" : "is being generated."}
-        <DateComponent style={{ paddingLeft: 6 }} />
+        {ready ? "is ready!" : "is being generated."}
+        <DateComponent paddingLeft />
       </Text.Base>}
     </Notification>
   )
@@ -119,7 +119,7 @@ const GenericNotification = ({ id, onPress, read, data }: GenereticNotificationP
     >
       {(DateComponent) => <Text.Base color={Colors.neutral[50]}>
         <TextComponent />
-        <DateComponent style={{ paddingLeft: 6 }} />
+        <DateComponent paddingLeft />
       </Text.Base>}
     </Notification>
   )

@@ -1,5 +1,5 @@
 import { JSX, ReactNode, useCallback } from "react";
-import { TextStyle, View } from "react-native";
+import { View } from "react-native";
 import { Colors } from "theme";
 import { Badge } from "../badge";
 import { Block } from "../block";
@@ -8,8 +8,8 @@ import { Pressable } from "../pressable";
 import { Skeleton } from "../skeleton";
 import { Text } from "../text";
 
-type DateComponent = ({ style }: {
-  style?: TextStyle | undefined;
+type DateComponent = ({ paddingLeft }: {
+  paddingLeft?: boolean | undefined;
 }) => JSX.Element | null
 
 type Props = {
@@ -33,11 +33,11 @@ export const Notification = ({ read, onPress, leftImage, rightImage, date, child
     : hoursAgo !== null ? hoursAgo < 24 ? `${hoursAgo} h`
       : daysAgo !== null ? `${daysAgo} d` : null : null : null;
 
-  const DateComponent = useCallback(({ style }: { style?: TextStyle }) => {
+  const DateComponent = useCallback(({ paddingLeft }: { paddingLeft?: boolean }) => {
     if (!timeAgoString) return null;
     return (
-      <Text.Base color={Colors.neutral[400]} style={style}>
-        {timeAgoString}
+      <Text.Base color={Colors.neutral[400]}>
+        {paddingLeft ? "  " : ""}{timeAgoString}
       </Text.Base>)
   }, [timeAgoString])
 
@@ -77,7 +77,7 @@ export const Notification = ({ read, onPress, leftImage, rightImage, date, child
             {typeof children === 'string' ? (
               <Text.Base color={Colors.neutral[50]} weight={500}>
                 {children}
-                <DateComponent style={{ paddingLeft: 6 }} />
+                <DateComponent paddingLeft />
               </Text.Base>
             ) : (children?.(DateComponent))}
           </View>
