@@ -21,7 +21,7 @@ export const _internal = internalAction({
     await ctx.runMutation(internal.router.admin.presets.repairOne._internal_mutation, {
       presetId,
       prompts: prompts.map((p) => p.prompt),
-      categories: prompts.flatMap(p => p.categories),
+      categories: prompts.flatMap(p => p.categories).map((c) => ({ name: c.name, score: c.confidence })),
     })
   }
 })
@@ -30,7 +30,10 @@ export const _internal_mutation = internalMutation({
   args: {
     presetId: v.id('presets'),
     prompts: v.array(PRESET_PROMPT),
-    categories: v.array(PRESET_CATEGORIES),
+    categories: v.array(v.object({
+      name: PRESET_CATEGORIES,
+      score: v.number()
+    })),
   },
   handler: async (ctx, { presetId, prompts, categories }) => {
     const existingCategories = await ctx.db.query("presetCategories")
@@ -40,9 +43,10 @@ export const _internal_mutation = internalMutation({
     await ctx.db.patch(presetId, { prompts });
 
     const existingCategoryNames = new Set(existingCategories.map(c => c.name));
-    const newCategories = categories.filter(c => !existingCategoryNames.has(c)).map(name => ({
+    const newCategories = categories.filter(c => !existingCategoryNames.has(c.name)).map(c => ({
       presetId,
-      name,
+      name: c.name,
+      score: c.score,
     }));
 
     await Promise.all(newCategories.map(c => ctx.db.insert("presetCategories", c)));

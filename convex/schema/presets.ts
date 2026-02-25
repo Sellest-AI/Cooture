@@ -110,9 +110,10 @@ export const presets = defineTable({
 export const presetCategories = defineTable({
   presetId: v.id("presets"),
   name: PRESET_CATEGORIES,
+  score: v.number(),
 })
   .index("by_preset_id", ["presetId"])
-  .index("by_name", ["name"])
+  .index("by_name_score", ["name", "score"])
 
 export const presetGenerations = defineTable({
   presetId: v.id("presets"),

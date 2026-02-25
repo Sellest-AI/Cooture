@@ -40,7 +40,7 @@ export const admin = adminAction({
         imageIds: images.map((img) => img._id),
         depthMaps: depthMaps.map((dm) => dm),
         prompts: prompts.map((p) => p.prompt),
-        categories: prompts.flatMap((p) => p.categories),
+        categories: prompts.flatMap((p) => p.categories).map((c) => ({ name: c.name, score: c.confidence })),
         contentRating: contentRating,
       })
 
@@ -70,8 +70,11 @@ export const _internal_mutation = internalMutation({
     imageIds: v.array(v.id("images")),
     depthMaps: v.array(v.id("images")),
     prompts: v.array(PRESET_PROMPT),
-    categories: v.array(PRESET_CATEGORIES),
     contentRating: CONTENT_RATINGS,
+    categories: v.array(v.object({
+      name: PRESET_CATEGORIES,
+      score: v.number(),
+    })),
   },
   handler: async (ctx, { name, imageIds, depthMaps, prompts, categories, contentRating }) => {
     const presetId = await ctx.db.insert("presets", {
@@ -85,7 +88,11 @@ export const _internal_mutation = internalMutation({
 
     const uniqueCategories = Array.from(new Set(categories));
     for (const category of uniqueCategories) {
-      await ctx.db.insert("presetCategories", { presetId, name: category })
+      await ctx.db.insert("presetCategories", {
+        presetId,
+        name: category.name,
+        score: category.score
+      })
     }
 
     return presetId;

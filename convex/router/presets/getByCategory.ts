@@ -11,7 +11,7 @@ export const anon = publicQuery({
   },
   handler: async (ctx, args) => {
     const categories = await ctx.db.query('presetCategories')
-      .withIndex('by_name', (q) => q.eq("name", args.category))
+      .withIndex('by_name_score', (q) => q.eq("name", args.category).gte("score", 0.6))
       .paginate(args.paginationOpts);
 
     // Sanitize presets by removing prompts

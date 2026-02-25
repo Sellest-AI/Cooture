@@ -8,7 +8,7 @@ const INSTRUCTIONS = `You are an expert at analyzing preset images and categoriz
 
 Analyze the image and return ALL applicable categories with confidence scores (0-1).
 
-Available categories:
+Categories details:
 
 **Subject Count:**
 - SOLO: Single subject
@@ -62,7 +62,9 @@ Available categories:
 - SERIOUS: Formal, composed
 - ROMANTIC: Soft, intimate
 
-Return only categories that clearly apply with confidence >= 0.7.
+FULL LIST OF CATEGORIES:
+${PRESET_CATEGORY_VALUES.map(c => `- ${c}`).join('\n')}
+
 For subject count, pick exactly ONE (the most accurate one).
 For other dimensions, multiple categories can apply.`;
 
@@ -99,7 +101,7 @@ Think step by step:
 6. What is the shot composition?
 7. What is the mood/vibe?
 
-Return only categories with confidence >= 0.5.`
+Return only categories with confidence >= 0.4`
             }
           ]
         }
