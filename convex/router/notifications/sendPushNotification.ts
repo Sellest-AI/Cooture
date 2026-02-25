@@ -3,24 +3,23 @@ import { v } from "convex/values";
 import { Expo } from "expo-server-sdk";
 import { internal } from "../../_generated/api";
 import { internalAction } from "../../_generated/server";
-import { NOTIFICATION_CHANNEL, NOTIFICATION_TYPE } from "../../schema/notifications";
 
 const expo = new Expo();
 
 export const _internal = internalAction({
   args: {
-    type: NOTIFICATION_TYPE,
+    channelId: v.string(),
     userId: v.id("users"),
     title: v.string(),
     body: v.string(),
-    data: v.optional(v.any())
+    data: v.optional(v.any()),
+    image: v.optional(v.string()), // URL to image
+    redirectUrl: v.optional(v.string()) // Deep link or screen to navigate to
   },
   handler: async (ctx, args) => {
     const tokens = await ctx.runQuery(internal.router.notifications.sendPushNotificationSteps._internal_step_1, { userId: args.userId });
 
     if (!tokens) return;
-
-    const channel = NOTIFICATION_CHANNEL[args.type] || "social";
 
     const messages = tokens
       .filter(t => Expo.isExpoPushToken(t))
@@ -28,9 +27,10 @@ export const _internal = internalAction({
         to: t,
         title: args.title,
         body: args.body,
-        data: args.data,
+        data: args.redirectUrl ? { ...args.data, url: args.redirectUrl } : args.data,
         sound: "default" as const,
-        channelId: channel
+        channelId: args.channelId,
+        ...(args.image && { image: args.image }) // Add image if provided
       }));
 
     const chunks = expo.chunkPushNotifications(messages);

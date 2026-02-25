@@ -75,3 +75,5 @@ export function turnNullKeysToUndefined<T extends object>(obj: T): {
 }
 
 export const prismaToConvex = <T extends object>(obj: T) => turnNullKeysToUndefined(removeUndefinedKeys(obj));
+
+export type Nullable<T> = T | null | undefined;

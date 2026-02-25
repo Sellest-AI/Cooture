@@ -67,6 +67,8 @@ async function registerForPushNotificationsAsync() {
 
 function useNotificationObserver() {
   useEffect(() => {
+    if (Platform.OS === 'web') return;
+
     function redirect(notification: Notifications.Notification) {
       const url = notification.request.content.data?.url;
       if (typeof url === 'string') {
@@ -76,17 +78,12 @@ function useNotificationObserver() {
     }
 
     const response = Notifications.getLastNotificationResponse();
-    if (response?.notification) {
-      redirect(response.notification);
-    }
+    if (response?.notification) redirect(response.notification);
 
-    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
-      redirect(response.notification);
-    });
+    const subscription = Notifications.addNotificationResponseReceivedListener(response =>
+      redirect(response.notification));
 
-    return () => {
-      subscription.remove();
-    };
+    return () => subscription.remove();
   }, []);
 }
 
@@ -100,6 +97,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
   // Set the app badge count to the number of unread notifications
   const { data: unreadCount } = useQuery(api.router.notifications.getUnread.authed, user ? undefined : 'skip');
   useEffect(() => {
+    if (Platform.OS === 'web') return;
     if (unreadCount !== undefined) { Notifications.setBadgeCountAsync(unreadCount.length).catch(() => null); }
   }, [unreadCount]);
 
@@ -108,6 +106,7 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
   useEffect(() => {
     if (!user) return;
     if (triggered) return;
+    if (Platform.OS === 'web') return;
 
     registerForPushNotificationsAsync().then(token => {
       if (token) { register({ token }); }

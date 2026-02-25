@@ -1,7 +1,8 @@
+import { Nullable, ROUTES } from "@shared/utils";
 import { internal } from "../../_generated/api";
-import { Id } from "../../_generated/dataModel";
+import { Doc, Id } from "../../_generated/dataModel";
 import { MutationCtx, QueryCtx } from "../../procedures";
-import { NOTIFICATION_TYPE } from '../../schema/notifications';
+import { NOTIFICATION_CHANNEL, NOTIFICATION_TYPE } from '../../schema/notifications';
 
 type Type = typeof NOTIFICATION_TYPE['type'];
 type SingleObject = { generationId: Id<'generations'>, outfitId?: never } |
@@ -38,6 +39,62 @@ type Args<T extends Type> = {
     never
   )
 
+type ArgsExtended<T extends Type> = Args<T> & (
+  T extends "generation_ready" ? { generation: Nullable<Doc<'generations'>>, type: "generation_ready" } :
+  T extends "tagged_in_generation" ? { generation: Nullable<Doc<'generations'>>, type: "tagged_in_generation" } :
+  T extends "new_like" ? { generation?: Nullable<Doc<'generations'>>, outfit?: Nullable<Doc<'outfits'>>, user?: Nullable<Doc<'usersExtended'>>, type: "new_like" } :
+  T extends "new_follower" ? { follower: Nullable<Doc<'usersExtended'>>, type: "new_follower" } :
+  never
+)
+
+type PushNotification = {
+  title: string,
+  body: string,
+  image?: string;
+  redirectUrl?: string;
+}
+
+const createPushNotification = async (args: ArgsExtended<Type>, notification?: Doc<'notifications'> | null): Promise<PushNotification> => {
+  const FALLBACK_ROUTE = ROUTES.EXTRA.NOTIFICATIONS;
+
+  switch (args.type) {
+    case "generation_ready":
+      return {
+        title: "Your generation is ready",
+        body: "Tap to view",
+        redirectUrl: ROUTES.PHOTOSHOOT.GENERATIONS.ID(args.generationId)
+      }
+    case "tagged_in_generation":
+      return {
+        title: "You were tagged in a generation",
+        body: "Tap to view",
+        redirectUrl: FALLBACK_ROUTE
+      }
+    case "new_follower":
+      return {
+        title: "You have a new follower",
+        body: "Tap to view",
+        image: args.follower?.imageUrl,
+        redirectUrl: args.follower ? ROUTES.USER.ID(args.follower._id) : FALLBACK_ROUTE
+      }
+    case "new_like":
+      if (notification && (notification.aggregationCount ?? 0) > 2)
+        return {
+          title: `+${notification.aggregationCount} people liked your post`,
+          body: "Tap to view",
+          image: args.user?.imageUrl,
+          redirectUrl: FALLBACK_ROUTE
+        }
+
+      return {
+        title: "Your content got a new like",
+        body: "Tap to view",
+        image: args.user?.imageUrl,
+        redirectUrl: FALLBACK_ROUTE
+      }
+  }
+}
+
 const aggregationKey = (args: Args<Type>) => {
   switch (args.type) {
     case "generation_ready":
@@ -51,58 +108,58 @@ const aggregationKey = (args: Args<Type>) => {
   }
 }
 
-type PushNotification = {
-  title: string,
-  body: string,
-}
-
-const createPushNotification = (args: Args<Type>): PushNotification => {
+const getUserId = (args: ArgsExtended<Type>) => {
   switch (args.type) {
     case "generation_ready":
-      return {
-        title: "Your generation is ready!",
-        body: "Tap to view your new post.",
-      }
+      return args.generation?.userId;
     case "tagged_in_generation":
-      return {
-        title: "You were tagged in a generation!",
-        body: "Tap to view the generation you were tagged in.",
-      }
-    case "new_follower":
-      return {
-        title: "You have a new follower!",
-        body: "Tap to view their profile.",
-      }
-    case "new_like":
-      return {
-        title: "Your content got a new like!",
-        body: "Tap to view who's liking your content.",
-      }
-  }
-}
-
-const getUserId = async (ctx: QueryCtx, args: Args<Type>) => {
-  switch (args.type) {
-    case "generation_ready":
-      return (await ctx.db.query("generations").withIndex("by_id", q => q.eq("_id", args.generationId)).first())?.userId;
-    case "tagged_in_generation":
-      return (await ctx.db.query("generations").withIndex("by_id", q => q.eq("_id", args.generationId)).first())?.userId;
+      return args.generation?.userId;
     case "new_follower":
       return args.actorId;
     case "new_like":
-      if (args.generationId) {
-        return (await ctx.db.query("generations").withIndex("by_id", q => q.eq("_id", args.generationId)).first())?.userId;
-      } else if (args.outfitId) {
-        return (await ctx.db.query("outfits").withIndex("by_id", q => q.eq("_id", args.outfitId)).first())?.userId;
-      }
+      return args.generation?.userId ?? args.outfit?.userId;
   }
 }
 
+async function getObjects(ctx: QueryCtx, args: Args<Type>): Promise<ArgsExtended<Type>> {
+  if (args.type === "generation_ready") {
+    const generation = await ctx.db.query("generations").withIndex("by_id", q => q.eq("_id", args.generationId)).first();
+    return { ...args, generation, type: "generation_ready" };
+  }
+
+  if (args.type === "tagged_in_generation") {
+    const taggedGeneration = await ctx.db.query("generations").withIndex("by_id", q => q.eq("_id", args.generationId)).first();
+    return { ...args, generation: taggedGeneration };
+  }
+
+  if (args.type === "new_follower") {
+    const follower = await ctx.db.query("usersExtended").withIndex("by_user_id", q => q.eq("userId", args.actorId)).first();
+    return { ...args, follower };
+  }
+
+  if (args.type === "new_like") {
+    const user = await ctx.db.query("usersExtended").withIndex("by_user_id", q => q.eq("userId", args.actorId)).first();
+    if (args.generationId) {
+      const generation = await ctx.db.query("generations").withIndex("by_id", q => q.eq("_id", args.generationId)).first();
+      return { ...args, generation, user };
+    }
+    else if (args.outfitId) {
+      const outfit = await ctx.db.query("outfits").withIndex("by_id", q => q.eq("_id", args.outfitId)).first();
+      return { ...args, outfit, user };
+    }
+  }
+
+  return args;
+}
+
 export const saveNotification = async <T extends Type>(ctx: MutationCtx, args: Args<T>) => {
-  const existingNotification = await ctx.db.query("notifications")
-    .withIndex("by_aggregation_key", q => q.eq("aggregationKey", aggregationKey(args)))
-    .order("desc")
-    .first();
+  const [objectsArgs, existingNotification] = await Promise.all([
+    getObjects(ctx, args),
+    ctx.db.query("notifications")
+      .withIndex("by_aggregation_key", q => q.eq("aggregationKey", aggregationKey(args)))
+      .order("desc")
+      .first(),
+  ])
 
   const now = Date.now();
   const ONE_DAY = 24 * 60 * 60 * 1000;
@@ -131,16 +188,18 @@ export const saveNotification = async <T extends Type>(ctx: MutationCtx, args: A
     }
   }
 
-  const userId = args.userId ?? await getUserId(ctx, args);
+  const argsExtended = { ...args, ...objectsArgs } as ArgsExtended<Type>;
+
+  const userId = args.userId ?? getUserId(argsExtended);
   if (!userId) throw new Error("Unable to determine userId for notification");
 
   // Schedule a push notification to be sent immediately with the notification details to user's decides. 
   if (args.pushToDevice)
     await ctx.scheduler.runAfter(0, internal.router.notifications.sendPushNotification._internal, {
-      ...createPushNotification(args),
-      data: args,
+      ...(await createPushNotification(argsExtended, existingNotification)),
+      data: argsExtended,
       userId: userId,
-      type: args.type,
+      channelId: NOTIFICATION_CHANNEL[args.type],
     })
 
   return ctx.db.insert("notifications", {

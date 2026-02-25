@@ -3,6 +3,7 @@ import * as Notifications from 'expo-notifications';
 import { router, usePathname } from "expo-router";
 import { atom, useAtomValue } from "jotai";
 import { useEffect } from "react";
+import { Platform } from "react-native";
 import { ROUTES } from "routes";
 
 export const claimedAtom = atom(false);
@@ -12,6 +13,7 @@ function useStreakNotification() {
   const { wallet } = useAccount.Wallet();
 
   useEffect(() => {
+    if (Platform.OS === 'web') return;
     if (!wallet?.nextClaimAt) return;
     if (!wallet.canClaimNow) return;
     if (claimed) return;
