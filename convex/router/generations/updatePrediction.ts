@@ -28,14 +28,6 @@ const updateGenerationStatus = async (ctx: MutationCtx, generationId: Id<'genera
 
   // Archive or publish the generation depending on the predictions status
   if (allProcessed) {
-    // Only send a notification if the generation is transitioning to COMPLETED for the first time
-    if (generation.status !== 'COMPLETED')
-      await saveNotification(ctx, {
-        userId: generation.userId, actorId: generation.userId,
-        type: "generation_ready", generationId: generation._id,
-        pushToDevice: true
-      })
-
     if (allRejected && generation.publication === "ARCHIVED") return;
     if (someAccepted && generation.publication === "PUBLISHED") return;
     await ctx.db.patch(generationId, {
@@ -47,9 +39,16 @@ const updateGenerationStatus = async (ctx: MutationCtx, generationId: Id<'genera
   }
 
   const hasLoading = predictions.some(prediction => prediction.status === "LOADING");
-  if (hasLoading) return ctx.db.patch(generationId, { status: "LOADING" });
+  if (hasLoading) return ctx.db.patch(generationId, { status: "LOADING", publication: "DRAFT" });
 
-  await ctx.db.patch(generationId, { status: "PENDING" });
+  await ctx.db.patch(generationId, { status: "PENDING", publication: "DRAFT" });
+
+  // Only send a notification when the generation is waiting for human validation
+  await saveNotification(ctx, {
+    userId: generation.userId, actorId: generation.userId,
+    type: "generation_ready", generationId: generation._id,
+    pushToDevice: true
+  });
 }
 
 const updatePrediction = async (ctx: MutationCtx, args: {

@@ -47,7 +47,8 @@ export default function Screen() {
     />
   }, [post]);
 
-  if (!isPending && post?.predictions.length === 0) return <Redirect href={ROUTES.TABS.DISCOVER} />
+  if (!isPending && !post)
+    return <Redirect href={ROUTES.TABS.DISCOVER} />
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

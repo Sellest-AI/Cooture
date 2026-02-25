@@ -28,7 +28,8 @@ export const Notification = ({ read, onPress, leftImage, rightImage, date, child
   const hoursAgo = minutesAgo !== null ? Math.floor(minutesAgo / 60) : null;
   const daysAgo = hoursAgo !== null ? Math.floor(hoursAgo / 24) : null;
 
-  const timeAgoString = minutesAgo !== null ? minutesAgo < 60 ? `${minutesAgo} m`
+  const timeAgoString = minutesAgo !== null ? minutesAgo < 60 ?
+    (minutesAgo < 1 ? null : `${minutesAgo} m`)
     : hoursAgo !== null ? hoursAgo < 24 ? `${hoursAgo} h`
       : daysAgo !== null ? `${daysAgo} d` : null : null : null;
 
@@ -76,7 +77,7 @@ export const Notification = ({ read, onPress, leftImage, rightImage, date, child
             {typeof children === 'string' ? (
               <Text.Base color={Colors.neutral[50]} weight={500}>
                 {children}
-                <DateComponent style={{ marginLeft: 6 }} />
+                <DateComponent style={{ paddingLeft: 6 }} />
               </Text.Base>
             ) : (children?.(DateComponent))}
           </View>

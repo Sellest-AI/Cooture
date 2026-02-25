@@ -1,4 +1,4 @@
-import { api, Id } from "@/lib/convex/api";
+import { Api, api, Id } from "@/lib/convex/api";
 import { useMutation, usePaginatedQueryCached, useQueryCached } from "@/lib/convex/client";
 import { EmptyBlock } from "@ui/block.empty";
 import { Notification } from "@ui/cards";
@@ -6,10 +6,9 @@ import { Bell } from "@ui/icons";
 import { ModalHeader } from "@ui/modal";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { Text } from "@ui/text";
-import { notEmpty } from "@utils/convex-allowed";
+import { mergeLoadMoreArrays, notEmpty } from "@utils/convex-allowed";
 import { router } from "expo-router";
-import { atom, useAtom } from "jotai";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
@@ -25,7 +24,7 @@ const GenerationNotification = ({ generationId, onPress }: { generationId: Id<'g
 
   const completed = generation?.status === 'COMPLETED';
 
-  const imagesLoaded = !imageIds || (images && (imageIds ?? []).length > 0);
+  const imagesLoaded = (imageIds?.length === 0) || images;
   if (!preset || !generation || !imagesLoaded) return <Notification.Skeleton />
 
   return (
@@ -43,21 +42,23 @@ const GenerationNotification = ({ generationId, onPress }: { generationId: Id<'g
         {"Your photoshoot"}
         <Text.Base color={Colors.foreground} weight={600}> {`"${preset.name}" `}</Text.Base>
         {completed ? "is ready!" : "is being generated."}
-        <DateComponent style={{ marginLeft: 6 }} />
+        <DateComponent style={{ paddingLeft: 6 }} />
       </Text.Base>}
     </Notification>
   )
 }
 
 type GenereticNotificationProps = {
+  data?: Api['router']['notifications']['getPaginated']['authed']['_returnType']['page'][number];
   id: Id<'notifications'>;
   onPress?: () => void;
   read?: boolean;
 }
-const GenericNotification = ({ id, onPress, read }: GenereticNotificationProps) => {
+const GenericNotification = ({ id, onPress, read, data }: GenereticNotificationProps) => {
   const _unread = useQueryCached(api.router.notifications.getUnread.authed);
   const unread = (_unread?.data ?? []);
-  const notification = unread.find((n) => n._id === id);
+
+  const notification = unread.find((n) => n._id === id) ?? data;
 
   const rightImageId = notification?.generation?.coverId ?? notification?.outfit?.coverId;
   const { data: rightImage } = useQueryCached(api.router.storage.images.getOne.anon, rightImageId ? { id: rightImageId } : 'skip');
@@ -67,18 +68,25 @@ const GenericNotification = ({ id, onPress, read }: GenereticNotificationProps) 
 
     const aggregationCount = notification.aggregationCount ?? 1;
 
-    if (notification.type === "new_like") {
+    if (notification.type === "new_like")
       return <>
         <Text.Base color={Colors.foreground} weight={600}>{notification.actor?.name} </Text.Base>
         {aggregationCount > 1 ? `${aggregationCount} people liked your post.` : "liked your post."}
       </>
-    }
 
     if (notification.type === "new_follower")
       return <>
         <Text.Base color={Colors.foreground} weight={600}>{notification.actor?.name} </Text.Base>
         started following you.
       </>
+
+    if (notification.type === "tagged_in_generation") {
+      if (notification.generation)
+        return <>
+          <Text.Base color={Colors.foreground} weight={600}>{notification.actor?.name} </Text.Base>
+          tagged you in a photoshoot <Text.Base color={Colors.foreground} weight={600}>{`"${notification.generation?.preset?.name}"`}</Text.Base>
+        </>
+    }
 
   }, [notification])
 
@@ -111,20 +119,14 @@ const GenericNotification = ({ id, onPress, read }: GenereticNotificationProps) 
     >
       {(DateComponent) => <Text.Base color={Colors.neutral[50]}>
         <TextComponent />
-        <DateComponent style={{ marginLeft: 6 }} />
+        <DateComponent style={{ paddingLeft: 6 }} />
       </Text.Base>}
     </Notification>
   )
 }
 
-const readAtoms = atom(new Set<Id<'notifications'>>());
-
 export default function Screen() {
-  // Mark notifications as read when leaving the screen
-  const [notificationsRead, setNotificationsRead] = useAtom(readAtoms);
   const { mutate: readNotifications } = useMutation(api.router.notifications.readNotifications.authed);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => () => { readNotifications({ notificationIds: Array.from(notificationsRead) }) }, [])
 
   const _generations = usePaginatedQueryCached(api.router.generations.getPaginated.authed, {}, { initialNumItems: 12 });
   const generations = (_generations.results ?? []);
@@ -155,7 +157,12 @@ export default function Screen() {
         flex: isEmpty ? 1 : undefined
       }}
       stickyHeaderIndices={[0]}
-      onReachEnd={() => { if (canLoadMore) _generations.loadMore(12); }}
+      onReachEnd={() => {
+        if (canLoadMore) {
+          _generations.loadMore(12);
+          _notifications.loadMore(12);
+        }
+      }}
     >
       <ModalHeader
         style={{ backgroundColor: Colors.background, paddingTop: 12, paddingHorizontal: 4 }}
@@ -179,7 +186,7 @@ export default function Screen() {
           generationId={generation._id}
           onPress={() => {
             const notification = unread.find((u) => u.generationId === generation._id);
-            if (notification) setNotificationsRead((s) => new Set(s).add(notification._id));
+            if (notification) readNotifications({ notificationIds: [notification._id] });
           }}
         />
       ))}
@@ -187,40 +194,40 @@ export default function Screen() {
         <GenericNotification
           key={notification._id}
           id={notification._id}
-          onPress={() => { setNotificationsRead((s) => new Set(s).add(notification._id)) }}
-          read={notificationsRead.has(notification._id)}
+          onPress={() => { readNotifications({ notificationIds: [notification._id] }) }}
+          read={false}
         />
       ))}
       {pendingGenerations.length > 0 &&
         <Text.Base color={Colors.foreground} weight={600} style={{ marginBottom: 8, marginLeft: 4 }}>
           Earlier
         </Text.Base>}
-      {[
-        ...generations.filter((g) => g.status === 'COMPLETED').map((g) => ({ ...g, type: 'GENERATION' as const })),
-        ...notifications.filter((g) => g.type !== 'generation_ready').map((n) => ({ ...n, type: 'NOTIFICATION' as const }))
-      ]
-        .sort((a, b) => new Date(b._creationTime).getTime() - new Date(a._creationTime).getTime())
-        .map((notification) => {
-          if (notification.type === "GENERATION") {
-            return <GenerationNotification
-              key={notification._id}
-              generationId={notification._id}
-              onPress={() => {
-                const notif = unread.find((u) => u.generationId === notification._id);
-                if (notif) setNotificationsRead((s) => new Set(s).add(notif._id));
-              }}
-            />
-          }
+      {mergeLoadMoreArrays(
+        notifications.filter((g) => g.type !== 'generation_ready').map((n) => ({ ...n, objectType: 'NOTIFICATION' as const })),
+        generations.filter((g) => g.status === 'COMPLETED').map((g) => ({ ...g, objectType: 'GENERATION' as const })),
+        { canLoadMore: _notifications.status !== "Exhausted" }
+      ).map((notification, i) => {
+        if (notification.objectType === "GENERATION") {
+          return <GenerationNotification
+            key={notification._id}
+            generationId={notification._id}
+            onPress={() => {
+              const notif = unread.find((u) => u.generationId === notification._id);
+              if (notif) readNotifications({ notificationIds: [notif._id] });
+            }}
+          />
+        }
 
-          return (
-            <GenericNotification
-              key={notification._id}
-              id={notification._id}
-              onPress={() => { setNotificationsRead((s) => new Set(s).add(notification._id)) }}
-              read={notificationsRead.has(notification._id)}
-            />
-          )
-        })}
+        return (
+          <GenericNotification
+            data={notification}
+            key={notification._id}
+            id={notification._id}
+            onPress={() => { readNotifications({ notificationIds: [notification._id] }) }}
+            read={true}
+          />
+        )
+      })}
       {(canLoadMore || _generations.isLoading || _notifications.isLoading) && <>
         <Notification.Skeleton />
         <Notification.Skeleton />

@@ -74,6 +74,18 @@ export function turnNullKeysToUndefined<T extends object>(obj: T): {
   ) as any;
 }
 
+type MergeFilterArrays<T> = { _creationTime: number } & T;
+type Options = { canLoadMore: boolean }
+export const mergeLoadMoreArrays = <T, K>(array1: MergeFilterArrays<T>[], array2: MergeFilterArrays<K>[], options?: Options) => {
+  const oldestTimeInArray1 = array1.length > 0 ? Math.min(...array1.map(a => a._creationTime)) : Infinity;
+  return [
+    // Only include items from array1 that are newer than the oldest item in array2 to avoid duplicates
+    ...array1,
+    ...array2.filter((a) => !options?.canLoadMore ? true : a._creationTime >= oldestTimeInArray1)
+  ]
+    .sort((a, b) => new Date(b._creationTime).getTime() - new Date(a._creationTime).getTime())
+}
+
 export const prismaToConvex = <T extends object>(obj: T) => turnNullKeysToUndefined(removeUndefinedKeys(obj));
 
 export type Nullable<T> = T | null | undefined;
