@@ -31,6 +31,7 @@ import type * as functions_items_extractPosition from "../functions/items/extrac
 import type * as functions_items_getItem from "../functions/items/getItem.js";
 import type * as functions_notifications_getNotificationDetails from "../functions/notifications/getNotificationDetails.js";
 import type * as functions_notifications_index from "../functions/notifications/index.js";
+import type * as functions_notifications_readNotification from "../functions/notifications/readNotification.js";
 import type * as functions_notifications_registerToken from "../functions/notifications/registerToken.js";
 import type * as functions_notifications_saveNotification from "../functions/notifications/saveNotification.js";
 import type * as functions_outfits_getBackgroundColor from "../functions/outfits/getBackgroundColor.js";
@@ -240,6 +241,7 @@ declare const fullApi: ApiFromModules<{
   "functions/items/getItem": typeof functions_items_getItem;
   "functions/notifications/getNotificationDetails": typeof functions_notifications_getNotificationDetails;
   "functions/notifications/index": typeof functions_notifications_index;
+  "functions/notifications/readNotification": typeof functions_notifications_readNotification;
   "functions/notifications/registerToken": typeof functions_notifications_registerToken;
   "functions/notifications/saveNotification": typeof functions_notifications_saveNotification;
   "functions/outfits/getBackgroundColor": typeof functions_outfits_getBackgroundColor;

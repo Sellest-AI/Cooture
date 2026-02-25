@@ -2,7 +2,7 @@ import { removeUndefinedKeys } from "@shared/utils";
 import { v } from "convex/values";
 import { Doc, Id } from "../../_generated/dataModel";
 import { upsertFeedScore } from "../../functions/feed";
-import { saveNotification } from "../../functions/notifications";
+import { readNotification, saveNotification } from "../../functions/notifications";
 import { adminMutation, authMutation, internalMutation, MutationCtx } from "../../procedures";
 import { PREDICTION_STATUS } from "../../schema/generations";
 
@@ -30,6 +30,7 @@ const updateGenerationStatus = async (ctx: MutationCtx, generationId: Id<'genera
   if (allProcessed) {
     if (allRejected && generation.publication === "ARCHIVED") return;
     if (someAccepted && generation.publication === "PUBLISHED") return;
+    await readNotification(ctx, { userId: generation.userId, generationId, type: "generation_ready" });
     await ctx.db.patch(generationId, {
       status: "COMPLETED",
       completedAt: completedAt,
@@ -48,7 +49,7 @@ const updateGenerationStatus = async (ctx: MutationCtx, generationId: Id<'genera
   // Only send a notification when the generation is waiting for human validation
   await saveNotification(ctx, {
     userId: generation.userId, actorId: generation.userId,
-    type: "generation_ready", generationId: generation._id,
+    type: "generation_ready", generationId,
     pushToDevice: true
   });
 }
