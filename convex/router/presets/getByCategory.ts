@@ -15,22 +15,24 @@ export const anon = publicQuery({
       .paginate(args.paginationOpts);
 
     // Sanitize presets by removing prompts
-    const sanitizedPresets = await Promise.all(categories.page.map(async (categories) => {
-      const preset = await ctx.db.get(categories.presetId);
-      if (!preset) return null;
-      const cover = await getImage(ctx, preset.imageIds[0]);
-      if (!cover) return null;
+    const sanitizedPresets = await Promise.all(categories.page
+      .sort((a, b) => b.score - a.score) // Sort by category score
+      .map(async (categories) => {
+        const preset = await ctx.db.get(categories.presetId);
+        if (!preset) return null;
+        const cover = await getImage(ctx, preset.imageIds[0]);
+        if (!cover) return null;
 
-      const { prompts, ...rest } = preset;
-      const hasMultipleSubjects = prompts.some((p) => p.subjects.length > 1);
+        const { prompts, ...rest } = preset;
+        const hasMultipleSubjects = prompts.some((p) => p.subjects.length > 1);
 
-      return {
-        ...rest,
-        expectedResults: preset.prompts.length,
-        hasMultipleSubjects,
-        cover,
-      }
-    }));
+        return {
+          ...rest,
+          expectedResults: preset.prompts.length,
+          hasMultipleSubjects,
+          cover,
+        }
+      }));
 
     const page = sanitizedPresets.filter(notEmpty);
 
