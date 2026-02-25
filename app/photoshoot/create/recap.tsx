@@ -276,9 +276,10 @@ export default function Screen() {
 
             let cancel = false;
             const timer = setTimeout(() => {
+              if (cancel) return;
               if (!outfitId) return;
-              dismissTo(ROUTES.PHOTOSHOOT.GENERATIONS.NEXT);
               cancel = true;
+              dismissTo(ROUTES.PHOTOSHOOT.GENERATIONS.NEXT);
             }, 500);
 
             const generationId = await action({
@@ -289,11 +290,14 @@ export default function Screen() {
                 _id: outfitId,
                 size: outfitSize
               } : undefined,
-            });
-
-            clearTimeout(timer);
+            }).catch(() => null);
 
             if (cancel) return;
+
+            cancel = true;
+            clearTimeout(timer);
+
+            if (!generationId) return;
 
             dismissTo(ROUTES.PHOTOSHOOT.GENERATIONS.PATH, {
               pathParams: { id: generationId },

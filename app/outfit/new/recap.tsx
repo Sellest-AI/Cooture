@@ -61,6 +61,8 @@ export default function Screen() {
             const marginLeft = 20;
             const marginRight = 20;
 
+            if (!item) return null;
+
             const isLoading = index >= newItems.length;
             const isCompleted = completed && !isLoading;
 

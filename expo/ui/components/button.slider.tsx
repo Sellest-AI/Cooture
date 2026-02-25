@@ -57,6 +57,7 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
   }
 
   const sharedFinish = async ({ finished, max }: { finished: boolean, max: number }) => {
+    if (showLoader) return; // Prevent multiple triggers
     if (finished) {
       currentX.current = max;
       setShowLoader(true);
