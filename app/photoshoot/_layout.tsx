@@ -14,6 +14,7 @@ export default function Layout() {
     >
       <Stack.Screen name="create" />
       <Stack.Screen name="generations/[id]" />
+      <Stack.Screen name="generations/next" />
     </Stack>
   )
 }

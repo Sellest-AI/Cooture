@@ -18,7 +18,7 @@ import { Carousel, ICarouselInstance } from "@ui/screen-carousel";
 import { Text } from "@ui/text";
 import { notEmpty } from "@utils/convex-allowed";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Dimensions, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
@@ -228,23 +228,26 @@ export default function Screen() {
     setAnimatingItem({ id: currentItem._id, status: validated ? 'ACCEPTING' : 'REJECTING' });
   }
 
-  const handleAnimationComplete = () => {
+  const handleAnimationComplete = useCallback(() => {
     const currentItem = animatingItem;
     if (!currentItem) return;
 
-    // Add to animated items set
-    setAnimatedItemIds(prev => new Set([...prev, currentItem.id]));
-
-    // Reset animation state
+    // Reset animation state first
     setAnimatingItem(null);
 
-    // The carousel will automatically show the next item after filtering
-    // since the current item is now removed from visibleItems
+    // Small delay before removing item to allow gesture handlers to clean up
+    requestAnimationFrame(() => {
+      // Add to animated items set
+      setAnimatedItemIds(prev => new Set([...prev, currentItem.id]));
 
-    // // If no next item, and all items are validated or rejected, go back to profile
-    const nextItem = visibleItems.find(item => item._id !== currentItem.id);
-    if (!nextItem) return router.dismissTo(ROUTES.PROFILE.GENERATIONS);
-  }
+      // Check if we should navigate away
+      const nextItem = visibleItems.find(item => item._id !== currentItem.id);
+      if (!nextItem) {
+        router.dismissTo(ROUTES.PROFILE.GENERATIONS);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [animatingItem])
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>

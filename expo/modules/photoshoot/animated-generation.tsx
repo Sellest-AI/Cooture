@@ -11,6 +11,10 @@ export const AnimatedGeneration = ({ children, status, onAnimationComplete }: An
   const opacityAnim = useRef(new Animated.Value(1)).current;
   const transformAnim = useRef(new Animated.Value(0)).current;
 
+  // Use a ref so changing the callback never re-triggers the animation
+  const onAnimationCompleteRef = useRef(onAnimationComplete);
+  onAnimationCompleteRef.current = onAnimationComplete;
+
   useEffect(() => {
     if (status === 'IDLE') return;
     Animated.parallel([
@@ -30,9 +34,10 @@ export const AnimatedGeneration = ({ children, status, onAnimationComplete }: An
         useNativeDriver: true,
       }),
     ]).start(() => {
-      onAnimationComplete?.();
+      onAnimationCompleteRef.current?.();
     });
-  }, [onAnimationComplete, scaleAnim, opacityAnim, status, transformAnim]);
+
+  }, [scaleAnim, opacityAnim, status, transformAnim]);
 
   return (
     <Animated.View
