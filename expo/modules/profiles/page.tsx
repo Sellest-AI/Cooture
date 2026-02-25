@@ -1,7 +1,7 @@
 import { useRouter } from "@/hooks";
 import { Id } from "@/lib/convex/client";
 import { Block } from "@ui/block";
-import { Settings } from "@ui/icons";
+import { Camera, Settings } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
@@ -38,7 +38,7 @@ type Props = {
 }
 
 export function Screen({ user, isSelf, recentPosts, style }: Props) {
-  const { back } = useRouter();
+  const { back, push } = useRouter(ROUTES.USER.PATH);
   const path = useRouter.Path();
   const scrollRef = useRef<ScrollView>(null);
   const slotRef = useRef<LayoutRectangle | null>(null);
@@ -124,9 +124,12 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
               title="Profile"
               type="alt"
               size="big"
-              endContent={isSelf ? <View style={{ flexDirection: 'row', gap: 8 }}>
+              endContent={<View style={{ flexDirection: 'row', gap: 8 }}>
                 {/* <Notification /> */}
-                <Pressable onPress={() => router.push(ROUTES.PROFILE.SETTINGS)}>
+                <Pressable onPress={() => {
+                  if (isSelf) push(ROUTES.PROFILE.SETTINGS);
+                  if (!isSelf) push(ROUTES.PHOTOSHOOT.NEW, { params: { userId: user._id } })
+                }}>
                   <Block
                     variant="blur"
                     style={{
@@ -134,10 +137,11 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
                       padding: 10,
                     }}
                   >
-                    <Settings size={24} color={Colors.foreground} />
+                    {isSelf && <Settings size={24} color={Colors.foreground} />}
+                    {!isSelf && <Camera size={24} color={Colors.foreground} />}
                   </Block>
                 </Pressable>
-              </View> : undefined}
+              </View>}
             />
           </View>
         }

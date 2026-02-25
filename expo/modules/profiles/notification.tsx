@@ -1,5 +1,5 @@
 import { ROUTES, useRouter } from "@/hooks";
-import { api, usePaginatedQuery } from "@/lib/convex/client";
+import { api, usePaginatedQuery, useQueryCached } from "@/lib/convex/client";
 import { Block } from "@ui/block";
 import { Bell, Loader } from "@ui/icons";
 import { Pressable } from "@ui/pressable";
@@ -12,11 +12,10 @@ type Props = {
 }
 
 export const Notification = ({ style }: Props) => {
-  const data = usePaginatedQuery(api.router.generations.getPaginated.authed, {}, { initialNumItems: 9 });
-  const generations = data.results ?? [];
-  const newGenerations = generations.filter(g => g.status === 'PENDING');
-  const hasNewNotifications = newGenerations.length > 0;
+  const { results: generations } = usePaginatedQuery(api.router.generations.getPaginated.authed, {}, { initialNumItems: 9 });
+  const { data } = useQueryCached(api.router.notifications.getUnread.authed);
   const isLoading = generations.some(g => g.status === 'LOADING');
+  const hasNewNotifications = isLoading || (data?.length ?? 0) > 0;
 
   const { push } = useRouter();
 
@@ -40,7 +39,7 @@ export const Notification = ({ style }: Props) => {
         <Text.Sm color={Colors.destructive[50]} weight={700}
           style={{ marginLeft: -4, marginTop: -2 }}
         >
-          {newGenerations.length}
+          {data?.length ?? 0}
         </Text.Sm>
       </Block>}
       {isLoading && <Block

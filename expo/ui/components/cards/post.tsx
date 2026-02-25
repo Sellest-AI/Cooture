@@ -298,65 +298,67 @@ export const Post = ({ style, postedAt, image, users, preset, outfit, images, li
       >
         {type === 'preset' ? 'Recreate' : 'Try on'}
       </Button>}
-      <View style={{ marginTop: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: PADDING_HORIZONTAL + 4 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', gap: 8 }}>
-          <GhostIconWrapper
-            style={{ padding: 4 }}
-            icon={HeartIcon}
-            selected={isLiked}
-            color={isLiked ? Colors.secondary[500] : Colors.foreground}
-            onPress={() => { onToggleLike?.(!isLiked); }}
-            size={20}
-          />
-          {likedAccounts && <View style={{ flexDirection: 'row', gap: 0, alignItems: 'center' }}>
-            {likedAccounts.slice(0, 3).map((account) => (
-              <Image
+      <View style={{ paddingHorizontal: PADDING_HORIZONTAL + 4, marginTop: 8 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', gap: 8 }}>
+            <GhostIconWrapper
+              style={{ padding: 4 }}
+              icon={HeartIcon}
+              selected={isLiked}
+              color={isLiked ? Colors.secondary[500] : Colors.foreground}
+              onPress={() => { onToggleLike?.(!isLiked); }}
+              size={20}
+            />
+            {likedAccounts && <View style={{ flexDirection: 'row', gap: 0, alignItems: 'center' }}>
+              {likedAccounts.slice(0, 3).map((account) => (
+                <Image
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: 99,
+                    marginRight: -4
+                  }}
+                  source={account}
+                  key={account}
+                />
+              ))}
+            </View>}
+          </View>
+          <View style={{ gap: 12, flexDirection: 'row', alignItems: 'center' }}>
+            <GhostIconWrapper
+              style={{ padding: 4 }}
+              icon={BookmarkIcon}
+              selected={isBookmarked}
+              color={Colors.primary[500]}
+              onPress={() => { onToggleBookmark?.(); }}
+              size={20}
+            />
+            {onShare && <ShareIcon size={20} color={Colors.secondary[500]} onPress={() => {
+              const id = images?.[currentIndex]._id ?? image?._id;
+              if (id) onShare?.(id);
+            }} />}
+          </View>
+          {(images && images.length > 1) && <View style={{
+            position: 'absolute',
+            left: '50%',
+            transform: [{ translateX: '-50%' }],
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 4
+          }}>
+            {images?.map((img, i) => (
+              <MotiView
+                key={img._id}
                 style={{
-                  width: 24,
-                  height: 24,
+                  width: 5,
+                  height: 5,
+                  backgroundColor: currentIndex === i ? Colors.neutral[50] : Colors.neutral[400],
                   borderRadius: 99,
-                  marginRight: -4
                 }}
-                source={account}
-                key={account}
+              // animate={{}}
               />
             ))}
           </View>}
-        </View>
-        {(images && images.length > 1) && <View style={{
-          position: 'absolute',
-          left: '50%',
-          transform: [{ translateX: '-50%' }],
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 4
-        }}>
-          {images?.map((img, i) => (
-            <MotiView
-              key={img._id}
-              style={{
-                width: 5,
-                height: 5,
-                backgroundColor: currentIndex === i ? Colors.neutral[50] : Colors.neutral[400],
-                borderRadius: 99,
-              }}
-            // animate={{}}
-            />
-          ))}
-        </View>}
-        <View style={{ gap: 12, flexDirection: 'row', alignItems: 'center' }}>
-          <GhostIconWrapper
-            style={{ padding: 4 }}
-            icon={BookmarkIcon}
-            selected={isBookmarked}
-            color={Colors.primary[500]}
-            onPress={() => { onToggleBookmark?.(); }}
-            size={20}
-          />
-          {onShare && <ShareIcon size={20} color={Colors.secondary[500]} onPress={() => {
-            const id = images?.[currentIndex]._id ?? image?._id;
-            if (id) onShare?.(id);
-          }} />}
         </View>
       </View>
     </View>
