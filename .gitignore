@@ -46,6 +46,7 @@ tunnel_url.txt
 
 dataset
 
+.expo/devices.json
 .expo
 android
 .idea

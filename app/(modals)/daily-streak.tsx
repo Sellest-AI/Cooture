@@ -312,7 +312,7 @@ const FlameComponent = () => {
         </Animated.View>
         <Animated.View style={flameAnimatedStyle}>
           <Image
-            source={require("assets/images/flame.png")}
+            source={require("assets/images/flame.webp")}
             contentFit="contain"
             style={{ width: 172, height: 172 }}
           />
