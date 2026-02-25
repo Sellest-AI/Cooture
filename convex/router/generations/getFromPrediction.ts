@@ -9,6 +9,21 @@ export const anon = publicQuery({
   handler: async (ctx, args) => {
     const prediction = await ctx.db.get(args.id);
     if (!prediction?.generationId) return null;
-    return getGenerationMax(ctx, prediction.generationId);
+
+    const generation = await getGenerationMax(ctx, prediction.generationId);
+    if (!generation) return null;
+
+    const predictions = generation.predictions.filter((p) => p.status === 'ACCEPTED');
+    if (predictions.length === 0) return null;
+
+    const firstPredictionId = predictions[0]._id;
+    const coverId = predictions[0].imageId;
+
+    return {
+      ...generation,
+      predictions,
+      firstPredictionId,
+      coverId,
+    }
   }
 })

@@ -1,4 +1,4 @@
-import { useRoute } from "@/hooks";
+import { ROUTES, useRoute } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
 import { usePaginatedQuery, useQuery } from "@/lib/convex/client";
 import { GenerationPost } from "@/modules/feed/post.generation";
@@ -8,14 +8,14 @@ import { FlashList } from "@ui/flat-list";
 import { ModalHeader } from "@ui/modal";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
-import { router } from "expo-router";
+import { Redirect, router } from "expo-router";
 import { useCallback, useMemo } from "react";
 import { Colors } from "theme";
 
 
 export default function Screen() {
   const { id } = useRoute.Params<{ id: Id<'predictions'> }>();
-  const { data: post } = useQuery(api.router.generations.getFromPrediction.anon, { id });
+  const { data: post, isPending } = useQuery(api.router.generations.getFromPrediction.anon, { id });
   const { results: postsFromUser, isLoading, loadMore } = usePaginatedQuery(api.router.generations.getPaginated.anon, post?.user?._id ? { userId: post?.user?._id } : 'skip', { initialNumItems: 8 });
 
   const posts = (postsFromUser ?? []).filter((p) => p._id !== post?._id);
@@ -46,6 +46,8 @@ export default function Screen() {
       disableLongPress={true}
     />
   }, [post]);
+
+  if (!isPending && post?.predictions.length === 0) return <Redirect href={ROUTES.TABS.DISCOVER} />
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
