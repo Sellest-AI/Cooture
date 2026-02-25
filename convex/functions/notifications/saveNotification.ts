@@ -57,6 +57,8 @@ type PushNotification = {
 const createPushNotification = async (args: ArgsExtended<Type>, notification?: Doc<'notifications'> | null): Promise<PushNotification> => {
   const FALLBACK_ROUTE = ROUTES.EXTRA.NOTIFICATIONS;
 
+  const aggregationCount = notification?.aggregationCount ?? 0;
+
   switch (args.type) {
     case "generation_ready":
       return {
@@ -78,9 +80,9 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
         redirectUrl: args.follower ? ROUTES.USER.ID(args.follower._id) : FALLBACK_ROUTE
       }
     case "new_like":
-      if (notification && (notification.aggregationCount ?? 0) > 2)
+      if (aggregationCount > 2)
         return {
-          title: `+${notification.aggregationCount} people liked your post`,
+          title: `+${aggregationCount} people liked your post`,
           body: "Tap to view",
           image: args.user?.imageUrl,
           redirectUrl: FALLBACK_ROUTE
@@ -124,7 +126,7 @@ const getUserId = (args: ArgsExtended<Type>) => {
 async function getObjects(ctx: QueryCtx, args: Args<Type>): Promise<ArgsExtended<Type>> {
   if (args.type === "generation_ready") {
     const generation = await ctx.db.query("generations").withIndex("by_id", q => q.eq("_id", args.generationId)).first();
-    return { ...args, generation, type: "generation_ready" };
+    return { ...args, generation };
   }
 
   if (args.type === "tagged_in_generation") {
@@ -152,6 +154,17 @@ async function getObjects(ctx: QueryCtx, args: Args<Type>): Promise<ArgsExtended
   return args;
 }
 
+const isNotificationAllowed = (args: ArgsExtended<Type>) => {
+  const userId = args.userId ?? getUserId(args);
+
+  if (args.type === "generation_ready") return true;
+
+  // Don't allow notifications if the actor is the same as the user (e.g. liking your own generation, following yourself, etc.)
+  if (userId === args.actorId) return false;
+
+  return true;
+}
+
 export const saveNotification = async <T extends Type>(ctx: MutationCtx, args: Args<T>) => {
   const [objectsArgs, existingNotification] = await Promise.all([
     getObjects(ctx, args),
@@ -161,8 +174,13 @@ export const saveNotification = async <T extends Type>(ctx: MutationCtx, args: A
       .first(),
   ])
 
+  const argsExtended = { ...args, ...objectsArgs } as ArgsExtended<Type>;
+
+  // Don't create or update notifications if the action is performed by the same user (e.g. liking your own generation, following yourself, etc.)
+  if (!isNotificationAllowed(argsExtended)) return null;
+
   const now = Date.now();
-  const ONE_DAY = 24 * 60 * 60 * 1000;
+  const TEN_HOURS = 10 * 60 * 60 * 1000;
   const THIRTY_MINUTES = 30 * 60 * 1000;
 
   // Notifications can be stacked up to 30 minutes OR until a hard cap of 1 day after the first notification in the stack, whichever comes first.
@@ -171,7 +189,7 @@ export const saveNotification = async <T extends Type>(ctx: MutationCtx, args: A
 
   if (existingNotification) {
     const withinWindow = (existingNotification.aggregatedUntil ?? 0) >= now;
-    const withinHardCap = (existingNotification._creationTime + ONE_DAY) >= now;
+    const withinHardCap = (existingNotification._creationTime + TEN_HOURS) >= now;
 
     if (withinWindow && withinHardCap) {
       if (existingNotification.actorId === args.actorId)
@@ -187,8 +205,6 @@ export const saveNotification = async <T extends Type>(ctx: MutationCtx, args: A
       return existingNotification._id;
     }
   }
-
-  const argsExtended = { ...args, ...objectsArgs } as ArgsExtended<Type>;
 
   const userId = args.userId ?? getUserId(argsExtended);
   if (!userId) throw new Error("Unable to determine userId for notification");

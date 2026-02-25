@@ -1,4 +1,4 @@
-import { url } from "@utils/routes";
+import { url } from "../../utils/routes";
 import { WEBSITE } from "./website";
 
 export const SERVER_ROUTE_PATH = '/_next/data';

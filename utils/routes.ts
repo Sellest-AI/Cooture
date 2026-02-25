@@ -1,7 +1,3 @@
-import { POSTHOG_IGNORED_ROUTES } from "global";
-
-export const isRouteIgnored = (url: string | undefined) => POSTHOG_IGNORED_ROUTES.some((path) => url?.startsWith(path));
-
 type Param = boolean | number | string | string[] | undefined | null;
 
 export const url = <T extends string>(path: T, params: Record<string, Param>): T => {
