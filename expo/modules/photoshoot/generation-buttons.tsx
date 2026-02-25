@@ -2,6 +2,7 @@ import { downloadImageCrossPlatform } from "@/lib/image/client";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
 import { HeartIcon, Loader, X } from "@ui/icons";
+import { AnimatePresence, MotiView } from "@ui/motion";
 import { SafeAreaView, useSafeAreaInsets } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import { View } from "react-native";
@@ -26,61 +27,70 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
   const { bottom } = useSafeAreaInsets();
 
   return (
-    <SafeAreaView
-      edges={{ top: 'off', bottom: 'off' }}
-      style={{
-        paddingBottom: bottom + 28,
-        alignItems: 'center',
-      }}>
-      {isCurrentLoading && <Block
-        variant="blur"
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: 12,
-          paddingHorizontal: 24,
-          borderRadius: 99,
-          gap: 12,
-        }}
+    <AnimatePresence>
+      {currentItem && <MotiView
+        key="buttons"
+        from={{ opacity: 0, translateY: 20 }}
+        animate={{ opacity: 1, translateY: 0 }}
+        exit={{ opacity: 0, translateY: 20 }}
       >
-        <Loader color={Colors.primary[500]} />
-        <Text.Base color={Colors.neutral[50]}>
-          Please be patient...
-        </Text.Base>
-        <Text.Sm color={Colors.neutral[400]} weight={600} style={{ marginLeft: 12 }}>
-          {processed} / {processed + loading}
-        </Text.Sm>
-      </Block>}
-      {!isCurrentLoading && <View style={{
-        flexDirection: 'row',
-        gap: 12,
-      }}
-      >
-        <Button
-          variant="blur"
-          startIcon={X}
-          onPress={() => {
-            if (!currentItem) return;
-            onNext(false);
+        <SafeAreaView
+          edges={{ top: 'off', bottom: 'off' }}
+          style={{
+            paddingBottom: bottom + 28,
+            alignItems: 'center',
+          }}>
+          {isCurrentLoading && <Block
+            variant="blur"
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: 12,
+              paddingHorizontal: 24,
+              borderRadius: 99,
+              gap: 12,
+            }}
+          >
+            <Loader color={Colors.primary[500]} />
+            <Text.Base color={Colors.neutral[50]}>
+              Please be patient...
+            </Text.Base>
+            <Text.Sm color={Colors.neutral[400]} weight={600} style={{ marginLeft: 12 }}>
+              {processed} / {processed + loading}
+            </Text.Sm>
+          </Block>}
+          {!isCurrentLoading && <View style={{
+            flexDirection: 'row',
+            gap: 12,
           }}
-        >
-          Archive
-        </Button>
-        <Button
-          variant="primary"
-          startIcon={HeartIcon}
-          onPress={async () => {
-            if (!currentItem?.url) return;
-            try {
-              await downloadImageCrossPlatform(currentItem.url);
-            } catch { }
-            onNext(true);
-          }}
-        >
-          Save
-        </Button>
-      </View>}
-    </SafeAreaView>
+          >
+            <Button
+              variant="blur"
+              startIcon={X}
+              onPress={() => {
+                if (!currentItem) return;
+                onNext(false);
+              }}
+            >
+              Archive
+            </Button>
+            <Button
+              variant="primary"
+              startIcon={HeartIcon}
+              onPress={async () => {
+                if (!currentItem?.url) return;
+                try {
+                  await downloadImageCrossPlatform(currentItem.url);
+                } catch { }
+                onNext(true);
+              }}
+            >
+              Save
+            </Button>
+          </View>}
+        </SafeAreaView>
+      </MotiView>}
+    </AnimatePresence>
   )
 }

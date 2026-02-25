@@ -15,7 +15,7 @@ import { Colors } from "theme";
 import { itemsAtom } from "./browser";
 
 export default function Screen() {
-  const { dismissTo } = useRouter();
+  const { forceDismissTo } = useRouter();
 
   const [completed, setCompleted] = useState(false);
   const { setItems, saveOutfit } = useOutfit.New();
@@ -106,8 +106,8 @@ export default function Screen() {
           variant="primary"
           onPress={async () => {
             const outfit = await saveOutfit();
-            dismissTo(ROUTES.OUTFIT.PATH, { pathParams: { id: outfit } });
             setBrowserItems([]);
+            forceDismissTo(ROUTES.OUTFIT.PATH, { pathParams: { id: outfit } });
           }}
         >
           Save Outfit

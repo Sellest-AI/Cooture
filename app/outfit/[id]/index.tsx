@@ -28,7 +28,7 @@ import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 const UserBlock = () => {
-  const { push } = useRouter('/outfit/[id]');
+  const { push } = useRouter(ROUTES.OUTFIT.PATH);
   const { id } = useRoute.Params<{ id: Id<'outfits'> }>();
   const { outfit } = useOutfit(id);
 
@@ -84,7 +84,7 @@ const UserBlock = () => {
 }
 
 const Generation = ({ imageId, predictionId }: { imageId: Id<'images'>, predictionId: Id<'predictions'> }) => {
-  const { push } = useRouter('/outfit/[id]');
+  const { push } = useRouter(ROUTES.OUTFIT.PATH);
   const { data: image } = useQueryCached(api.router.storage.images.getOne.anon, { id: imageId });
 
   return (
@@ -153,7 +153,7 @@ export default function ItemScreen() {
   const { user: me } = useAccount();
   const { bottom } = useSafeAreaInsets();
 
-  const { push } = useRouter('/outfit/[id]');
+  const { push } = useRouter(ROUTES.OUTFIT.PATH);
   const { id } = useRoute.Params<{ id: Id<'outfits'> }>();
   const { outfit, updateItems, updateName, remove } = useOutfit(id);
   const { data: user } = useQuery(api.router.users.getAccount.anon, outfit ? { userId: outfit.userId } : 'skip');

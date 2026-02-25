@@ -41,6 +41,8 @@ const updateGenerationStatus = async (ctx: MutationCtx, generationId: Id<'genera
   const hasLoading = predictions.some(prediction => prediction.status === "LOADING");
   if (hasLoading) return ctx.db.patch(generationId, { status: "LOADING", publication: "DRAFT" });
 
+  if (generation.status === "PENDING") return;
+
   await ctx.db.patch(generationId, { status: "PENDING", publication: "DRAFT" });
 
   // Only send a notification when the generation is waiting for human validation

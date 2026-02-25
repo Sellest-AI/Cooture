@@ -240,6 +240,12 @@ export const useRouter = <T extends Route = Route>(_href?: T) => {
     router.dismissTo(toUrl, options);
   }, [_routerFunction]);
 
+  const forceDismissTo = useCallback(<T extends Route>(to: T, options?: RouterParams<T>) => {
+    const toUrl = _routerFunction(to, options);
+    if (router.canDismiss()) router.dismissAll();
+    requestAnimationFrame(() => router.dismissTo(toUrl, options));
+  }, [_routerFunction]);
+
   const back = useCallback(() => {
     if (router.canGoBack()) router.back();
     else router.dismissTo('/');
@@ -264,6 +270,7 @@ export const useRouter = <T extends Route = Route>(_href?: T) => {
     push,
     replace,
     dismissTo,
+    forceDismissTo,
     _routerFunction,
     _toUrl
   }

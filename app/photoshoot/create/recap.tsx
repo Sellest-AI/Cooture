@@ -234,6 +234,7 @@ export default function Screen() {
   const { data: canPay } = useQueryCached(api.router.credits.canPay.authed, cost ? { amount: cost } : 'skip');
   const { outfitId, outfitSize, presetId, friendId, disabled } = usePhotoshoot.New();
   const { dismissTo, push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
+  const { forceDismissTo } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
 
   const { action, isLoading } = useAction(api.llm.triggers.photoshoot.authed);
 
@@ -299,7 +300,7 @@ export default function Screen() {
 
             if (!generationId) return;
 
-            dismissTo(ROUTES.PHOTOSHOOT.GENERATIONS.PATH, {
+            forceDismissTo(ROUTES.PHOTOSHOOT.GENERATIONS.PATH, {
               pathParams: { id: generationId },
             })
           }}
