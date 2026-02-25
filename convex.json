@@ -2,7 +2,8 @@
   "node": {
     "externalPackages": [
       "sharp",
-      "runpod-sdk"
+      "runpod-sdk",
+      "expo-server-sdk"
     ]
   }
 }

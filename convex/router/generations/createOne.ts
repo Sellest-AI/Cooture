@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { Id } from "../../_generated/dataModel";
+import { saveNotification } from "../../functions/notifications";
 import { internalMutation } from "../../procedures";
 
 export const _internal = internalMutation({
@@ -27,6 +28,15 @@ export const _internal = internalMutation({
     })));
 
     const userIds = Array.from(new Set([userId, ...(extraUserIds ?? [])]));
+
+    const extraUsers = (extraUserIds ?? []).filter((id) => id !== userId);
+    await Promise.all(extraUsers.map((id) => saveNotification(ctx, {
+      userId: id,
+      actorId: userId,
+      type: "tagged_in_generation",
+      generationId,
+      pushToDevice: true
+    })));
 
     if (preset) {
       await ctx.db.insert("presetGenerations", {

@@ -7,6 +7,7 @@ import { generations, predictions } from "./schema/generations";
 import { imageObjects, images, imageSizes } from "./schema/images";
 import { items } from "./schema/items";
 import { likes, likeStats } from "./schema/likes";
+import { notifications, pushTokens } from "./schema/notifications";
 import { outfitItems, outfits } from "./schema/outfits";
 import { presetCategories, presetGenerations, presets } from "./schema/presets";
 import { quests, userQuestProgress } from "./schema/quests";
@@ -47,4 +48,6 @@ export default defineSchema({
   creditTransactions,
   waitlistCodes,
   waitlist,
+  notifications,
+  pushTokens,
 });

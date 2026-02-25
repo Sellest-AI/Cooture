@@ -1,9 +1,10 @@
 import { ConvexError, v } from "convex/values";
 import { Id } from "../../_generated/dataModel";
+import { saveNotification } from "../../functions/notifications";
 import { authMutation, internalMutation, MutationCtx } from "../../procedures";
 import { LIKEABLE_TYPE } from "../../schema/likes";
 
-const extractType = <T extends (typeof LIKEABLE_TYPE)['type']>(args: { generationId?: Id<'generations'>; outfitId?: Id<'outfits'> }): T => {
+const extractType = <T extends (typeof LIKEABLE_TYPE)['type']>(args: { generationId?: Id<'generations'>, outfitId?: Id<'outfits'> }): T => {
   if (args.generationId) return "generation" as T;
   if (args.outfitId) return "outfit" as T;
   throw new ConvexError("Exactly one of generationId or outfitId must be provided");
@@ -17,6 +18,9 @@ const args = {
 
 const sharedFunction = async (ctx: MutationCtx, args: { userId: Id<'users'>, value?: boolean, generationId?: Id<'generations'>, outfitId?: Id<'outfits'> }) => {
   const { generationId, outfitId } = args;
+
+  if (!generationId && !outfitId)
+    throw new ConvexError("Either generationId or outfitId must be provided");
 
   // Validate exactly one ID is provided
   const providedIds = [generationId, outfitId].filter(Boolean);
@@ -56,6 +60,10 @@ const sharedFunction = async (ctx: MutationCtx, args: { userId: Id<'users'>, val
     });
     // Schedule stats update
     await updateStats(ctx, { generationId, outfitId }, 1);
+
+    const post = generationId ? { generationId } : { outfitId: outfitId! };
+    await saveNotification(ctx, { type: "new_like", actorId: args.userId, pushToDevice: true, ...post });
+
     return { liked: true };
   }
 }

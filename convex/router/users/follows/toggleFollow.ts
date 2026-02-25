@@ -1,5 +1,6 @@
 import { ConvexError, v } from "convex/values";
 import { Id } from "../../../_generated/dataModel";
+import { saveNotification } from "../../../functions/notifications";
 import { authMutation, internalMutation, MutationCtx } from "../../../procedures";
 
 const toggleFollow = async (
@@ -39,6 +40,15 @@ const toggleFollow = async (
       followingId: targetUserId,
       createdAt: Date.now(),
     });
+
+    // Notify the user that they have a new follower
+    await saveNotification(ctx, {
+      pushToDevice: true,
+      userId: targetUserId,
+      actorId: args.userId,
+      type: "new_follower",
+    })
+
     await updateStats(ctx, args.userId, targetUserId, 1);
     return { following: true };
   }

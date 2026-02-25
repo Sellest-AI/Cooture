@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "49558589927",
+    "project_id": "cooture-ai",
+    "storage_bucket": "cooture-ai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:49558589927:android:ce6ca2f606dfca41baed42",
+        "android_client_info": {
+          "package_name": "com.cooture.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsUryfQAFdiNz_S0Ea_Qy-ZO7CvB2Jyk8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

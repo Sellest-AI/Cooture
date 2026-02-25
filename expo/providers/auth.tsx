@@ -37,7 +37,9 @@ const AuthenticationGate = () => {
     else return null;
   }
 
-  if (pathname.startsWith('/auth/')) return <Redirect href={ROUTES.TABS.DISCOVER} />
+  if (!isInWaitlist && pathname.startsWith(ROUTES.WELCOME.WAIT_LIST)) return <Redirect href={ROUTES.TABS.FEED} />
+
+  if (pathname.startsWith(ROUTES.AUTH)) return <Redirect href={ROUTES.TABS.DISCOVER} />
 
   if (pathname.length <= 1) return <Redirect href={ROUTES.TABS.FEED} />
 
@@ -47,7 +49,7 @@ const AuthenticationGate = () => {
 const UnauthenticatedGate = () => {
   const pathname = usePathname();
 
-  if (pathname.startsWith('/auth/')) return null;
+  if (pathname.startsWith(ROUTES.AUTH)) return null;
 
   return <Redirect href={ROUTES.AUTH} />
 }

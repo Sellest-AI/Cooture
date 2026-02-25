@@ -2,6 +2,7 @@ import { removeUndefinedKeys } from "@shared/utils";
 import { v } from "convex/values";
 import { Doc, Id } from "../../_generated/dataModel";
 import { upsertFeedScore } from "../../functions/feed";
+import { saveNotification } from "../../functions/notifications";
 import { adminMutation, authMutation, internalMutation, MutationCtx } from "../../procedures";
 import { PREDICTION_STATUS } from "../../schema/generations";
 
@@ -27,6 +28,14 @@ const updateGenerationStatus = async (ctx: MutationCtx, generationId: Id<'genera
 
   // Archive or publish the generation depending on the predictions status
   if (allProcessed) {
+    // Only send a notification if the generation is transitioning to COMPLETED for the first time
+    if (generation.status !== 'COMPLETED')
+      await saveNotification(ctx, {
+        userId: generation.userId, actorId: generation.userId,
+        type: "generation_ready", generationId: generation._id,
+        pushToDevice: true
+      })
+
     if (allRejected && generation.publication === "ARCHIVED") return;
     if (someAccepted && generation.publication === "PUBLISHED") return;
     await ctx.db.patch(generationId, {

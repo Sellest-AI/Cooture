@@ -1,10 +1,39 @@
 import { useAccount } from "@/lib/convex/auth";
+import * as Notifications from 'expo-notifications';
 import { router, usePathname } from "expo-router";
 import { atom, useAtomValue } from "jotai";
 import { useEffect } from "react";
 import { ROUTES } from "routes";
 
 export const claimedAtom = atom(false);
+
+function useStreakNotification() {
+  const claimed = useAtomValue(claimedAtom);
+  const { wallet } = useAccount.Wallet();
+
+  useEffect(() => {
+    if (!wallet?.nextClaimAt) return;
+    if (!wallet.canClaimNow) return;
+    if (claimed) return;
+
+    const secondsUntilNextClaim = Math.floor((wallet.nextClaimAt - Date.now()) / 1000);
+    if (secondsUntilNextClaim <= 0) return;
+
+    Notifications.scheduleNotificationAsync({
+      identifier: "streak-reminder",
+      content: {
+        title: "Don't break your streak 🔥",
+        body: "Open the app and get your daily credits!",
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: secondsUntilNextClaim,
+        repeats: false,
+        channelId: "streak",
+      },
+    });
+  }, [claimed, wallet]);
+}
 
 export const StreakProvider = ({ children }: { children: React.ReactNode }) => {
   const path = usePathname();
@@ -13,6 +42,9 @@ export const StreakProvider = ({ children }: { children: React.ReactNode }) => {
 
   // If the user just created their account, consider them as having claimed the streak for today to avoid showing the modal immediately
   const isFirstDay = (Date.now() - (wallet?._creationTime ?? 0) < 24 * 60 * 60 * 1000);
+
+  // Show the daily streak notification if the user hasn't claimed their streak yet
+  useStreakNotification();
 
   useEffect(() => {
     if (claimed) return;
