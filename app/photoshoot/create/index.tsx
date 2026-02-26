@@ -100,6 +100,7 @@ export default function Screen() {
                   horizontal
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={{
+                    minHeight: 34,
                     paddingHorizontal: 12,
                     marginBottom: 24
                   }}

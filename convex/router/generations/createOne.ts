@@ -28,8 +28,8 @@ export const _internal = internalMutation({
     })));
 
     const userIds = Array.from(new Set([userId, ...(extraUserIds ?? [])]));
-
     const extraUsers = (extraUserIds ?? []).filter((id) => id !== userId);
+
     await Promise.all(extraUsers.map((id) => saveNotification(ctx, {
       userId: id,
       actorId: userId,

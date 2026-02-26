@@ -64,7 +64,7 @@ const generateFunction = async (ctx: ActionCtx, args: {
     // Create new generation
     await ctx.runMutation(internal.router.generations.createOne._internal, {
       userId: args.userId,
-      extraUserIds: subjects.map(s => s.userId),
+      extraUserIds: subjects.map(s => s.userId).slice(schema.prompt.subjects.length), // only add extra users to generation, not the main user
       predictionIds: predictions.map(p => p.id),
       preset: {
         presetId: preset._id,

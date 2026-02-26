@@ -15,7 +15,7 @@ import { Colors } from "theme";
 
 export default function Layout() {
   const { setOutfitId, setPresetId, setFriendId, reset, preset } = usePhotoshoot.New();
-  useRoute('/photoshoot/create', {
+  const { initialized } = useRoute('/photoshoot/create', {
     resetFnc: reset,
     onInit: ({ outfitId, presetId, userId }) => {
       if (outfitId === null) setOutfitId(null);
@@ -79,14 +79,14 @@ export default function Layout() {
           </View>
         }
       >
-        <MotiView
+        {initialized && <MotiView
           style={{ flex: 1 }}
           animate={{ opacity: 1, translateY: 0 }}
           from={{ opacity: 0, translateY: 50 }}
           transition={{ duration: 500 }}
         >
           <Slot />
-        </MotiView>
+        </MotiView>}
       </ParallaxScrollView>
     </SafeAreaView>
   )

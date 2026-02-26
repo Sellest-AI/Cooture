@@ -232,7 +232,7 @@ export default function Screen() {
   const [numberToGenerate] = useState(2);
   const { data: cost } = useQueryCached(api.router.credits.getCost.anon, { type: 'GENERATION_COST', amount: numberToGenerate });
   const { data: canPay } = useQueryCached(api.router.credits.canPay.authed, cost ? { amount: cost } : 'skip');
-  const { outfitId, outfitSize, presetId, friendId, disabled } = usePhotoshoot.New();
+  const { outfitId, outfitSize, presetId, friendId, disabled, hasMultipleSubjects } = usePhotoshoot.New();
   const { dismissTo, push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
   const { forceDismissTo } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
 
@@ -283,10 +283,12 @@ export default function Screen() {
               dismissTo(ROUTES.PHOTOSHOOT.GENERATIONS.NEXT);
             }, 500);
 
+            const friend = hasMultipleSubjects ? (friendId ? [friendId] : undefined) : undefined;
+
             const generationId = await action({
               presetId: presetId,
               numberToGenerate: numberToGenerate,
-              extraUserIds: friendId ? [friendId] : undefined,
+              extraUserIds: friend,
               outfit: outfitId ? {
                 _id: outfitId,
                 size: outfitSize

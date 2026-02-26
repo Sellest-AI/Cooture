@@ -101,6 +101,7 @@ export const useRoute = <K extends Record<string, any> = EmptyObject, T extends 
   const [_data, setData] = useAtom(dataAtom);
   const [href] = useState(_href);
 
+  const [initialized, setInitialized] = useState(false);
   const [localData, setLocalData] = useState(retrieveData(href, _data) as ParamsDefault<T>);
 
   useFocusEffect(useCallback(() => {
@@ -138,6 +139,7 @@ export const useRoute = <K extends Record<string, any> = EmptyObject, T extends 
   useFocusEffect(useCallback(() => {
     if (!options?.onInit) return;
     options.onInit(localData ?? {} as ParamsDefault<T>);
+    setInitialized(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localData]));
 
@@ -153,7 +155,7 @@ export const useRoute = <K extends Record<string, any> = EmptyObject, T extends 
     return { ...searchParams, redirectTo, ...localData };
   }, [localData, redirectTo, searchParams]);
 
-  return params;
+  return { ...params, initialized };
 }
 
 export const useRouter = <T extends Route = Route>(_href?: T) => {
