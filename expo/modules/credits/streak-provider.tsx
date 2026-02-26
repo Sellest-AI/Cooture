@@ -2,7 +2,7 @@ import { useAccount } from "@/lib/convex/auth";
 import * as Notifications from 'expo-notifications';
 import { router, usePathname } from "expo-router";
 import { atom, useAtomValue } from "jotai";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Platform } from "react-native";
 import { ROUTES } from "routes";
 
@@ -48,6 +48,8 @@ export const StreakProvider = ({ children }: { children: React.ReactNode }) => {
   // Show the daily streak notification if the user hasn't claimed their streak yet
   useStreakNotification();
 
+  const pushed = useRef(false);
+
   useEffect(() => {
     if (claimed) return;
     if (!wallet) return;
@@ -57,7 +59,10 @@ export const StreakProvider = ({ children }: { children: React.ReactNode }) => {
     if (isFirstDay && !path.startsWith(ROUTES.COLLECTION.PATH)) return;
 
     const claimDay = wallet?.canClaimNow;
-    if (claimDay) router.push(ROUTES.MODALS.DAILY_STREAK);
+    if (claimDay && !pushed.current) {
+      pushed.current = true;
+      setTimeout(() => { router.push(ROUTES.MODALS.DAILY_STREAK); pushed.current = false; }, 3000);
+    }
   }, [claimed, isFirstDay, path, wallet])
 
   return (children)
