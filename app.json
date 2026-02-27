@@ -48,6 +48,13 @@
         }
       ],
       [
+        "expo-build-properties",
+        {
+          "buildReactNativeFromSource": true,
+          "useHermesV1": true
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
@@ -138,7 +145,8 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/f31d9764-3c8b-402d-9458-91e02bddf9d9"
+      "url": "https://u.expo.dev/f31d9764-3c8b-402d-9458-91e02bddf9d9",
+      "enableBsdiffPatchSupport": true
     }
   }
 }
