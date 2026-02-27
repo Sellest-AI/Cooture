@@ -5,11 +5,20 @@ import { Image } from '@ui/image';
 import { LinearGradient } from '@ui/linear-gradient';
 import { SafeAreaView } from '@ui/safe-area-view';
 import { Text } from '@ui/text';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Platform, View } from 'react-native';
 import { Colors } from 'theme';
 
 const BackgroundImage = () => {
+  const player = useVideoPlayer(require('assets/backgrounds/main_video.mp4'), player => {
+    try {
+      player.loop = true;
+      player.muted = true;
+      requestAnimationFrame(() => { try { player.play(); } catch { } })
+    } catch { }
+  });
+
   const fadeAnim = useRef(new Animated.Value(0.6));
 
   useEffect(() => {
@@ -31,18 +40,33 @@ const BackgroundImage = () => {
         opacity: fadeAnim.current,
       }}
     >
-      <Image
-        source={require('assets/placeholders/home-model.png')}
-        contentFit="cover"
-        style={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          opacity: 0.9,
-        }}
-      />
+      <View style={{ paddingBottom: 24, height: '100%', position: 'relative' }}>
+        <View style={{ width: '100%', height: '100%', position: 'relative' }}>
+          <VideoView
+            player={player}
+            nativeControls={false}
+            contentFit="cover"
+            style={{
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              opacity: 0.9,
+            }}
+          />
+          <LinearGradient
+            colors={['transparent', Colors.background]}
+            style={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: 72
+            }}
+          />
+        </View>
+      </View>
       <LinearGradient
-        colors={['rgba(0, 0, 0, 0.6)', 'transparent']}
+        colors={['rgba(0, 0, 0, 0.8)', 'transparent']}
         style={{
           position: 'absolute',
           left: 0,

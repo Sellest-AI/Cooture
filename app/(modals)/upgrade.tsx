@@ -1,9 +1,10 @@
 import { Button } from "@ui/button"
 import { ArrowRight, Check, Clock9, Gift } from "@ui/icons"
-import { Image } from "@ui/image"
 import { ParallaxScrollView } from "@ui/parallax-scroll-view"
 import { Pressable } from "@ui/pressable"
 import { Text } from "@ui/text"
+import { router } from "expo-router"
+import { useVideoPlayer, VideoView } from "expo-video"
 import { MotiView } from "moti"
 import { ReactNode, useState } from "react"
 import { Platform, View, ViewStyle } from "react-native"
@@ -158,12 +159,20 @@ const CardPeriod = ({ onPress, title, children, extra, badge, selected }: CardPe
 export default function Screen() {
   const [period, setPeriod] = useState<'weekly' | 'monthly'>('monthly');
 
+  const player = useVideoPlayer(require('assets/backgrounds/main_video.mp4'), player => {
+    try {
+      player.loop = true;
+      player.muted = true;
+      requestAnimationFrame(() => { try { player.play(); } catch { } })
+    } catch { }
+  })
+
   return <View style={{ flex: 1 }}>
     <ParallaxScrollView
       headerBackground={
-        <Image
-          contentPosition="center"
-          source={require('assets/backgrounds/metro-boy.jpg')}
+        <VideoView
+          player={player}
+          contentFit="cover"
           style={{
             opacity: 0.3,
             position: 'absolute',
@@ -282,6 +291,7 @@ export default function Screen() {
         style={{ marginTop: 12 }}
         variant="primary"
         endIcon={ArrowRight}
+        onPress={() => router.dismissTo('/')}
       >
         Upgrade to max
       </Button>
