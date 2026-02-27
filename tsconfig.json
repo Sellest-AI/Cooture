@@ -7,7 +7,7 @@
         "./assets/*"
       ],
       "global": [
-        "./expo/global"
+        "./expo/global/website.ts"
       ],
       "routes": [
         "./expo/global/routes.ts"

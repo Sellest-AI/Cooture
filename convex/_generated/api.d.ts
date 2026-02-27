@@ -100,6 +100,8 @@ import type * as router_admin_bots_createOne from "../router/admin/bots/createOn
 import type * as router_admin_bots_crons from "../router/admin/bots/crons.js";
 import type * as router_admin_bots_getAll from "../router/admin/bots/getAll.js";
 import type * as router_admin_bots_getWaiting from "../router/admin/bots/getWaiting.js";
+import type * as router_admin_config_getConfig from "../router/admin/config/getConfig.js";
+import type * as router_admin_config_initConfig from "../router/admin/config/initConfig.js";
 import type * as router_admin_outfits_regenerateCovers from "../router/admin/outfits/regenerateCovers.js";
 import type * as router_admin_presets_repairOne from "../router/admin/presets/repairOne.js";
 import type * as router_auth_linkStripeSubscription from "../router/auth/linkStripeSubscription.js";
@@ -196,6 +198,7 @@ import type * as router_waitlist_getCodes from "../router/waitlist/getCodes.js";
 import type * as router_waitlist_getStatistics from "../router/waitlist/getStatistics.js";
 import type * as schema_auth from "../schema/auth.js";
 import type * as schema_collection from "../schema/collection.js";
+import type * as schema_config from "../schema/config.js";
 import type * as schema_constants from "../schema/constants.js";
 import type * as schema_feed from "../schema/feed.js";
 import type * as schema_follows from "../schema/follows.js";
@@ -311,6 +314,8 @@ declare const fullApi: ApiFromModules<{
   "router/admin/bots/crons": typeof router_admin_bots_crons;
   "router/admin/bots/getAll": typeof router_admin_bots_getAll;
   "router/admin/bots/getWaiting": typeof router_admin_bots_getWaiting;
+  "router/admin/config/getConfig": typeof router_admin_config_getConfig;
+  "router/admin/config/initConfig": typeof router_admin_config_initConfig;
   "router/admin/outfits/regenerateCovers": typeof router_admin_outfits_regenerateCovers;
   "router/admin/presets/repairOne": typeof router_admin_presets_repairOne;
   "router/auth/linkStripeSubscription": typeof router_auth_linkStripeSubscription;
@@ -407,6 +412,7 @@ declare const fullApi: ApiFromModules<{
   "router/waitlist/getStatistics": typeof router_waitlist_getStatistics;
   "schema/auth": typeof schema_auth;
   "schema/collection": typeof schema_collection;
+  "schema/config": typeof schema_config;
   "schema/constants": typeof schema_constants;
   "schema/feed": typeof schema_feed;
   "schema/follows": typeof schema_follows;

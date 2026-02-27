@@ -1,6 +1,7 @@
 import { defineSchema } from "convex/server";
 import { authTables } from "./schema/auth";
 import { bookmarks, bookmarkStats } from "./schema/collection";
+import { config } from "./schema/config";
 import { feedScores } from "./schema/feed";
 import { follows, followStats } from "./schema/follows";
 import { generations, predictions } from "./schema/generations";
@@ -18,6 +19,7 @@ import { creditTransactions, userWallets } from "./schema/wallets";
 
 export default defineSchema({
   ...authTables,
+  config,
   usersExtended,
   bots,
   images,

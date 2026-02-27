@@ -8,11 +8,6 @@ const originalResolveRequest = config.resolver.resolveRequest;
 // Exclude the .history folder from Metro bundler/watchers (handles Unix and Windows paths)
 config.resolver.blockList = [/.*[\/\\]\.history[\/\\].*/];
 
-// Add extra node_modules to prevent issues with barrel exports
-config.resolver.extraNodeModules = {
-  'global': path.resolve(__dirname, 'expo/global'),
-};
-
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (moduleName === 'tslib' || moduleName.endsWith('/tslib')) return {
     filePath: path.resolve(__dirname, './node_modules/tslib/tslib.js'),
