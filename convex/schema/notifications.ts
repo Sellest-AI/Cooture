@@ -28,9 +28,11 @@ export const notifications = defineTable({
   outfitId: v.optional(v.id("outfits")),
 
   // aggregation
-  aggregationCount: v.optional(v.number()),
+  aggregationCount: v.optional(v.number()), // starts at 1
   aggregationKey: v.optional(v.string()),
   aggregatedUntil: v.optional(v.number()),
+
+  lastPushSentAt: v.optional(v.number()),
   updatedAt: v.number(),
 })
   .index("by_user_id", ["userId"])

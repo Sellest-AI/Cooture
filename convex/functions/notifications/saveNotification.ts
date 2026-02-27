@@ -80,7 +80,7 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
         redirectUrl: args.follower ? ROUTES.USER.ID(args.follower._id) : FALLBACK_ROUTE
       }
     case "new_like":
-      if (aggregationCount > 2)
+      if (aggregationCount > 1)
         return {
           title: `+${aggregationCount} people liked your post`,
           body: "Tap to view",
@@ -89,7 +89,7 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
         }
 
       return {
-        title: "Your content got a new like",
+        title: "You have a new like",
         body: "Tap to view",
         image: args.user?.imageUrl,
         redirectUrl: FALLBACK_ROUTE
@@ -179,44 +179,64 @@ export const saveNotification = async <T extends Type>(ctx: MutationCtx, args: A
   // Don't create or update notifications if the action is performed by the same user (e.g. liking your own generation, following yourself, etc.)
   if (!isNotificationAllowed(argsExtended)) return null;
 
-  const now = Date.now();
-  const TEN_HOURS = 10 * 60 * 60 * 1000;
-  const THIRTY_MINUTES = 30 * 60 * 1000;
-
-  // Notifications can be stacked up to 30 minutes OR until a hard cap of 1 day after the first notification in the stack, whichever comes first.
-  // After that, a new notification will be created to avoid stacking too many notifications together or keeping notifications in the stack for too long.
-  const NEW_AGGREGATION_WINDOW = now + THIRTY_MINUTES;
-
-  if (existingNotification) {
-    const withinWindow = (existingNotification.aggregatedUntil ?? 0) >= now;
-    const withinHardCap = (existingNotification._creationTime + TEN_HOURS) >= now;
-
-    if (withinWindow && withinHardCap) {
-      if (existingNotification.actorId === args.actorId)
-        return existingNotification._id; // Don't update if the same actor is performing the action again
-
-      await ctx.db.patch(existingNotification._id, {
-        read: false,
-        actorId: args.actorId,
-        aggregationCount: (existingNotification.aggregationCount ?? 1) + 1,
-        aggregatedUntil: NEW_AGGREGATION_WINDOW, // still extend the window
-        updatedAt: now,
-      });
-      return existingNotification._id;
-    }
-  }
-
   const userId = args.userId ?? getUserId(argsExtended);
   if (!userId) throw new Error("Unable to determine userId for notification");
 
-  // Schedule a push notification to be sent immediately with the notification details to user's decides. 
-  if (args.pushToDevice)
-    await ctx.scheduler.runAfter(0, internal.router.notifications.sendPushNotification._internal, {
+  const sendPushNotification = async () => {
+    if (!args.pushToDevice) return false;
+    // Schedule a push notification to be sent immediately with the notification details to user's decides. 
+    const result = await ctx.scheduler.runAfter(0, internal.router.notifications.sendPushNotification._internal, {
       ...(await createPushNotification(argsExtended, existingNotification)),
       data: argsExtended,
       userId: userId,
       channelId: NOTIFICATION_CHANNEL[args.type],
     })
+
+    return !!result;
+  }
+
+  const now = Date.now();
+  const HARD_CAP_DELAY = 24 * 60 * 60 * 1000; // 24 hours
+  const WINDOW_DELAY = 6 * 60 * 60 * 1000; // 6 hours
+
+  // How many time before a push notification is sent again
+  const PUSH_NOTIFICATION_RATE = 5 * 60 * 60 * 1000; // 5 hours
+
+  // Notifications can be stacked up to "X time" OR until a hard cap of "Y time" after the first notification in the stack, whichever comes first.
+  // After that, a new notification will be created to avoid stacking too many notifications together or keeping notifications in the stack for too long.
+  const NEW_AGGREGATION_WINDOW = now + WINDOW_DELAY;
+
+  if (existingNotification) {
+    const withinWindow = (existingNotification.aggregatedUntil ?? 0) >= now;
+    const withinHardCap = (existingNotification._creationTime + HARD_CAP_DELAY) >= now;
+
+    // Can aggregate if notification unread OR if it's within both the aggregation window and hard cap.
+    const canAggregate = !existingNotification.read || (withinWindow && withinHardCap);
+
+    // Only send a push notification if we're outside of the aggregation window to avoid sending too many push notifications for the same action. 
+    const canSendPush = (existingNotification.lastPushSentAt ?? 0) + PUSH_NOTIFICATION_RATE <= now;
+
+    if (canAggregate) {
+      if (existingNotification.actorId === args.actorId)
+        return existingNotification._id; // Don't update if the same actor is performing the action again
+
+      // Only send a push notification every X time
+      const notificationPushed = canSendPush ? await sendPushNotification() : false;
+
+      await ctx.db.patch(existingNotification._id, {
+        read: false,
+        actorId: args.actorId,
+        lastPushSentAt: notificationPushed ? now : existingNotification.lastPushSentAt,
+        aggregationCount: (existingNotification.aggregationCount ?? 1) + 1,
+        aggregatedUntil: NEW_AGGREGATION_WINDOW, // still extend the window
+        updatedAt: now,
+      });
+
+      return existingNotification._id;
+    }
+  }
+
+  const notificationPushed = await sendPushNotification();
 
   return ctx.db.insert("notifications", {
     userId: userId,
@@ -225,8 +245,10 @@ export const saveNotification = async <T extends Type>(ctx: MutationCtx, args: A
     actorId: args.actorId,
     generationId: "generationId" in args ? args.generationId : undefined,
     outfitId: "outfitId" in args ? args.outfitId : undefined,
+    aggregationCount: 1,
     aggregationKey: aggregationKey(args),
     aggregatedUntil: NEW_AGGREGATION_WINDOW,
+    lastPushSentAt: notificationPushed ? now : undefined,
     updatedAt: now,
   })
 }
