@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { Doc, Id } from "../../_generated/dataModel";
 import { upsertFeedScore } from "../../functions/feed";
 import { readNotification, saveNotification } from "../../functions/notifications";
+import { isAuthorized } from "../../functions/users";
 import { adminMutation, authMutation, internalMutation, MutationCtx } from "../../procedures";
 import { PREDICTION_STATUS } from "../../schema/generations";
 
@@ -55,16 +56,11 @@ const updateGenerationStatus = async (ctx: MutationCtx, generationId: Id<'genera
 }
 
 const updatePrediction = async (ctx: MutationCtx, args: {
-  predictionId: string,
+  prediction: Doc<'predictions'>,
   status?: Doc<'predictions'>['status'],
   imageId?: Id<'images'>,
 }) => {
-  const { predictionId, imageId } = args;
-
-  const prediction = await ctx.db.query("predictions").withIndex("by_prediction_id", (q) =>
-    q.eq("predictionId", predictionId)).first();
-
-  if (!prediction) { throw new Error(`Prediction with id ${predictionId} not found`); }
+  const { prediction, imageId } = args;
 
   const status = args.status ?? (imageId ? "PENDING" : undefined);
   const readyAt = prediction.readyAt ?? (imageId ? Date.now() : undefined);
@@ -90,7 +86,12 @@ export const _internal = internalMutation({
     imageId: v.optional(v.id("images")),
   },
   handler: async (ctx, args) => {
-    return updatePrediction(ctx, args);
+    const prediction = await ctx.db.query("predictions").withIndex("by_prediction_id", (q) =>
+      q.eq("predictionId", args.predictionId)).first();
+
+    if (!prediction) { throw new Error(`Prediction with id ${args.predictionId} not found`); }
+
+    return updatePrediction(ctx, { ...args, prediction });
   }
 })
 
@@ -100,7 +101,14 @@ export const authed = authMutation({
     status: v.optional(v.union(v.literal('ACCEPTED'), v.literal('REJECTED'))),
   },
   handler: async (ctx, args) => {
-    return updatePrediction(ctx, args);
+    const prediction = await ctx.db.query("predictions").withIndex("by_prediction_id", (q) =>
+      q.eq("predictionId", args.predictionId)).first();
+
+    if (!prediction) { throw new Error(`Prediction with id ${args.predictionId} not found`); }
+
+    await isAuthorized(ctx, prediction);
+
+    return updatePrediction(ctx, { ...args, prediction });
   }
 })
 
@@ -110,6 +118,11 @@ export const admin = adminMutation({
     status: v.optional(v.union(v.literal('ACCEPTED'), v.literal('REJECTED'))),
   },
   handler: async (ctx, args) => {
-    return updatePrediction(ctx, args);
+    const prediction = await ctx.db.query("predictions").withIndex("by_prediction_id", (q) =>
+      q.eq("predictionId", args.predictionId)).first();
+
+    if (!prediction) { throw new Error(`Prediction with id ${args.predictionId} not found`); }
+
+    return updatePrediction(ctx, { ...args, prediction });
   }
 })

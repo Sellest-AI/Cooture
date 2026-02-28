@@ -44,6 +44,7 @@ import type * as functions_subscriptions_isSubscriptionActive from "../functions
 import type * as functions_users_getAccount from "../functions/users/getAccount.js";
 import type * as functions_users_getPortraits from "../functions/users/getPortraits.js";
 import type * as functions_users_index from "../functions/users/index.js";
+import type * as functions_users_isAuthorized from "../functions/users/isAuthorized.js";
 import type * as functions_waitlist_index from "../functions/waitlist/index.js";
 import type * as functions_waitlist_updateWaitlist from "../functions/waitlist/updateWaitlist.js";
 import type * as http from "../http.js";
@@ -258,6 +259,7 @@ declare const fullApi: ApiFromModules<{
   "functions/users/getAccount": typeof functions_users_getAccount;
   "functions/users/getPortraits": typeof functions_users_getPortraits;
   "functions/users/index": typeof functions_users_index;
+  "functions/users/isAuthorized": typeof functions_users_isAuthorized;
   "functions/waitlist/index": typeof functions_waitlist_index;
   "functions/waitlist/updateWaitlist": typeof functions_waitlist_updateWaitlist;
   http: typeof http;
