@@ -18,12 +18,16 @@ export const usePhotoshoot = (id: Id<'generations'> | null) => {
     return mutate({ predictionId, status: 'REJECTED' });
   }
 
+  const { mutate: publish } = useMutation(api.router.generations.publishRest.authed);
+  const publishRest = () => { if (!id) return; return publish({ generationId: id }); }
+
   return {
     results,
     photoshoot,
     preset,
     acceptPrediction,
     rejectPrediction,
+    publishRest,
   }
 }
 

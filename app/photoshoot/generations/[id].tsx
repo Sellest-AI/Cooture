@@ -18,7 +18,7 @@ import { Carousel, ICarouselInstance } from "@ui/screen-carousel";
 import { Text } from "@ui/text";
 import { notEmpty } from "@utils/convex-allowed";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Dimensions, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
@@ -190,7 +190,11 @@ export default function Screen() {
   const { id } = useLocalSearchParams<{ id: Id<'generations'> }>();
   const carouselRef = useRef<ICarouselInstance>(null);
 
-  const { photoshoot, results, preset, acceptPrediction, rejectPrediction } = usePhotoshoot(id);
+  const { photoshoot, results, preset, acceptPrediction, rejectPrediction, publishRest } = usePhotoshoot(id);
+
+  /** Auto publish pending predictions on unmount */
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => () => { try { publishRest() } catch { } }, [])
 
   const outfitId = photoshoot?.outfitId;
 
