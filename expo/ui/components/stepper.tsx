@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { View, ViewStyle } from "react-native";
 import { Colors } from "theme";
-import { BLUR_PROPS, BlurView } from "./blur-view";
+import { BLUR_PROPS, BlurKeys, BlurTargetView, BlurView } from "./blur-view";
 import { Check } from "./icons";
 import { LinearGradient } from "./linear-gradient";
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSpring, withTiming } from './motion';
@@ -43,6 +43,8 @@ const Step = ({ active, children, delay = 0 }: StepProps) => {
     <Animated.View style={animatedStyle}>
       <Component
         {...customProps}
+        blurKey={BlurKeys.STEPPER_LINE}
+        intensity={64}
         style={{
           borderRadius: 99,
           backgroundColor: active ? Colors.primary[500] : Colors.blur.medium,
@@ -109,9 +111,10 @@ const Line = ({ active, inProgress, delay = 0, reverseDelay = 0 }: LineProps) =>
       : [Colors.blur.medium, Colors.blur.medium];
 
   return (
-    <BlurView
+    <BlurTargetView
       {...BLUR_PROPS}
       style={{ flex: 1, height: 6 }}
+      blurKey={BlurKeys.STEPPER_LINE}
     >
       <View
         style={{
@@ -135,7 +138,7 @@ const Line = ({ active, inProgress, delay = 0, reverseDelay = 0 }: LineProps) =>
           animatedStyle
         ]}
       />
-    </BlurView>
+    </BlurTargetView>
   );
 };
 
@@ -157,7 +160,8 @@ export const Stepper = ({ value, style }: StepperProps) => {
       <BlurView
         {...BLUR_PROPS}
         style={{
-          flex: 1, height: 6,
+          flex: 1,
+          height: 6,
           position: 'absolute',
           backgroundColor: Colors.blur.medium,
           width: '90%'

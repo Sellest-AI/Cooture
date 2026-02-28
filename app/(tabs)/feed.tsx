@@ -5,6 +5,7 @@ import { CreditsButton } from "@/modules/premium/credits.button";
 import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { WaitlistBlock } from "@/modules/waitlist/walitlist-block";
+import { BlurKeys, BlurTargetView } from "@ui/blur-view";
 import { Post } from "@ui/cards";
 import { FlashList, FlashListRef } from "@ui/flat-list";
 import { ModalHeader } from "@ui/modal";
@@ -21,70 +22,72 @@ export default function Screen() {
   const listRef = useRef<FlashListRef<NonNullable<typeof feed>[number]>>(null);
 
   return (
-    <SafeAreaView edges={{ top: 'off', bottom: 'maximum' }} style={{ flex: 1 }}>
-      <FlashList
-        ref={listRef}
-        refreshing={isLoading}
-        onRefresh={() => { updateSeed(); listRef.current?.scrollToOffset({ offset: 0 }) }}
-        onEndReached={() => loadMore(8)}
-        data={(feed ?? [])}
-        keyExtractor={(i) => i?._id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingBottom: TOTAL_TABS_SPACE,
-          paddingTop: top,
-        }}
-        ListEmptyComponent={<>
-          <Post.Skeleton style={{ marginHorizontal: 12 }} />
-          <Post.Skeleton style={{ marginHorizontal: 12 }} />
-        </>}
-        ListHeaderComponent={<>
-          <ModalHeader
-            title="Feed"
-            type="alt"
-            size="big"
-            endContent={<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <CreditsButton />
-              <Notification />
-            </View>}
-            style={{
-              paddingTop: 12,
-              paddingLeft: 16,
-              paddingRight: 12,
-              backgroundColor: Colors.background,
-            }}
-          />
-          <WaitlistBlock
-            style={{ marginBottom: 24, marginHorizontal: 12 }}
-          />
-        </>}
-        ListFooterComponent={<>
-          {isLoading && <>
-            <Post.Skeleton style={{ marginHorizontal: 12, marginBottom: 28 }} />
-            <Post.Skeleton style={{ marginHorizontal: 12, marginBottom: 28 }} />
+    <BlurTargetView blurKey={BlurKeys.FEED}>
+      <SafeAreaView edges={{ top: 'off', bottom: 'maximum' }} style={{ flex: 1 }}>
+        <FlashList
+          ref={listRef}
+          refreshing={isLoading}
+          onRefresh={() => { updateSeed(); listRef.current?.scrollToOffset({ offset: 0 }) }}
+          onEndReached={() => loadMore(8)}
+          data={(feed ?? [])}
+          keyExtractor={(i) => i?._id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingBottom: TOTAL_TABS_SPACE,
+            paddingTop: top,
+          }}
+          ListEmptyComponent={<>
+            <Post.Skeleton style={{ marginHorizontal: 12 }} />
+            <Post.Skeleton style={{ marginHorizontal: 12 }} />
           </>}
-          {!canLoadMore && <Text.Base
-            color={Colors.neutral[400]}
-            style={{ textAlign: 'center', maxWidth: 148, alignSelf: 'center', marginTop: 8 }}
-          >
-            No more posts to show in your feed.
-          </Text.Base>}
-        </>}
-        renderItem={({ item }) => {
-          if (item.type === 'outfit')
-            return <OutfitPost
+          ListHeaderComponent={<>
+            <ModalHeader
+              title="Feed"
+              type="alt"
+              size="big"
+              endContent={<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <CreditsButton />
+                <Notification />
+              </View>}
+              style={{
+                paddingTop: 12,
+                paddingLeft: 16,
+                paddingRight: 12,
+                backgroundColor: Colors.background,
+              }}
+            />
+            <WaitlistBlock
+              style={{ marginBottom: 24, marginHorizontal: 12 }}
+            />
+          </>}
+          ListFooterComponent={<>
+            {isLoading && <>
+              <Post.Skeleton style={{ marginHorizontal: 12, marginBottom: 28 }} />
+              <Post.Skeleton style={{ marginHorizontal: 12, marginBottom: 28 }} />
+            </>}
+            {!canLoadMore && <Text.Base
+              color={Colors.neutral[400]}
+              style={{ textAlign: 'center', maxWidth: 148, alignSelf: 'center', marginTop: 8 }}
+            >
+              No more posts to show in your feed.
+            </Text.Base>}
+          </>}
+          renderItem={({ item }) => {
+            if (item.type === 'outfit')
+              return <OutfitPost
+                key={item._id}
+                id={item._id}
+                style={{ marginBottom: 28 }}
+              />
+
+            return <GenerationPost
               key={item._id}
               id={item._id}
               style={{ marginBottom: 28 }}
             />
-
-          return <GenerationPost
-            key={item._id}
-            id={item._id}
-            style={{ marginBottom: 28 }}
-          />
-        }}
-      />
-    </SafeAreaView>
+          }}
+        />
+      </SafeAreaView>
+    </BlurTargetView>
   );
 }

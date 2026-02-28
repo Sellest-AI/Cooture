@@ -3,6 +3,7 @@ import { useAccount } from "@/lib/convex/auth";
 import { Api, api, usePaginatedQuery, useQueryCached } from "@/lib/convex/client";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
 import { Block } from "@ui/block";
+import { BlurKeys, BlurTargetView } from "@ui/blur-view";
 import { Button } from "@ui/button";
 import { Collection } from "@ui/cards";
 import { FlashList } from "@ui/flat-list";
@@ -111,6 +112,7 @@ export default function Screen() {
                       onPress={() => setCategory((c) => c === item.value ? null : item.value)}
                     >
                       <Block
+                        blurKey={BlurKeys.PHOOTSHOOT_PRESETS_ITEMS}
                         variant={category === item.value ? 'primary' : 'blur'}
                         style={{
                           padding: 8,
@@ -134,7 +136,7 @@ export default function Screen() {
             const selected = presetId === item._id;
 
             return (
-              <View style={sharedStyle}>
+              <BlurTargetView style={sharedStyle} blurKey={BlurKeys.PHOOTSHOOT_PRESETS_ITEMS}>
                 <Collection
                   selected={selected}
                   source={item.cover.sizes.medium.url}
@@ -145,7 +147,7 @@ export default function Screen() {
                     if (!selected) requestAnimationFrame(() => push(ROUTES.PHOTOSHOOT.RECAP, { resetNextRoute: false }));
                   }}
                 />
-              </View>
+              </BlurTargetView>
             )
           }}
         />

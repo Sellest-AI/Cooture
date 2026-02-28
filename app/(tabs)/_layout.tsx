@@ -1,5 +1,6 @@
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Block } from "@ui/block";
+import { BlurKeys } from "@ui/blur-view";
 import { Compass, Home, Package, Plus, User } from "@ui/icons";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Tabs } from "expo-router";
@@ -32,9 +33,15 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     }).start();
   };
 
+  const blurKey = state.index === 0 ? BlurKeys.FEED :
+    state.index === 1 ? BlurKeys.EXPLORE :
+      state.index === 2 ? BlurKeys.NEW :
+        state.index === 3 ? BlurKeys.COLLECTION :
+          state.index === 4 ? BlurKeys.PROFILE : undefined;
   return (
     <SafeAreaView style={styles.tabBarContainer} edges={{ top: 'off' }}>
       <Block
+        blurKey={blurKey}
         variant="blur"
         style={styles.tabBar}
       // blurComponent={BlurView}

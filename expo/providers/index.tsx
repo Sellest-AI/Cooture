@@ -1,4 +1,5 @@
 import { KeyboardAvoiderProvider } from '@good-react-native/keyboard-avoider'
+import { BlurProvider } from '@ui/blur-view'
 import { SafeAreaProvider } from '@ui/safe-area-view'
 import { AsyncProviders } from "./async"
 import { AuthProvider } from './auth'
@@ -18,17 +19,19 @@ export const Providers = ({ children }: Props) => {
       <I18nProvider>
         <ThemeProvider>
           <MotionProvider>
-            <SafeAreaProvider>
-              <KeyboardAvoiderProvider>
-                <AsyncProviders>
-                  <AuthProvider>
-                    <NotificationsProvider>
-                      {children}
-                    </NotificationsProvider>
-                  </AuthProvider>
-                </AsyncProviders>
-              </KeyboardAvoiderProvider>
-            </SafeAreaProvider>
+            <BlurProvider>
+              <SafeAreaProvider>
+                <KeyboardAvoiderProvider>
+                  <AsyncProviders>
+                    <AuthProvider>
+                      <NotificationsProvider>
+                        {children}
+                      </NotificationsProvider>
+                    </AuthProvider>
+                  </AsyncProviders>
+                </KeyboardAvoiderProvider>
+              </SafeAreaProvider>
+            </BlurProvider>
           </MotionProvider>
         </ThemeProvider>
       </I18nProvider>

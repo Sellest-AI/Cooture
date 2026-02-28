@@ -3,6 +3,7 @@ import { useQuery, useQueryCached } from "@/lib/convex/client";
 import { useFeed } from "@/modules/feed/_hooks";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Block } from "@ui/block";
+import { BlurKeys, BlurTargetView } from "@ui/blur-view";
 import { FlashList } from "@ui/flat-list";
 import { Col, Grid, Row } from "@ui/grid";
 import { Loader, Search } from "@ui/icons";
@@ -114,117 +115,117 @@ export default function Screen() {
   const empty = (feed ?? []).length === 0;
 
   return (
-    <SafeAreaView
-      edges={{ top: 'additive', bottom: 'maximum' }}
-    >
-      <FlashList
-        onEndReached={() => loadMore(24)}
-        onRefresh={() => updateSeed()}
-        style={{ flex: empty ? 1 : undefined }}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingBottom: TOTAL_TABS_SPACE,
-          paddingHorizontal: 4,
-        }}
-        ListHeaderComponent={
-          <ModalHeader
-            title="Discover"
-            type="alt"
-            size="big"
-            endContent={
-              <AnimatedPressable>
-                <Block
-                  variant="blur"
-                  style={{
-                    borderRadius: 99,
-                    padding: 10,
-                  }}
-                >
-                  <Search size={24} color={Colors.foreground} />
-                </Block>
-              </AnimatedPressable>
-            }
-            style={{
-              paddingTop: 12,
-              paddingLeft: 16,
-              paddingRight: 12,
-              backgroundColor: Colors.background,
-            }}
-          />
-        }
-        ListEmptyComponent={<GridSkeleton />}
-        ListFooterComponent={<>
-          {canLoadMore && <View style={{ marginTop: 32, marginBottom: 48, alignItems: 'center' }}>
-            <View style={{ position: 'absolute' }}><Loader color={Colors.foreground} /></View>
-          </View>}
-          {!canLoadMore && <Text.Base
-            style={{ textAlign: 'center', marginTop: 32, maxWidth: 200, alignSelf: 'center' }}
-            color={Colors.neutral[400]}
-          >
-            You have reached the end of the discover feed.
-          </Text.Base>}
-        </>}
-        data={empty ? undefined : Array.from({ length: Math.ceil(feed.length / 12) })}
-        keyExtractor={(_, index) => index.toString()}
-        renderItem={({ index }) => {
-          const cycleIndex = index;
-          const startIdx = cycleIndex * 12;
-          const posts = feed.slice(startIdx, startIdx + 12);
-          return (
-            <View key={cycleIndex} style={{ gap: GAP, marginBottom: 4 }}>
-              {/* First grid: 2 small left, 1 large right */}
-              {posts.length > 0 && (
-                <Grid style={{ height: HEIGHT, gap: GAP }}>
-                  <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
-                    {posts[1] ? <Post id={posts[1]._id} type={posts[1].type} size="small" style={{ flex: 1, borderTopLeftRadius: 8 }} /> : <Skeleton style={{ flex: 1 }} />}
-                    {posts[2] ? <Post id={posts[2]._id} type={posts[2].type} size="small" style={{ flex: 1 }} /> : <Skeleton style={{ flex: 1 }} />}
-                  </Col>
-                  <Col size={2}>
-                    {posts[0] ? <Post id={posts[0]._id} type={posts[0].type} size="large" style={{ flex: 1, borderTopRightRadius: 8 }} /> : <Skeleton style={{ flex: 1 }} />}
-                  </Col>
-                </Grid>
-              )}
-
-              {/* Second grid: 3 columns of 2 small each */}
-              {posts.length > 3 && (
-                <Grid style={{ height: HEIGHT, gap: GAP }}>
-                  <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
-                    {posts[3] ? <Row><Post id={posts[3]._id} type={posts[3].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
-                    <Row>
-                      {posts[4] ? <Post id={posts[4]._id} type={posts[4].type} size="small" style={{ flex: 1 }} /> : <Skeleton style={{ flex: 1 }} />}
-                    </Row>
-                  </Col>
-                  {posts.length > 5 && (
+    <BlurTargetView blurKey={BlurKeys.EXPLORE}>
+      <SafeAreaView edges={{ top: 'additive', bottom: 'maximum' }}>
+        <FlashList
+          onEndReached={() => loadMore(24)}
+          onRefresh={() => updateSeed()}
+          style={{ flex: empty ? 1 : undefined }}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingBottom: TOTAL_TABS_SPACE,
+            paddingHorizontal: 4,
+          }}
+          ListHeaderComponent={
+            <ModalHeader
+              title="Discover"
+              type="alt"
+              size="big"
+              endContent={
+                <AnimatedPressable>
+                  <Block
+                    variant="blur"
+                    style={{
+                      borderRadius: 99,
+                      padding: 10,
+                    }}
+                  >
+                    <Search size={24} color={Colors.foreground} />
+                  </Block>
+                </AnimatedPressable>
+              }
+              style={{
+                paddingTop: 12,
+                paddingLeft: 16,
+                paddingRight: 12,
+                backgroundColor: Colors.background,
+              }}
+            />
+          }
+          ListEmptyComponent={<GridSkeleton />}
+          ListFooterComponent={<>
+            {canLoadMore && <View style={{ marginTop: 32, marginBottom: 48, alignItems: 'center' }}>
+              <View style={{ position: 'absolute' }}><Loader color={Colors.foreground} /></View>
+            </View>}
+            {!canLoadMore && <Text.Base
+              style={{ textAlign: 'center', marginTop: 32, maxWidth: 200, alignSelf: 'center' }}
+              color={Colors.neutral[400]}
+            >
+              You have reached the end of the discover feed.
+            </Text.Base>}
+          </>}
+          data={empty ? undefined : Array.from({ length: Math.ceil(feed.length / 12) })}
+          keyExtractor={(_, index) => index.toString()}
+          renderItem={({ index }) => {
+            const cycleIndex = index;
+            const startIdx = cycleIndex * 12;
+            const posts = feed.slice(startIdx, startIdx + 12);
+            return (
+              <View key={cycleIndex} style={{ gap: GAP, marginBottom: 4 }}>
+                {/* First grid: 2 small left, 1 large right */}
+                {posts.length > 0 && (
+                  <Grid style={{ height: HEIGHT, gap: GAP }}>
                     <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
-                      {posts[5] ? <Row><Post id={posts[5]._id} type={posts[5].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
-                      {posts[6] ? <Row><Post id={posts[6]._id} type={posts[6].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                      {posts[1] ? <Post id={posts[1]._id} type={posts[1].type} size="small" style={{ flex: 1, borderTopLeftRadius: 8 }} /> : <Skeleton style={{ flex: 1 }} />}
+                      {posts[2] ? <Post id={posts[2]._id} type={posts[2].type} size="small" style={{ flex: 1 }} /> : <Skeleton style={{ flex: 1 }} />}
                     </Col>
-                  )}
-                  {posts.length > 7 && (
-                    <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
-                      {posts[7] ? <Row><Post id={posts[7]._id} type={posts[7].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
-                      {posts[8] ? <Row><Post id={posts[8]._id} type={posts[8].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                    <Col size={2}>
+                      {posts[0] ? <Post id={posts[0]._id} type={posts[0].type} size="large" style={{ flex: 1, borderTopRightRadius: 8 }} /> : <Skeleton style={{ flex: 1 }} />}
                     </Col>
-                  )}
-                </Grid>
-              )}
+                  </Grid>
+                )}
 
-              {/* Third grid: 1 large left, 2 small right */}
-              {posts.length > 9 && (
-                <Grid style={{ height: HEIGHT, gap: GAP }}>
-                  <Col size={2}>
-                    {posts[9] ? <Post id={posts[9]._id} type={posts[9].type} size="large" style={{ flex: 1 }} /> : <Skeleton style={{ flex: 1 }} />}
-                  </Col>
-                  <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
-                    {posts[10] ? <Row><Post id={posts[10]._id} type={posts[10].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
-                    {posts[11] ? <Row><Post id={posts[11]._id} type={posts[11].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
-                  </Col>
-                </Grid>
-              )}
-            </View>
-          );
-        }}
-      />
-    </SafeAreaView>
+                {/* Second grid: 3 columns of 2 small each */}
+                {posts.length > 3 && (
+                  <Grid style={{ height: HEIGHT, gap: GAP }}>
+                    <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
+                      {posts[3] ? <Row><Post id={posts[3]._id} type={posts[3].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                      <Row>
+                        {posts[4] ? <Post id={posts[4]._id} type={posts[4].type} size="small" style={{ flex: 1 }} /> : <Skeleton style={{ flex: 1 }} />}
+                      </Row>
+                    </Col>
+                    {posts.length > 5 && (
+                      <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
+                        {posts[5] ? <Row><Post id={posts[5]._id} type={posts[5].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                        {posts[6] ? <Row><Post id={posts[6]._id} type={posts[6].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                      </Col>
+                    )}
+                    {posts.length > 7 && (
+                      <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
+                        {posts[7] ? <Row><Post id={posts[7]._id} type={posts[7].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                        {posts[8] ? <Row><Post id={posts[8]._id} type={posts[8].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                      </Col>
+                    )}
+                  </Grid>
+                )}
+
+                {/* Third grid: 1 large left, 2 small right */}
+                {posts.length > 9 && (
+                  <Grid style={{ height: HEIGHT, gap: GAP }}>
+                    <Col size={2}>
+                      {posts[9] ? <Post id={posts[9]._id} type={posts[9].type} size="large" style={{ flex: 1 }} /> : <Skeleton style={{ flex: 1 }} />}
+                    </Col>
+                    <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
+                      {posts[10] ? <Row><Post id={posts[10]._id} type={posts[10].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                      {posts[11] ? <Row><Post id={posts[11]._id} type={posts[11].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                    </Col>
+                  </Grid>
+                )}
+              </View>
+            );
+          }}
+        />
+      </SafeAreaView>
+    </BlurTargetView>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { LayoutChangeEvent, Pressable, ViewStyle } from "react-native";
 import { Colors } from "theme";
 import { Block } from "./block";
+import { BlurKeys } from "./blur-view";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "./motion";
 import { Text } from "./text";
 
@@ -15,9 +16,10 @@ type Props<T extends string> = {
   activeTab?: T;
   onTabChange?: (value: T) => void;
   style?: ViewStyle;
+  blurKey?: BlurKeys;
 };
 
-export const Tabs = <T extends string>({ tabs, activeTab: controlledActiveTab, onTabChange, style }: Props<T>) => {
+export const Tabs = <T extends string>({ tabs, activeTab: controlledActiveTab, onTabChange, style, blurKey }: Props<T>) => {
   const [activeTab, setActiveTab] = useState(controlledActiveTab || tabs[0]?.value || '');
   const [tabLayouts, setTabLayouts] = useState<{ [key: string]: { x: number; width: number } }>({});
 
@@ -65,6 +67,7 @@ export const Tabs = <T extends string>({ tabs, activeTab: controlledActiveTab, o
   return (
     <Block
       variant="blur"
+      blurKey={blurKey}
       style={{
         flexDirection: "row",
         width: 'auto',

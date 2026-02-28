@@ -1,6 +1,7 @@
 import { useRouter } from "@/hooks";
 import { Id } from "@/lib/convex/client";
 import { Block } from "@ui/block";
+import { BlurKeys } from "@ui/blur-view";
 import { Camera, Settings } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
@@ -222,6 +223,7 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
             }}
           >
             <Tabs
+              blurKey={BlurKeys.PROFILE_TABS}
               tabs={[
                 { label: 'Generations', value: 'generations' },
                 { label: 'Outfits', value: 'outfits' },

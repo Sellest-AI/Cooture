@@ -1,5 +1,5 @@
 import { cn } from '@ui/utils';
-import { useMemo } from 'react';
+import { ComponentProps, useMemo } from 'react';
 import { View, ViewStyle } from 'react-native';
 import { Colors } from 'theme';
 import { BLUR_PROPS, BlurView } from './blur-view';
@@ -12,6 +12,7 @@ type Props = {
   children?: React.ReactNode;
   disabled?: boolean;
   blurComponent?: typeof BlurView;
+  blurKey?: ComponentProps<typeof BlurView>['blurKey'];
 }
 
 export const getBlockColors = (variant: Props['variant'], disabled?: boolean) => {
@@ -52,7 +53,7 @@ export const getBlockColors = (variant: Props['variant'], disabled?: boolean) =>
   }
 }
 
-export const Block = ({ className = "", children, variant, style, disabled, blurComponent }: Props) => {
+export const Block = ({ className = "", children, variant, style, disabled, blurComponent, blurKey }: Props) => {
   const VariantColors = useMemo(() => getBlockColors(variant, disabled), [disabled, variant]);
 
   const Component = variant === 'blur' ? (blurComponent ?? BlurView) : View;
@@ -63,17 +64,17 @@ export const Block = ({ className = "", children, variant, style, disabled, blur
   return (
     <Component
       {...BLUR_PROPS}
-      style={[{
+      blurKey={blurKey}
+      style={{
         overflow: 'hidden',
         position: 'relative',
         ...VariantColors,
         borderTopWidth: disabled ? 0 : 1,
         borderLeftWidth: disabled ? 0 : 2,
         borderRadius: 18,
-      }, {
         ...style,
         backgroundColor: style?.backgroundColor ?? VariantColors.backgroundColor,
-      }]}
+      }}
       className={cn(className)}
     >
       {showTopBorder && <LinearGradient
