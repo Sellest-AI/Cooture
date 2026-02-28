@@ -100,12 +100,12 @@ const Calendar = ({ style }: Props) => {
         <View style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
-          width: 294,
+          width: 324,
           gap: 18
         }}>
           <MotiView
             from={{ width: 0 }}
-            animate={{ width: (normalizedIndex + 1) * 26 + normalizedIndex * 18 }}
+            animate={{ width: (normalizedIndex + 1) * 28 + normalizedIndex * 18 }}
             transition={{ delay: DELAYS.calendar, duration: (normalizedIndex) * 850 }}
             style={{
               backgroundColor: Colors.primary[500],

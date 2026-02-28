@@ -34,6 +34,9 @@ export const BlurView = ({ style, blurKey, children, className, ...props }: Blur
   const target = Platform.OS === 'android' ? (blurTarget ?? undefined) : undefined;
   const method = Platform.OS === 'android' ? (blurTarget ? 'dimezisBlurViewSdk31Plus' : 'none') : undefined;
 
+  const width = (style?.width || style?.flex === 1) ? '100%' : undefined;
+  const height = (style?.height || style?.flex === 1) ? '100%' : undefined;
+
   return <ExpoBlurView
     {...BLUR_PROPS}
     {...props}
@@ -43,7 +46,7 @@ export const BlurView = ({ style, blurKey, children, className, ...props }: Blur
   >
     <View
       style={{
-        flex: style?.flex === undefined ? 1 : style?.flex,
+        flex: style?.flex,
         flexDirection,
         justifyContent,
         alignItems,
@@ -56,6 +59,8 @@ export const BlurView = ({ style, blurKey, children, className, ...props }: Blur
         paddingVertical,
         paddingTop,
         paddingBottom,
+        width,
+        height,
       }}
       className={className}
     >
