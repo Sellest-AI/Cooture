@@ -58,7 +58,7 @@ export const _internal_step_bookmark = internalMutation({
       const stackedDelay = index * 1000 * CONFIG.bookmark.stackDelay; // Stack delay of 30 seconds between each bookmark to avoid bookmarking all at once
       const finalDelay = Math.round(randomDelay + stackedDelay);
 
-      await ctx.scheduler.runAfter(finalDelay, internal.router.collection.toggleBookmark.internal, {
+      await ctx.scheduler.runAfter(finalDelay, internal.router.collection.toggleBookmark._internal, {
         value: true,
         generationId: item.type === 'generation' ? item._id : undefined,
         outfitId: item.type === 'outfit' ? item._id : undefined,

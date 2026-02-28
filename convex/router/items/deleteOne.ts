@@ -26,7 +26,7 @@ export const authed = authMutation({
     if (outfits.length > 0) return { success: false, associatedOutfits: outfits }
 
     // Remove bookmarks associated with the item
-    await ctx.runMutation(internal.router.collection.toggleBookmark.internal, {
+    await ctx.runMutation(internal.router.collection.toggleBookmark._internal, {
       itemId: itemId,
       userId: ctx.userId,
       value: false,

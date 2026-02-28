@@ -66,7 +66,7 @@ const toggleBookmark = async (ctx: MutationCtx, args: {
   }
 }
 
-export const internal = internalMutation({
+export const _internal = internalMutation({
   args: {
     value: v.optional(v.boolean()),
     generationId: v.optional(v.id("generations")),
