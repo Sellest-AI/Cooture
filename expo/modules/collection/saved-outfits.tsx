@@ -78,6 +78,11 @@ export const SavedOutfits = ({ style, direction, numColumns, header, itemWidth, 
           gap: GAP,
         }}
         data={(results || [])}
+        ListEmptyComponent={<>
+          <Skeleton style={{ width: itemWidth, aspectRatio: 4 / 5 }} />
+          <Skeleton style={{ width: itemWidth, aspectRatio: 4 / 5 }} />
+          <Skeleton style={{ width: itemWidth, aspectRatio: 4 / 5 }} />
+        </>}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <Item {...item} />

@@ -215,7 +215,7 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
   const [canGoForward, setCanGoForward] = useState(false);
   const [currentUrl, setCurrentUrl] = useAtom(latestUrlAtom);
 
-  let timer = useRef<number | null>(null);
+  let timer = useRef<NodeJS.Timeout | null>(null);
 
   const goBack = () => { if (canGoBack) webviewRef.current?.goBack(); };
   const goForward = () => { if (canGoForward) webviewRef.current?.goForward(); };

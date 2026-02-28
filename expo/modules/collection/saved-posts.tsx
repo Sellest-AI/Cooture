@@ -3,6 +3,7 @@ import { api, usePaginatedQuery, useQuery, useQueryCached } from "@/lib/convex/c
 import { PostMini } from "@ui/cards";
 import { FlashList } from "@ui/flat-list";
 import { Pressable } from "@ui/pressable";
+import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
 import { notEmpty } from "@utils/convex-allowed";
 import { useMemo } from "react";
@@ -92,6 +93,11 @@ export const SavedPosts = ({ style, direction, numColumns, header, itemWidth, in
           gap: GAP,
         }}
         data={(results || [])}
+        ListEmptyComponent={<>
+          <Skeleton style={{ width: itemWidth, aspectRatio: 4 / 5 }} />
+          <Skeleton style={{ width: itemWidth, aspectRatio: 4 / 5 }} />
+          <Skeleton style={{ width: itemWidth, aspectRatio: 4 / 5 }} />
+        </>}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <Item {...item} />

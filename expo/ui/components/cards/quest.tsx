@@ -117,6 +117,7 @@ export const Quest = ({ style, source, title, description, progress, credits, cl
       {credits && <Block
         variant={completed ? "primary" : "blur"}
         style={{
+          flex: 0,
           marginTop: 16,
           flexDirection: 'row',
           gap: 4,
