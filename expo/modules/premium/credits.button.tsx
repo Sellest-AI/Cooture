@@ -3,12 +3,12 @@ import { useAccount } from "@/lib/convex/auth"
 import { useNumberIncrement } from "@ui/hooks/use-number-increment"
 import { Credits, Loader } from "@ui/icons"
 import { LinearGradient } from "@ui/linear-gradient"
+import Odometer from "@ui/odometer"
 import { Pressable } from "@ui/pressable"
 import { Skeleton } from "@ui/skeleton"
-import { Text } from "@ui/text"
 import { useState } from "react"
 import { ViewStyle } from "react-native"
-import { Colors } from "theme"
+import { Colors, Texts } from "theme"
 
 type Props = {
   style?: ViewStyle;
@@ -65,13 +65,12 @@ export const CreditsButton = ({ style, onPress }: Props) => {
           height: 18,
         }}
       /> :
-        <Text.Lg
+        <Odometer
           color={Colors.primary[900]}
           style={{ opacity: 0.8 }}
-          weight={700}
-        >
-          {displayedValue}
-        </Text.Lg>}
+          value={displayedValue}
+          fontSize={Texts.lg.fontSize}
+        />}
     </Pressable>
   )
 }

@@ -15,7 +15,7 @@ export const Portrait = ({ style }: { style?: ViewStyle }) => {
 
   // Only redirect if we're certain there's no image (not during loading)
   if (!isPending && frontImage === null) return <Router.Redirect
-    href={ROUTES.EXTRA.AVATAR.UPDATE_PORTRAITS}
+    href={ROUTES.EXTRA.AVATAR.PORTRAITS}
     redirectTo={ROUTES.PHOTOSHOOT.RECAP}
   />
 
@@ -48,7 +48,7 @@ export const Portrait = ({ style }: { style?: ViewStyle }) => {
         startIcon={Pencil}
         style={{ marginTop: 12 }}
         onPress={() => {
-          push(ROUTES.EXTRA.AVATAR.UPDATE_PORTRAITS, {
+          push(ROUTES.EXTRA.AVATAR.PORTRAITS, {
             redirectHere: true
           })
         }}

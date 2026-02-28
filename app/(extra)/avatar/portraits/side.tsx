@@ -6,7 +6,7 @@ import { useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 
 export default function Screen() {
-  const { push } = useRouter('/avatar/update-portraits/side');
+  const { push } = useRouter('/avatar/portraits/side');
 
   const { uploadImage } = useUpload();
   const { frontImage, smileImage, setSideImage, sideImage, pushImagesToServer } = usePortraitsLocal();
@@ -32,7 +32,7 @@ export default function Screen() {
           sideImageId: _sideImage._id,
         });
 
-        push('/avatar/update-appearance', { forwardRedirect: true });
+        push('/avatar/appearance', { forwardRedirect: true });
       }}
       examples={{
         hint: "Make sure to be in a bright enough room. Try to keep a plain white background.",

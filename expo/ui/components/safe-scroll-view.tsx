@@ -52,6 +52,7 @@ export const SafeScrollView = ({ style, children, contentContainerStyle, onReach
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={[contentContainerStyle, {
             paddingBottom: contentPaddingBottom ?? Math.max(fallbackPadding * 2, insets.bottom),
+            minHeight: style?.minHeight,
           }]}
           scrollEventThrottle={400}
           showsVerticalScrollIndicator={showsVerticalScrollIndicator}

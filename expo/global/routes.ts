@@ -59,8 +59,7 @@ export const ROUTES = {
     SETINGS: '/settings',
     NOTIFICATIONS: '/notifications',
     AVATAR: {
-      UPDATE_PORTRAITS: '/avatar/update-portraits',
-      UPDATE_HEIGHT: '/update-height',
+      PORTRAITS: '/avatar/portraits',
     }
   },
   PROFILE: {

@@ -24,7 +24,7 @@ export const StickyView = ({
   };
 
   // Account for the header offset from ParallaxScrollView
-  const absoluteY = headerOffset + layoutY;
+  const absoluteY = (headerOffset ?? 0) + layoutY;
   const stickyThreshold = Math.max(0, absoluteY - topOffset);
 
   const translateY = scrollY.interpolate({

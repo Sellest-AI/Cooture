@@ -5,7 +5,7 @@ import { useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 
 export default function Screen() {
-  const { push } = useRouter('/avatar/update-portraits');
+  const { push } = useRouter('/avatar/portraits');
   const { setFrontImage, frontImage } = usePortraitsLocal();
   useFocusEffect(useCallback(() => { setFrontImage(null) }, [setFrontImage]))
 
@@ -14,7 +14,7 @@ export default function Screen() {
       imageUri={frontImage ?? undefined}
       onCapture={(photoUri) => {
         setFrontImage(photoUri);
-        setTimeout(() => { push('/avatar/update-portraits/smile', { forwardRedirect: true }) }, 1300);
+        setTimeout(() => { push('/avatar/portraits/smile', { forwardRedirect: true }) }, 1300);
       }}
       examples={{
         hint: "Make sure to be in a bright enough room. Try to keep a plain white background.",
