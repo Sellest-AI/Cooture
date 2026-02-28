@@ -36,7 +36,7 @@ export const NativeUpdateProvider = ({
 
   const status: Status = isPending ? 'checking' : (compareVersions(currentVersion, requiredVersion) >= 0 ? 'ok' : 'outdated');
 
-  const isAllowed = status === 'ok' || Platform.OS === 'web' || __DEV__;
+  const isAllowed = status !== 'outdated' || Platform.OS === 'web' || __DEV__;
 
   useEffect(() => {
     if (__DEV__) { onComplete?.(); return; }

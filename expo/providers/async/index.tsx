@@ -13,7 +13,7 @@ type Props = {
 }
 
 export const AsyncProviders = ({ children }: Props) => {
-  const [loadedLeft, setLoadedLeft] = useState(3);
+  const [loadedLeft, setLoadedLeft] = useState(1);
 
   useEffect(() => {
     if (loadedLeft <= 0) SplashScreen.hideAsync();
@@ -24,8 +24,8 @@ export const AsyncProviders = ({ children }: Props) => {
       {/* BLOCK RENDERING UNTIL ALL ASYNC TASKS ARE DONE */}
       {loadedLeft <= 0 ? children : null}
       <FontsProvider onComplete={() => setLoadedLeft((p) => p - 1)} />
-      <OTAUpdateProvider onComplete={() => setLoadedLeft((p) => p - 1)} />
-      <NativeUpdateProvider onComplete={() => setLoadedLeft((p) => p - 1)} />
+      <OTAUpdateProvider />
+      <NativeUpdateProvider />
       {/* <ThemeProvider /> */}
     </>
   )

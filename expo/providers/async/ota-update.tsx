@@ -1,10 +1,12 @@
 import { fetchUpdateAsync, reloadAsync } from 'expo-updates';
 import React, { useEffect } from 'react';
 
-export const OTAUpdateProvider = ({ children, onComplete, }: {
+type Props = {
   children?: React.ReactNode;
   onComplete?: () => void;
-}) => {
+}
+
+export const OTAUpdateProvider = ({ children, onComplete, }: Props) => {
   useEffect(() => {
     if (__DEV__) {
       onComplete?.();
