@@ -86,8 +86,8 @@ export default function Screen() {
   const { redirect } = useRouter();
 
   const [image, setImage] = useState<string | null>(null);
-  const [username, setUsername] = useState('');
-  const [displayName, setDisplayName] = useState('');
+  const [username, setUsername] = useState(user?.username ?? '');
+  const [displayName, setDisplayName] = useState(user?.name ?? '');
 
   const debouncedUsername = useDebounce(username, 1000);
   const hasUsername = debouncedUsername.length > 0;
@@ -96,6 +96,14 @@ export default function Screen() {
   const { action: upsertImage } = useAction(api.router.users.upsertImage.authed);
   const { data: usernameAvailable, isPending } = useQuery(api.router.users.checkUsername.anon,
     hasUsername ? { username: debouncedUsername } : 'skip');
+
+  const isSame = user?.username === usernameAvailable?.sanitizedUsername;
+  const isAvailable = isSame || usernameAvailable?.available;
+
+  useEffect(() => {
+    if (user && user.username) setUsername(user.username);
+    if (user && user.name) setDisplayName(user.name);
+  }, [user])
 
   useEffect(() => {
     if (
@@ -139,7 +147,7 @@ export default function Screen() {
           <CircleAvatar
             size={112}
             style={{ ...styles.circleAvatar, top: 56, left: '32%' }}
-            source={image ?? undefined}
+            source={image ?? user?.imageUrl}
             label="Import Image"
             onPress={async () => {
               try {
@@ -198,9 +206,9 @@ export default function Screen() {
         paddingHorizontal: 12,
         marginTop: hasUsername ? 28 : 32,
       }}>
-        {hasUsername && <Text.Sm color={usernameAvailable ? Colors.primary[500] : Colors.secondary[500]} style={{ marginBottom: 8, textAlign: 'right', marginRight: 8 }}>
+        {(hasUsername && !isSame) && <Text.Sm color={isAvailable ? Colors.primary[500] : Colors.secondary[500]} style={{ marginBottom: 8, textAlign: 'right', marginRight: 8 }}>
           {isPending && <View style={{ marginRight: 8 }}><Loader size={12} /></View>}
-          {usernameAvailable ? "Available" : "Unavailable"}
+          {isAvailable ? "Available" : "Unavailable"}
         </Text.Sm>}
         <TextInput
           placeholder="Username (@joshuaduffy)"
@@ -232,11 +240,11 @@ export default function Screen() {
         <Button
           style={{ marginTop: 32 }}
           variant="primary"
-          disabled={!username || !displayName || !usernameAvailable}
+          disabled={!username || !displayName || !isAvailable}
           onPress={async () => {
             await upsertProfile({ username, displayName });
             if (image) await upsertImage({ base64: image });
-            redirect({ fallbackTo: ROUTES.PROFILE.PATH });
+            redirect({ fallbackTo: ROUTES.EXTRA.AVATAR.APPEARANCE });
           }}
         >
           Save

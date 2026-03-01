@@ -32,10 +32,15 @@ const AuthenticationGate = () => {
 
   if (!user) return <LoadingView />;
 
+  const WAITLIST_PATHS_ALLOWED = ["/welcome/", "/avatar/"]
+
   if (isInWaitlist) {
-    if (!pathname.startsWith('/welcome/')) return <Redirect href={ROUTES.WELCOME.WAIT_LIST} />
+    if (!WAITLIST_PATHS_ALLOWED.some(path => pathname.startsWith(path)))
+      return <Redirect href={ROUTES.WELCOME.WAIT_LIST} />
     else return null;
   }
+
+  if (!isInWaitlist && !user.username) return <Redirect href={ROUTES.EXTRA.AVATAR.PROFILE} />
 
   if (!isInWaitlist && pathname.startsWith(ROUTES.WELCOME.WAIT_LIST)) return <Redirect href={ROUTES.TABS.FEED} />
 

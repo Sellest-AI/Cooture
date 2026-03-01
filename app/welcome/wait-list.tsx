@@ -1,39 +1,58 @@
+import { ROUTES, useRouter } from "@/hooks";
 import { api, useMutation, useQueryCachedData } from "@/lib/convex/client";
 import { Block } from "@ui/block";
+import { BlurKeys, BlurTargetView } from "@ui/blur-view";
 import { Button } from "@ui/button";
 import { QrCode } from "@ui/icons";
-import { Image } from "@ui/image";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
 import { TextInput } from "@ui/text-input";
+import { VideoView } from "@ui/video-view";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import { View } from "react-native";
 import { Colors } from "theme";
+
 export default function Screen() {
+  const { push } = useRouter(ROUTES.WELCOME.WAIT_LIST);
   const [code, setCode] = useState("");
 
   const { data: stats } = useQueryCachedData(api.router.waitlist.getStatistics.anon, { key: 'waitlist-stats' });
   const { mutate: enterCode } = useMutation(api.router.waitlist.enterCode.authed);
 
   return (
-    <View style={{ flex: 1 }}>
-      <Image
-        source={require('assets/placeholders/can-model.png')}
-        contentFit="cover"
+    <View style={{ flex: 1, backgroundColor: Colors.background }}>
+      <BlurTargetView blurKey={BlurKeys.WAITLIST_BACKGROUND}
         style={{
           position: 'absolute',
           inset: 0,
+          bottom: 128
+        }}
+      >
+        <VideoView
+          source={require('assets/backgrounds/main_video.mp4')}
+          contentFit="cover"
+          style={{ width: '100%', height: '100%' }}
+        />
+      </BlurTargetView>
+      <LinearGradient
+        colors={['rgba(0,0,0,0.7)', 'transparent']}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 200
         }}
       />
       <LinearGradient
-        colors={['transparent', 'rgba(0,0,0,0.7)', 'rgba(0,0,0,0.9)', 'rgba(0,0,0,1)']}
+        colors={['transparent', 'rgba(0,0,0,0.7)', 'rgba(0,0,0,0.9)', Colors.background]}
         style={{
           position: 'absolute',
-          bottom: 0,
+          bottom: 128,
           left: 0,
           right: 0,
-          height: 500
+          height: 400
         }}
       />
       <View style={{
@@ -43,20 +62,20 @@ export default function Screen() {
       }}>
         <Block
           variant="blur"
+          blurKey={BlurKeys.WAITLIST_BACKGROUND}
           style={{
             alignSelf: 'center',
             width: 'auto',
             paddingHorizontal: 16,
             paddingVertical: 8,
             borderRadius: 99
-
           }}
         >
           <Text.Sm color={Colors.neutral[400]} weight={600}>Closed Beta</Text.Sm>
         </Block>
         <View
           style={{
-            marginTop: 16,
+            marginTop: 12,
             marginHorizontal: 'auto',
             width: '95%'
           }}
@@ -71,12 +90,12 @@ export default function Screen() {
           <Text.H4
             color={Colors.neutral[200]}
             textBreakStrategy="balanced"
-            style={{ marginTop: 24, textAlign: 'center' }}>
+            style={{ marginTop: 16, textAlign: 'center' }}>
             If you have a code to access the app, enter it bellow
           </Text.H4>
         </View>
         <TextInput
-          style={{ marginTop: 36 }}
+          style={{ marginTop: 24 }}
           startIcon={QrCode}
           placeholder="Code"
           value={code}
@@ -84,7 +103,7 @@ export default function Screen() {
         />
         <Button
           style={{ marginTop: 8 }}
-          variant="primary"
+          variant="blur"
           disabled={code.length < 7}
           onPress={async () => {
             // Fake 1000ms
@@ -103,6 +122,16 @@ export default function Screen() {
               people are waiting
             </Text.Base>
           </View> : <Skeleton width={132} height={14} style={{ marginHorizontal: 'auto', marginTop: 8 }} />}
+
+        <Button
+          style={{ marginTop: 32 }}
+          variant="primary"
+          onPress={async () => {
+            push(ROUTES.EXTRA.AVATAR.PROFILE, { redirectTo: ROUTES.EXTRA.AVATAR.APPEARANCE });
+          }}
+        >
+          Claim my username
+        </Button>
       </View>
     </View >
   )

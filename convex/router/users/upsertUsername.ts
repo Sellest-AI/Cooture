@@ -11,7 +11,9 @@ export const authed = authMutation({
   },
   handler: async (ctx, args) => {
     const { available, sanitizedUsername } = await ctx.runQuery(api.router.users.checkUsername.anon, { username: args.username });
-    if (!available) throw new Error("Username not available");
+    if (ctx.user.username !== sanitizedUsername) {
+      if (!available) throw new Error("Username not available");
+    }
 
     const currentUser = await ctx.db.get(ctx.userId);
     if (!currentUser) throw new Error("User not found");

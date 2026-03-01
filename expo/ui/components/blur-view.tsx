@@ -117,4 +117,5 @@ export enum BlurKeys {
   HEADER = 'header',
   STEPPER_LINE = 'stepper-line',
   PHOOTSHOOT_PRESETS_ITEMS = 'photoshoot-presets-items',
+  WAITLIST_BACKGROUND = 'waitlist-background',
 }

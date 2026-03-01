@@ -60,6 +60,8 @@ export const ROUTES = {
     NOTIFICATIONS: '/notifications',
     AVATAR: {
       PORTRAITS: '/avatar/portraits',
+      PROFILE: '/avatar/profile',
+      APPEARANCE: '/avatar/appearance',
     }
   },
   PROFILE: {

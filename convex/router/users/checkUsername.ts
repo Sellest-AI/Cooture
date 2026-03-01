@@ -14,8 +14,6 @@ export const anon = publicQuery({
       .replace(/^[^a-z0-9]+/, '')     // remove leading punctuation
       .slice(0, 24);
 
-    console.log(sanitizedUsername);
-
     const existingUser = await ctx.db.query("usersExtended")
       .withIndex("by_username", q => q.eq("username", sanitizedUsername))
       .first();
