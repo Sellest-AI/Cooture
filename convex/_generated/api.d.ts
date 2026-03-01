@@ -184,6 +184,7 @@ import type * as router_subscriptions_createSubscription from "../router/subscri
 import type * as router_subscriptions_endOne from "../router/subscriptions/endOne.js";
 import type * as router_subscriptions_getUserSubscription from "../router/subscriptions/getUserSubscription.js";
 import type * as router_subscriptions_updateSubscriptionStatus from "../router/subscriptions/updateSubscriptionStatus.js";
+import type * as router_users_checkUsername from "../router/users/checkUsername.js";
 import type * as router_users_follows_checkFollowing from "../router/users/follows/checkFollowing.js";
 import type * as router_users_follows_getFollowStats from "../router/users/follows/getFollowStats.js";
 import type * as router_users_follows_getFollowersPaginated from "../router/users/follows/getFollowersPaginated.js";
@@ -194,6 +195,8 @@ import type * as router_users_getAccount from "../router/users/getAccount.js";
 import type * as router_users_getAppearance from "../router/users/getAppearance.js";
 import type * as router_users_getFromStripeId from "../router/users/getFromStripeId.js";
 import type * as router_users_upsertAppearance from "../router/users/upsertAppearance.js";
+import type * as router_users_upsertImage from "../router/users/upsertImage.js";
+import type * as router_users_upsertUsername from "../router/users/upsertUsername.js";
 import type * as router_waitlist_enterCode from "../router/waitlist/enterCode.js";
 import type * as router_waitlist_generateCodes from "../router/waitlist/generateCodes.js";
 import type * as router_waitlist_getCodes from "../router/waitlist/getCodes.js";
@@ -400,6 +403,7 @@ declare const fullApi: ApiFromModules<{
   "router/subscriptions/endOne": typeof router_subscriptions_endOne;
   "router/subscriptions/getUserSubscription": typeof router_subscriptions_getUserSubscription;
   "router/subscriptions/updateSubscriptionStatus": typeof router_subscriptions_updateSubscriptionStatus;
+  "router/users/checkUsername": typeof router_users_checkUsername;
   "router/users/follows/checkFollowing": typeof router_users_follows_checkFollowing;
   "router/users/follows/getFollowStats": typeof router_users_follows_getFollowStats;
   "router/users/follows/getFollowersPaginated": typeof router_users_follows_getFollowersPaginated;
@@ -410,6 +414,8 @@ declare const fullApi: ApiFromModules<{
   "router/users/getAppearance": typeof router_users_getAppearance;
   "router/users/getFromStripeId": typeof router_users_getFromStripeId;
   "router/users/upsertAppearance": typeof router_users_upsertAppearance;
+  "router/users/upsertImage": typeof router_users_upsertImage;
+  "router/users/upsertUsername": typeof router_users_upsertUsername;
   "router/waitlist/enterCode": typeof router_waitlist_enterCode;
   "router/waitlist/generateCodes": typeof router_waitlist_generateCodes;
   "router/waitlist/getCodes": typeof router_waitlist_getCodes;
