@@ -13,7 +13,7 @@ import RulerSlider from "@ui/slider.ruler";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Dimensions, View } from "react-native";
+import { View } from "react-native";
 import { Colors } from "theme";
 
 const centimetersToFeet = (cm: number) => {
@@ -152,14 +152,13 @@ export default function Screen() {
     <SafeScrollView
       style={{
         backgroundColor: Colors.background,
-        minHeight: Dimensions.get('screen').height
       }}
     >
       <ModalHeader
         onBack={router.canGoBack() ? router.back : undefined}
         title="Appearance"
         subtitle="Manage your physical appearance"
-        style={{ marginBottom: 32, marginTop: 12 }}
+        style={{ marginBottom: 32, marginTop: 12, paddingHorizontal: 12 }}
       />
 
       <PhysicalAppearance

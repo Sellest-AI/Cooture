@@ -13,7 +13,7 @@ import { Text } from "@ui/text";
 import { TextInput } from "@ui/text-input";
 import { launchImageLibraryAsync } from "expo-image-picker";
 import { useEffect, useState } from "react";
-import { Dimensions, StyleSheet, View, ViewStyle } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 
 type CircleAvatarProps = {
@@ -120,7 +120,6 @@ export default function Screen() {
       edges={{ top: 'off' }}
       style={{
         flex: 1,
-        minHeight: Dimensions.get('window').height,
       }}>
       <LinearGradient
         colors={[Colors.primary[500], 'transparent']}
