@@ -59,6 +59,7 @@ const uploadImage = async (ctx: ActionCtx, base64orUrl: string, extra: Extra) =>
   return image;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const imagesArgs = v.array(v.object(uploadSingleArgs));
 
 type SharedArgs = {
