@@ -11,9 +11,11 @@ export const claimedAtom = atom(false);
 function useStreakNotification() {
   const claimed = useAtomValue(claimedAtom);
   const { wallet } = useAccount.Wallet();
+  const { isInWaitlist } = useAccount();
 
   useEffect(() => {
     if (Platform.OS === 'web') return;
+    if (isInWaitlist) return;
     if (!wallet?.nextClaimAt) return;
     if (!wallet.canClaimNow) return;
     if (claimed) return;
@@ -34,13 +36,14 @@ function useStreakNotification() {
         channelId: "streak",
       },
     });
-  }, [claimed, wallet]);
+  }, [claimed, isInWaitlist, wallet]);
 }
 
 export const StreakProvider = ({ children }: { children: React.ReactNode }) => {
   const path = usePathname();
   const { wallet } = useAccount.Wallet();
   const claimed = useAtomValue(claimedAtom);
+  const { isInWaitlist } = useAccount();
 
   // If the user just created their account, consider them as having claimed the streak for today to avoid showing the modal immediately
   const isFirstDay = (Date.now() - (wallet?._creationTime ?? 0) < 24 * 60 * 60 * 1000);
@@ -51,6 +54,7 @@ export const StreakProvider = ({ children }: { children: React.ReactNode }) => {
   const pushed = useRef(false);
 
   useEffect(() => {
+    if (isInWaitlist) return;
     if (claimed) return;
     if (!wallet) return;
     if (path.startsWith(ROUTES.MODALS.DAILY_STREAK)) return;
@@ -63,7 +67,7 @@ export const StreakProvider = ({ children }: { children: React.ReactNode }) => {
       pushed.current = true;
       setTimeout(() => { router.push(ROUTES.MODALS.DAILY_STREAK); pushed.current = false; }, 3000);
     }
-  }, [claimed, isFirstDay, path, wallet])
+  }, [claimed, isFirstDay, isInWaitlist, path, wallet])
 
   return (children)
 }
