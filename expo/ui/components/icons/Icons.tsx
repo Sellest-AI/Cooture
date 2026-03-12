@@ -1,6 +1,8 @@
 export { Credits } from './credits';
 export { IconSymbol } from './icon-symbol';
 
+export { BodySize } from './body-size';
+
 export { Explozish } from './explozish';
 export { Loader } from './loader';
 export { Roundish } from './roundish';

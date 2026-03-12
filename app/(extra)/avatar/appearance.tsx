@@ -3,7 +3,7 @@ import { useAppearance } from "@/modules/profiles/_hooks/useAppearance";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
 import { FlashList, FlashListRef } from "@ui/flat-list";
-import { Image } from "@ui/image";
+import { BodySize } from "@ui/icons";
 import { ModalHeader } from "@ui/modal";
 import Odometer from "@ui/odometer";
 import { Pressable } from "@ui/pressable";
@@ -64,7 +64,6 @@ const PhysicalAppearance = ({ value, onValueChange }: { value: SizeValue, onValu
       <FlashList
         ref={flashListRef}
         horizontal
-        scrollEnabled={false}
         style={{ marginTop: 24 }}
         showsHorizontalScrollIndicator={false}
         data={[0, 2, 4, 6, 8, 10]}
@@ -93,18 +92,18 @@ const PhysicalAppearance = ({ value, onValueChange }: { value: SizeValue, onValu
                     opacity: selected ? 1 : 0.3,
                     padding: 12,
                     flex: 1,
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
-                  <Image
-                    source={require('assets/placeholders/sizes/lean.png')}
-                    contentFit="contain"
-                    style={{
-                      flex: 1
-                    }}
+                  <BodySize
+                    size={32}
+                    fill={Colors.neutral[50]}
+                    bodySize={SIZES[index].valueText}
                   />
                   <Text.Base
                     color={selected ? Colors.primary[500] : Colors.neutral[400]}
-                    style={{ marginTop: 8, textAlign: 'center' }}
+                    style={{ marginTop: 20, textAlign: 'center' }}
                     weight={600}
                   >
                     {SIZES[index].label}
@@ -152,6 +151,7 @@ export default function Screen() {
     <SafeScrollView
       style={{
         backgroundColor: Colors.background,
+        flex: 1,
       }}
     >
       <ModalHeader
@@ -192,7 +192,6 @@ export default function Screen() {
           />
         </View>
       </View>
-
       <View style={{
         justifyContent: 'flex-end',
         padding: 12,
