@@ -1,4 +1,5 @@
 import { ROUTES, useRouter } from "@/hooks";
+import { useAccount } from "@/lib/convex/auth";
 import { api, useMutation, useQueryCachedData } from "@/lib/convex/client";
 import { Block } from "@ui/block";
 import { BlurKeys, BlurTargetView } from "@ui/blur-view";
@@ -19,6 +20,8 @@ export default function Screen() {
 
   const { data: stats } = useQueryCachedData(api.router.waitlist.getStatistics.anon, { key: 'waitlist-stats' });
   const { mutate: enterCode } = useMutation(api.router.waitlist.enterCode.authed);
+
+  const { user } = useAccount();
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -115,7 +118,7 @@ export default function Screen() {
         </Button>
         {stats ?
           <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 8, alignItems: 'center' }}>
-            <Text.Base color={Colors.neutral[50]} style={{ marginRight: 5 }}>
+            <Text.Base color={Colors.neutral[50]} style={{ marginRight: 3 }}>
               {stats.numberOfUsers.toLocaleString("en")}
             </Text.Base>
             <Text.Base color={Colors.neutral[400]} >
@@ -130,7 +133,7 @@ export default function Screen() {
             push(ROUTES.EXTRA.AVATAR.PROFILE, { redirectTo: ROUTES.EXTRA.AVATAR.APPEARANCE });
           }}
         >
-          Claim my username
+          {user?.username ? "Edit profile" : "Claim my username"}
         </Button>
       </View>
     </View >
