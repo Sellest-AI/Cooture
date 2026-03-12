@@ -54,6 +54,8 @@ export const userCheck = async (ctx: Context): UserCheckResult => {
     ...userExtended,
     _idExtended: userExtended._id,
     ...user,
+    name: userExtended.name || user.name,
+    image: userExtended.imageUrl || user.image,
   }
 
   // This new ctx will be applied to the function's.
