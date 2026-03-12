@@ -39,40 +39,23 @@ export default function RulerSlider({
   useEffect(() => { snapToValue(initialValue) }, [])
 
   const totalTicks = maxValue - minValue + 1;
-  const sidePadding = SCREEN_WIDTH / 2;
+  const sidePadding = (SCREEN_WIDTH - TICK_SPACING) / 2;
   const initialOffset = (initialValue - minValue) * TICK_SPACING;
 
-  // scrollSnapAlign:'center' causes each tick's CENTER to align to the viewport center.
-  // This means contentOffset.x = (tickIndex * TICK_SPACING) + TICK_SPACING/2 when that tick
-  // is centered — i.e. offset is always TICK_SPACING/2 ahead of a naive index calculation.
-  // We correct for this by subtracting TICK_SPACING/2 before rounding.
   const offsetToValue = useCallback((offsetX: number) => {
-    const index = Math.round((offsetX - TICK_SPACING / 2) / TICK_SPACING);
+    const index = Math.round(offsetX / TICK_SPACING);
     return Math.min(maxValue, Math.max(minValue, minValue + index));
   }, [minValue, maxValue]);
 
   const valueToOffset = useCallback((value: number) => {
     const index = value - minValue;
-    return index * TICK_SPACING + TICK_SPACING / 2;
+    return index * TICK_SPACING;
   }, [minValue]);
 
   const snapToValue = useCallback((value: number) => {
     const offset = valueToOffset(value);
     scrollRef.current?.scrollTo({ x: offset, animated: true });
   }, [valueToOffset]);
-
-  const snapToNearestTick = useCallback(
-    (offsetX: number) => {
-      const newValue = offsetToValue(offsetX);
-      scrollRef.current?.scrollTo({ x: valueToOffset(newValue), animated: true });
-
-      if (newValue !== currentValue.current) {
-        currentValue.current = newValue;
-        onValueChange?.(newValue);
-      }
-    },
-    [offsetToValue, valueToOffset, onValueChange]
-  );
 
   const handleScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -83,20 +66,6 @@ export default function RulerSlider({
       }
     },
     [offsetToValue, onValueChange]
-  );
-
-  const handleScrollEndDrag = useCallback(
-    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      snapToNearestTick(e.nativeEvent.contentOffset.x);
-    },
-    [snapToNearestTick]
-  );
-
-  const handleMomentumScrollEnd = useCallback(
-    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      snapToNearestTick(e.nativeEvent.contentOffset.x);
-    },
-    [snapToNearestTick]
   );
 
   const ticks = Array.from({ length: totalTicks }, (_, i) => {
@@ -137,8 +106,6 @@ export default function RulerSlider({
         contentOffset={{ x: initialOffset, y: 0 }}
         onScroll={handleScroll}
         scrollEventThrottle={16}
-        onScrollEndDrag={handleScrollEndDrag}
-        onMomentumScrollEnd={handleMomentumScrollEnd}
         contentContainerStyle={[
           styles.scrollContent,
           { paddingHorizontal: sidePadding },

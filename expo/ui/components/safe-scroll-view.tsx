@@ -34,7 +34,7 @@ export const SafeScrollView = ({ style, children, contentContainerStyle, onReach
       keyboardVerticalOffset={insets.top + fallbackPadding}
     >
       <SafeAreaView
-        style={{ flex: Platform.OS === 'web' ? 1 : undefined }}
+        style={{ flex: Platform.OS === 'web' ? 1 : style?.flex }}
         edges={{
           top: edges?.top === 'padding' ? 'off' : (edges?.top ?? 'additive'),
           left: edges?.left ?? 'additive',
@@ -51,8 +51,9 @@ export const SafeScrollView = ({ style, children, contentContainerStyle, onReach
           }}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={[contentContainerStyle, {
-            paddingBottom: contentPaddingBottom ?? Math.max(fallbackPadding * 2, insets.bottom),
+            paddingBottom: contentPaddingBottom ?? Math.max(fallbackPadding * 2, 0),
             minHeight: style?.minHeight,
+            flex: style?.flex,
           }]}
           scrollEventThrottle={400}
           showsVerticalScrollIndicator={showsVerticalScrollIndicator}

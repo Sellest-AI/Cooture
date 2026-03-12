@@ -1,5 +1,5 @@
 import { cn } from "@ui/utils";
-import { Text as NativeText, Platform, StyleSheet, TextStyle } from "react-native";
+import { Platform, StyleSheet, Text as TextNative, TextStyle, View } from "react-native";
 import { Texts } from "theme";
 
 type Props = {
@@ -10,9 +10,30 @@ type Props = {
   style?: TextStyle & {
     textBalance?: boolean;
   };
-} & Omit<NativeText['props'], 'style'>;
+} & Omit<TextNative['props'], 'style'>;
 
 type PropsExtended = Props & { type?: 'default' | 'alt' }
+
+const NativeText = ({ ...props }: TextNative['props']) => {
+  if (Platform.OS === 'web') return <TextNative {...props} />;
+
+  const style = StyleSheet.flatten(props.style);
+
+  const spaceLeft = style?.paddingLeft || style?.paddingHorizontal || style?.paddingInlineStart || style?.marginLeft || style?.marginHorizontal || style?.marginInlineStart;
+  const spaceRight = style?.paddingRight || style?.paddingHorizontal || style?.paddingInlineEnd || style?.marginRight || style?.marginHorizontal || style?.marginInlineEnd;
+
+  const hasSpace = spaceLeft || spaceRight;
+
+  if (hasSpace) {
+    return <>
+      {spaceLeft && <View style={{ width: spaceLeft }} />}
+      <TextNative {...props} />
+      {spaceRight && <View style={{ width: spaceRight }} />}
+    </>
+  }
+
+  return <TextNative {...props} />
+}
 
 export const Text = () => {
   return null;

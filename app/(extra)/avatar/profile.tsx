@@ -118,9 +118,7 @@ export default function Screen() {
   return (
     <SafeScrollView
       edges={{ top: 'off' }}
-      style={{
-        flex: 1,
-      }}>
+      style={{ flex: 1 }}>
       <LinearGradient
         colors={[Colors.primary[500], 'transparent']}
         style={{
@@ -192,7 +190,7 @@ export default function Screen() {
         alignItems: 'center',
         marginHorizontal: 'auto',
         maxWidth: 264,
-        marginTop: 32,
+        marginTop: 40,
       }}>
         <Text.H3 color={Colors.neutral[50]} style={{ textAlign: 'center' }}>
           {user?.username ? "Update" : "Choose"} your name
