@@ -4,7 +4,7 @@ import { adminQuery } from "../../../procedures";
 export const admin = adminQuery({
   handler: async (ctx) => {
     const results = await ctx.db.query('bots')
-      .take(1024);
+      .order("desc").take(1024);
 
     const bots = await Promise.all(results.map(async (r) => {
       const latestGeneration = await ctx.db.query('generations')

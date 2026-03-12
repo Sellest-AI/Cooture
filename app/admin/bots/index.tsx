@@ -30,7 +30,7 @@ export const PendingBots = (props: SharedProps) => {
         <Text.Base color={Colors.neutral[400]}>({results.length})</Text.Base>
       </View>
       {results
-        .sort((a, b) => (b.lastGeneratedAt || 0) - (a.lastGeneratedAt || 0))
+        .sort((a, b) => (a.lastGeneratedAt || 0) - (b.lastGeneratedAt || 0))
         .slice(0, 3).map((i) => {
           const isLoading = i.latestGeneration?.status === 'LOADING';
           return (
@@ -106,7 +106,7 @@ export const WaitingBots = (props: SharedProps) => {
         <Text.Base color={Colors.neutral[400]}>({results.length})</Text.Base>
       </View>
       {results
-        .sort((a, b) => (b.lastGeneratedAt || 0) - (a.lastGeneratedAt || 0))
+        .sort((a, b) => (a.lastGeneratedAt || 0) - (b.lastGeneratedAt || 0))
         .slice(0, 3).map((i) => {
           return (
             <Pressable
