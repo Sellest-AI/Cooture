@@ -9,9 +9,10 @@ type CarouselImageProps = {
   animationValue: SharedValue<number>,
   item: ReactNode,
   animate?: boolean,
+  style?: ViewStyle,
 }
 
-const CarouselComponent = ({ animationValue, item, animate }: CarouselImageProps) => {
+const CarouselComponent = ({ animationValue, item, animate, style }: CarouselImageProps) => {
   const animatedStyle = useAnimatedStyle(() => {
     if (!animate) return {}
 
@@ -44,6 +45,7 @@ const CarouselComponent = ({ animationValue, item, animate }: CarouselImageProps
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'visible',
+          height: style?.height,
         },
         animatedStyle
       ]}
@@ -65,7 +67,9 @@ type CarouselProps<T extends ReactNode> = {
   defaultIndex?: ComponentProps<typeof CarouselRNRC>['defaultIndex'];
 }
 
-export const Carousel = <T extends ReactNode>({ scaleAnimation, items, itemWidth, itemsOffset, itemHeight, style, ref, defaultIndex, onProgressChange }: CarouselProps<T>) => {
+export const Carousel = <T extends ReactNode>({ scaleAnimation, items, itemWidth, itemsOffset, style, ref, defaultIndex, onProgressChange, ...props }: CarouselProps<T>) => {
+  const itemHeight = props.itemHeight ? props.itemHeight * 1.2 : undefined;
+
   return (
     <View style={{
       width: '100%',
@@ -76,7 +80,7 @@ export const Carousel = <T extends ReactNode>({ scaleAnimation, items, itemWidth
     >
       <CarouselRNRC
         ref={ref}
-        style={{ flex: 1, marginTop: -32, width: '100%', overflow: 'visible' }}
+        style={{ flex: 1, marginTop: -((itemHeight ?? 0) / 20), width: '100%', overflow: 'visible' }}
         data={items}
         mode="parallax"
         itemWidth={itemWidth}
@@ -92,6 +96,7 @@ export const Carousel = <T extends ReactNode>({ scaleAnimation, items, itemWidth
 
           return <CarouselComponent
             key={index}
+            style={{ height: itemHeight }}
             animationValue={animationValue}
             animate={scaleAnimation}
             item={Component}

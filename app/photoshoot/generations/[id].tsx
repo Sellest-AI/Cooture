@@ -329,6 +329,7 @@ export default function Screen() {
         </View>}
         <View style={{ flex: 1, maxHeight: Dimensions.get('window').height / 2, overflow: 'visible' }}>
           {visibleItems.length > 0 && <Carousel
+            itemHeight={456}
             defaultIndex={currentIndex}
             ref={carouselRef}
             onProgressChange={(_, v) => {
