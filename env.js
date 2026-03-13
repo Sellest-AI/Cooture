@@ -8,7 +8,7 @@ export const env = createEnv({
    */
   server: {
     NODE_ENV: z
-      .enum(["development", "test", "production"])
+      .enum(["development", "preview", "production"])
       .default("development"),
   },
 
@@ -19,7 +19,7 @@ export const env = createEnv({
    */
   client: {
     PUBLIC_CONVEX_URL: z.url(),
-    PUBLIC_NODE_ENV: z.enum(["development", "production"]).default('development'),
+    PUBLIC_NODE_ENV: z.enum(["development", "preview", "production"]).default('development'),
     PUBLIC_POSTHOG_KEY: z.string().optional(),
     PUBLIC_POSTHOG_HOST: z.string().optional(),
     PUBLIC_AUTH_URL: z.string(),
