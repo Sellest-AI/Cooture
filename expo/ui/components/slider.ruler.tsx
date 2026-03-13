@@ -39,7 +39,7 @@ export default function RulerSlider({
   useEffect(() => { snapToValue(initialValue) }, [])
 
   const totalTicks = maxValue - minValue + 1;
-  const sidePadding = (SCREEN_WIDTH - TICK_SPACING) / 2;
+  const sidePadding = Math.round((SCREEN_WIDTH - TICK_SPACING) / 2);
   const initialOffset = (initialValue - minValue) * TICK_SPACING;
 
   const offsetToValue = useCallback((offsetX: number) => {
@@ -101,7 +101,8 @@ export default function RulerSlider({
         ref={scrollRef}
         horizontal
         showsHorizontalScrollIndicator={false}
-        snapToInterval={TICK_SPACING}
+        snapToOffsets={ticks.map((_, i) => i * TICK_SPACING)}
+        snapToAlignment="start"
         decelerationRate="fast"
         contentOffset={{ x: initialOffset, y: 0 }}
         onScroll={handleScroll}
@@ -110,11 +111,10 @@ export default function RulerSlider({
           styles.scrollContent,
           { paddingHorizontal: sidePadding },
         ]}
-        style={{ scrollSnapType: 'x mandatory' } as any}
       >
         <View style={styles.ruler}>
           {ticks.map(({ tickValue, isMajor, index }) => (
-            <View key={index} style={[styles.tickWrapper, { scrollSnapAlign: 'center' } as any]}>
+            <View key={index} style={styles.tickWrapper}>
               <View
                 style={[
                   styles.tick,

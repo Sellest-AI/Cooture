@@ -1,7 +1,6 @@
-import { Badge } from '@ui/badge';
 import { Button } from '@ui/button';
-import { Collection } from '@ui/cards';
-import { Plus } from '@ui/icons';
+import { Col, Grid, Row } from '@ui/grid';
+import { Image } from '@ui/image';
 import { Text } from '@ui/text';
 import { View } from 'react-native';
 import { ROUTES } from 'routes';
@@ -19,7 +18,7 @@ export default function Screen() {
         padding: 8,
       }}
     >
-      <View style={{ maxWidth: 456, flex: 1, marginBottom: 28 }}>
+      <View style={{ maxWidth: 456, width: '100%', flex: 1, marginBottom: 28 }}>
         <View style={{ flex: 1 }}>
           <Text.H3
             style={{
@@ -31,7 +30,7 @@ export default function Screen() {
               maxWidth: 224
             }}
           >
-            Your Dream Camera
+            Every version of you
           </Text.H3>
           <Text.Lg
             style={{
@@ -43,72 +42,97 @@ export default function Screen() {
               marginBottom: 32,
             }}
           >
-            Choose an outfit, a style and see yourself transformed into a 1M subscribers model.
+            Find your next era.
           </Text.Lg>
-          <View
-            style={{
-              height: 46,
-              marginHorizontal: 32,
-              marginBottom: 28,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: -12,
-              }}
-            >
-              <Badge
-                source={require('assets/placeholders/jeans-outfit.png')}
-                contentFit='contain'
-                style={{ zIndex: 3 }}
-              />
-              <Badge
-                source={require('assets/placeholders/blue-shirt.png')}
-                contentFit='contain'
-                style={{ marginLeft: -24, zIndex: 2 }}
-              />
-              <Badge
-                source={require('assets/placeholders/shoes-outfit.png')}
-                contentFit='contain'
-                style={{ marginLeft: -24, zIndex: 1 }}
-              />
-              <Badge
-                text={"+3"}
-                style={{ marginLeft: -24 }}
-              />
-            </View>
-            <Plus color={Colors.neutral[400]} size={12} strokeWidth={4} />
-            <Badge
-              source={require('assets/placeholders/avatar.png')}
-              contentFit='cover'
-            />
-            <Plus color={Colors.neutral[400]} size={12} strokeWidth={4} />
-            <Badge
-              source={require('assets/placeholders/bench-model.png')}
-              contentFit='cover'
-            />
-          </View>
-          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <View
+          <View style={{
+            flex: 1,
+            justifyContent: 'center',
+          }}>
+            <Grid
               style={{
                 flex: 1,
-                paddingHorizontal: 24,
-                marginHorizontal: 'auto',
-                alignSelf: 'stretch',
-                alignItems: 'center',
-                maxHeight: 370
+                height: 472,
+                width: '100%',
+                paddingHorizontal: 8,
+                gap: 8
               }}
             >
-              <Collection
-                source={require('assets/placeholders/bench-model.png')}
+              <Col style={{ gap: 8 }}>
+                <Row>
+                  <Image
+                    source={require('assets/placeholders/onboarding/profile/img1.webp')}
+                    style={{
+                      borderRadius: 12,
+                      width: '100%',
+                      height: '100%'
+                    }}
+                  />
+                </Row>
+                <Row>
+                  <Image
+                    source={require('assets/placeholders/onboarding/profile/img2.webp')}
+                    style={{
+                      borderRadius: 12,
+                      width: '100%',
+                      height: '100%'
+                    }}
+                  />
+                </Row>
+              </Col>
+              <Col style={{ gap: 8 }}>
+                <Row>
+                  <Image
+                    source={require('assets/placeholders/onboarding/profile/img3.webp')}
+                    style={{
+                      borderRadius: 12,
+                      width: '100%',
+                      height: '100%'
+                    }}
+                  />
+                </Row>
+                <Row>
+                  <Image
+                    source={require('assets/placeholders/onboarding/profile/img4.webp')}
+                    style={{
+                      borderRadius: 12,
+                      width: '100%',
+                      height: '100%'
+                    }}
+                  />
+                </Row>
+              </Col>
+            </Grid>
+            <View style={{
+              position: 'absolute',
+              left: '50%',
+              transform: [{ translateX: -40 }],
+            }}>
+              <View
                 style={{
-                  height: '100%'
+                  position: 'absolute',
+                  transform: [{ translateX: -12 }, { translateY: -12 }],
+                  backgroundColor: 'rgba(255,255,255,0.2)',
+                  width: 104,
+                  height: 104,
+                  borderRadius: 999
+                }}
+              />
+              <View
+                style={{
+                  position: 'absolute',
+                  transform: [{ translateX: -26 }, { translateY: -26 }],
+                  backgroundColor: 'rgba(255,255,255,0.2)',
+                  width: 132,
+                  height: 132,
+                  borderRadius: 999
+                }}
+              />
+              <Image
+                source={require('assets/placeholders/onboarding/profile/selfie.webp')}
+                style={{
+                  borderRadius: 99,
+                  width: 80,
+                  height: 80
                 }}
               />
             </View>

@@ -1,22 +1,14 @@
 import { Button } from '@ui/button';
+import { Plus } from '@ui/icons';
 import { Image } from '@ui/image';
+import { LinearGradient } from '@ui/linear-gradient';
+import { MotiView } from '@ui/motion';
 import { Text } from '@ui/text';
-import { useEffect, useRef } from 'react';
-import { Animated, View } from 'react-native';
+import { View } from 'react-native';
 import { ROUTES } from 'routes';
 import { Colors } from 'theme';
 
 export default function Screen() {
-  const fadeAnim = useRef(new Animated.Value(0));
-
-  useEffect(() => {
-    Animated.timing(fadeAnim.current, {
-      toValue: 1,
-      duration: 800,
-      useNativeDriver: true,
-    }).start();
-  }, []);
-
   return (
     <View
       style={{
@@ -41,7 +33,7 @@ export default function Screen() {
             maxWidth: 282
           }}
         >
-          Create your dream wardrobe
+          See yourself in it
         </Text.H3>
         <Text.Lg
           style={{
@@ -50,30 +42,127 @@ export default function Screen() {
             color: Colors.neutral[400],
             maxWidth: 320,
             marginInline: 'auto',
-            marginBottom: 28,
           }}
         >
-          Snap clothes while shopping or at home, and build your dream outfits.
+          Pick any outfit. Pick any world. See it on you before you wear it.
         </Text.Lg>
-        <Animated.View
+        <MotiView
+          from={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           style={{
             flex: 1,
-            marginHorizontal: 32,
-            marginBottom: 40,
-            opacity: fadeAnim.current,
+            marginHorizontal: 40,
+            paddingBottom: 40,
+            paddingTop: 16,
+            justifyContent: 'center',
+            maxWidth: 310,
           }}
         >
-          <Image
-            source={require('assets/placeholders/full-outfit.png')}
-            contentFit="contain"
-            style={{
+          <View style={{
+            justifyContent: 'center',
+            width: '100%',
+            aspectRatio: 3 / 4,
+          }}>
+            <View style={{ width: '100%', height: '100%', borderRadius: 28, overflow: 'hidden' }}>
+              <Image
+                source={require('assets/placeholders/onboarding/photoshoot.webp')}
+                contentFit="cover"
+                style={{
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                }}
+              />
+              <LinearGradient
+                colors={['rgba(0,0,0,0.8)', 'transparent']}
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  height: 156
+                }}
+              />
+            </View>
+            <View style={{
               position: 'absolute',
-              width: '100%',
-              height: '100%',
-              opacity: 0.9,
-            }}
-          />
-        </Animated.View>
+              top: -16,
+              left: '50%',
+              transform: [{ translateX: -96 }],
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 192,
+            }}>
+              <Image
+                source={require('assets/placeholders/onboarding/preset.jpg')}
+                contentFit="cover"
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 99
+                }}
+              />
+              <Text.Base
+                color={Colors.neutral[400]}
+                style={{
+                  textBalance: true,
+                  marginTop: 8
+                }}
+              >
+                Style
+              </Text.Base>
+              <Text.Lg
+                color={Colors.neutral[50]}
+                style={{
+                  textBalance: true,
+                }}
+              >
+                Old Money
+              </Text.Lg>
+            </View>
+            <View
+              style={{
+                position: 'absolute',
+                bottom: -24,
+                left: '50%',
+                transform: [{ translateX: -96 }],
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'row',
+                width: 192,
+                gap: 12
+              }}>
+              <Image
+                source={require('assets/placeholders/onboarding/selfie.webp')}
+                contentFit="cover"
+                style={{
+                  width: 76,
+                  height: 104,
+                  borderRadius: 8
+                }}
+              />
+              <Image
+                source={require('assets/placeholders/onboarding/outfit.webp')}
+                contentFit="cover"
+                style={{
+                  width: 76,
+                  height: 104,
+                  borderRadius: 8
+                }}
+              />
+              <View style={{
+                padding: 10,
+                backgroundColor: Colors.primary[200],
+                borderBottomWidth: 2,
+                borderColor: Colors.primary[500],
+                borderRadius: 99,
+                position: 'absolute',
+              }}>
+                <Plus color={Colors.primary[900]} size={24} />
+              </View>
+            </View>
+          </View>
+        </MotiView>
       </View>
       <Button
         style={{ alignSelf: 'stretch' }}

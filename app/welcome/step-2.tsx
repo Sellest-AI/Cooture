@@ -1,18 +1,35 @@
+import { Badge } from '@ui/badge';
 import { Button } from '@ui/button';
 import { ImageGeneration } from '@ui/cards';
+import { HeartIcon } from '@ui/icons';
 import { Carousel } from '@ui/screen-carousel';
 import { Text } from '@ui/text';
 import { View } from 'react-native';
 import { ROUTES } from 'routes';
 import { Colors } from 'theme';
 
-const data = [
-  require('assets/placeholders/can-model.png'),
-  require('assets/placeholders/snow-model.png'),
-  require('assets/placeholders/restaurant-model.png'),
-  require('assets/placeholders/tiger-model.png'),
-  require('assets/placeholders/street-model.png'),
-]
+const BottomComponent = ({ likes, cta }: { likes: number; cta: string }) => {
+  return (
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+      }}>
+        <HeartIcon size={20} color={Colors.secondary[500]} weight='fill' />
+        <Text.Base
+          color={Colors.neutral[50]}
+          weight={600}
+        >
+          {likes > 1000 ? `+${(likes / 1000).toFixed(1)}K` : likes}
+        </Text.Base>
+      </View>
+      <View style={{ paddingHorizontal: 12, paddingVertical: 4, backgroundColor: Colors.blur.dark, borderRadius: 99 }}>
+        <Text.Base color={Colors.neutral[50]}>{cta}</Text.Base>
+      </View>
+    </View>
+  )
+}
 
 const CarouselComponent = () => {
   return (
@@ -23,12 +40,111 @@ const CarouselComponent = () => {
     >
       <Carousel
         scaleAnimation={true}
-        items={data.map((source, i) => (
-          <ImageGeneration
-            key={i}
-            source={source}
-          />
-        ))}
+        itemHeight={320}
+        items={[1, 2, 3].map((_, i) => {
+          if (i === 0)
+            return (
+              <View key={i}>
+                <ImageGeneration
+                  source={require('assets/placeholders/onboarding/posts/outfit/outfit.webp')}
+                  disabled
+                />
+                <Badge
+                  source={require('assets/placeholders/onboarding/posts/outfit/avatar.webp')}
+                  contentFit="cover"
+                  style={{ width: 48, height: 48, position: 'absolute', top: 16, left: 16 }}
+                />
+                <View style={{
+                  position: 'absolute',
+                  top: 16,
+                  right: 16,
+                  flexDirection: 'row',
+                }}>
+                  <Badge
+                    source={require('assets/placeholders/onboarding/posts/outfit/pants.webp')}
+                    contentFit="contain"
+                    style={{ width: 48, height: 48 }}
+                  />
+                  <Badge
+                    source={require('assets/placeholders/onboarding/posts/outfit/blazer.webp')}
+                    contentFit="contain"
+                    style={{ marginLeft: -20, width: 48, height: 48 }}
+                  />
+                </View>
+                <BottomComponent
+                  likes={1300}
+                  cta="Try on"
+                />
+              </View>
+            )
+
+          if (i === 1)
+            return (
+              <View key={i}>
+                <ImageGeneration
+                  source={require('assets/placeholders/onboarding/posts/duo/photoshoot.webp')}
+                  disabled
+                />
+                <View style={{
+                  position: 'absolute',
+                  top: 16,
+                  left: 16,
+                  flexDirection: 'row',
+                }}>
+                  <Badge
+                    source={require('assets/placeholders/onboarding/posts/duo/avatar2.webp')}
+                    contentFit="cover"
+                    style={{ width: 48, height: 48 }}
+                  />
+                  <Badge
+                    source={require('assets/placeholders/onboarding/posts/duo/avatar1.webp')}
+                    contentFit="cover"
+                    style={{ marginLeft: -20, width: 48, height: 48 }}
+                  />
+                </View>
+                <BottomComponent
+                  likes={2100}
+                  cta="Recreate"
+                />
+              </View>
+            )
+
+          if (i === 2)
+            return (
+              <View key={i}>
+                <ImageGeneration
+                  source={require('assets/placeholders/onboarding/posts/neon-coffee/photoshootXavatar.webp')}
+                  disabled
+                />
+                <Badge
+                  source={require('assets/placeholders/onboarding/posts/neon-coffee/photoshootXavatar.webp')}
+                  contentFit="cover"
+                  style={{ width: 48, height: 48, position: 'absolute', top: 16, left: 16 }}
+                />
+                <View style={{
+                  position: 'absolute',
+                  top: 16,
+                  right: 16,
+                  flexDirection: 'row',
+                }}>
+                  <Badge
+                    source={require('assets/placeholders/onboarding/posts/neon-coffee/jacket.webp')}
+                    contentFit="contain"
+                    style={{ width: 48, height: 48 }}
+                  />
+                  <Badge
+                    source={require('assets/placeholders/onboarding/posts/neon-coffee/pants.webp')}
+                    contentFit="contain"
+                    style={{ marginLeft: -20, width: 48, height: 48 }}
+                  />
+                </View>
+                <BottomComponent
+                  likes={813}
+                  cta="Recreate"
+                />
+              </View>
+            )
+        })}
       />
     </View>
   )
@@ -62,7 +178,7 @@ export default function Screen() {
             maxWidth: 224
           }}
         >
-          Find trending outfits and styles
+          Where are you ?
         </Text.H3>
         <Text.Lg
           style={{
@@ -74,7 +190,7 @@ export default function Screen() {
             marginBottom: 24,
           }}
         >
-          Try out the newest outfits in the most popular trending scenaries.
+          Recreate any look. Make it yours. Post it.
         </Text.Lg>
       </View>
       <View style={{ flex: 1, width: '100%', marginBottom: 24 }}>
