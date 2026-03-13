@@ -3,8 +3,10 @@ import { useAuthActions } from '@/lib/convex/auth';
 import { Button } from '@ui/button';
 import { Image } from '@ui/image';
 import { LinearGradient } from '@ui/linear-gradient';
+import { Pressable } from '@ui/pressable';
 import { SafeAreaView } from '@ui/safe-area-view';
 import { Text } from '@ui/text';
+import { env } from 'env';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Platform, View } from 'react-native';
@@ -93,7 +95,7 @@ const LoginButtons = () => {
   const [init, setInit] = useState(false);
   useEffect(() => { setTimeout(() => setInit(true), 500) }, [])
 
-  const { isLoading, signInGoogle } = useAuthActions();
+  const { isLoading, signInGoogle, signInTester } = useAuthActions();
   const [innerLoading, setInnerLoading] = useState<"google" | "apple" | null>(null);
 
   const disableRuntime = isLoading || innerLoading !== null;
@@ -135,6 +137,13 @@ const LoginButtons = () => {
           </Button>
         )
       }))}
+      {env.PUBLIC_NODE_ENV !== 'production' && (
+        <Pressable style={{ marginTop: 12 }} onPress={() => signInTester()}>
+          <Text.Base color={Colors.neutral[400]}>
+            Sign in with test account
+          </Text.Base>
+        </Pressable>
+      )}
     </>
   )
 }

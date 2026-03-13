@@ -105,6 +105,7 @@ import type * as router_admin_config_getConfig from "../router/admin/config/getC
 import type * as router_admin_config_initConfig from "../router/admin/config/initConfig.js";
 import type * as router_admin_outfits_regenerateCovers from "../router/admin/outfits/regenerateCovers.js";
 import type * as router_admin_presets_repairOne from "../router/admin/presets/repairOne.js";
+import type * as router_auth_getTestAccount from "../router/auth/getTestAccount.js";
 import type * as router_auth_linkStripeSubscription from "../router/auth/linkStripeSubscription.js";
 import type * as router_auth_postCreateOrUpdate from "../router/auth/postCreateOrUpdate.js";
 import type * as router_collection_getBookmarked from "../router/collection/getBookmarked.js";
@@ -324,6 +325,7 @@ declare const fullApi: ApiFromModules<{
   "router/admin/config/initConfig": typeof router_admin_config_initConfig;
   "router/admin/outfits/regenerateCovers": typeof router_admin_outfits_regenerateCovers;
   "router/admin/presets/repairOne": typeof router_admin_presets_repairOne;
+  "router/auth/getTestAccount": typeof router_auth_getTestAccount;
   "router/auth/linkStripeSubscription": typeof router_auth_linkStripeSubscription;
   "router/auth/postCreateOrUpdate": typeof router_auth_postCreateOrUpdate;
   "router/collection/getBookmarked": typeof router_collection_getBookmarked;

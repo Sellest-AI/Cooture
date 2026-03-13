@@ -1,4 +1,5 @@
 import { useAuthToken, useAuthActions as useConvexAuthActions } from "@convex-dev/auth/react";
+import { env } from "env";
 import { makeRedirectUri } from "expo-auth-session";
 import { Href, router } from "expo-router";
 import { reloadAsync } from "expo-updates";
@@ -6,11 +7,12 @@ import { openAuthSessionAsync } from "expo-web-browser";
 import { useCallback, useState } from "react";
 import { Platform } from "react-native";
 import { ROUTES } from "routes";
-import { api, useQueryCached } from "./client";
+import { api, useMutation, useQueryCached } from "./client";
 import { convexAuthStorage } from "./storage";
 
 export const useAuthActions = () => {
   const convex = useConvexAuthActions();
+  const { mutate: getTestAccount } = useMutation(api.router.auth.getTestAccount.anon);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,6 +37,12 @@ export const useAuthActions = () => {
     setIsLoading(false);
     return result.type === "success";
   }, [convex]);
+
+  const signInTester = useCallback(async () => {
+    if (env.PUBLIC_NODE_ENV === 'production') return;
+    const account = await getTestAccount();
+    convex.signIn("password", { email: account.email, password: account.password, flow: "signIn" })
+  }, [convex, getTestAccount])
 
   const signInEmail = useCallback((data: FormData) => {
     return convex.signIn("resend-otp", data);
@@ -61,6 +69,7 @@ export const useAuthActions = () => {
     signOut,
     signInGoogle,
     signInEmail,
+    signInTester
   }
 }
 
