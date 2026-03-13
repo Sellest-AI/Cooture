@@ -16,7 +16,7 @@ export const _internal = internalMutation({
     const result = await deductCredits(ctx, {
       userId: args.userId,
       amount: args.amount,
-      type: "GENERATION_COST",
+      type: args.generationId ? "GENERATION_COST" : "SYSTEM_DEDUCT",
       metadata: args.generationId ? {
         generationId: args.generationId,
       } : undefined,

@@ -23,6 +23,7 @@ export const TRANSACTION_TYPE = v.union(
   v.literal("GENERATION_COST"),
   v.literal("ADMIN_GRANT"),
   v.literal("SYSTEM_GRANT"),
+  v.literal("SYSTEM_DEDUCT"),
   v.literal("REFUND"),
   v.literal("SUBSCRIPTION_BONUS"),
   v.literal("TRANSFER"), // For future P2P transfers
