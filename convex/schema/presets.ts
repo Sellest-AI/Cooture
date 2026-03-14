@@ -106,6 +106,7 @@ export const presets = defineTable({
   archived: v.boolean(),
 })
   .index("by_archived", ["archived"])
+  .searchIndex("search_name", { searchField: "name" })
 
 export const presetCategories = defineTable({
   presetId: v.id("presets"),

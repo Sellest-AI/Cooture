@@ -132,7 +132,7 @@ export default function Screen() {
               type="alt"
               size="big"
               endContent={
-                <AnimatedPressable>
+                <AnimatedPressable onPress={() => router.push(ROUTES.SEARCH)}>
                   <Block
                     variant="blur"
                     style={{

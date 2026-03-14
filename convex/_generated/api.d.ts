@@ -160,6 +160,7 @@ import type * as router_presets_getAll from "../router/presets/getAll.js";
 import type * as router_presets_getByCategory from "../router/presets/getByCategory.js";
 import type * as router_presets_getCategories from "../router/presets/getCategories.js";
 import type * as router_presets_getOne from "../router/presets/getOne.js";
+import type * as router_presets_searchMany from "../router/presets/searchMany.js";
 import type * as router_quests_getAll from "../router/quests/getAll.js";
 import type * as router_quests_getOne from "../router/quests/getOne.js";
 import type * as router_quests_initAll from "../router/quests/initAll.js";
@@ -381,6 +382,7 @@ declare const fullApi: ApiFromModules<{
   "router/presets/getByCategory": typeof router_presets_getByCategory;
   "router/presets/getCategories": typeof router_presets_getCategories;
   "router/presets/getOne": typeof router_presets_getOne;
+  "router/presets/searchMany": typeof router_presets_searchMany;
   "router/quests/getAll": typeof router_quests_getAll;
   "router/quests/getOne": typeof router_quests_getOne;
   "router/quests/initAll": typeof router_quests_initAll;

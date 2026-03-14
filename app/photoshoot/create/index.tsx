@@ -1,20 +1,20 @@
-import { useRouter } from "@/hooks";
+import { useDebounce, useRouter } from "@/hooks";
 import { useAccount } from "@/lib/convex/auth";
-import { Api, api, usePaginatedQuery, useQueryCached } from "@/lib/convex/client";
+import { Api, api, usePaginatedQuery, useQuery, useQueryCached } from "@/lib/convex/client";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
 import { Block } from "@ui/block";
 import { BlurKeys, BlurTargetView } from "@ui/blur-view";
 import { Button } from "@ui/button";
 import { Collection } from "@ui/cards";
-import { FlashList } from "@ui/flat-list";
+import { FlashList, FlashListRef } from "@ui/flat-list";
 import { Col, Grid } from "@ui/grid";
-import { ArrowRight, Search } from "@ui/icons";
+import { ArrowRight, Loader, Search } from "@ui/icons";
 import { AnimatePresence, MotiView } from "@ui/motion";
 import { Pressable } from "@ui/pressable";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
 import { TextInput } from "@ui/text-input";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
@@ -33,20 +33,37 @@ export default function Screen() {
   const seed = new Date().getHours();
   const { data: presets } = useQueryCached(api.router.presets.getAll.anon, { seed });
 
-  const finalPresets = category ? presetsByCategory : (presets ?? []);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 800);
+  const query = search !== debouncedSearch ? '' : search;
+
+  const { data: searchedPresets, isPending } = useQuery(api.router.presets.searchMany.anon, query.length > 0 ? { query } : 'skip');
+
+  const mergedSearchPresets = (searchedPresets ?? []).length > 0 ? (searchedPresets ?? []) : (presets ?? []);
+  const finalPresets = category ? presetsByCategory : mergedSearchPresets;
   const sanitizedPresets = outfitId ? finalPresets.filter((p) => !p.hasMultipleSubjects) : finalPresets;
+
+  const listRef = useRef<FlashListRef<typeof sanitizedPresets[number] | string>>(null);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <View style={{ marginTop: 8 }}>
         <TextInput
-          startIcon={Search}
+          startIcon={(isPending && query) ? Loader : Search}
           placeholder="Search preset"
           style={{ marginHorizontal: 12 }}
+          canClear
+          value={search}
+          onChangeText={(v) => {
+            setSearch(v);
+            if (v.length > 0) setCategory(null);
+            listRef.current?.scrollToTop({ animated: true });
+          }}
         />
       </View>
       <View style={{ flex: 1 }}>
         <FlashList
+          ref={listRef}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             paddingBottom: presetId !== null ? 72 : 0,
@@ -109,7 +126,11 @@ export default function Screen() {
                   keyExtractor={(item) => item.value}
                   renderItem={({ item, index }) => (
                     <Pressable
-                      onPress={() => setCategory((c) => c === item.value ? null : item.value)}
+                      onPress={() => {
+                        setCategory((c) => c === item.value ? null : item.value);
+                        listRef.current?.scrollToTop({ animated: true });
+                        setSearch('');
+                      }}
                     >
                       <Block
                         blurKey={BlurKeys.PHOOTSHOOT_PRESETS_ITEMS}
