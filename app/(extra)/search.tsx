@@ -28,8 +28,8 @@ const UserSkeleton = ({ style }: { style?: ViewStyle }) => {
       />
       <View>
         <Skeleton
-          width={128}
-          height={16}
+          width={132}
+          height={14}
         />
         <Skeleton
           width={96}
@@ -64,17 +64,18 @@ const User = ({ style, src, username, name, id }: UserProps) => {
         source={src ?? require('assets/backgrounds/dark-gradient.png')}
       />
       <View>
-        <Text.Lg
+        <Text.Base
           color={Colors.neutral[50]}
+          weight={600}
         >
           {username}
-        </Text.Lg>
-        <Text.Base
+        </Text.Base>
+        <Text.Sm
           color={Colors.neutral[400]}
           style={{ marginTop: 6 }}
         >
           {name}
-        </Text.Base>
+        </Text.Sm>
       </View>
     </Pressable>
   )

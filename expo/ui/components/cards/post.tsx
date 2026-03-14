@@ -202,7 +202,7 @@ export const Post = ({ style, postedAt, image, users, preset, outfit, images, li
                 aspectRatio: 3 / 4,
                 zIndex: pinching && pinching.index === index ? 10 : 0,
                 backgroundColor: img?.backgroundColor ?? Colors.blur.dark,
-                borderRadius: 32,
+                borderRadius: 28,
               }}>
               {img && <ZoomableImage
                 onPinchChange={(pinching) => setPinching(pinching ? { index } : false)}
@@ -211,7 +211,7 @@ export const Post = ({ style, postedAt, image, users, preset, outfit, images, li
                 width={Dimensions.get('window').width - (PADDING_HORIZONTAL * 2)}
                 aspectRatio={3 / 4}
                 style={{
-                  borderRadius: 32,
+                  borderRadius: 28,
                   backgroundColor: img?.backgroundColor ?? Colors.blur.dark,
                   borderColor: !pinching ? Colors.blur.dark : undefined,
                   borderTopWidth: 0, // Removed borders
@@ -403,7 +403,7 @@ const SkeletonPost = ({ style }: SkeletonPostProps) => {
       <View style={{
         width: '100%',
         aspectRatio: 3 / 4,
-        borderRadius: 32,
+        borderRadius: 28,
         borderTopColor: Colors.blur.medium,
         borderTopWidth: 1,
         overflow: 'hidden',

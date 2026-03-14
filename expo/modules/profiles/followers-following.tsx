@@ -130,9 +130,9 @@ export const FollowersFollowing = ({ style, userId }: Props) => {
       <MotiView
         key={animateFollow ? "animate" : "static"}
         style={{ flex: undefined }}
-        from={animateFollow ? { width: 135 } : undefined}
+        from={{ width: 156 }}
         animate={animateFollow ? {
-          width: [135, 0, 0, 0, 0, 135],
+          width: [156, 0, 0, 0, 0, 156],
           height: [93, 112, 93, 93, 93, 93],
           opacity: [1, 0, 0, 0, 1],
         } : undefined}
