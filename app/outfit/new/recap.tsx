@@ -18,7 +18,7 @@ export default function Screen() {
   const { forceDismissTo } = useRouter();
 
   const [completed, setCompleted] = useState(false);
-  const { setItems, saveOutfit } = useOutfit.New();
+  const { setItems, saveOutfit, items } = useOutfit.New();
   const { newItems, pendingItems } = useItem.Create();
 
   // Reset browser
@@ -101,17 +101,32 @@ export default function Screen() {
         padding: 12,
         paddingTop: 0
       }}>
-        <Button
-          isLoading={!completed}
-          variant="primary"
-          onPress={async () => {
-            const outfit = await saveOutfit();
-            setBrowserItems([]);
-            forceDismissTo(ROUTES.OUTFIT.PATH, { pathParams: { id: outfit } });
-          }}
-        >
-          Save Outfit
-        </Button>
+        {items.length === 1 && (
+          <Button
+            isLoading={!completed}
+            variant="primary"
+            onPress={async () => {
+              setBrowserItems([]);
+              const item = items[0];
+              forceDismissTo(ROUTES.ITEM.PATH, { pathParams: { id: item } });
+            }}
+          >
+            View Item
+          </Button>
+        )}
+        {items.length > 1 && (
+          <Button
+            isLoading={!completed}
+            variant="primary"
+            onPress={async () => {
+              const outfit = await saveOutfit();
+              setBrowserItems([]);
+              forceDismissTo(ROUTES.OUTFIT.PATH, { pathParams: { id: outfit } });
+            }}
+          >
+            Save Outfit
+          </Button>
+        )}
       </View>
     </SafeAreaView>
   )

@@ -115,6 +115,7 @@ export default function NewOutfitScreen() {
           />
           <Button
             variant="primary"
+            disabled={itemIds.length < 2}
             onPress={async () => {
               const outfit = await saveOutfit();
               redirect({

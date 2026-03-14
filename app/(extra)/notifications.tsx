@@ -71,7 +71,7 @@ const GenericNotification = ({ id, onPress, read, data }: GenereticNotificationP
     if (notification.type === "new_like")
       return <>
         <Text.Base color={Colors.foreground} weight={600}>{notification.actor?.name} </Text.Base>
-        {aggregationCount > 1 ? `${aggregationCount} people liked your post.` : "liked your post."}
+        {aggregationCount > 1 ? `and ${aggregationCount} people liked your post.` : "liked your post."}
       </>
 
     if (notification.type === "new_follower")

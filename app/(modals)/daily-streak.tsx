@@ -11,7 +11,7 @@ import { router } from "expo-router";
 import { useSetAtom } from "jotai";
 import { MotiView } from "moti";
 import { useEffect } from "react";
-import { View, ViewStyle } from "react-native";
+import { Dimensions, ScrollView, View, ViewStyle } from "react-native";
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -93,6 +93,7 @@ const Calendar = ({ style }: Props) => {
           alignContent: 'center',
           width: '100%',
           padding: 20,
+          paddingHorizontal: 12,
           paddingBottom: 24,
           borderRadius: 28,
           ...style
@@ -100,12 +101,12 @@ const Calendar = ({ style }: Props) => {
         <View style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
-          width: 324,
+          width: '100%',
           gap: 18
         }}>
           <MotiView
             from={{ width: 0 }}
-            animate={{ width: (normalizedIndex + 1) * 28 + normalizedIndex * 18 }}
+            animate={{ width: (normalizedIndex + 1) * 32 + normalizedIndex * 18 }}
             transition={{ delay: DELAYS.calendar, duration: (normalizedIndex) * 850 }}
             style={{
               backgroundColor: Colors.primary[500],
@@ -294,8 +295,8 @@ const FlameComponent = () => {
     <View style={{
       alignItems: 'center',
       justifyContent: 'center',
-      width: 172,
-      height: 172,
+      width: 156,
+      height: 156,
     }}
     >
       <View style={{
@@ -314,7 +315,7 @@ const FlameComponent = () => {
           <Image
             source={require("assets/images/flame.webp")}
             contentFit="contain"
-            style={{ width: 172, height: 172 }}
+            style={{ width: 156, height: 156 }}
           />
         </Animated.View>
       </View>
@@ -340,19 +341,24 @@ export default function Screen() {
       flex: 1,
       justifyContent: 'flex-end',
       alignItems: 'center',
-      paddingTop: 28,
-      padding: 12
+      paddingHorizontal: 12,
     }}>
-      <View style={{
-        flex: 1,
-        width: '100%',
-        alignItems: 'center',
-        alignSelf: 'center',
-        justifyContent: 'center',
-      }}>
+      <ScrollView
+        style={{
+          flex: 1,
+          width: '100%',
+        }}
+        contentContainerStyle={{
+          paddingTop: 28,
+          paddingBottom: 32,
+          alignItems: 'center',
+          justifyContent: 'center',
+          flex: Dimensions.get('screen').height < 900 ? 0 : 1,
+        }}
+      >
         <FlameComponent />
         <MotiView style={{
-          marginTop: 56,
+          marginTop: 40,
           alignItems: 'center',
           paddingHorizontal: 12
         }}
@@ -390,12 +396,8 @@ export default function Screen() {
             </Text.Base>
           </MotiView>
         </MotiView>
-      </View>
-      <Calendar style={{
-        marginTop: 32,
-        marginBottom: 12,
-      }}
-      />
+      </ScrollView>
+      <Calendar style={{ marginBottom: 12 }} />
       <MotiView
         from={{ opacity: 0, translateY: 20 }}
         animate={{ opacity: 1, translateY: 0 }}

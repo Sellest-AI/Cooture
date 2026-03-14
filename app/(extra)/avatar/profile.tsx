@@ -118,7 +118,8 @@ export default function Screen() {
   return (
     <SafeScrollView
       edges={{ top: 'off' }}
-      style={{ flex: 1 }}>
+      style={{ flex: 1 }}
+    >
       <LinearGradient
         colors={[Colors.primary[500], 'transparent']}
         style={{
