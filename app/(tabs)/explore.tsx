@@ -164,12 +164,17 @@ export default function Screen() {
               You have reached the end of the discover feed.
             </Text.Base>}
           </>}
-          data={empty ? undefined : Array.from({ length: Math.ceil(feed.length / 12) })}
-          keyExtractor={(_, index) => index.toString()}
-          renderItem={({ index }) => {
+          data={empty ? undefined : Array.from({ length: Math.ceil(feed.length / 12) }).map((_, index) => {
+            const startIdx = index * 12;
+            return feed.slice(startIdx, startIdx + 12);
+          })}
+          extraData={feed}
+          keyExtractor={(chunk, index) => {
+            return chunk.length > 0 ? chunk.map(p => p._id).join('-') : `empty-${index}`;
+          }}
+          renderItem={({ item, index }) => {
             const cycleIndex = index;
-            const startIdx = cycleIndex * 12;
-            const posts = feed.slice(startIdx, startIdx + 12);
+            const posts = item;
             return (
               <View key={cycleIndex} style={{ gap: GAP, marginBottom: 4 }}>
                 {/* First grid: 2 small left, 1 large right */}

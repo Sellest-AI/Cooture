@@ -44,16 +44,22 @@ export const useFeed = (params: Props = { initialNumItems: 8 }) => {
   })), [_userFeed]);
 
   const feed = useMemo(() => {
-    // Only shuffle the first 12 items
-    const first12 = _feed.slice(0, params.initialNumItems);
-    const rest = _feed.slice(params.initialNumItems);
+    // 1. Remove duplicates that occur when scrolling, caused by the constantly changing scores 
+    // on the backend shifting the pagination cursors.
+    const uniqueFeed = _feed.filter((item, index, self) =>
+      index === self.findIndex((i) => i._id === item._id)
+    );
 
-    const shuffledFirst12 = [...first12].sort((a, b) => {
-      if (seed === null) return 0;
-      return hash(a._id, seed) - hash(b._id, seed);
-    });
+    // 2. Only shuffle the initial items (first page)
+    const numToShuffle = 24;
+    const firstItems = uniqueFeed.slice(0, numToShuffle);
+    const rest = uniqueFeed.slice(numToShuffle);
 
-    const sortedFeed = [...shuffledFirst12, ...rest];
+    const shuffledFirstItems = seed === null
+      ? firstItems
+      : [...firstItems].sort((a, b) => hash(a._id, seed) - hash(b._id, seed));
+
+    const sortedFeed = [...shuffledFirstItems, ...rest];
 
     // If no user or no userFeed, just return the sorted feed
     if (!userFeed || userFeed.length === 0) {
@@ -77,7 +83,7 @@ export const useFeed = (params: Props = { initialNumItems: 8 }) => {
 
     // Add recent user posts at the top
     return [...recentUserPosts, ...feedWithoutDuplicates];
-  }, [_feed, params, userFeed, seed, age]);
+  }, [_feed, userFeed, seed, age]);
 
   const canLoadMore = status !== 'Exhausted' && status !== 'LoadingFirstPage';
 
