@@ -41,7 +41,9 @@ export const usersExtended = defineTable({
   imageUrl: v.optional(v.string()),
 }).index("by_user_id", ["userId"])
   .index("by_username", ["username"])
-  .index("by_stripe_customer_id", ["stripeCustomerId"]);
+  .index("by_stripe_customer_id", ["stripeCustomerId"])
+  .searchIndex("search_username", { searchField: "username" })
+  .searchIndex("search_name", { searchField: "name" });
 
 export const userImages = defineTable({
   userId: v.id('users'),

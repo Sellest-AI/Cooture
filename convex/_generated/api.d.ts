@@ -195,6 +195,7 @@ import type * as router_users_follows_toggleFollow from "../router/users/follows
 import type * as router_users_getAccount from "../router/users/getAccount.js";
 import type * as router_users_getAppearance from "../router/users/getAppearance.js";
 import type * as router_users_getFromStripeId from "../router/users/getFromStripeId.js";
+import type * as router_users_searchMany from "../router/users/searchMany.js";
 import type * as router_users_upsertAppearance from "../router/users/upsertAppearance.js";
 import type * as router_users_upsertImage from "../router/users/upsertImage.js";
 import type * as router_users_upsertUsername from "../router/users/upsertUsername.js";
@@ -415,6 +416,7 @@ declare const fullApi: ApiFromModules<{
   "router/users/getAccount": typeof router_users_getAccount;
   "router/users/getAppearance": typeof router_users_getAppearance;
   "router/users/getFromStripeId": typeof router_users_getFromStripeId;
+  "router/users/searchMany": typeof router_users_searchMany;
   "router/users/upsertAppearance": typeof router_users_upsertAppearance;
   "router/users/upsertImage": typeof router_users_upsertImage;
   "router/users/upsertUsername": typeof router_users_upsertUsername;

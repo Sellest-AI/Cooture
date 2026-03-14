@@ -12,6 +12,7 @@ export const ROUTES = {
     DISCOVER: '/explore',
   },
   SCAN: '/scan',
+  SEARCH: '/search',
   MODALS: {
     PICK_OUTFIT: '/pick-outfit',
     NEW_OUTFIT: '/new-outfit',
