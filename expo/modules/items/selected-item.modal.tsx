@@ -2,8 +2,9 @@ import { api, Id } from '@/lib/convex/api';
 import { useQuery } from '@/lib/convex/client';
 import { Button } from '@ui/button';
 import { CardItem } from '@ui/cards/card-item';
-import { ExternalLink, Trash } from '@ui/icons';
+import { ExternalLink, Globe, Trash } from '@ui/icons';
 import { Modal, ModalProps } from '@ui/modal';
+import * as Linking from 'expo-linking';
 import { router } from 'expo-router';
 import { View } from 'react-native';
 import { ROUTES } from 'routes';
@@ -40,15 +41,22 @@ export const SelectedItemModal = ({ itemId, onRemove, ...props }: SelectedItemMo
           >
             Remove
           </Button>
+          {item.link && <Button
+            variant="blur"
+            startIcon={Globe}
+            style={{ marginTop: 12 }}
+            onPress={() => item.link && Linking.openURL(item.link)}
+          >
+            Open Website
+          </Button>}
           <Button
             variant="blur"
             startIcon={ExternalLink}
             style={{ marginTop: 12 }}
             onPress={() => router.push(ROUTES.ITEM.ID(item._id))}
           >
-            Open details
+            View Details
           </Button>
-
           <Button
             style={{ marginTop: 12 }}
             variant="blur"
