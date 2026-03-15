@@ -13,7 +13,7 @@ import { useProfileContext } from "./page";
 export function Screen() {
   const { user } = useAccount();
   const { userId } = useProfileContext();
-  const { data: outfits } = useQueryCached(api.router.outfits.getAll.anon, { userId });
+  const { data: outfits } = useQueryCached(api.router.outfits.getFromUser.anon, { userId });
 
   const isOwnProfile = user?._id === userId;
 

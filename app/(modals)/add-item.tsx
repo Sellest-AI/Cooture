@@ -1,5 +1,5 @@
 import { ROUTES, useRoute, useRouter, useStateEffect } from "@/hooks";
-import { api, useQuery } from "@/lib/convex/client";
+import { api, useQueryCachedData } from "@/lib/convex/client";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { Button } from "@ui/button";
 import { CardItem } from "@ui/cards/card-item";
@@ -17,7 +17,7 @@ import { Colors } from "theme";
 export default function AddItemScreen() {
   const { redirect, dismissTo } = useRouter("/add-item");
   const { outfitId, itemIds } = useRoute("/add-item");
-  const { data: _items } = useQuery(api.router.items.getAll.authed);
+  const { data: _items } = useQueryCachedData(api.router.items.getAll.authed, { key: "getAllItems" });
 
   const mode = outfitId ? 'edit' : 'new';
 

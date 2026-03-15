@@ -1,5 +1,5 @@
 import { Router, useRoute, useRouter } from "@/hooks";
-import { api, useMutation, useQueryCached } from "@/lib/convex/client";
+import { api, useMutation, useQueryCachedData } from "@/lib/convex/client";
 import { LoadingBlock } from "@ui/block.loading";
 import { Button } from "@ui/button";
 import { Collection } from "@ui/cards";
@@ -14,11 +14,11 @@ export default function PickOutfitScreen() {
   const { push, redirect } = useRouter("/pick-outfit");
   const { canSkip, itemIds, redirectTo } = useRoute("/pick-outfit");
 
-  const { data: outfits, isPending } = useQueryCached(api.router.outfits.getAll.authed);
+  const { data: outfits, isLoading } = useQueryCachedData(api.router.outfits.getAll.authed, { key: "getAllOutfits" });
   const filteredOutfits = outfits?.filter((outfit) => !outfit.items.some((item) => itemIds?.includes(item.itemId)));
 
   // Redirect to new outfit if no outfits available (but only after data is loaded)
-  if (!isPending && filteredOutfits && filteredOutfits.length === 0) {
+  if (!isLoading && filteredOutfits && filteredOutfits.length === 0) {
     return <Router.Redirect
       redirectTo={redirectTo}
       href={ROUTES.MODALS.NEW_OUTFIT}

@@ -11,6 +11,9 @@ export function createArrayWithValidLength<T extends unknown[], K extends readon
 export const normalizeArray = <T extends string>(v?: T | T[] | null) =>
   v == null ? [] : Array.isArray(v) ? v : [v];
 
+type ArrayType = string | number | boolean | symbol | bigint | Date;
+export const uniqueArray = <T extends ArrayType>(array: T[]) => Array.from(new Set(array));
+
 /**
  * Removes undefined values from an object recursively
  * @param obj The object to process

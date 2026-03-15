@@ -32,7 +32,7 @@ export default function RemoveBackgroundScreen() {
   const { action: removeBackground } = useAction(api.llm.triggers.removeBackground.authed);
 
   const { data: image } = useQuery(api.router.storage.images.getLatest.authed);
-  const { data: items } = useQuery(api.router.items.getAll.authed);
+  const { data: items } = useQuery(api.router.items.getFromUser.authed);
 
   // Check whenever create item is triggered
   useEffect(() => {
