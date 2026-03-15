@@ -7,6 +7,7 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "environment": "development",
       "env": {
         "EXPO_PUBLIC_CUSTOM_NODE_ENV": "development",
         "EXPO_PUBLIC_CONVEX_URL": "https://flippant-ocelot-772.convex.cloud",
@@ -27,6 +28,7 @@
       "android": {
         "buildType": "app-bundle"
       },
+      "environment": "preview",
       "env": {
         "EXPO_PUBLIC_CUSTOM_NODE_ENV": "preview",
         "EXPO_PUBLIC_CONVEX_URL": "https://flippant-ocelot-772.convex.cloud",
@@ -44,6 +46,7 @@
       "android": {
         "buildType": "app-bundle"
       },
+      "environment": "production",
       "env": {
         "EXPO_PUBLIC_CUSTOM_NODE_ENV": "production",
         "EXPO_PUBLIC_CONVEX_URL": "https://mild-newt-461.convex.cloud",
