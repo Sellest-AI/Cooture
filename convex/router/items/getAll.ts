@@ -13,7 +13,7 @@ const cache = new ActionCache(components.actionCache, {
   ttl: 1000 * 60 * 5, // 5 minutes
 });
 
-type ReturnType = (Doc<'items'> & { image: NonNullable<GetImageDoc> })[]
+type ReturnType = (Doc<'items'> & { image: NonNullable<GetImageDoc>, ownedByUser?: boolean })[]
 
 export const _internal_cache = internalAction({
   handler: async (ctx, args): Promise<ReturnType> =>
@@ -60,7 +60,8 @@ export const _internal_query_2 = internalQuery({
       if (!image) return null;
       return {
         ...item,
-        image
+        image,
+        ownedByUser: true,
       }
     }));
 

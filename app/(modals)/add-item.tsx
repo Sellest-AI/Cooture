@@ -56,6 +56,10 @@ export default function AddItemScreen() {
           data={_items ?? []}
           style={{ paddingHorizontal: 8, paddingBottom: 56, marginTop: 16 }}
           renderItem={({ item }) => {
+            const badgeNew = item._creationTime > newDelay ? "New" : undefined;
+            const badgeTrending = item.ownedByUser ? undefined : "Trending";
+            const badge = badgeTrending || badgeNew;
+
             return (
               <View style={{
                 marginBottom: 36,
@@ -69,7 +73,7 @@ export default function AddItemScreen() {
                   title={item.name}
                   subtitle={item.category}
                   selected={!!innerItems.find((i) => i === item._id)}
-                  badge={item._creationTime > newDelay ? "New" : undefined}
+                  badge={badge}
                   onPress={() => {
                     setInnerItems((prev) => {
                       if (prev.find((i) => i === item._id)) {

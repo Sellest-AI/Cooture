@@ -5,11 +5,13 @@ import { Explozish, Loader, Plus } from "../icons";
 import { Image } from '../image';
 import { Text } from "../text";
 
+type Style = ViewStyle & { subtitleColor?: string };
+
 type Props = {
   title?: string;
   subtitle?: string;
   disabled?: boolean;
-  style?: ViewStyle;
+  style?: Style;
   selected?: boolean;
   source?: ComponentProps<typeof Image>['source'];
   contentFit?: ComponentProps<typeof Image>['contentFit'];
@@ -240,7 +242,7 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
             style={{
               maxWidth: '100%',
               fontWeight: 700,
-              color: selected ? Colors.primary[900] : Colors.neutral[400],
+              color: selected ? Colors.primary[900] : style?.subtitleColor || Colors.neutral[400],
               opacity: selected ? 0.5 : 1,
               marginTop: 0
             }}

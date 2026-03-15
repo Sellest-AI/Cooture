@@ -66,6 +66,8 @@ export default function PickOutfitScreen() {
               )
             }
 
+            const subtitle = outfit.ownedByUser ? `${outfit.itemsCount} items` : 'Trending';
+
             return (
               <View style={{
                 marginBottom: 24,
@@ -75,11 +77,14 @@ export default function PickOutfitScreen() {
               }}
               >
                 <Collection
+                  style={{
+                    subtitleColor: outfit.ownedByUser ? undefined : Colors.secondary[500],
+                  }}
                   backgroundColor={outfit.backgroundColor}
                   source={outfit.cover.sizes.small.url}
                   contentFit="contain"
                   title={outfit.name}
-                  subtitle={`${outfit.itemsCount} items`}
+                  subtitle={subtitle}
                   // selected={i % 3 === 0}
                   onPress={() => {
                     if (itemIds && itemIds?.length > 0) {

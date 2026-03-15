@@ -13,7 +13,7 @@ const cache = new ActionCache(components.actionCache, {
   ttl: 1000 * 60 * 5, // 5 minutes
 });
 
-type Returned = Promise<NonNullable<Awaited<ReturnType<typeof getOutfit>>>[]>;
+type Returned = Promise<NonNullable<Awaited<ReturnType<typeof getOutfit>> & { ownedByUser?: boolean }>[]>;
 
 export const _internal_cache = internalAction({
   handler: async (ctx, args): Returned =>
@@ -51,7 +51,9 @@ export const _internal_query_2 = internalQuery({
       .collect();
 
     const detailedOutfits = await Promise.all(outfits.map(async (outfit) => {
-      return getOutfit(ctx, outfit);
+      const result = await getOutfit(ctx, outfit);
+      if (!result) return null;
+      return { ...result, ownedByUser: true };
     }));
 
     return detailedOutfits.filter(notEmpty);
