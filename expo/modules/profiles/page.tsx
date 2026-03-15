@@ -23,6 +23,7 @@ const TABS = ['generations', 'outfits', 'items'] as const;
 
 type Props = {
   user?: null | {
+    username?: string;
     name?: string;
     _id: Id<'users'>;
     _creationTime: number;
@@ -148,12 +149,17 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
         }
       >
         <View style={{ paddingHorizontal: 20 }}>
-          <Text.H3 color={Colors.foreground}>
-            {user.name}
-          </Text.H3>
-          <Text.Base color={Colors.neutral[400]} weight={600} style={{ marginTop: 2 }}>
-            Since {new Date(user._creationTime).getFullYear()}
-          </Text.Base>
+          {user.username && <Text.Lg color={Colors.neutral[200]} weight={500} style={{ marginBottom: 2 }}>
+            @{user.username}
+          </Text.Lg>}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <Text.H3 color={Colors.foreground} numberOfLines={1}>
+              {user.name}
+            </Text.H3>
+            <Text.Base color={Colors.neutral[400]} weight={600} >
+              Since {new Date(user._creationTime).getFullYear()}
+            </Text.Base>
+          </View>
         </View>
         <View style={{ paddingHorizontal: 8, gap: 8, marginTop: 16 }}>
           <FollowersFollowing userId={user._id} />
