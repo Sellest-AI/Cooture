@@ -1,6 +1,7 @@
 import { internal } from "../../_generated/api";
 import { Id } from "../../_generated/dataModel";
 import { ActionCtx } from "../../procedures";
+import { CREDITS_CONFIG } from "../credits";
 
 type Args = {
   imageId: Id<"images">;
@@ -32,6 +33,11 @@ export const createItem = async (ctx: ActionCtx, data: Args): Promise<Id<"items"
     imageId: data.imageId,
     link: data.metadata?.itemUrl,
   });
+
+  await ctx.runMutation(internal.router.credits.deductCredits._internal, {
+    userId: data.userId,
+    amount: CREDITS_CONFIG.COST_PER_ITEM,
+  }).catch(() => null);
 
   return item;
 }

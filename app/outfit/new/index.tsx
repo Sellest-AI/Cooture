@@ -1,17 +1,28 @@
 import { ROUTES, useRouter } from "@/hooks";
+import { useAccount } from "@/lib/convex/auth";
+import { api, useQueryCached } from "@/lib/convex/client";
 import { Block } from "@ui/block";
 import { Globe, ScanLine, Search } from "@ui/icons";
 import { ModalHeader } from "@ui/modal";
 import { Pressable } from "@ui/pressable";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
-import { router } from "expo-router";
+import { Route, router } from "expo-router";
 import { MotiView } from "moti";
 import { StyleSheet, View } from "react-native";
 import { Colors } from "theme";
 
 export default function Screen() {
   const { push, replace } = useRouter();
+
+  const { wallet } = useAccount.Wallet();
+  const { data: cost } = useQueryCached(api.router.credits.getCost.anon, { type: 'ITEM_CREATION_COST', amount: 1 });
+
+  const onPress = (route: Route) => {
+    if (!wallet || cost === undefined) return;
+    if (wallet.credits < cost) { push(ROUTES.MODALS.UPGRADE); }
+    else replace(route);
+  }
 
   return (
     <SafeAreaView style={{
@@ -38,7 +49,7 @@ export default function Screen() {
         >
           <Pressable
             style={{ width: '100%', flex: 1 }}
-            onPress={() => { replace(ROUTES.SCAN); }}
+            onPress={() => { onPress(ROUTES.SCAN); }}
           >
             <Block variant="blur" style={{
               ...styles.buttons,
@@ -92,7 +103,7 @@ export default function Screen() {
               borderTopColor: Colors.secondary[200],
               backgroundColor: Colors.secondary[500],
             }}
-            onPress={() => { replace(ROUTES.OUTFIT.BROWSER); }}
+            onPress={() => { onPress(ROUTES.OUTFIT.BROWSER); }}
           >
             <Globe size={40} color={Colors.secondary[900]} />
             <Text.Lg color={Colors.secondary[900]} style={{ textAlign: 'center', marginBottom: 4 }}>

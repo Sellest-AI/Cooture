@@ -78,7 +78,7 @@ const generateFunction = async (ctx: ActionCtx, args: {
     amount: CREDITS_CONFIG.COST_PER_GENERATION * AMOUNT_OF_IMAGES,
     userId: args.userId,
     generationId,
-  });
+  }).catch(() => null);
 
   return generationId;
 }

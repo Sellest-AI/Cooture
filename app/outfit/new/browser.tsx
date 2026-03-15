@@ -1,3 +1,5 @@
+import { useAccount } from "@/lib/convex/auth";
+import { api, useQueryCached } from "@/lib/convex/client";
 import { useItem } from "@/modules/items/_hooks/useItem";
 import { BrowserItems } from "@/modules/outfits/browser/browser.items";
 import { Browser, BrowserProductData } from "@/modules/outfits/browser/browser.view";
@@ -186,6 +188,10 @@ export default function Screen() {
 
   const itemImage = item?.images?.[0];
 
+  const { wallet } = useAccount.Wallet();
+  const { data: cost } = useQueryCached(api.router.credits.getCost.anon, { type: 'GENERATION_COST', amount: items.length + 1 });
+  const canPay = wallet ? cost !== undefined && wallet.credits >= cost : false;
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background, gap: 8 }}>
       <View style={{ flex: 1 }}>
@@ -217,7 +223,7 @@ export default function Screen() {
                 <Button
                   variant="blur"
                   startIcon={added ? Check : (itemImage ? undefined : Plus)}
-                  disabled={items.length > 5 || loading}
+                  disabled={items.length > 5 || loading || !canPay}
                   startContent={added ? undefined : (itemImage ? <Image
                     style={{ width: 24, height: 24, borderRadius: 8 }}
                     source={itemImage.url}
