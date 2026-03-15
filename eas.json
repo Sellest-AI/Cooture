@@ -19,7 +19,11 @@
       "channel": "development"
     },
     "preview": {
-      "distribution": "internal",
+      "distribution": "store",
+      "ios": {
+        "simulator": false,
+        "image": "latest"
+      },
       "android": {
         "buildType": "app-bundle"
       },
@@ -32,7 +36,11 @@
       "channel": "preview"
     },
     "production": {
+      "distribution": "store",
       "autoIncrement": true,
+      "ios": {
+        "image": "latest"
+      },
       "android": {
         "buildType": "app-bundle"
       },
@@ -46,6 +54,7 @@
     }
   },
   "submit": {
+    "preview": {},
     "production": {}
   }
 }
