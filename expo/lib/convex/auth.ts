@@ -16,10 +16,10 @@ export const useAuthActions = () => {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const signInGoogle = useCallback(async (route?: Href) => {
+  const signIn = useCallback(async (provider: "apple" | "google", route?: Href) => {
     setIsLoading(true);
     const redirectTo = makeRedirectUri();
-    const { redirect } = await convex.signIn("google", { redirectTo });
+    const { redirect } = await convex.signIn(provider, { redirectTo });
 
     if (Platform.OS === "web") { return; }
 
@@ -27,7 +27,7 @@ export const useAuthActions = () => {
     if (result.type === "success") {
       const { url } = result;
       const code = new URL(url).searchParams.get("code")!;
-      await convex.signIn("google", { code });
+      await convex.signIn(provider, { code });
 
       if (route) router.dismissTo(route);
 
@@ -37,6 +37,9 @@ export const useAuthActions = () => {
     setIsLoading(false);
     return result.type === "success";
   }, [convex]);
+
+  const signInGoogle = useCallback(async (route?: Href) => signIn("google", route), [signIn]);
+  const signInApple = useCallback(async (route?: Href) => signIn("apple", route), [signIn]);
 
   const signInTester = useCallback(async () => {
     if (env.PUBLIC_NODE_ENV === 'production') return;
@@ -68,6 +71,7 @@ export const useAuthActions = () => {
     isLoading,
     signOut,
     signInGoogle,
+    signInApple,
     signInEmail,
     signInTester
   }

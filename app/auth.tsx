@@ -7,6 +7,7 @@ import { Pressable } from '@ui/pressable';
 import { SafeAreaView } from '@ui/safe-area-view';
 import { Text } from '@ui/text';
 import { env } from 'env';
+import { AppleAuthenticationButton, AppleAuthenticationButtonStyle, AppleAuthenticationButtonType } from "expo-apple-authentication";
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Platform, View } from 'react-native';
@@ -95,17 +96,35 @@ const LoginButtons = () => {
   const [init, setInit] = useState(false);
   useEffect(() => { setTimeout(() => setInit(true), 500) }, [])
 
-  const { isLoading, signInGoogle, signInTester } = useAuthActions();
+  const { isLoading, signInGoogle, signInApple, signInTester } = useAuthActions();
   const [innerLoading, setInnerLoading] = useState<"google" | "apple" | null>(null);
 
   const disableRuntime = isLoading || innerLoading !== null;
 
   const list: ("google" | "apple")[]
-    = Platform.OS === "ios" ? ["apple", "google"] : ["google", "apple"];
+    = Platform.OS === "ios" ? ["apple", "google"] : ["google"];
 
   return (
     <>
       {list.map(((item, i) => {
+        if (item === "apple")
+          return (
+            <AppleAuthenticationButton
+              key={item}
+              buttonType={AppleAuthenticationButtonType.SIGN_IN}
+              buttonStyle={AppleAuthenticationButtonStyle.WHITE}
+              cornerRadius={18}
+              style={{ width: '100%', height: 56, alignSelf: 'stretch' }}
+              onPress={async () => {
+                setInnerLoading(item);
+                const success = await signInApple(ROUTES.WELCOME.INDEX);
+                if (!success) setInnerLoading(null);
+              }}
+            />
+          )
+
+        const isGoogle = item === "google";
+
         return (
           <Button
             key={item}
@@ -113,10 +132,10 @@ const LoginButtons = () => {
             disabled={disableRuntime || !init}
             style={{
               alignSelf: 'stretch',
-              backgroundColor: i === 0 ? undefined : "white",
-              marginTop: 8
+              backgroundColor: isGoogle ? undefined : "white",
+              marginTop: i > 0 ? 8 : 0
             }}
-            variant={i === 0 ? "primary" : "ghost"}
+            variant={isGoogle ? "primary" : "ghost"}
             onPress={async () => {
               setInnerLoading(item);
               const success = await signInGoogle(ROUTES.WELCOME.INDEX);
@@ -126,8 +145,8 @@ const LoginButtons = () => {
               <Image
                 style={{ width: 20, height: 20 }}
                 contentFit='contain'
-                source={item === "apple" ? require('assets/logos/apple.webp') :
-                  require('assets/logos/google.webp')}
+                // source={item === "apple" ? require('assets/logos/apple.webp') : require('assets/logos/google.webp')}
+                source={require('assets/logos/google.webp')}
               />
             }
           >
