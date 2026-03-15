@@ -26,7 +26,7 @@ export const _internal_query = internalQuery({
   handler: async (ctx): Promise<Returned> => {
     const results = await ctx.db.query("outfits")
       .order('desc')
-      .take(10);
+      .take(32);
 
     const outfits = await Promise.all(results.map(async (outfit) => {
       return getOutfit(ctx, outfit);

@@ -11,6 +11,7 @@ import { Pressable } from "@ui/pressable";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
+import { useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
@@ -61,6 +62,13 @@ export default function Screen() {
 
   const { data: presets } = useQueryCached(api.router.presets.getAll.anon, {});
   const { data: outfits } = useQueryCachedData(api.router.outfits.getLatest.anon, { key: 'latestOutfits' });
+
+  const [date] = useState(new Date());
+  const randomizedOutfits = [...(outfits || [])].sort((a, b) => {
+    const seedA = a._id.charCodeAt(a._id.length - 1);
+    const seedB = b._id.charCodeAt(b._id.length - 1);
+    return Math.sin(date.getDate() + seedA) - Math.sin(date.getDate() + seedB);
+  }).slice(0, 6);
 
   return (
     <BlurTargetView blurKey={BlurKeys.NEW}>
@@ -139,7 +147,7 @@ export default function Screen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ gap: 32, paddingHorizontal: 16, paddingTop: 6 }}
-            data={(outfits?.slice(0, 6) || [])}
+            data={outfits ? randomizedOutfits : undefined}
             keyExtractor={(item) => item._id}
             renderItem={({ item }) => (
               <Collection
