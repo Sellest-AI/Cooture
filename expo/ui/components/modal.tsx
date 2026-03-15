@@ -4,6 +4,7 @@ import { Colors } from 'theme';
 import { Block } from './block';
 import { BLUR_PROPS, BlurView } from './blur-view';
 import { ArrowLeft } from './icons';
+import { useSafeAreaInsets } from './safe-area-view';
 import { Text } from './text';
 
 type Children = (actions: { next: () => void, back: () => void, close: () => void }) => ReactNode[] | ReactNode;
@@ -69,6 +70,7 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
   }, []);
 
   const FinalView = scrollable ? ScrollView : View;
+  const { bottom } = useSafeAreaInsets();
 
   return (
     <NativeModal
@@ -129,7 +131,10 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
             paddingBottom: 0,
           }}
         >
-          <FinalView showsVerticalScrollIndicator={false}>
+          <FinalView showsVerticalScrollIndicator={false}
+            style={{ paddingBottom: scrollable ? 0 : bottom }}
+            contentContainerStyle={{ paddingBottom: bottom }}
+          >
             {header && <ModalHeader
               type={header.type}
               style={{ marginTop: 16 }}

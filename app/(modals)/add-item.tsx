@@ -37,6 +37,7 @@ export default function AddItemScreen() {
     }}>
       <SafeScrollView
         showsVerticalScrollIndicator={false}
+        edges={{ top: 'off' }}
         style={{
           padding: 12,
         }}
