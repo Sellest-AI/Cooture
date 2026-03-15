@@ -113,7 +113,7 @@ export default function Screen() {
         <TextInput
           startIcon={Search}
           canClear
-          focusOnLayout
+          autoFocus
           value={search}
           onChangeText={setSearch}
           style={{ flex: 1 }}

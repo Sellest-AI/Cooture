@@ -8,12 +8,12 @@ import { Pressable } from './pressable';
 type Props = {
   className?: string;
   style?: ViewStyle;
-  focusOnLayout?: boolean;
+  autoFocus?: boolean;
   startIcon?: React.ComponentType<{ size?: number, color?: string, style?: SvgProps['style'] }>;
   canClear?: boolean;
 } & ComponentProps<typeof NativeTextInput>;
 
-export const TextInput = ({ className = "", style, startIcon, canClear, focusOnLayout, ...props }: Props) => {
+export const TextInput = ({ className = "", style, startIcon, canClear, autoFocus, ...props }: Props) => {
   const hasIcon = !!startIcon;
   const Icon = startIcon;
 
@@ -50,7 +50,8 @@ export const TextInput = ({ className = "", style, startIcon, canClear, focusOnL
       </View>}
       <NativeTextInput
         {...props}
-        onLayout={focusOnLayout ? (e) => e.currentTarget.focus() : undefined}
+        autoFocus={autoFocus}
+        onLayout={autoFocus ? (e) => e.currentTarget.focus() : undefined}
         placeholderTextColor={Colors.neutral[400]}
         className="focus:border-none focus:ring-0 focus:outline-none"
         style={[{
