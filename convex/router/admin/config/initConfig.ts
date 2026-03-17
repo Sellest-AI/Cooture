@@ -34,6 +34,9 @@ export const _internal = internalMutation({
 
     await ctx.scheduler.runAfter(0, internal.router.admin.config.initConfig._internal_step_1,
       { createTestAccount: !testAccount })
+
+    // Quests
+    await ctx.runMutation(internal.router.quests.initAll._internal);
   }
 })
 
