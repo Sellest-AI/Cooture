@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { Id } from "../../../_generated/dataModel";
 import { saveNotification } from "../../../functions/notifications";
+import { updateQuest } from "../../../functions/quests";
 import { authMutation, internalMutation, MutationCtx } from "../../../procedures";
 
 const toggleFollow = async (
@@ -99,6 +100,10 @@ async function updateStats(
       updatedAt: Date.now(),
     });
   }
+
+  // Update quests
+  const amount = increment >= 0 ? { increment: 1 } : { decrement: 1 };
+  await updateQuest(ctx, { ...amount, questType: "followers_gained", userId: followingId });
 }
 
 export const authed = authMutation({

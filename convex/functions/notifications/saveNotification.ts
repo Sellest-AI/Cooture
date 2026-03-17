@@ -165,7 +165,7 @@ const isNotificationAllowed = (args: ArgsExtended<Type>) => {
   return true;
 }
 
-export const saveNotification = async <T extends Type>(ctx: MutationCtx, args: Args<T>) => {
+export const saveNotification = async <T extends Type>(ctx: MutationCtx, args: Args<T>): Promise<Id<'notifications'> | false> => {
   const [objectsArgs, existingNotification] = await Promise.all([
     getObjects(ctx, args),
     ctx.db.query("notifications")
@@ -177,7 +177,7 @@ export const saveNotification = async <T extends Type>(ctx: MutationCtx, args: A
   const argsExtended = { ...args, ...objectsArgs } as ArgsExtended<Type>;
 
   // Don't create or update notifications if the action is performed by the same user (e.g. liking your own generation, following yourself, etc.)
-  if (!isNotificationAllowed(argsExtended)) return null;
+  if (!isNotificationAllowed(argsExtended)) return false;
 
   const userId = args.userId ?? getUserId(argsExtended);
   if (!userId) throw new Error("Unable to determine userId for notification");
@@ -218,7 +218,7 @@ export const saveNotification = async <T extends Type>(ctx: MutationCtx, args: A
 
     if (canAggregate) {
       if (existingNotification.actorId === args.actorId)
-        return existingNotification._id; // Don't update if the same actor is performing the action again
+        return false; // Don't update if the same actor is performing the action again
 
       // Only send a push notification every X time
       const notificationPushed = canSendPush ? await sendPushNotification() : false;

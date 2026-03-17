@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { Doc, Id } from "../../_generated/dataModel";
 import { upsertFeedScore } from "../../functions/feed";
 import { readNotification, saveNotification } from "../../functions/notifications";
+import { updateQuest } from "../../functions/quests";
 import { isAuthorized } from "../../functions/users";
 import { adminMutation, authMutation, internalMutation, MutationCtx } from "../../procedures";
 import { PREDICTION_STATUS } from "../../schema/generations";
@@ -46,6 +47,13 @@ const updateGenerationStatus = async (ctx: MutationCtx, generationId: Id<'genera
   if (generation.status === "PENDING") return;
 
   await ctx.db.patch(generationId, { status: "PENDING", publication: "DRAFT" });
+
+  // Update quests
+  await updateQuest(ctx, {
+    questType: "photos_generated",
+    userId: generation.userId,
+    increment: predictions.length,
+  })
 
   // Only send a notification when the generation is waiting for human validation
   await saveNotification(ctx, {

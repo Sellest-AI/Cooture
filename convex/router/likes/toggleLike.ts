@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import { Id } from "../../_generated/dataModel";
 import { saveNotification } from "../../functions/notifications";
+import { updateQuest } from "../../functions/quests";
 import { authMutation, internalMutation, MutationCtx } from "../../procedures";
 import { LIKEABLE_TYPE } from "../../schema/likes";
 
@@ -62,7 +63,15 @@ const sharedFunction = async (ctx: MutationCtx, args: { userId: Id<'users'>, val
     await updateStats(ctx, { generationId, outfitId }, 1);
 
     const post = generationId ? { generationId } : { outfitId: outfitId! };
-    await saveNotification(ctx, { type: "new_like", actorId: args.userId, pushToDevice: true, ...post });
+    const isNew = await saveNotification(ctx, { type: "new_like", actorId: args.userId, pushToDevice: true, ...post });
+
+    // Update Quests
+    const object = await ctx.db.get(post.generationId ?? post.outfitId);
+    if (object && isNew && object.userId !== args.userId) {
+      // Since it's easy to farm likes on someone else's post, we only count it if the notification is new (meaning they didn't just like -> unlike -> like again)
+      await updateQuest(ctx, { questType: "posts_liked", increment: 1, userId: args.userId });
+      await updateQuest(ctx, { questType: "likes_received", increment: 1, userId: object.userId });
+    }
 
     return { liked: true };
   }

@@ -1,7 +1,15 @@
 import { v } from "convex/values";
 import { Id } from "../../_generated/dataModel";
 import { saveNotification } from "../../functions/notifications";
-import { internalMutation } from "../../procedures";
+import { updateQuest } from "../../functions/quests";
+import { internalMutation, MutationCtx } from "../../procedures";
+
+const questHandler = async (ctx: MutationCtx, { userId, presetId }: { userId: Id<'users'>, presetId: Id<'presets'> }) => {
+  const generations = await ctx.db.query("generations").withIndex("by_user_id", (q) => q.eq("userId", userId)).collect();
+  const presets = await Promise.all(generations.map((generation) => ctx.db.query("presetGenerations").withIndex("by_generation_id", (q) => q.eq("generationId", generation._id)).first()));
+  const isNewPreset = !presets.some((preset) => preset?.presetId === presetId);
+  if (isNewPreset) await updateQuest(ctx, { userId, questType: "presets_used", increment: 1 });
+}
 
 export const _internal = internalMutation({
   args: {
@@ -46,6 +54,9 @@ export const _internal = internalMutation({
         prompts: preset.prompts,
         userIds,
       });
+
+      // Update quests
+      await questHandler(ctx, { userId, presetId: preset.presetId });
     }
 
     return generationId;

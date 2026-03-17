@@ -6,10 +6,11 @@ export const _internal = internalMutation({
   args: {
     questType: questTypes,
     userId: v.id("users"),
-    incrementAmount: v.number(),
+    increment: v.optional(v.number()),
+    decrement: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const { questType, userId, incrementAmount } = args;
+    const { questType, userId, increment, decrement } = args;
 
     // Get all quests of the given type
     const quests = await ctx.db.query("quests")
@@ -22,7 +23,7 @@ export const _internal = internalMutation({
         .withIndex("by_user_and_quest", q => q.eq("userId", userId).eq("questId", quest._id))
         .first();
 
-      const newAmount = (progress?.currentAmount || 0) + incrementAmount;
+      const newAmount = (progress?.currentAmount ?? 0) + (increment ?? -(decrement ?? 0));
       const wasCompleted = progress?.isCompleted || false;
       const isNowCompleted = newAmount >= quest.target;
 

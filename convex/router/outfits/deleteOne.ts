@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+import { updateQuest } from "../../functions/quests";
 import { authMutation } from "../../procedures";
 
 export const authed = authMutation({
@@ -26,5 +27,7 @@ export const authed = authMutation({
 
     // Delete outfit
     await ctx.db.delete(args.outfitId);
+
+    await updateQuest(ctx, { questType: "outfits_created", decrement: 1 });
   }
 })
