@@ -14,6 +14,18 @@ export const normalizeArray = <T extends string>(v?: T | T[] | null) =>
 type ArrayType = string | number | boolean | symbol | bigint | Date;
 export const uniqueArray = <T extends ArrayType>(array: T[]) => Array.from(new Set(array));
 
+export const shuffleArray = <T>(array: T[], key: string): T[] => {
+  const result = [...array];
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) hash = Math.imul(31, hash) + key.charCodeAt(i) | 0;
+  const random = () => (hash = Math.imul(hash ^ hash >>> 15, hash | 1), ((hash ^= hash + Math.imul(hash ^ hash >>> 7, hash | 61)) ^ hash >>> 14) >>> 0) / 4294967296;
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 /**
  * Removes undefined values from an object recursively
  * @param obj The object to process

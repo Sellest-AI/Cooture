@@ -1,7 +1,8 @@
 import { ROUTES, useDebounce } from "@/hooks";
-import { api, useQuery } from "@/lib/convex/client";
+import { api, Id, useQuery, useQueryCached } from "@/lib/convex/client";
 import { Badge } from "@ui/badge";
 import { Block } from "@ui/block";
+import { CardItem, Collection } from "@ui/cards";
 import { FlashList } from "@ui/flat-list";
 import { ArrowLeft, Search } from "@ui/icons";
 import { Pressable } from "@ui/pressable";
@@ -9,8 +10,9 @@ import { SafeAreaView } from "@ui/safe-area-view";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
 import { TextInput } from "@ui/text-input";
+import { shuffleArray } from "@utils/convex-allowed";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 
@@ -81,6 +83,41 @@ const User = ({ style, src, username, name, id }: UserProps) => {
   )
 }
 
+const Item = ({ id }: { id: Id<'items'> }) => {
+  const [aspectRatio, setAspectRatio] = useState<number>(4 / 5);
+  const { data: item } = useQueryCached(api.router.items.getOne.anon, { itemId: id });
+
+  useEffect(() => { if (item) setAspectRatio(item.image.width / item.image.height) }, [item])
+  if (!item) return <Skeleton style={{ flex: 1, aspectRatio }} />;
+
+  return (
+    <CardItem
+      image={item.image}
+      source={item.image.sizes.small.url}
+      title={item.name}
+      subtitle={item.category.toLowerCase()}
+      onPress={() => router.push(ROUTES.ITEM.ID(item._id))}
+    />
+  )
+}
+
+const Outfit = ({ id }: { id: Id<'outfits'> }) => {
+  const { data: item } = useQueryCached(api.router.outfits.getOne.anon, { outfitId: id });
+
+  if (!item) return <Skeleton style={{ flex: 1, aspectRatio: 4 / 5 }} />;
+
+  return (
+    <Collection
+      backgroundColor={item.backgroundColor}
+      source={item.cover?.sizes.small.url}
+      contentFit="contain"
+      title={item.name}
+      subtitle={`${item.items.length} items`}
+      onPress={() => router.push(ROUTES.OUTFIT.ID(item._id))}
+    />
+  )
+}
+
 export default function Screen() {
   const [search, setSearch] = useState('');
 
@@ -88,9 +125,17 @@ export default function Screen() {
   const query = search !== debouncedSearch ? '' : search;
 
   const hasQuery = query.length > 0;
-  const { data, isSuccess } = useQuery(api.router.users.searchMany.authed, hasQuery ? { query } : 'skip');
+  const { data: users, isSuccess: isUsersSuccess } = useQuery(api.router.users.searchMany.authed, hasQuery ? { query } : 'skip');
+  const { data: items, isSuccess: isItemsSuccess } = useQuery(api.router.items.searchMany.anon, hasQuery ? { query } : 'skip');
+  const { data: outfits, isSuccess: isOutfitsSuccess } = useQuery(api.router.outfits.searchMany.anon, hasQuery ? { query } : 'skip');
 
+  const isSuccess = isUsersSuccess && isItemsSuccess && isOutfitsSuccess;
   const showLoading = search && !isSuccess;
+
+  const data = useMemo(() => shuffleArray([
+    ...(items ?? []).map((chunk) => ({ type: 'item' as const, data: chunk })).slice(0, 20),
+    ...((outfits ?? []).map((chunk) => ({ type: 'outfit' as const, data: chunk }))).slice(0, 10)
+  ], query), [items, outfits, query]);
 
   return (
     <SafeAreaView style={{
@@ -120,25 +165,69 @@ export default function Screen() {
         />
       </View>
       <FlashList
+        scrollEnabled={!showLoading}
         ListEmptyComponent={showLoading ? <>
           <UserSkeleton style={{ marginBottom: 24 }} />
           <UserSkeleton style={{ marginBottom: 24 }} />
           <UserSkeleton style={{ marginBottom: 24 }} />
+          {[1, 2, 3].map((i) => (
+            <View style={{ flexDirection: 'row', gap: 12, marginBottom: 12 }} key={i}>
+              <Skeleton style={{ flex: 1, aspectRatio: 4 / 5 }} />
+              <Skeleton style={{ flex: 1, aspectRatio: 4 / 5 }} />
+            </View>
+          ))}
         </> : undefined}
         style={{
           marginTop: 24,
-          paddingHorizontal: 4
+          paddingHorizontal: 4,
         }}
-        data={data}
-        renderItem={({ item }) => (
-          <User
-            style={{ marginBottom: 24 }}
-            src={item.imageUrl}
-            username={item.username}
-            name={item.name}
-            id={item._id}
-          />
-        )}
+        data={data.length > 0 ? data : []}
+        masonry
+        numColumns={2}
+        keyExtractor={(item) => item.data._id.toString()}
+        ListHeaderComponent={(users ?? []).length > 0 ? <View>
+          {(users ?? []).map((u) => (
+            <User
+              key={u._id}
+              style={{ marginBottom: 24 }}
+              src={u.imageUrl}
+              username={u.username}
+              name={u.name}
+              id={u._id}
+            />
+          ))}
+          {data.length > 0 && <View style={{
+            marginTop: 12,
+            marginBottom: 40,
+            width: '100%',
+            height: 1,
+            backgroundColor: Colors.blur.dark,
+            borderRadius: 99
+          }} />}
+        </View> : undefined}
+        renderItem={({ item }) => {
+          if (item.type === "item") {
+            return (
+              <View style={{ flexDirection: 'row', marginBottom: 24, paddingHorizontal: 12 }}>
+                <Item
+                  id={item.data._id}
+                />
+              </View>
+            )
+          }
+
+          if (item.type === "outfit") {
+            return (
+              <View style={{ flexDirection: 'row', paddingHorizontal: 20, marginBottom: 24 }}>
+                <Outfit
+                  id={item.data._id}
+                />
+              </View>
+            )
+          }
+
+          return null;
+        }}
       />
     </SafeAreaView>
   )

@@ -42,7 +42,10 @@ export const CardItem = ({ title, subtitle, selected, disabled, badge, style, so
     if (typeof source === 'string') {
       RNImage.getSize(source, (w, h) => setIntrinsicSize({ width: w, height: h }), () => { });
     }
-  }, [source]);
+    if (image) {
+      setIntrinsicSize({ width: image.width, height: image.height });
+    }
+  }, [image, source]);
 
   // Compute height that preserves aspect ratio given the measured layout width
   const computedHeight = intrinsicSize && layoutWidth ? (layoutWidth / intrinsicSize.width) * intrinsicSize.height : null;

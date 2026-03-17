@@ -103,3 +103,6 @@ export const items = defineTable({
   userId: v.id("users"),
 })
   .index("by_user_id", ["userId"])
+  .searchIndex("search_name", { searchField: "name", filterFields: ["userId"] })
+  .searchIndex("search_brand", { searchField: "brand", filterFields: ["userId"] })
+  .searchIndex("search_description", { searchField: "description", filterFields: ["userId"] });
