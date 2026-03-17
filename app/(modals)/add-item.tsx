@@ -1,16 +1,16 @@
-import { ROUTES, useRoute, useRouter, useStateEffect } from "@/hooks";
-import { api, useQueryCachedData } from "@/lib/convex/client";
+import { ROUTES, useDebounce, useRoute, useRouter, useStateEffect } from "@/hooks";
+import { api, useQuery, useQueryCachedData } from "@/lib/convex/client";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { Button } from "@ui/button";
 import { CardItem } from "@ui/cards/card-item";
 import { FlashList } from "@ui/flat-list";
-import { Search } from "@ui/icons";
+import { Loader, Search } from "@ui/icons";
 import { ModalHeader } from "@ui/modal";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { TextInput } from "@ui/text-input";
 import { normalizeArray } from "@utils/convex-allowed";
 import { router } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { Colors } from "theme";
 
@@ -30,6 +30,16 @@ export default function AddItemScreen() {
 
   const newDelay = Date.now() - 3 * 24 * 60 * 60 * 1000 // 3 days
 
+  // Search
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 800);
+  const query = search !== debouncedSearch ? '' : search;
+  const hasQuery = query.length > 0;
+  const { data: searchResults } = useQuery(api.router.items.searchMany.anon, query ? { query } : 'skip');
+  const isLoading = hasQuery && !searchResults;
+
+  const data = (hasQuery ? searchResults : _items) as typeof _items;
+
   return (
     <View style={{
       flex: 1,
@@ -47,19 +57,20 @@ export default function AddItemScreen() {
           onBack={router.canGoBack() ? () => { router.back() } : undefined}
         />
         <TextInput
-          startIcon={Search}
+          startIcon={isLoading ? Loader : Search}
+          value={search}
+          onChangeText={setSearch}
           placeholder="Search for items..."
           style={{
             marginBottom: 12,
           }}
         />
         <FlashList
-          data={_items ?? []}
+          data={data ?? []}
           style={{ paddingHorizontal: 8, paddingBottom: 56, marginTop: 16 }}
           renderItem={({ item }) => {
             const badgeNew = item._creationTime > newDelay ? "New" : undefined;
-            const badgeTrending = item.ownedByUser ? undefined : "Trending";
-            const badge = badgeTrending || badgeNew;
+            const badge = badgeNew;
 
             return (
               <View style={{

@@ -74,12 +74,12 @@ const getItems = async (ctx: ActionCtx, userId?: Id<'users'>): Promise<ReturnTyp
   const publicItems = await cache.fetch(ctx, {});
 
   const items = [
-    ...userItems.slice(0, 8),
-    ...publicItems.slice(0, 8),
-    ...userItems.slice(8, 16),
-    ...publicItems.slice(8, 16),
-    ...userItems.slice(16),
-    ...publicItems.slice(16)
+    ...userItems.slice(0, 12),
+    ...publicItems.slice(0, 12),
+    ...userItems.slice(12, 24),
+    ...publicItems.slice(12, 24),
+    ...userItems.slice(24),
+    ...publicItems.slice(24)
   ];
 
   const uniqueItems = uniqueArray(items.map((i) => i._id));
