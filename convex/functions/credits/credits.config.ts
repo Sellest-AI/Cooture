@@ -13,6 +13,7 @@ export const CREDITS_CONFIG = {
 
   // Initial credits for new users
   STARTING_CREDITS: 200, // Enough for 2 generations to try the app
+  COOTURE_PLUS_CREDITS: 100 * 15,
 } as const;
 
 /**

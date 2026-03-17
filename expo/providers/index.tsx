@@ -7,6 +7,7 @@ import { ConvexClientProvider } from "./convex-client"
 import { I18nProvider } from "./i18n"
 import { MotionProvider } from "./motion"
 import { NotificationsProvider } from './notifications'
+import { RevenueCatProvider } from './revenue-cat'
 import { ThemeProvider } from "./theme"
 
 type Props = {
@@ -24,9 +25,11 @@ export const Providers = ({ children }: Props) => {
                 <KeyboardAvoiderProvider>
                   <AsyncProviders>
                     <AuthProvider>
-                      <NotificationsProvider>
-                        {children}
-                      </NotificationsProvider>
+                      <RevenueCatProvider>
+                        <NotificationsProvider>
+                          {children}
+                        </NotificationsProvider>
+                      </RevenueCatProvider>
                     </AuthProvider>
                   </AsyncProviders>
                 </KeyboardAvoiderProvider>

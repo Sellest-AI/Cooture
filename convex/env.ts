@@ -16,4 +16,6 @@ export const env = {
   S3_ENDPOINT: process.env.S3_ENDPOINT ?? '',
   // Runpod Configuration
   RUNPOD_API_KEY: process.env.RUNPOD_API_KEY ?? '',
+  // RevenueCat
+  REVENUECAT_WEBHOOK_SECRET: process.env.REVENUECAT_WEBHOOK_SECRET ?? ''
 }

@@ -25,12 +25,23 @@ export const userSizes = v.union(
   v.literal("heavyset"),
 );
 
+const userPlan = v.object({
+  id: v.string(), // e.g., "COOTURE_PLUS"
+  renewalInterval: v.union(
+    v.literal("weekly"),
+    v.literal("monthly"),
+    v.literal("yearly"),
+  )
+})
+
 export const usersExtended = defineTable({
   userId: v.id('users'),
   canTakeFreeTrial: v.boolean(),
   stripeCustomerId: v.string(),
+  revenueCatUserId: v.optional(v.string()),
   accountStatus: accountStatus,
   role: role,
+  plan: v.optional(userPlan),
   // Profile
   firstName: v.optional(v.string()),
   lastName: v.optional(v.string()),
@@ -42,6 +53,7 @@ export const usersExtended = defineTable({
 }).index("by_user_id", ["userId"])
   .index("by_username", ["username"])
   .index("by_stripe_customer_id", ["stripeCustomerId"])
+  .index("by_revenuecat_user_id", ["revenueCatUserId"])
   .searchIndex("search_username", { searchField: "username" })
   .searchIndex("search_name", { searchField: "name" });
 

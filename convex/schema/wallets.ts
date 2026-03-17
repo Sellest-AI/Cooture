@@ -40,9 +40,7 @@ export const creditTransactions = defineTable({
   balanceAfter: v.number(), // Balance of the receiving user after transaction
   metadata: v.optional(v.object({
     reason: v.optional(v.string()),
-    claim: v.optional(v.object({
-      streakDay: v.number(),
-    })),
+    claim: v.optional(v.object({ streakDay: v.number() })),
     generationId: v.optional(v.id("generations")),
     adminId: v.optional(v.id("users")),
     refund: v.optional(v.object({

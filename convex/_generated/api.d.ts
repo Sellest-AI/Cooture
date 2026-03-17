@@ -49,6 +49,7 @@ import type * as functions_waitlist_index from "../functions/waitlist/index.js";
 import type * as functions_waitlist_updateWaitlist from "../functions/waitlist/updateWaitlist.js";
 import type * as http from "../http.js";
 import type * as http_replicate from "../http/replicate.js";
+import type * as http_revenuecat from "../http/revenuecat.js";
 import type * as http_runpod from "../http/runpod.js";
 import type * as lib_image_index from "../lib/image/index.js";
 import type * as lib_image_node from "../lib/image/node.js";
@@ -273,6 +274,7 @@ declare const fullApi: ApiFromModules<{
   "functions/waitlist/updateWaitlist": typeof functions_waitlist_updateWaitlist;
   http: typeof http;
   "http/replicate": typeof http_replicate;
+  "http/revenuecat": typeof http_revenuecat;
   "http/runpod": typeof http_runpod;
   "lib/image/index": typeof lib_image_index;
   "lib/image/node": typeof lib_image_node;

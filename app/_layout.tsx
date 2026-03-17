@@ -28,6 +28,10 @@ export default function RootLayout() {
                 sheetCornerRadius: 28,
               }}
             />
+            <Stack.Screen
+              name="upgrade"
+              options={{ presentation: 'formSheet', sheetAllowedDetents: [0] }}
+            />
           </Stack>
         </StreakProvider>
       </View>
