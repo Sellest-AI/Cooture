@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+import { internal } from "../../_generated/api";
 import { internalMutation } from "../../procedures";
 import { questTypes } from "../../schema/quests";
 
@@ -27,6 +28,9 @@ export const _internal = internalMutation({
       const wasCompleted = progress?.isCompleted || false;
       const isNowCompleted = newAmount >= quest.target;
 
+      // Only allow claiming reward if they weren't already completed before, to prevent farming by toggling actions on/off
+      const claimReward = progress?.rewardClaimed ? false : (!wasCompleted && isNowCompleted);
+
       if (!progress) {
         // If no progress exists, create a new entry
         await ctx.db.insert("userQuestProgress", {
@@ -35,7 +39,7 @@ export const _internal = internalMutation({
           currentAmount: newAmount,
           isCompleted: isNowCompleted,
           completedAt: isNowCompleted ? Date.now() : undefined,
-          rewardClaimed: false,
+          rewardClaimed: claimReward,
           startedAt: Date.now(),
           updatedAt: Date.now(),
         });
@@ -49,7 +53,19 @@ export const _internal = internalMutation({
           // Only set completedAt the first time it's completed
           completedAt: !wasCompleted && isNowCompleted ? Date.now() : progress.completedAt,
           updatedAt: Date.now(),
+          rewardClaimed: progress.rewardClaimed || claimReward,
         });
+      }
+
+      if (claimReward) {
+        await ctx.runMutation(internal.router.credits.grantCredits._internal, {
+          userId,
+          amount: quest.rewardCredits,
+          type: "QUEST_REWARD",
+          metadata: {
+            reason: `Quest completed: ${quest.title} (${quest.type})`,
+          }
+        })
       }
     }
   }

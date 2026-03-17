@@ -20,6 +20,7 @@ export const userWallets = defineTable({
  */
 export const TRANSACTION_TYPE = v.union(
   v.literal("DAILY_CLAIM"),
+  v.literal("QUEST_REWARD"),
   v.literal("GENERATION_COST"),
   v.literal("ADMIN_GRANT"),
   v.literal("SYSTEM_GRANT"),
