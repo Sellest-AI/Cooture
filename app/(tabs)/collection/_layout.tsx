@@ -16,7 +16,6 @@ export default function ProfileLayout() {
             backgroundColor: Colors.background,
           },
           animation: 'slide_from_right',
-          presentation: 'pageSheet'
         }}
       >
         <Stack.Screen name="index" />

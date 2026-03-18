@@ -14,8 +14,7 @@ export default function RootLayout() {
             screenOptions={{
               headerShown: false,
               contentStyle: { backgroundColor: Colors.background },
-              animation: 'simple_push',
-              presentation: 'pageSheet'
+              animation: 'simple_push'
             }}
           >
             <Slot />

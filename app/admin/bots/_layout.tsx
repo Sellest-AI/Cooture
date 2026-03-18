@@ -16,7 +16,6 @@ export default function Layout() {
         headerShown: false,
         contentStyle: { backgroundColor: Colors.background },
         animation: 'simple_push',
-        presentation: 'pageSheet'
       }}
     >
       <Slot />
