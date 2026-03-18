@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { internalAction } from "../../_generated/server";
 import { createItem } from "../../functions/items/createItem";
-import { authAction, internalMutation } from "../../procedures";
+import { adminAction, authAction, internalMutation } from "../../procedures";
 import { ITEMS_SCHEMA } from "../../schema/items";
 
 const sharedArgs = {
@@ -23,6 +23,17 @@ export const authed = authAction({
     })
   }
 });
+
+export const admin = adminAction({
+  args: { ...sharedArgs, userId: v.id("users") },
+  handler: async (ctx, { imageId, userId, metadata }) => {
+    return createItem(ctx, {
+      imageId,
+      userId,
+      metadata,
+    })
+  }
+})
 
 export const _internal = internalAction({
   args: {

@@ -36,6 +36,7 @@ const RemoveBackgroundTaskSchema = WebhookTaskSchema.extend({
       nextStep: z.enum(['SAVE_IMAGE', 'CREATE_ITEM']),
       nextArgs: z.optional(z.object({
         CREATE_ITEM: z.optional(z.object({
+          brand: z.optional(z.string()),
           name: z.optional(z.string()),
           description: z.optional(z.string()),
           itemUrl: z.optional(z.string()),
@@ -59,6 +60,7 @@ const removeBackgroundSchemaValidator = v.object({
     nextStep: v.union(v.literal('SAVE_IMAGE'), v.literal('CREATE_ITEM')),
     nextArgs: v.optional(v.object({
       CREATE_ITEM: v.optional(v.object({
+        brand: v.optional(v.string()),
         name: v.optional(v.string()),
         description: v.optional(v.string()),
         itemUrl: v.optional(v.string()),
@@ -120,6 +122,7 @@ export const runpodHandler = httpAction(async (ctx, request) => {
             name: callback.nextArgs.CREATE_ITEM?.name,
             description: callback.nextArgs.CREATE_ITEM?.description,
             itemUrl: callback.nextArgs.CREATE_ITEM?.itemUrl,
+            brand: callback.nextArgs.CREATE_ITEM?.brand,
           }
         } : undefined,
       },

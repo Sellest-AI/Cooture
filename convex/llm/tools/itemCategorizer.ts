@@ -38,6 +38,7 @@ export const itemCategorizer = createTool({
     imageUrl: z.string(),
     extractText: z.optional(z.boolean().default(false)),
     metadata: z.optional(z.object({
+      brand: z.optional(z.string()),
       name: z.optional(z.string()),
       description: z.optional(z.string()),
     })),

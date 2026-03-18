@@ -82,8 +82,11 @@ export const ROUTES = {
   PRICING: '/pricing',
   REFERRAL: (referralCode: string) => `${WEBSITE.URL}/${referralCode}`,
   ADMIN: {
-    USERS: (id: string) => `/admin/users/${id}`,
-    toString: () => '/admin',
+    BOTS: {
+      OUTFITS: {
+        EXTRACTOR: '/admin/bots/outfits/extractor',
+      }
+    }
   },
   APP: {
     TOOLS: {

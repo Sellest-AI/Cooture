@@ -7,6 +7,7 @@ type Args = {
   imageId: Id<"images">;
   userId: Id<"users">;
   metadata?: {
+    brand?: string;
     name?: string;
     description?: string;
     itemUrl?: string;
@@ -19,6 +20,7 @@ export const createItem = async (ctx: ActionCtx, data: Args): Promise<Id<"items"
     userId: data.userId,
     extractText: true,
     metadata: data.metadata ? {
+      brand: data.metadata.brand,
       name: data.metadata.name,
       description: data.metadata.description,
     } : undefined,

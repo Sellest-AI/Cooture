@@ -1,19 +1,27 @@
 import { ArrowLeft, ArrowRight, Home, X } from "@ui/icons";
+import { Image } from "@ui/image";
 import { Pressable } from "@ui/pressable";
 import { router } from "expo-router";
 import { atom, useAtom } from "jotai";
-import { createContext, useContext, useRef, useState } from "react";
-import { View } from "react-native";
+import { nanoid } from "nanoid/non-secure";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { BackHandler, View } from "react-native";
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 // Types for extracted product data
-export type BrowserProductData = {
+export type BrowserProductItem = {
+  key: string;
   title: string;
-  description: string;
-  images: { url: string; width: number; height: number }[];
+  brand?: string;
+  description?: string;
   url: string;
+  images: { url: string; width: number; height: number }[];
+};
+
+export type BrowserProductData = {
+  items?: BrowserProductItem[];
 }
 
 // JavaScript code to extract product information from the current webpage
@@ -34,6 +42,21 @@ const EXTRACT_PRODUCT_INFO = `
            document.querySelector('h1')?.innerText ||
            document.title ||
            'Untitled';
+  }
+
+  // Extract brand from common selectors
+  function getBrand() {
+    try {
+      const brandElement = document.querySelector('[data-testid="product_title-brand-name"]') || 
+                           document.querySelector('[data-testid*="brand"]') ||
+                           document.querySelector('.brand-name');
+      if (brandElement && brandElement.textContent) {
+        return brandElement.textContent.trim();
+      }
+    } catch (e) {
+      // Ignore
+    }
+    return undefined;
   }
   
   // Extract description
@@ -179,16 +202,81 @@ const EXTRACT_PRODUCT_INFO = `
     return uniqueImages;
   }
   
+  // Extract outfit items if available
+  function getOutfitItems() {
+    const container = document.querySelector('[data-testid="outfit-view-shoppable-items"]');
+    if (!container) return null;
+    
+    let items = [];
+    const articles = container.querySelectorAll('article');
+    
+    for (let i = 0; i < articles.length; i++) {
+      const article = articles[i];
+      const link = article.querySelector('a');
+      const url = link ? link.href : '';
+      
+      const img = article.querySelector('img');
+      let image = null;
+      if (img) {
+        let src = img.src || img.getAttribute('src');
+        if (src) {
+          src = getFullSizeImageUrl(src);
+          image = {
+            url: src,
+            width: img.naturalWidth || img.width || 800,
+            height: img.naturalHeight || img.height || 1200
+          };
+        }
+      }
+      
+      let brand = '';
+      let title = '';
+      const h3 = article.querySelector('h3');
+      if (h3) {
+        const spans = h3.querySelectorAll('span');
+        if (spans.length >= 2) {
+          brand = (spans[0].innerText || spans[0].textContent || '').trim();
+          title = (spans[1].innerText || spans[1].textContent || '').trim();
+        } else if (spans.length === 1) {
+          title = (spans[0].innerText || spans[0].textContent || '').trim();
+        } else {
+          title = (h3.innerText || h3.textContent || '').trim();
+        }
+      }
+      
+      if (url || title) {
+        items.push({ 
+          url, 
+          brand, 
+          title, 
+          images: image ? [image] : [] 
+        });
+      }
+    }
+    
+    return items.length > 0 ? items : null;
+  }
+  
   // Collect all data
-  const productData = {
-    title: getTitle(),
-    description: getDescription(),
-    images: getImages(),
-    url: window.location.href
-  };
+  const outfitItems = getOutfitItems();
+  
+  let resultData = {};
+  if (outfitItems) {
+    resultData = { items: outfitItems };
+  } else {
+    resultData = {
+      items: [{
+        title: getTitle(),
+        brand: getBrand(),
+        description: getDescription(),
+        images: getImages(),
+        url: window.location.href
+      }]
+    };
+  }
   
   // Send data back to React Native
-  window.ReactNativeWebView.postMessage(JSON.stringify(productData));
+  window.ReactNativeWebView.postMessage(JSON.stringify(resultData));
 })();
 true; // Required for iOS
 `;
@@ -220,10 +308,32 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
   const goBack = () => { if (canGoBack) webviewRef.current?.goBack(); };
   const goForward = () => { if (canGoForward) webviewRef.current?.goForward(); };
 
+  const navigateTo = (url: string) => {
+    setCurrentUrl(url);
+    // Force the webview to navigate in case the URI prop change is ignored by the native component (e.g. difference in trailing slash)
+    webviewRef.current?.injectJavaScript(`window.location.href = '${url}'; true;`);
+  };
+
+  useEffect(() => {
+    const handleBackPress = () => {
+      if (canGoBack) { webviewRef.current?.goBack(); return true; }
+      return false;
+    };
+    const sub = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+    return () => { sub.remove(); };
+  }, [canGoBack]);
+
   const handleMessage = (event: WebViewMessageEvent) => {
     try {
       const data = JSON.parse(event.nativeEvent.data) as BrowserProductData;
-      onProductExtracted(data);
+      const sanitizedData = {
+        ...data,
+        items: data.items?.map(item => ({
+          ...item,
+          key: nanoid()
+        })),
+      }
+      onProductExtracted(sanitizedData);
     } catch (e) {
       console.error("Failed to parse product data:", e);
     }
@@ -283,11 +393,21 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
           <Pressable onPress={goForward} disabled={!canGoForward} style={{ opacity: canGoForward ? 1 : 0.5 }}>
             <ArrowRight color={Colors.foreground} size={24} />
           </Pressable>
-          <Pressable onPress={() => setCurrentUrl(BASE_URL)}>
-            <Home color={Colors.foreground} size={24} />
-          </Pressable>
         </View>
         <View style={{ flexDirection: 'row', gap: 24 }}>
+          <View style={{ flexDirection: 'row', gap: 12 }}>
+            <Pressable onPress={() => navigateTo(BASE_URL)}>
+              <Home color={Colors.foreground} size={24} />
+            </Pressable>
+            <FaviconPressable
+              favicon="https://play-lh.googleusercontent.com/KvjPFAHzgHACNxLyic2KQTHHxLEb0gQx_-lNx46XB7antXXkBiHNq67fAqOrBlIVfcZR"
+              onPress={() => navigateTo("https://www.forever21.com/")}
+            />
+            <FaviconPressable
+              favicon="https://play-lh.googleusercontent.com/Iwk_bPilB4vXqMjXVX1aYD3yhihBzpGuVm3bEqPRcuX-Mz0sQJmN3ukpooXpL_lXoQ"
+              onPress={() => navigateTo("https://www.zalando.com/get-the-look-femme/?style=style_all")}
+            />
+          </View>
           <X
             onPress={() => router.canGoBack() ? router.back() : router.dismissTo(ROUTES.TABS.NEW)}
             color={Colors.foreground}
@@ -298,6 +418,13 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
     </View>
   )
 }
+
+const FaviconPressable = ({ favicon, onPress }: { favicon: string; onPress: () => void }) => <Pressable onPress={onPress}>
+  <Image
+    style={{ width: 24, height: 24, borderRadius: 8 }}
+    source={favicon}
+  />
+</Pressable>
 
 Browser.BaseUrl = BASE_URL;
 

@@ -33,6 +33,7 @@ type PendingItem = {
   key: string;
   url: string;
   name?: string;
+  brand?: string;
   description?: string;
   /** Main image */
   image: { url: string, width: number, height: number };
@@ -68,6 +69,7 @@ export const useCreateItem = () => {
       nextStep: 'CREATE_ITEM',
       nextArgs: {
         CREATE_ITEM: {
+          brand: item.brand,
           name: item.name,
           description: item.description,
           itemUrl: item.url,

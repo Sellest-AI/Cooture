@@ -20,7 +20,7 @@ type PresetsProps = {
   presetId: Id<'presets'> | null;
 }
 const Presets = ({ onSelect, presetId }: PresetsProps) => {
-  const { data: presets } = useQuery(api.router.presets.getAll.anon);
+  const { data: presets } = useQuery(api.router.presets.getAll.anon, {});
 
   useEffect(() => {
     if (!presets) return;

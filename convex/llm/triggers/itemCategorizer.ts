@@ -11,6 +11,7 @@ export const _internal = internalAction({
     imageId: v.id("images"),
     extractText: v.optional(v.boolean()),
     metadata: v.optional(v.object({
+      brand: v.optional(v.string()),
       name: v.optional(v.string()),
       description: v.optional(v.string()),
     })),

@@ -14,6 +14,7 @@ type ParamsDefault<T extends Route> =
   T extends "/new-outfit" ? { itemIds?: Id<'items'>[] } :
   T extends "/add-item" ? { outfitId?: Id<'outfits'>, itemIds?: Id<'items'>[] } :
   T extends "/admin/bots/generate" ? { userId?: Id<'users'> | null } :
+  T extends "/admin/bots/outfits/extractor" ? { userId?: Id<'users'> | null } :
   never;
 
 const LINKED_ROUTES: { parent: Route, child: Route }[] = [

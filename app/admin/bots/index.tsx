@@ -1,4 +1,4 @@
-import { useRouter } from "@/hooks";
+import { ROUTES, useRouter } from "@/hooks";
 import { api, useQuery } from "@/lib/convex/client";
 import { Badge } from "@ui/badge";
 import { Block } from "@ui/block";
@@ -11,7 +11,7 @@ import { Pressable } from "@ui/pressable";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
-import { Platform, View, ViewStyle } from "react-native";
+import { View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 
 type SharedProps = { style?: ViewStyle }
@@ -143,7 +143,7 @@ export const WaitingBots = (props: SharedProps) => {
                     @{i.user?.username}
                   </Text.Sm>
                   <Text.Base color={Colors.neutral[50]}>
-                    Last posted {i.lastGeneratedAt > 0 ? Math.floor((Date.now() - i.lastGeneratedAt) / (1000 * 60 * 60 * 24)) : 0} days ago
+                    Last posted {i.lastGeneratedAt > 0 ? Math.floor((Date.now() - i.lastGeneratedAt) / (1000 * 60 * 60 * 24)) : 999} days ago
                   </Text.Base>
                 </View>
                 <ArrowUpRight size={20} color={Colors.primary[500]} />
@@ -176,7 +176,9 @@ export const Bots = (props: SharedProps) => {
         numColumns={3}
         renderItem={({ item }) => (
           <Pressable
-            onPress={() => push(`/admin/bots/generate`, { params: { userId: item._id } })}
+            onLongPress={() => push(ROUTES.USER.PATH, { pathParams: { id: item._id } })}
+            onPress={() => push(ROUTES.ADMIN.BOTS.OUTFITS.EXTRACTOR, { params: { userId: item._id } })}
+            // onPress={() => push(`/admin/bots/generate`, { params: { userId: item._id } })}
             style={{
               marginHorizontal: 12,
               justifyContent: 'center',
@@ -202,7 +204,7 @@ export const Bots = (props: SharedProps) => {
       />
       <Button
         variant="blur"
-        style={{ marginBottom: Platform.OS === 'web' ? 12 : 0 }}
+        style={{ marginBottom: 12 }}
         onPress={() => router.push('/admin/bots/create')}>
         Create one
       </Button>

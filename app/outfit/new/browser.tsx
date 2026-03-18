@@ -1,8 +1,8 @@
 import { useAccount } from "@/lib/convex/auth";
 import { api, useQueryCached } from "@/lib/convex/client";
 import { useItem } from "@/modules/items/_hooks/useItem";
-import { BrowserItems } from "@/modules/outfits/browser/browser.items";
-import { Browser, BrowserProductData } from "@/modules/outfits/browser/browser.view";
+import { BrowserItemsList } from "@/modules/outfits/browser/browser.items-list";
+import { Browser, BrowserProductData, BrowserProductItem } from "@/modules/outfits/browser/browser.view";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
 import { ArrowRight, Check, Plus, TShirt, X } from "@ui/icons";
@@ -15,7 +15,7 @@ import { router } from "expo-router";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { nanoid } from "nanoid/non-secure";
 import { useRef, useState } from "react";
-import { Dimensions, StyleSheet, View, ViewStyle } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 
 type RoundedButtonProps = {
@@ -45,8 +45,7 @@ const RoundedButton = ({ onPress, style, badgeCount, icon: Icon, variant = "blur
   )
 }
 
-type ExtractedImage = { url: string, width: number, height: number, selected?: boolean }
-type Item = { key: string, url: string, name: string, description?: string, images: ExtractedImage[] }
+type Item = Omit<BrowserProductItem, 'images'> & { images: (BrowserProductItem['images'][number] & { selected: boolean })[] };
 export const itemsAtom = atom<Item[]>([]);
 
 const showItemsAtom = atom(false);
@@ -78,64 +77,34 @@ const OutfitItems = () => {
   const [items, setItems] = useAtom(itemsAtom);
   const [opened, setOpened] = useAtom(showItemsAtom);
 
-  const { setCurrentUrl } = Browser.useContext();
-
   return (
-    <AnimatePresence>
-      {opened && <MotiView
-        from={{ height: 0 }}
-        animate={{ height: 'auto' }}
-        exit={{ translateY: 16 }}
-        exitTransition={{ duration: 500 }}
-        style={{
-          maxHeight: 320,
-          overflow: 'hidden',
-          borderRadius: 20,
-          width: '100%',
-        }}>
-        <BrowserItems
-          onNavigateToItem={(id) => {
-            const item = items.find(i => i.key === id);
-            if (item) setCurrentUrl(item.url);
-          }}
-          onRemoveItem={(id) => {
-            setItems(p => {
-              const updated = p.filter(i => i.key !== id);
-              if (updated.length === 0) setOpened(false);
-              return updated;
-            });
-          }}
-          items={items.map((p) => ({
-            ...p,
-            title: p.name,
-            id: p.key,
-            description: p.description ?? '',
-            images: p.images.map((i) => ({ ...i }))
-          }))}
-          onSelectImage={(item) => {
-            setItems(p => {
-              const index = p.findIndex(i => i.key === item.id);
-              if (index === -1) return p;
-              const image = p[index].images.find(img => img.url === item.url);
-              if (!image) return p;
-              const newItem = {
-                ...p[index],
-                images: p[index].images.map(i => ({ ...i, selected: i.url === image.url }))
-              };
-              const newPending = [...p];
-              newPending[index] = newItem;
-              return newPending;
-            })
-          }}
-          style={{
-            width: Dimensions.get("screen").width,
-            backgroundColor: Colors.background,
-            padding: 12,
-            paddingBottom: 0,
-          }}
-        />
-      </MotiView>}
-    </AnimatePresence>
+    <BrowserItemsList
+      items={items}
+      onClose={() => setOpened(false)}
+      isOpen={opened}
+      onRemoveItem={(id) => {
+        setItems(p => {
+          const updated = p.filter(i => i.key !== id);
+          if (updated.length === 0) setOpened(false);
+          return updated;
+        });
+      }}
+      onSelectImage={(item) => {
+        setItems(p => {
+          const index = p.findIndex(i => i.key === item.id);
+          if (index === -1) return p;
+          const image = p[index].images.find(img => img.url === item.url);
+          if (!image) return p;
+          const newItem = {
+            ...p[index],
+            images: p[index].images.map(i => ({ ...i, selected: i.url === image.url }))
+          };
+          const newPending = [...p];
+          newPending[index] = newItem;
+          return newPending;
+        })
+      }}
+    />
   )
 }
 
@@ -152,36 +121,37 @@ const styles = StyleSheet.create({
   }
 })
 
-
-
 export default function Screen() {
   const setShowList = useSetAtom(showItemsAtom);
   const [added, setAdded] = useState(false);
   const listen = useRef(false);
 
   const extractProductRef = useRef<(callback?: (data: BrowserProductData) => void) => void>(() => { });
-  const [item, setItem] = useState<BrowserProductData | null>(null);
+  const [item, setItem] = useState<BrowserProductItem | null>(null);
   const [items, setItems] = useAtom(itemsAtom);
 
   const [loading, setLoading] = useState(false);
   const { create } = useItem.Create();
 
   const handleProductExtracted = (data: BrowserProductData) => {
-    if (data.images.length === 0) return null;
-    setItem(data);
+    const items = data.items?.filter((i) => i.images.length > 0);
+    setItem(items?.[0] ?? null);
 
-    data.images.forEach((img) => { prefetch(img.url) });
+    items?.map((i) => i.images).flat().forEach((img) => { prefetch(img.url) });
+
+    const newItems = (items ?? []).map((item) => ({
+      key: nanoid(),
+      url: item.url,
+      brand: item.brand,
+      title: item.title,
+      description: item.description,
+      images: item.images.map((img, i) => ({ ...img, selected: i === 0 })),
+    }))
 
     if (listen.current) {
       listen.current = false;
       setAdded(true);
-      setItems(p => [...p, {
-        key: nanoid(),
-        url: data.url,
-        name: data.title,
-        description: data.description,
-        images: data.images.map((img, i) => ({ ...img, selected: i === 0 })),
-      }]);
+      setItems(p => [...p, ...newItems]);
       setTimeout(() => { setAdded(false); }, 1200);
     }
   };
@@ -246,7 +216,8 @@ export default function Screen() {
                       await create({
                         key: item.key,
                         url: item.url,
-                        name: item.name,
+                        name: item.title,
+                        brand: item.brand,
                         description: item.description,
                         image: item.images.find(i => i.selected) || item.images[0],
                         createdAt: Date.now(),
