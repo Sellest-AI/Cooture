@@ -4,13 +4,14 @@ import { Badge } from "@ui/badge";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
 import { FlashList } from "@ui/flat-list";
-import { ArrowUpRight, Loader } from "@ui/icons";
+import { ArrowUpRight, Camera, Loader, TShirt, User } from "@ui/icons";
 import { Image } from "@ui/image";
-import { ModalHeader } from "@ui/modal";
+import { Modal, ModalHeader } from "@ui/modal";
 import { Pressable } from "@ui/pressable";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
+import { useState } from "react";
 import { View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 
@@ -164,6 +165,8 @@ export const Bots = (props: SharedProps) => {
   const { push } = useRouter();
   const { data: bots } = useQuery(api.router.admin.bots.getAll.admin);
 
+  const [modal, setModal] = useState<string | null>(null);
+
   return (
     <View style={props.style}>
       <Text.H4 color={Colors.neutral[50]}>Bots</Text.H4>
@@ -175,31 +178,64 @@ export const Bots = (props: SharedProps) => {
         style={{ marginTop: 20 }}
         numColumns={3}
         renderItem={({ item }) => (
-          <Pressable
-            onLongPress={() => push(ROUTES.USER.PATH, { pathParams: { id: item._id } })}
-            onPress={() => push(ROUTES.ADMIN.BOTS.OUTFITS.EXTRACTOR, { params: { userId: item._id } })}
-            // onPress={() => push(`/admin/bots/generate`, { params: { userId: item._id } })}
-            style={{
-              marginHorizontal: 12,
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginBottom: 24,
-              flex: 1,
-            }}
-          >
-            <Badge
-              source={item.image ?? require('assets/backgrounds/dark-gradient.png')}
-              style={{ width: 86, height: 86, marginBottom: 16 }}
-            />
-            <Text.Sm
-              numberOfLines={1}
-              color={Colors.neutral[400]}
-              style={{ textAlign: 'center' }}
-              weight={600}
+          <>
+            <Pressable
+              onLongPress={() => push(ROUTES.USER.PATH, { pathParams: { id: item._id } })}
+              // onPress={() => push(`/admin/bots/generate`, { params: { userId: item._id } })}
+              onPress={() => setModal(item._id)}
+              style={{
+                marginHorizontal: 12,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: 24,
+                flex: 1,
+              }}
             >
-              @{item.username}
-            </Text.Sm>
-          </Pressable>
+              <Badge
+                source={item.image ?? require('assets/backgrounds/dark-gradient.png')}
+                style={{ width: 86, height: 86, marginBottom: 16 }}
+              />
+              <Text.Sm
+                numberOfLines={1}
+                color={Colors.neutral[400]}
+                style={{ textAlign: 'center' }}
+                weight={600}
+              >
+                @{item.username}
+              </Text.Sm>
+            </Pressable>
+            <Modal
+              open={modal === item._id}
+              onOpenChange={(v) => setModal(v ? item._id : null)}
+              header={{
+                title: item.name,
+              }}
+            >
+              <View style={{ padding: 12, paddingTop: 0, gap: 12 }}>
+                <Button
+                  variant="blur"
+                  onPress={() => { push(ROUTES.USER.PATH, { pathParams: { id: item._id } }); setModal(null); }}
+                  startIcon={User}
+                >
+                  View profile
+                </Button>
+                <Button
+                  variant="blur"
+                  onPress={() => { push('/admin/bots/generate', { pathParams: { id: item._id } }); setModal(null); }}
+                  startIcon={Camera}
+                >
+                  Generate Photoshoot
+                </Button>
+                <Button
+                  variant="blur"
+                  onPress={() => { push(ROUTES.ADMIN.BOTS.OUTFITS.EXTRACTOR, { pathParams: { id: item._id } }); setModal(null); }}
+                  startIcon={TShirt}
+                >
+                  Extract Outfits
+                </Button>
+              </View>
+            </Modal>
+          </>
         )}
       />
       <Button

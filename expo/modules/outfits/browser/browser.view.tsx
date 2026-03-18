@@ -400,8 +400,9 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
               <Home color={Colors.foreground} size={24} />
             </Pressable>
             <FaviconPressable
-              favicon="https://play-lh.googleusercontent.com/KvjPFAHzgHACNxLyic2KQTHHxLEb0gQx_-lNx46XB7antXXkBiHNq67fAqOrBlIVfcZR"
-              onPress={() => navigateTo("https://www.forever21.com/")}
+              favicon="https://www.endclothing.com/static/images/end-logo.svg"
+              onPress={() => navigateTo("https://www.endclothing.com")}
+              contain
             />
             <FaviconPressable
               favicon="https://play-lh.googleusercontent.com/Iwk_bPilB4vXqMjXVX1aYD3yhihBzpGuVm3bEqPRcuX-Mz0sQJmN3ukpooXpL_lXoQ"
@@ -419,9 +420,12 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
   )
 }
 
-const FaviconPressable = ({ favicon, onPress }: { favicon: string; onPress: () => void }) => <Pressable onPress={onPress}>
+const FaviconPressable = ({ favicon, onPress, contain }: { favicon: string; onPress: () => void, contain?: boolean }) => <Pressable
+  style={{ backgroundColor: 'white', borderRadius: 8, overflow: 'hidden', padding: contain ? 4 : 0, width: 24, height: 24 }}
+  onPress={onPress}>
   <Image
-    style={{ width: 24, height: 24, borderRadius: 8 }}
+    contentFit={contain ? "contain" : "cover"}
+    style={{ flex: 1 }}
     source={favicon}
   />
 </Pressable>
