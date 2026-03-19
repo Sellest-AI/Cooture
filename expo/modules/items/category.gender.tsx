@@ -7,6 +7,7 @@ type Props = {
   style?: ComponentProps<typeof Category>['style'];
   title: ComponentProps<typeof Category>['title'];
   onPress?: (value: typeof categories[number]['value']) => void;
+  disabled?: boolean;
 };
 
 const categories = [

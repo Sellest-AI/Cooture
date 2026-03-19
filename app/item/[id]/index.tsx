@@ -149,6 +149,9 @@ export default function ItemScreen() {
   const { push, redirect } = useRouter('/item/[id]');
   const { item, isLoading, update } = useItem(id);
 
+  const { user } = useAccount();
+  const disabled = (id: Id<'users'>) => user?._id !== id;
+
   if (isLoading || !item) {
     return <LoadingBlock style={{ height: 'auto' }} />
   }
@@ -205,13 +208,13 @@ export default function ItemScreen() {
           <LinkBlock />
           <ColorsBlock />
           <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
-            <ItemCategory title={item.category} onPress={(category) => update({ category })} />
-            <WeatherCategory title={item.weatherTags[0]} onPress={(weather) => update({ weatherTags: [weather, ...item.weatherTags.slice(1)] })} />
+            <ItemCategory title={item.category} onPress={(category) => update({ category })} disabled={disabled(item.userId)} />
+            <WeatherCategory title={item.weatherTags[0]} onPress={(weather) => update({ weatherTags: [weather, ...item.weatherTags.slice(1)] })} disabled={disabled(item.userId)} />
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
-            <ColorCategory title={item.colorTones[0]} onPress={(color) => update({ colorTones: [color, ...item.colorTones.slice(1)] })} />
-            <FeelCategory title={item.materialFeel} onPress={(materialFeel) => update({ materialFeel })} />
-            <GenderCategory title={item.gender} onPress={(gender) => update({ gender })} />
+            <ColorCategory title={item.colorTones[0]} onPress={(color) => update({ colorTones: [color, ...item.colorTones.slice(1)] })} disabled={disabled(item.userId)} />
+            <FeelCategory title={item.materialFeel} onPress={(materialFeel) => update({ materialFeel })} disabled={disabled(item.userId)} />
+            <GenderCategory title={item.gender} onPress={(gender) => update({ gender })} disabled={disabled(item.userId)} />
           </View>
           <DeleteOutfitButton />
         </SafeAreaView>

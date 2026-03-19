@@ -23,7 +23,7 @@ export const SelectedItemModal = ({ itemId, onRemove, ...props }: SelectedItemMo
       header={{ title: item?.name ?? '' }}
     >
       {({ close }) => !item ? null : (
-        <View style={{ paddingTop: 12 }}>
+        <View style={{ paddingTop: 12, paddingBottom: 12 }}>
           <CardItem
             image={item.image}
             source={item.image.sizes.medium.url}
@@ -44,7 +44,7 @@ export const SelectedItemModal = ({ itemId, onRemove, ...props }: SelectedItemMo
           {item.link && <Button
             variant="blur"
             startIcon={Globe}
-            style={{ marginTop: 12 }}
+            style={{ marginTop: 8 }}
             onPress={() => item.link && Linking.openURL(item.link)}
           >
             Open Website
@@ -52,13 +52,13 @@ export const SelectedItemModal = ({ itemId, onRemove, ...props }: SelectedItemMo
           <Button
             variant="blur"
             startIcon={ExternalLink}
-            style={{ marginTop: 12 }}
+            style={{ marginTop: 8 }}
             onPress={() => router.push(ROUTES.ITEM.ID(item._id))}
           >
             View Details
           </Button>
           <Button
-            style={{ marginTop: 12 }}
+            style={{ marginTop: 8 }}
             variant="blur"
             onPress={() => close()}
           >

@@ -2,10 +2,12 @@ import { Firm, Medium, Rigid, Soft } from "@ui/icons";
 import { ComponentProps } from "react";
 import { Categories } from "./categories";
 import { Category } from "./category";
+
 type Props = {
   style?: ComponentProps<typeof Category>['style'];
   title: ComponentProps<typeof Category>['title'];
   onPress?: (value: typeof categories[number]['value']) => void;
+  disabled?: boolean;
 };
 
 const categories = [

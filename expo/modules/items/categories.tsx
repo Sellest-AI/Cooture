@@ -9,9 +9,10 @@ type Props<T extends string> = {
   style?: React.ComponentProps<typeof Category>['style'];
   categoryTitle: string;
   onPress?: (value: T) => void;
+  disabled?: boolean;
 }
 
-export const Categories = <T extends string>({ value, categories, categoryTitle, onPress, ...props }: Props<T>) => {
+export const Categories = <T extends string>({ value, categories, categoryTitle, onPress, disabled, ...props }: Props<T>) => {
   const [open, setOpen] = useState(false);
 
   const Icon = categories.find(i => i.value === value)?.icon || categories[0].icon;
@@ -22,7 +23,7 @@ export const Categories = <T extends string>({ value, categories, categoryTitle,
         {...props}
         icon={Icon}
         title={value}
-        onPress={() => setOpen(true)}
+        onPress={disabled ? undefined : () => setOpen(true)}
       />
       <Modal
         onOpenChange={setOpen}
