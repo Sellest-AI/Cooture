@@ -1,4 +1,5 @@
 import { VideoView as ExpoVideoView, useVideoPlayer } from "expo-video";
+import { useEffect } from "react";
 import { ViewStyle } from "react-native";
 
 type VideoViewProps = {
@@ -9,12 +10,14 @@ type VideoViewProps = {
 
 export const VideoView = ({ style, source, contentFit }: VideoViewProps) => {
   const player = useVideoPlayer(source, player => {
-    try {
-      player.loop = true;
-      player.muted = true;
-      requestAnimationFrame(() => { try { player.play(); } catch { } })
-    } catch { }
+    player.loop = true;
+    player.muted = true;
   });
+
+  useEffect(() => {
+    if (!player) return;
+    try { player.play(); } catch { }
+  }, [player, source]);
 
   return (
     <ExpoVideoView
