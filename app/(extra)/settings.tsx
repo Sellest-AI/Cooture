@@ -38,7 +38,7 @@ const SectionButton = ({ icon, text, style, onPress }: Props) => {
           style={{ padding: 14 }}>
           <Icon color={Colors.neutral[50]} size={20} />
         </Block>
-        <Text.Base color={Colors.neutral[50]} weight={500}>
+        <Text.Base color={Colors.neutral[50]} weight={500} numberOfLines={1}>
           {text}
         </Text.Base>
       </View>
@@ -164,7 +164,7 @@ export default function SettingsScreen() {
           <Text.Sm weight={500} color={Colors.neutral[400]} style={{ marginBottom: 4 }}>More</Text.Sm>
           <SectionButton
             icon={Package}
-            text={`Update ${currentlyRunning.runtimeVersion} - ${currentlyRunning.createdAt?.toLocaleDateString() ?? 'X'} - ${isUpdateAvailable ? "Update available" : "App is up to date"}`}
+            text={`${currentlyRunning.runtimeVersion} - ${currentlyRunning.createdAt?.toLocaleDateString() ?? 'X'} - ${isUpdateAvailable ? "Update available" : "Up to date"}`}
             onPress={async () => { await fetchUpdateAsync(); await reloadAsync(); }}
           />
         </View>
