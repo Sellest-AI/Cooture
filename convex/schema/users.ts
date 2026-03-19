@@ -54,6 +54,7 @@ export const usersExtended = defineTable({
   .index("by_username", ["username"])
   .index("by_stripe_customer_id", ["stripeCustomerId"])
   .index("by_revenuecat_user_id", ["revenueCatUserId"])
+  .index("by_account_status", ["accountStatus"])
   .searchIndex("search_username", { searchField: "username" })
   .searchIndex("search_name", { searchField: "name" });
 

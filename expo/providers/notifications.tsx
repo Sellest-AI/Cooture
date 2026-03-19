@@ -27,6 +27,10 @@ async function registerForPushNotificationsAsync() {
   if (Platform.OS === 'web') return null;
 
   if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync("system", {
+      name: "System Notifications",
+      importance: Notifications.AndroidImportance.MAX,
+    });
     await Notifications.setNotificationChannelAsync("streak", {
       name: "Daily Streak Reminders",
       importance: Notifications.AndroidImportance.MAX,

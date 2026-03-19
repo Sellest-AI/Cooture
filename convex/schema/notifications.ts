@@ -6,6 +6,7 @@ export const NOTIFICATION_TYPE = v.union(
   v.literal("new_like"),
   v.literal("new_follower"),
   v.literal("tagged_in_generation"),
+  v.literal("waitlist_approval"),
 )
 
 export const NOTIFICATION_CHANNEL: Record<typeof NOTIFICATION_TYPE['type'], string> = {
@@ -13,6 +14,7 @@ export const NOTIFICATION_CHANNEL: Record<typeof NOTIFICATION_TYPE['type'], stri
   "new_like": "social",
   "new_follower": "social",
   "tagged_in_generation": "social",
+  "waitlist_approval": "system",
 }
 
 export const notifications = defineTable({
