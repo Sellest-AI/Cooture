@@ -1,4 +1,3 @@
-import { useDebounce } from '@/hooks';
 import { useAccount } from '@/lib/convex/auth';
 import { LogoLoading } from '@ui/icons';
 import { Authenticated, AuthLoading, Unauthenticated } from 'convex/react';
@@ -10,7 +9,7 @@ import { Colors } from 'theme';
 
 const LoadingView = () => {
   const [init, setInit] = useState(false);
-  useEffect(() => { setTimeout(() => setInit(true), 500) }, [])
+  useEffect(() => { setTimeout(() => setInit(true), 300) }, [])
   return (<View style={{
     backgroundColor: Colors.background,
     position: 'absolute',
@@ -29,8 +28,7 @@ type Props = {
 
 const AuthenticationGate = () => {
   const { user, isInWaitlist } = useAccount();
-  const _pathname = usePathname();
-  const pathname = useDebounce(_pathname, 500);
+  const pathname = usePathname();
 
   if (!user) return <LoadingView />;
 
@@ -62,6 +60,8 @@ const UnauthenticatedGate = () => {
 }
 
 export const AuthProvider = ({ children }: Props) => {
+  const { isAuthenticating } = useAccount.Authenticated();
+
   return <>
     {children}
     <AuthLoading>
@@ -73,5 +73,6 @@ export const AuthProvider = ({ children }: Props) => {
     <Unauthenticated>
       <UnauthenticatedGate />
     </Unauthenticated>
+    {isAuthenticating && <LoadingView />}
   </>;
 }

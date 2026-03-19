@@ -4,6 +4,7 @@ import { makeRedirectUri } from "expo-auth-session";
 import { Href, router } from "expo-router";
 import { reloadAsync } from "expo-updates";
 import { openAuthSessionAsync } from "expo-web-browser";
+import { atom, useAtom } from "jotai";
 import { useCallback, useState } from "react";
 import { Platform } from "react-native";
 import { ROUTES } from "routes";
@@ -14,6 +15,7 @@ export const useAuthActions = () => {
   const convex = useConvexAuthActions();
   const { mutate: getTestAccount } = useMutation(api.router.auth.getTestAccount.anon);
 
+  const { setAuthenticating } = useAuthenticated();
   const [isLoading, setIsLoading] = useState(false);
 
   const signIn = useCallback(async (provider: "apple" | "google", route?: Href) => {
@@ -22,6 +24,8 @@ export const useAuthActions = () => {
     const { redirect } = await convex.signIn(provider, { redirectTo });
 
     if (Platform.OS === "web") { return; }
+
+    setAuthenticating(true);
 
     const result = await openAuthSessionAsync(redirect!.toString(), redirectTo);
     if (result.type === "success") {
@@ -36,7 +40,7 @@ export const useAuthActions = () => {
     }
     setIsLoading(false);
     return result.type === "success";
-  }, [convex]);
+  }, [convex, setAuthenticating]);
 
   const signInGoogle = useCallback(async (route?: Href) => signIn("google", route), [signIn]);
   const signInApple = useCallback(async (route?: Href) => signIn("apple", route), [signIn]);
@@ -52,6 +56,7 @@ export const useAuthActions = () => {
   }, [convex]);
 
   const signOut = useCallback(() => {
+    setAuthenticating(true);
     router.push(ROUTES.AUTH);
     setTimeout(() => {
       convex.signOut();
@@ -65,7 +70,7 @@ export const useAuthActions = () => {
         // window.location.reload();
       }, 500);
     }, 300)
-  }, [convex]);
+  }, [convex, setAuthenticating]);
 
   return {
     isLoading,
@@ -116,4 +121,18 @@ const useWallet = () => {
   return { wallet };
 }
 
+const authenticatingAtom = atom(false);
+const useAuthenticated = () => {
+  const [isAuthenticating, _setAuthenticating] = useAtom(authenticatingAtom);
+  const setAuthenticating = (value: boolean) => {
+    if (value) { setTimeout(() => _setAuthenticating(false), 5000); }
+    _setAuthenticating(value);
+  }
+  return {
+    isAuthenticating,
+    setAuthenticating
+  }
+}
+
 useAccount.Wallet = useWallet;
+useAccount.Authenticated = useAuthenticated;
