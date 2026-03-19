@@ -1,7 +1,7 @@
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Block } from "@ui/block";
 import { BlurKeys } from "@ui/blur-view";
-import { Compass, Home, Package, Plus, User } from "@ui/icons";
+import { BookmarkIcon, Compass, Home, Plus, User } from "@ui/icons";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Tabs } from "expo-router";
 import { useRef } from "react";
@@ -135,7 +135,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="collection"
         options={{
-          tabBarIcon: ({ color, size }) => <Package color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <BookmarkIcon color={color} size={size} />,
         }}
       />
       <Tabs.Screen

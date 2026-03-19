@@ -18,9 +18,9 @@ export const PremiumBlock = ({ style }: Props) => {
         variant="blur"
         style={{
           borderRadius: 28,
-          paddingLeft: 10,
+          paddingLeft: 8,
           paddingRight: 4,
-          paddingVertical: 10,
+          paddingVertical: 8,
           flexDirection: "row",
           justifyContent: "center",
           alignItems: "center",

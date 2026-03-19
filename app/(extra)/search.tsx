@@ -178,10 +178,8 @@ export default function Screen() {
             </View>
           ))}
         </> : undefined}
-        style={{
-          marginTop: 24,
-          paddingHorizontal: 4,
-        }}
+        style={{ paddingHorizontal: 4 }}
+        contentContainerStyle={{ paddingTop: 24 }}
         data={data.length > 0 ? data : []}
         masonry
         numColumns={2}
@@ -198,8 +196,8 @@ export default function Screen() {
             />
           ))}
           {data.length > 0 && <View style={{
-            marginTop: 12,
-            marginBottom: 40,
+            marginTop: 0,
+            marginBottom: 32,
             width: '100%',
             height: 1,
             backgroundColor: Colors.blur.dark,
