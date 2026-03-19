@@ -29,16 +29,7 @@ export const anon = publicQuery({
       .filter((q) => q.lte(q.field('_creationTime'), maxAge))
       .paginate(paginationOpts);
 
-    // ⚠️ Fallback to get more items if we don't have enough items
-    // This can happen if the algorithm sucks and too much newest posts have Bigger scores than Older TRENDING posts
-    // For example if we retrieve 30 items but users created 100 in the last minute and they have bigger scores than TRENDING posts
-    // Then it will search through ALL the database, so we need to Monitor this and fix it ⚠️
-    const extra = scores.page.length > 0 ? [] : (await ctx.db.query('feedScores')
-      .withIndex('by_creation_time', (q) => q.lte('_creationTime', maxAge))
-      .order('desc')
-      .paginate(paginationOpts)).page;
-
-    const allScores = [...scores.page, ...extra]
+    const allScores = [...scores.page]
       .sort((a, b) => b.score - a.score)
       // Filter duplicates
       .filter((score, index, self) => index === self.findIndex((s) => s._id === score._id));
@@ -62,7 +53,6 @@ export const anon = publicQuery({
 
       return null;
     }).filter(notEmpty);
-
 
     return { ...scores, page: feed };
   }
