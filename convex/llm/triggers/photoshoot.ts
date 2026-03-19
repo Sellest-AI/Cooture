@@ -45,6 +45,10 @@ const generateFunction = async (ctx: ActionCtx, args: {
   const schema = await createPhotoshootSchema(ctx, baseSchema, subjects);
   const prompt = await schemaToMarkdown(schema.prompt);
 
+  // only add extra users to generation, not the main user
+  const extraUsers = Array.from(new Set(subjects.map(s => s.userId)))
+    .filter(id => id !== args.userId).slice(0, schema.prompt.subjects.length - 1);
+
   // seedream 4.5 has a max prompt length of 2000 characters, 
   // so we need to shrink the prompt if it's too long
   const shrinkedPrompt = sliceText(prompt, 2000);
@@ -64,7 +68,7 @@ const generateFunction = async (ctx: ActionCtx, args: {
     // Create new generation
     await ctx.runMutation(internal.router.generations.createOne._internal, {
       userId: args.userId,
-      extraUserIds: subjects.map(s => s.userId).slice(schema.prompt.subjects.length), // only add extra users to generation, not the main user
+      extraUserIds: extraUsers,
       predictionIds: predictions.map(p => p.id),
       preset: {
         presetId: preset._id,
