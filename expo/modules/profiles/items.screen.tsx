@@ -29,7 +29,7 @@ export function Screen() {
         description="You haven't added any items yet. Start scanning to see your items here."
         cta={isOwnProfile && {
           label: "Scan an item",
-          onPress: () => router.push(ROUTES.TABS.NEW)
+          onPress: () => router.push(ROUTES.OUTFIT.NEW)
         }}
       />
     )

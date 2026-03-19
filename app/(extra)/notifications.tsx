@@ -4,12 +4,12 @@ import { EmptyBlock } from "@ui/block.empty";
 import { Notification } from "@ui/cards";
 import { Bell } from "@ui/icons";
 import { ModalHeader } from "@ui/modal";
+import { SafeAreaView } from "@ui/safe-area-view";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { Text } from "@ui/text";
 import { mergeLoadMoreArrays, notEmpty } from "@utils/convex-allowed";
 import { router } from "expo-router";
 import { useCallback } from "react";
-import { View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -146,7 +146,7 @@ export default function Screen() {
 
   const pendingGenerations = generations.filter((g) => g.status !== 'COMPLETED');
 
-  const Component = isEmpty ? View : SafeScrollView;
+  const Component = isEmpty ? SafeAreaView : SafeScrollView;
 
   return (
     <Component
