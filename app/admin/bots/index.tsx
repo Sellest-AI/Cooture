@@ -211,7 +211,7 @@ export const Bots = (props: SharedProps) => {
                 title: item.name,
               }}
             >
-              <View style={{ padding: 12, paddingTop: 0, gap: 12 }}>
+              <View style={{ paddingBottom: 12, gap: 8 }}>
                 <Button
                   variant="blur"
                   onPress={() => { push(ROUTES.USER.PATH, { pathParams: { id: item._id } }); setModal(null); }}

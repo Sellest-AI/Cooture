@@ -223,7 +223,7 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
           />}
           <StickyView
             topOffset={Platform.OS === 'web' ? -48 : -12}
-            style={{ marginBottom: 24, marginTop: 16 }}
+            style={{ marginBottom: 24, marginTop: 0 }}
             onLayout={(e) => {
               slotRef.current = e.nativeEvent.layout;
             }}
