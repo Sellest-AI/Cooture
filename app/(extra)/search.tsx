@@ -166,6 +166,7 @@ export default function Screen() {
       </View>
       <FlashList
         scrollEnabled={!showLoading}
+        showsVerticalScrollIndicator={false}
         ListEmptyComponent={showLoading ? <>
           <UserSkeleton style={{ marginBottom: 24 }} />
           <UserSkeleton style={{ marginBottom: 24 }} />

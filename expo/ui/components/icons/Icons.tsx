@@ -41,7 +41,7 @@ export {
 // General Icons
 export {
   ALargeSmall, ArrowLeft, ArrowRight, ArrowUpRight, AtSign, Bell, Camera, Check, ChevronRight, CircleFadingArrowUp, Clock9, Compass, Copy, Download, ExternalLink, EyeClosed, Feather, Flame, Gift, Globe, Home, ImageIcon, ImageUp, LinkIcon,
-  Lock, Mail, Package, Palette, Pause, Pencil, Play, Plus, Puzzle, QrCode, Rewind, ScanLine, Search, Settings, Shapes, ShareIcon, SkipBack, SkipForward, Smile, Snowflake, Star, Sun, Tags, Trash, Shirt as TShirt, User, UserRoundCheck, UserRoundPlus, Users, X
+  Lock, Mail, Package, Palette, Pause, Pencil, Play, Plus, Puzzle, QrCode, ScanLine, Search, Settings, Shapes, ShareIcon, SkipBack, SkipForward, Smile, Snowflake, Star, Sun, Tags, Trash, Shirt as TShirt, User, UserRoundCheck, UserRoundPlus, Users, X
 } from 'lucide-react-native';
 
 // General Icons

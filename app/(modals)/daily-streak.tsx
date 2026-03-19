@@ -348,6 +348,7 @@ export default function Screen() {
           flex: 1,
           width: '100%',
         }}
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: 28,
           paddingBottom: 32,

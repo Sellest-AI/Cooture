@@ -43,9 +43,11 @@ export default function Screen() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ScrollView style={{
-        padding: 12,
-      }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{
+          padding: 12,
+        }}>
         <ModalHeader
           title="Create an outfit"
           subtitle="Please wait for your items to be imported. This can take some times…"

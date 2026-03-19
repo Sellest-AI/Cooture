@@ -16,7 +16,7 @@ type Props = {
   endIcon?: React.ComponentType<{ size?: number, color?: string, style?: IconStyle }> | false;
   disabled?: boolean;
   href?: Parameters<ReturnType<typeof useRouter>['push']>[0];
-  size?: "rounded",
+  size?: "rounded" | "sm",
   align?: "center" | "left" | "right" | "stretch";
   isLoading?: boolean;
 } & ComponentProps<typeof Block> & Omit<ComponentProps<typeof Pressable>, 'style'>;
@@ -98,21 +98,21 @@ export const Button = ({ startIcon, startContent, endIcon, children, disabled, v
         >
           <View
             style={{
-              height: isRounded ? undefined : (style?.height ?? 56),
+              height: isRounded ? undefined : (style?.height ?? (size === "sm" ? 48 : 56)),
               position: 'relative',
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center',
-              gap: 12,
+              gap: size === "sm" ? 6 : 12,
               marginTop: -2,
-              paddingHorizontal: isRounded ? undefined : 24,
-              padding: isRounded ? 12 : 0,
+              paddingHorizontal: size === "sm" ? 14 : (isRounded ? undefined : 24),
+              padding: size === "sm" ? 8 : (isRounded ? 12 : 0),
               opacity: runtimeDisabled ? 0.4 : 1,
             }}
           >
             {(startContent && !isLoading) && startContent}
             {StartIcon && <StartIcon
-              size={20}
+              size={size === "sm" ? 18 : 20}
               color={colors.textColor}
             />}
             {typeof children === 'string' ? (
@@ -126,7 +126,7 @@ export const Button = ({ startIcon, startContent, endIcon, children, disabled, v
               </Text.Base>
             ) : (children)}
             {EndIcon && <EndIcon
-              size={20}
+              size={size === "sm" ? 18 : 20}
               color={colors.textColor}
             />}
           </View>
