@@ -10,12 +10,13 @@ export const authed = authMutation({
     sideImageId: v.optional(v.id("images")),
     smileImageId: v.optional(v.id("images")),
     heightCm: v.optional(v.number()),
+    gender: v.optional(v.union(v.literal("male"), v.literal("female"))),
     size: v.optional(userSizes)
     // topAngleImageId: v.id("images"),
   },
   handler: async (ctx, args) => {
     const { userId } = ctx;
-    const { frontImageId, sideImageId, smileImageId, heightCm, size } = args
+    const { frontImageId, sideImageId, smileImageId, heightCm, gender, size } = args
 
     const existingPortraits = await ctx.db.query("usersAppearance")
       .withIndex("by_user_id", (q) => q.eq("userId", userId)).first();
@@ -25,6 +26,7 @@ export const authed = authMutation({
       sideImageId,
       smileImageId,
       heightCm,
+      gender,
       size,
     })
 

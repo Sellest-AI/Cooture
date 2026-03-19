@@ -3,7 +3,7 @@ import { useAppearance } from "@/modules/profiles/_hooks/useAppearance";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
 import { FlashList, FlashListRef } from "@ui/flat-list";
-import { BodySize } from "@ui/icons";
+import { BodySize, Female, Male } from "@ui/icons";
 import { ModalHeader } from "@ui/modal";
 import Odometer from "@ui/odometer";
 import { Pressable } from "@ui/pressable";
@@ -134,6 +134,25 @@ const PhysicalAppearance = ({ value, onValueChange }: { value: SizeValue, onValu
   )
 }
 
+const GenderButton = ({ gender, onPress, selected }: { gender: string; onPress: () => void, selected: boolean }) => {
+  const Icon = gender === "male" ? Male : Female;
+  return (
+    <Pressable style={{ flex: 1 }} onPress={onPress}>
+      <Block variant={selected ? "primary" : "blur"}
+        style={{ aspectRatio: 1, flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+        <Icon size={48} color={selected ? Colors.primary[900] : Colors.neutral[50]} />
+        <Text.Base
+          weight={500}
+          style={{ maxWidth: 96, textAlign: 'center', lineHeight: 18 }}
+          color={selected ? Colors.primary[700] : Colors.neutral[400]}
+        >
+          {gender === "male" ? "Masculine" : "Feminine"} silhouette
+        </Text.Base>
+      </Block>
+    </Pressable>
+  )
+}
+
 export default function Screen() {
   const { redirect } = useRouter();
 
@@ -146,6 +165,11 @@ export default function Screen() {
   const { size, updateSize } = useAppearance();
   const [innerSize, setInnerSize] = useState(size || "average");
   useEffect(() => { if (size) setInnerSize(size) }, [size])
+
+  // Gender
+  const { gender, updateGender } = useAppearance();
+  const [innerGender, setInnerGender] = useState(gender || "female");
+  useEffect(() => { if (gender) setInnerGender(gender) }, [gender])
 
   return (
     <SafeScrollView
@@ -165,6 +189,31 @@ export default function Screen() {
         value={innerSize}
         onValueChange={(v) => setInnerSize(v)}
       />
+
+      {/* Sex */}
+      <View style={{ marginTop: 36, paddingHorizontal: 12 }}>
+        <View>
+          <Text.H4 color={Colors.neutral[50]}>
+            Your body type
+          </Text.H4>
+          <Text.Base color={Colors.neutral[400]} style={{ marginTop: 8 }}>
+            So we generate outfits that actually fit your silhouette
+          </Text.Base>
+        </View>
+        <View style={{ flexDirection: 'row', gap: 12, marginTop: 16 }}>
+          <GenderButton
+            gender="male"
+            selected={innerGender === "male"}
+            onPress={() => setInnerGender("male")}
+          />
+          <GenderButton
+            gender="female"
+            selected={innerGender === "female"}
+            onPress={() => setInnerGender("female")}
+          />
+        </View>
+      </View>
+
 
       {/* Height */}
       <View style={{ marginTop: 40, marginBottom: 20 }}>
@@ -192,6 +241,7 @@ export default function Screen() {
           />
         </View>
       </View>
+
       <View style={{
         justifyContent: 'flex-end',
         padding: 12,
@@ -205,6 +255,7 @@ export default function Screen() {
             if (!innerHeight) return;
             await updateHeight(innerHeight);
             await updateSize(innerSize);
+            await updateGender(innerGender);
 
             redirect({ fallbackTo: ROUTES.PROFILE.PATH });
           }}

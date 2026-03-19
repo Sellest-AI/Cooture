@@ -13,6 +13,11 @@ export const useAppearance = () => {
     await mutate({ size })
   }
 
+  const updateGender = async (gender: NonNullable<Doc<'usersAppearance'>['gender']>) => {
+    await mutate({ gender })
+  }
+
+
   return {
     isPending,
     frontImage: appearance?.frontImage,
@@ -20,8 +25,10 @@ export const useAppearance = () => {
     smileImage: appearance?.smileImage,
     heightCm: appearance?.heightCm,
     size: appearance?.size,
+    gender: appearance?.gender,
     updateHeight,
-    updateSize
+    updateSize,
+    updateGender
   }
 }
 
