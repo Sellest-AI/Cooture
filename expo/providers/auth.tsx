@@ -1,3 +1,4 @@
+import { useDebounce } from '@/hooks';
 import { useAccount } from '@/lib/convex/auth';
 import { LogoLoading } from '@ui/icons';
 import { Authenticated, AuthLoading, Unauthenticated } from 'convex/react';
@@ -28,7 +29,8 @@ type Props = {
 
 const AuthenticationGate = () => {
   const { user, isInWaitlist } = useAccount();
-  const pathname = usePathname();
+  const _pathname = usePathname();
+  const pathname = useDebounce(_pathname, 500);
 
   if (!user) return <LoadingView />;
 

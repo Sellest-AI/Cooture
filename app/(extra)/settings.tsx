@@ -6,6 +6,7 @@ import { ArrowLeft, Bell, Camera, ChevronRight, Lock, Package, Settings, TShirt 
 import { Image } from "@ui/image";
 import { LinearGradient } from "@ui/linear-gradient";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
+import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
 import { fetchUpdateAsync, reloadAsync, useUpdates } from 'expo-updates';
@@ -58,9 +59,8 @@ export default function SettingsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
-
       <ParallaxScrollView
-        contentContainerStyle={{ paddingBottom: 12, paddingHorizontal: 12 }}
+        contentContainerStyle={{ paddingHorizontal: 12 }}
         showsVerticalScrollIndicator={false}
         headerBackground={
           <View style={{ position: 'absolute', width: '100%', left: 0, top: 0, height: 212 }}>
@@ -168,13 +168,15 @@ export default function SettingsScreen() {
             onPress={async () => { await fetchUpdateAsync(); await reloadAsync(); }}
           />
         </View>
-        <Button
-          style={{ marginTop: 16 }}
-          variant="destructive"
-          onPress={() => { signOut(); }}
-        >
-          Sign out
-        </Button>
+        <SafeAreaView edges={{ top: 'off' }} style={{ paddingBottom: 12 }}>
+          <Button
+            style={{ marginTop: 16 }}
+            variant="destructive"
+            onPress={() => { signOut(); }}
+          >
+            Sign out
+          </Button>
+        </SafeAreaView>
       </ParallaxScrollView>
     </View>
   );
