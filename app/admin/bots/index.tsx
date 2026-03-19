@@ -221,14 +221,14 @@ export const Bots = (props: SharedProps) => {
                 </Button>
                 <Button
                   variant="blur"
-                  onPress={() => { push('/admin/bots/generate', { pathParams: { id: item._id } }); setModal(null); }}
+                  onPress={() => { push('/admin/bots/generate', { params: { userId: item._id } }); setModal(null); }}
                   startIcon={Camera}
                 >
                   Generate Photoshoot
                 </Button>
                 <Button
                   variant="blur"
-                  onPress={() => { push(ROUTES.ADMIN.BOTS.OUTFITS.EXTRACTOR, { pathParams: { id: item._id } }); setModal(null); }}
+                  onPress={() => { push(ROUTES.ADMIN.BOTS.OUTFITS.EXTRACTOR, { params: { userId: item._id } }); setModal(null); }}
                   startIcon={TShirt}
                 >
                   Extract Outfits

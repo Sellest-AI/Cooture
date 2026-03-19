@@ -47,6 +47,7 @@ const useNew = () => {
 
   const { data: outfit } = useQuery(api.router.outfits.getOne.anon, outfitId ? { outfitId } : 'skip');
   const { data: preset } = useQueryCached(api.router.presets.getOne.anon, presetId ? { presetId } : 'skip');
+  const { data: appearance } = useQueryCached(api.router.users.getAppearance.authed);
 
   const reset = () => {
     setOutfitSize('DEFAULT');
@@ -56,7 +57,7 @@ const useNew = () => {
   }
 
   const hasMultipleSubjects = preset?.hasMultipleSubjects;
-  const disabled = !preset || (hasMultipleSubjects && !friendId);
+  const disabled = !preset || (hasMultipleSubjects && !friendId) || !appearance?.frontImageId;
 
   return {
     outfit,
