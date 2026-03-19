@@ -8,6 +8,10 @@ export const getPortraits = async (ctx: QueryCtx, userId: Id<'users'>) => {
 
   if (!appearance) { return null; }
 
+  if (!appearance.frontImageId || !appearance.sideImageId || !appearance.smileImageId) {
+    return null;
+  }
+
   const [frontImage, sideImage, smileImage] = await Promise.all([
     getImage(ctx, appearance.frontImageId),
     getImage(ctx, appearance.sideImageId),

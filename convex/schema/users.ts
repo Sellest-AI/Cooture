@@ -66,9 +66,9 @@ export const userImages = defineTable({
 
 export const usersAppearance = defineTable({
   userId: v.id('users'),
-  frontImageId: v.id('images'),
-  sideImageId: v.id('images'),
-  smileImageId: v.id('images'),
+  frontImageId: v.optional(v.id('images')),
+  sideImageId: v.optional(v.id('images')),
+  smileImageId: v.optional(v.id('images')),
   heightCm: v.optional(v.number()),
   gender: v.optional(v.union(v.literal("male"), v.literal("female"))),
   size: v.optional(userSizes),

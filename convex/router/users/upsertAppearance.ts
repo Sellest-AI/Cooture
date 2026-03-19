@@ -40,7 +40,7 @@ export const authed = authMutation({
 
       if (existingPortraits.smileImageId && smileImageId)
         await ctx.scheduler.runAfter(1000, internal.router.storage.images.deleteOne._internal, {
-          imageId: existingPortraits.sideImageId
+          imageId: existingPortraits.smileImageId
         });
 
       if (existingPortraits.sideImageId && sideImageId)
@@ -51,15 +51,13 @@ export const authed = authMutation({
       return existingPortraits._id;
     }
 
-    if (!frontImageId || !sideImageId || !smileImageId)
-      throw new Error("Missing images for new portraits");
-
     return ctx.db.insert("usersAppearance", {
       userId,
       frontImageId,
       sideImageId,
       smileImageId,
       heightCm,
+      gender,
       size,
       // topAngleImageId,
     });
