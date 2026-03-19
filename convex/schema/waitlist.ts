@@ -2,7 +2,10 @@ import { defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export const waitlist = defineTable({
-  numberOfUsers: v.number(),
+  /** Number of users who have joined the waitlist */
+  numberOfUsersIn: v.number(),
+  /** Number of users who have left the waitlist */
+  numberOfUsersOut: v.number(),
   numberOfCodes: v.number(),
   numberOfUsedCodes: v.number(),
 });

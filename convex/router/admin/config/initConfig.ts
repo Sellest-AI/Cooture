@@ -14,7 +14,8 @@ export const _internal = internalMutation({
       await ctx.db.insert("waitlist", {
         numberOfCodes: 0,
         numberOfUsedCodes: 0,
-        numberOfUsers: 0,
+        numberOfUsersIn: 0,
+        numberOfUsersOut: 0,
       })
     }
 

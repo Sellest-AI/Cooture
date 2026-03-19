@@ -31,7 +31,7 @@ export const _private = internalMutation({
       createUserWallet(ctx, userId),
 
       // increment waitlist users count
-      updateWaitlist(ctx, { addUsers: 1 })
+      updateWaitlist(ctx, { addUsersIn: 1 })
     ])
 
     return true;

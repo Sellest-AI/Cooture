@@ -27,7 +27,7 @@ export const authed = authMutation({
     await ctx.db.patch(selectedCode._id, { usedById: user._id, usedAt: Date.now() });
     await ctx.db.patch(user._idExtended, { accountStatus: 'ACTIVE' });
 
-    await updateWaitlist(ctx, { addCodeUsed: true });
+    await updateWaitlist(ctx, { addCodeUsed: true, addUsersOut: 1 });
 
     return true;
   }

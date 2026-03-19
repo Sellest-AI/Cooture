@@ -32,7 +32,7 @@ export const _internal_query = internalQuery({
     const WAITING_USERS = 30000;
 
     return {
-      numberOfUsers: statistics.numberOfUsers + WAITING_USERS,
+      numberOfUsers: statistics.numberOfUsersIn + WAITING_USERS,
     }
   }
 })
