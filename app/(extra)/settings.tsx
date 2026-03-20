@@ -2,7 +2,7 @@ import { useRouter } from "@/hooks";
 import { useAccount, useAuthActions } from "@/lib/convex/auth";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
-import { ArrowLeft, Bell, Camera, ChevronRight, Lock, Package, Settings, TShirt } from "@ui/icons";
+import { ArrowLeft, Bell, Camera, ChevronRight, Gem, Lock, Package, Settings, TriangleAlert, TShirt } from "@ui/icons";
 import { Image } from "@ui/image";
 import { LinearGradient } from "@ui/linear-gradient";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
@@ -10,8 +10,10 @@ import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
 import { fetchUpdateAsync, reloadAsync, useUpdates } from 'expo-updates';
+import { WEBSITE } from "global";
 import { ReactNode } from "react";
 import { Linking, Platform, Pressable, View, ViewStyle } from "react-native";
+import Purchases from "react-native-purchases";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -48,12 +50,17 @@ const SectionButton = ({ icon, text, style, onPress }: Props) => {
   )
 }
 
-export default function SettingsScreen() {
+export default function Screen() {
   const { currentlyRunning, isUpdateAvailable } = useUpdates();
 
   const { replace, push } = useRouter();
   const { signOut } = useAuthActions();
-  const { user, isAdmin } = useAccount();
+  const { user, isAdmin, isPremium } = useAccount();
+
+  const manageSubscription = async () => {
+    if (isPremium) await Purchases.showManageSubscriptions();
+    else await push(ROUTES.MODALS.UPGRADE);
+  }
 
   if (!user) return null;
 
@@ -161,7 +168,21 @@ export default function SettingsScreen() {
         </View>
 
         <View style={{ marginTop: 24 }}>
-          <Text.Sm weight={500} color={Colors.neutral[400]} style={{ marginBottom: 4 }}>More</Text.Sm>
+          <Text.Sm weight={500} color={Colors.neutral[400]} style={{ marginBottom: 4 }}>Account</Text.Sm>
+          <SectionButton
+            icon={Gem}
+            text="Manage subscription"
+            onPress={async () => await manageSubscription()}
+          />
+          <SectionButton
+            icon={TriangleAlert}
+            text="Delete account"
+            onPress={async () => Linking.openURL(WEBSITE.HELP.DELETE_ACCOUNT)}
+          />
+        </View>
+
+        <View style={{ marginTop: 24 }}>
+          <Text.Sm weight={500} color={Colors.neutral[400]} style={{ marginBottom: 4 }}>System</Text.Sm>
           <SectionButton
             icon={Package}
             text={`${currentlyRunning.runtimeVersion} - ${currentlyRunning.createdAt?.toLocaleDateString() ?? 'X'} - ${isUpdateAvailable ? "Update available" : "Up to date"}`}

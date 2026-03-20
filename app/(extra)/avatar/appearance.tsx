@@ -8,7 +8,6 @@ import { ModalHeader } from "@ui/modal";
 import Odometer from "@ui/odometer";
 import { Pressable } from "@ui/pressable";
 import { SafeScrollView } from "@ui/safe-scroll-view";
-import { Slider } from "@ui/slider";
 import RulerSlider from "@ui/slider.ruler";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
@@ -114,7 +113,7 @@ const PhysicalAppearance = ({ value, onValueChange }: { value: SizeValue, onValu
           )
         }}
       />
-      <View style={{ paddingHorizontal: 12 }}>
+      {/* <View style={{ paddingHorizontal: 12 }}>
         <Slider
           style={{ marginTop: 20 }}
           value={SIZES.find(s => s.valueText === value)?.value ?? 0}
@@ -129,7 +128,7 @@ const PhysicalAppearance = ({ value, onValueChange }: { value: SizeValue, onValu
             { value: 10, label: "Heavyset" },
           ]}
         />
-      </View>
+      </View> */}
     </View>
   )
 }
