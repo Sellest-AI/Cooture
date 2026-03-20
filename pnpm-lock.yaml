@@ -27,8 +27,8 @@ importers:
         specifier: ^0.3.2
         version: 0.3.2(@ai-sdk/provider-utils@4.0.8(zod@4.3.5))(ai@5.0.121(zod@4.3.5))(convex-helpers@0.1.109(@standard-schema/spec@1.1.0)(convex@1.31.4(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@4.3.5))(convex@1.31.4(react@19.2.0))(react@19.2.0)
       '@convex-dev/auth':
-        specifier: ^0.0.90
-        version: 0.0.90(@auth/core@0.37.4)(convex@1.31.4(react@19.2.0))(react@19.2.0)
+        specifier: ^0.0.91
+        version: 0.0.91(@auth/core@0.37.4)(convex@1.31.4(react@19.2.0))(react@19.2.0)
       '@convex-dev/migrations':
         specifier: ^0.3.1
         version: 0.3.1(convex@1.31.4(react@19.2.0))
@@ -1070,8 +1070,8 @@ packages:
       react:
         optional: true
 
-  '@convex-dev/auth@0.0.90':
-    resolution: {integrity: sha512-aqw88EB042HvnaF4wcf/f/wTocmT2Bus2VDQRuV79cM0+8kORM0ICK/ByZ6XsHgQ9qr6TmidNbXm6QAgndrdpQ==}
+  '@convex-dev/auth@0.0.91':
+    resolution: {integrity: sha512-wLD4hszo3IhhMkwPs6ozWf0cUauwmhOvjUVn0g//kC338n/jApOjeDYWKCrn/qYUkveyDsbag5zrY8mVzA09Qg==}
     hasBin: true
     peerDependencies:
       '@auth/core': ^0.37.0
@@ -7268,7 +7268,7 @@ snapshots:
       '@ungap/structured-clone': 1.3.0
       react: 19.2.0
 
-  '@convex-dev/auth@0.0.90(@auth/core@0.37.4)(convex@1.31.4(react@19.2.0))(react@19.2.0)':
+  '@convex-dev/auth@0.0.91(@auth/core@0.37.4)(convex@1.31.4(react@19.2.0))(react@19.2.0)':
     dependencies:
       '@auth/core': 0.37.4
       '@oslojs/crypto': 1.0.1
