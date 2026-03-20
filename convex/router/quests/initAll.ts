@@ -185,7 +185,7 @@ const quests: Quest[] = [
   },
   {
     title: "Active supporter",
-    description: "Like 100 posts",
+    description: "Like 200 posts",
     category: "engagement",
     type: "posts_liked",
     target: 100,
@@ -196,7 +196,7 @@ const quests: Quest[] = [
     description: "Like 500 posts",
     category: "engagement",
     type: "posts_liked",
-    target: 500,
+    target: 150,
     rewardPercent: 150,
   },
   {
@@ -204,7 +204,7 @@ const quests: Quest[] = [
     description: "Like 1000 posts",
     category: "engagement",
     type: "posts_liked",
-    target: 1000,
+    target: 150,
     rewardPercent: 200,
   },
 

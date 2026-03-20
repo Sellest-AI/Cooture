@@ -7,7 +7,12 @@ import { internalMutation } from "../../../procedures";
 const getUser = (ctx: MutationCtx, email: string) => ctx.db.query("users").withIndex('email', (q) => q.eq('email', email)).first();
 
 export const _internal = internalMutation({
-  handler: async (ctx) => {
+  args: {
+    generateTestAccount: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const { generateTestAccount } = args;
+
     // Waitlist
     const waitlist = await ctx.db.query("waitlist").collect();
     if (waitlist.length === 0) {
@@ -32,9 +37,11 @@ export const _internal = internalMutation({
     // Test Account
     const TEST_ACCOUNT = await ctx.runMutation(api.router.auth.getTestAccount.anon);
     const testAccount = await getUser(ctx, TEST_ACCOUNT.email);
+    // Only create a test account if it doesn't exist, and if the flag is set to true
+    const shouldCreateTestAccount = generateTestAccount ? !testAccount : false;
 
     await ctx.scheduler.runAfter(0, internal.router.admin.config.initConfig._internal_step_1,
-      { createTestAccount: !testAccount })
+      { createTestAccount: shouldCreateTestAccount })
 
     // Quests
     await ctx.runMutation(internal.router.quests.initAll._internal);
