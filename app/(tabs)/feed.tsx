@@ -5,6 +5,7 @@ import { CreditsButton } from "@/modules/premium/credits.button";
 import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { WaitlistBlock } from "@/modules/waitlist/walitlist-block";
+import { useScrollToTop } from "@react-navigation/native";
 import { BlurKeys, BlurTargetView } from "@ui/blur-view";
 import { Post } from "@ui/cards";
 import { FlashList, FlashListRef } from "@ui/flat-list";
@@ -17,9 +18,11 @@ import { Colors } from "theme";
 
 export default function Screen() {
   const { feed, canLoadMore, updateSeed, isLoading, loadMore } = useFeed({ initialNumItems: 8 });
-  const { top } = useSafeAreaInsets();
 
   const listRef = useRef<FlashListRef<NonNullable<typeof feed>[number]>>(null);
+
+  const { top } = useSafeAreaInsets();
+  useScrollToTop(listRef);
 
   return (
     <BlurTargetView blurKey={BlurKeys.FEED}>
@@ -29,7 +32,10 @@ export default function Screen() {
           refreshing={isLoading}
           refreshControl={<RefreshControl
             refreshing={isLoading}
-            onRefresh={() => { updateSeed(); listRef.current?.scrollToOffset({ offset: 0 }) }}
+            onRefresh={() => {
+              updateSeed();
+              setTimeout(() => listRef.current?.scrollToOffset({ offset: 0 }), 400);
+            }}
             tintColor={Colors.primary[500]}
             progressViewOffset={top}
           />}
