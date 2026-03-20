@@ -5,7 +5,10 @@ import { Platform, View, ViewStyle } from 'react-native';
 // export const BlurView = Platform.OS === 'web' ? ExpoBlurView : View;
 // export const BlurView = ExpoBlurView;
 
-export const BLUR_INTENSITY = Platform.OS === 'android' ? 12 : 48;
+export const BLUR_INTENSITY =
+  Platform.OS === 'android' ? 12 :
+    Platform.OS === 'ios' ? 24 : 48;
+
 export const BLUR_TINT: BlurViewProps['tint'] = 'dark' as const;
 export const BLUR_PROPS: BlurViewProps = {
   intensity: BLUR_INTENSITY,

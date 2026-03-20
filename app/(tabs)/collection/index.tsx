@@ -1,3 +1,4 @@
+import { useScrollToTop } from "@/hooks";
 import { api, Doc, Id, useQuery, useQueryCached } from "@/lib/convex/client";
 import { SavedOutfits } from "@/modules/collection/saved-outfits";
 import { SavedPosts } from "@/modules/collection/saved-posts";
@@ -124,8 +125,11 @@ const Quests = ({ style }: { style?: ViewStyle }) => {
 }
 
 export default function SavedScreen() {
+  const scrollRef = useScrollToTop();
+
   return (
     <SafeScrollView
+      ref={scrollRef}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: TOTAL_TABS_SPACE + 32 }}
       edges={{ top: 'padding', bottom: 'android' }}

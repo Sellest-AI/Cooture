@@ -1,5 +1,6 @@
 import { useRouter } from "@/hooks";
 import { Id } from "@/lib/convex/client";
+import { useScrollToTop } from "@react-navigation/native";
 import { Block } from "@ui/block";
 import { BlurKeys } from "@ui/blur-view";
 import { Camera, Settings } from "@ui/icons";
@@ -42,8 +43,9 @@ type Props = {
 export function Screen({ user, isSelf, recentPosts, style }: Props) {
   const { back, push } = useRouter(ROUTES.USER.PATH);
   const path = useRouter.Path();
-  const scrollRef = useRef<ScrollView>(null);
   const slotRef = useRef<LayoutRectangle | null>(null);
+  const scrollRef = useRef<ScrollView>(null);
+  useScrollToTop(scrollRef);
 
   const segments = useSegments();
   const currentRoute = segments[segments.length - 1] as typeof TABS[number];

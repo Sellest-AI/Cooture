@@ -1,4 +1,4 @@
-import { useRouter } from "@/hooks";
+import { useRouter, useScrollToTop } from "@/hooks";
 import { api, useQueryCached, useQueryCachedData } from "@/lib/convex/client";
 import { CreditsButton } from "@/modules/premium/credits.button";
 import { Notification } from "@/modules/profiles/notification";
@@ -58,6 +58,7 @@ const Actions = () => {
 }
 
 export default function Screen() {
+  const scrollRef = useScrollToTop();
   const { push } = useRouter('/new');
 
   const { data: presets } = useQueryCached(api.router.presets.getAll.anon, {});
@@ -73,6 +74,7 @@ export default function Screen() {
   return (
     <BlurTargetView blurKey={BlurKeys.NEW}>
       <SafeScrollView
+        ref={scrollRef}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: TOTAL_TABS_SPACE }}
         style={{ paddingTop: Platform.OS !== 'ios' ? 8 : 0 }}

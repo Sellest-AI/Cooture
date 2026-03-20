@@ -15,7 +15,8 @@ type Props = {
   style?: ViewStyle,
   onReachEnd?: () => void,
   edges?: Edges;
-} & Omit<ComponentProps<typeof ScrollView>, 'style'>;
+  ref?: React.Ref<ScrollView>;
+} & Omit<ComponentProps<typeof ScrollView>, 'style' | 'ref'>;
 
 export const SafeScrollView = ({ style, children, contentContainerStyle, onReachEnd, edges, showsVerticalScrollIndicator = false, ...props }: Props) => {
   const insets = useSafeAreaInsets();

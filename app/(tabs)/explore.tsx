@@ -1,3 +1,4 @@
+import { useScrollToTop } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
 import { useQuery, useQueryCached } from "@/lib/convex/client";
 import { useFeed } from "@/modules/feed/_hooks";
@@ -111,15 +112,16 @@ const Post = ({ id, type, style, size = 'large' }: PostProps) => {
 
 export default function Screen() {
   const { feed, canLoadMore, loadMore, updateSeed, isLoading } = useFeed({ initialNumItems: 16 });
+  const empty = (feed ?? []).length === 0;
 
   const { top } = useSafeAreaInsets();
-
-  const empty = (feed ?? []).length === 0;
+  const scrollRef = useScrollToTop.FlashList();
 
   return (
     <BlurTargetView blurKey={BlurKeys.EXPLORE}>
       <SafeAreaView edges={{ top: 'off', bottom: 'android' }}>
         <FlashList
+          ref={scrollRef}
           refreshControl={<RefreshControl
             refreshing={isLoading}
             onRefresh={() => { updateSeed(); }}
