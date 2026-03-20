@@ -1,4 +1,5 @@
-import { ComponentProps, ReactNode, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { ComponentProps, ReactNode, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Animated, Dimensions, Platform, ScrollView, View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 import { Image } from "./image";
@@ -47,6 +48,17 @@ export const ParallaxScrollView = ({
   const scrollRef = useRef<ScrollView>(null);
   useImperativeHandle(ref, () => scrollRef.current!, []);
 
+  // Force reset background inset (IOS BUG)
+  const [headerBackgroundInset, setHeaderBackgroundKey] = useState(0);
+  useFocusEffect(useCallback(() => {
+    if (Platform.OS !== 'ios') return;
+    requestAnimationFrame(() => {
+      if (scrollRef.current?.getNativeScrollRef()?.scrollTop === 0) return;
+      setHeaderBackgroundKey((k) => k === 0 ? -1 : 0);
+      requestAnimationFrame(() => setHeaderBackgroundKey((k) => k === 0 ? -1 : 0))
+    });
+  }, []));
+
   const scrollY = useRef(new Animated.Value(0)).current;
   const headerTranslateY = scrollY.interpolate({
     inputRange: [0, headerHeight],
@@ -62,8 +74,14 @@ export const ParallaxScrollView = ({
   });
 
   const headerOpacity = scrollY.interpolate({
-    inputRange: [0, headerHeight / 2, headerHeight],
-    outputRange: [1, 0.5, 0],
+    inputRange: [0, headerHeight / 1.3, headerHeight],
+    outputRange: [1, 0.05, 0],
+    extrapolate: 'clamp',
+  });
+
+  const headerBackgroundScale = scrollY.interpolate({
+    inputRange: [0, headerHeight / 2.5],
+    outputRange: [1, 1.02],
     extrapolate: 'clamp',
   });
 
@@ -99,13 +117,11 @@ export const ParallaxScrollView = ({
           position: 'absolute',
           inset: 0,
           opacity: headerOpacity,
+          transform: [{ scale: headerBackgroundScale }],
         }}>
           {headerBackground && <View style={{
             position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
+            inset: 0,
           }}>
             {headerBackground}
           </View>}
@@ -113,9 +129,8 @@ export const ParallaxScrollView = ({
             <Image
               source={headerBackgroundImage}
               style={[{
-                width: '100%',
-                height: '100%',
-                inset: 0,
+                position: 'absolute',
+                inset: headerBackgroundInset,
               }, headerBackgroundImageStyle]}
               contentPosition={headerBackgroundImagePosition}
               contentFit="cover"
