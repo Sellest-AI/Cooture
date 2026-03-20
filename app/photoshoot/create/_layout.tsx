@@ -10,7 +10,7 @@ import { Stepper } from "@ui/stepper";
 import { Text } from "@ui/text";
 import { router, Slot, usePathname } from "expo-router";
 import { MotiView } from "moti";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { Colors } from "theme";
 
 export default function Layout() {
@@ -38,7 +38,7 @@ export default function Layout() {
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: Colors.background }}
-      edges={{ bottom: 'additive', top: 'off' }}
+      edges={{ bottom: 'android', top: 'off' }}
     >
       <ParallaxScrollView
         scrollKey={step}
@@ -49,7 +49,7 @@ export default function Layout() {
         /> : undefined}
         headerContent={
           <View style={{ marginBottom: 4, flex: 1 }}>
-            <View style={{ padding: 12 }}>
+            <View style={{ padding: 12, paddingTop: Platform.OS === 'ios' ? 0 : 12 }}>
               <ModalHeader
                 title={title}
                 subtitle={subtitle}
@@ -65,7 +65,7 @@ export default function Layout() {
               alignItems: 'center',
               justifyContent: 'center',
               paddingBottom: 8,
-              marginTop: 32
+              marginTop: 32,
             }}
             >
               <Badge

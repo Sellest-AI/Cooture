@@ -11,7 +11,7 @@ import { Text } from "@ui/text";
 import { router } from "expo-router";
 import { fetchUpdateAsync, reloadAsync, useUpdates } from 'expo-updates';
 import { ReactNode } from "react";
-import { Linking, Pressable, View, ViewStyle } from "react-native";
+import { Linking, Platform, Pressable, View, ViewStyle } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -76,7 +76,7 @@ export default function SettingsScreen() {
           </View>
         }
         headerContent={
-          <View style={{ paddingTop: 12 }}>
+          <View style={{ paddingTop: Platform.OS !== 'ios' ? 12 : 0 }}>
             <Pressable
               style={{ alignSelf: 'flex-start' }}
               onPress={() => {
@@ -168,7 +168,7 @@ export default function SettingsScreen() {
             onPress={async () => { await fetchUpdateAsync(); await reloadAsync(); }}
           />
         </View>
-        <SafeAreaView edges={{ top: 'off' }} style={{ paddingBottom: 12 }}>
+        <SafeAreaView edges={{ top: 'off', bottom: 'android' }} style={{ paddingBottom: 12 }}>
           <Button
             style={{ marginTop: 16 }}
             variant="destructive"

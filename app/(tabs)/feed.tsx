@@ -12,7 +12,7 @@ import { ModalHeader } from "@ui/modal";
 import { SafeAreaView, useSafeAreaInsets } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import { useRef } from "react";
-import { View } from "react-native";
+import { Platform, RefreshControl, View } from "react-native";
 import { Colors } from "theme";
 
 export default function Screen() {
@@ -23,18 +23,24 @@ export default function Screen() {
 
   return (
     <BlurTargetView blurKey={BlurKeys.FEED}>
-      <SafeAreaView edges={{ top: 'off', bottom: 'maximum' }} style={{ flex: 1 }}>
+      <SafeAreaView edges={{ top: 'off', bottom: 'android' }} style={{ flex: 1 }}>
         <FlashList
           ref={listRef}
           refreshing={isLoading}
-          onRefresh={() => { updateSeed(); listRef.current?.scrollToOffset({ offset: 0 }) }}
+          refreshControl={<RefreshControl
+            refreshing={isLoading}
+            onRefresh={() => { updateSeed(); listRef.current?.scrollToOffset({ offset: 0 }) }}
+            tintColor={Colors.primary[500]}
+            progressViewOffset={top}
+          />}
+          // onRefresh={() => { updateSeed(); listRef.current?.scrollToOffset({ offset: 0 }) }}
           onEndReached={() => loadMore(8)}
           data={(feed ?? [])}
           keyExtractor={(i) => i?._id}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             paddingBottom: TOTAL_TABS_SPACE,
-            paddingTop: top,
+            paddingTop: Platform.OS !== 'ios' ? top + 8 : top,
           }}
           ListEmptyComponent={<>
             <Post.Skeleton style={{ marginHorizontal: 12 }} />
@@ -50,7 +56,6 @@ export default function Screen() {
                 <Notification />
               </View>}
               style={{
-                paddingTop: 12,
                 paddingLeft: 16,
                 paddingRight: 12,
                 backgroundColor: Colors.background,

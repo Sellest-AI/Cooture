@@ -150,6 +150,7 @@ export default function Screen() {
 
   return (
     <Component
+      edges={{ bottom: 'android' }}
       style={{
         padding: 12,
         paddingHorizontal: 8,
@@ -165,7 +166,7 @@ export default function Screen() {
       }}
     >
       <ModalHeader
-        style={{ backgroundColor: Colors.background, paddingTop: 12, paddingHorizontal: 4 }}
+        style={{ backgroundColor: Colors.background, paddingHorizontal: 4 }}
         onBack={() => router.canGoBack() ? router.back() : router.dismissTo(ROUTES.TABS.FEED)}
         title="Notifications"
         type="alt"

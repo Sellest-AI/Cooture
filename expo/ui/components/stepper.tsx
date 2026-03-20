@@ -58,14 +58,16 @@ const Step = ({ active, children, delay = 0 }: StepProps) => {
           overflow: 'hidden'
         }}
       >
-        <Text.Sm
+        {active && <Check size={12} strokeWidth={3} color={Colors.primary[900]} />}
+        {!active && <Text.Sm
           style={{
-            color: active ? Colors.primary[900] : Colors.neutral[50],
-            fontWeight: '700'
+            color: Colors.neutral[50],
+            fontWeight: '700',
+            lineHeight: active ? 0 : undefined,
           }}
         >
-          {active ? <Check size={12} strokeWidth={3} /> : children}
-        </Text.Sm>
+          {children}
+        </Text.Sm>}
       </Component>
     </Animated.View>
   )

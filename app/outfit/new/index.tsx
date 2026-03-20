@@ -9,7 +9,7 @@ import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import { Route, router } from "expo-router";
 import { MotiView } from "moti";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { Colors } from "theme";
 
 export default function Screen() {
@@ -25,10 +25,14 @@ export default function Screen() {
   }
 
   return (
-    <SafeAreaView style={{
-      padding: 8,
-      flex: 1,
-    }}>
+    <SafeAreaView
+      style={{
+        padding: 8,
+        paddingBottom: Platform.OS === 'ios' ? 16 : 8,
+        flex: 1,
+      }}
+      edges={{ bottom: 'android' }}
+    >
       <ModalHeader
         onBack={router.canGoBack() ? () => router.back() : undefined}
         title="New outfit"

@@ -118,6 +118,7 @@ const Generations = ({ customText }: { customText?: string }) => {
       </Text.H3>
       <FlashList
         data={generations}
+        scrollEnabled={false}
         style={{ marginTop: 20 }}
         renderItem={({ item, index }) => {
           const marginLeft = index % 2 === 0 ? 0 : 4;
@@ -261,7 +262,7 @@ export default function ItemScreen() {
           }
         >
           <SafeAreaView
-            edges={{ top: 'off' }}
+            edges={{ top: 'off', bottom: 'android' }}
             style={{
               paddingHorizontal: 12,
               paddingBottom: hasChanges ? 72 : 12,

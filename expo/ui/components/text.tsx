@@ -69,11 +69,12 @@ const H1 = ({ children, color, weight, className, style, type, ...props }: Props
 
   const fontWeight = weight ? { fontWeight: weight } : {};
   const overflow = props.numberOfLines ? 'hidden' : undefined;
+  const paddingRight = 2 + (Number(style?.padding || style?.paddingRight) || 0);
 
   return (
     <NativeText
       className={cn(className)}
-      style={{ ...styleToApply, ...fontWeight, color, ...styles.shared, overflow, ...style }}
+      style={{ ...styleToApply, ...fontWeight, color, ...styles.shared, overflow, paddingRight, ...style }}
       {...props}
       {...textBreakProps}
     >
@@ -91,11 +92,12 @@ const H3 = ({ children, color, weight, className, style, type, ...props }: Props
 
   const fontWeight = weight ? { fontWeight: weight } : {};
   const overflow = props.numberOfLines ? 'hidden' : undefined;
+  const paddingRight = 1 + (Number(style?.padding || style?.paddingRight) || 0);
 
   return (
     <NativeText
       className={cn(className)}
-      style={{ ...styleToApply, ...fontWeight, color, ...styles.shared, overflow, ...style }}
+      style={{ ...styleToApply, ...fontWeight, color, ...styles.shared, overflow, paddingRight, ...style }}
       {...props}
       {...textBreakProps}
     >

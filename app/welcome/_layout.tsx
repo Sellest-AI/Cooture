@@ -47,7 +47,7 @@ export default function WelcomeLayout() {
 
   return (
     <SafeAreaView
-      edges={{ top: 'off' }}
+      edges={{ top: 'off', bottom: 'android' }}
       style={{
         flex: 1,
         backgroundColor: Colors.background,

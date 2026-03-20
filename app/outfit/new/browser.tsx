@@ -163,7 +163,7 @@ export default function Screen() {
   const canPay = wallet ? cost !== undefined && wallet.credits >= cost : false;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background, gap: 8 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background, gap: 8 }} edges={{ bottom: 'android' }}>
       <View style={{ flex: 1 }}>
         <Browser.Provider>
           <Browser

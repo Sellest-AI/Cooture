@@ -1,5 +1,5 @@
 import { ComponentProps, ReactNode, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { Animated, Dimensions, ScrollView, View, ViewStyle } from "react-native";
+import { Animated, Dimensions, Platform, ScrollView, View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 import { Image } from "./image";
 import { LinearGradient } from "./linear-gradient";
@@ -67,9 +67,10 @@ export const ParallaxScrollView = ({
     extrapolate: 'clamp',
   });
 
-  const { bottom } = useSafeAreaInsets();
+  const { bottom: _bottom } = useSafeAreaInsets();
   const headerHeightRuntime = headerHeight;
   const headerOffset = headerHeightRuntime - contentNegativeSpace;
+  const bottom = Platform.OS === 'android' ? _bottom : 0;
 
   // Scroll to top when scrollKey changes
   useEffect(() => {
@@ -114,6 +115,7 @@ export const ParallaxScrollView = ({
               style={[{
                 width: '100%',
                 height: '100%',
+                inset: 0,
               }, headerBackgroundImageStyle]}
               contentPosition={headerBackgroundImagePosition}
               contentFit="cover"

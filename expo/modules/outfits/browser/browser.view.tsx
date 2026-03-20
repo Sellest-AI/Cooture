@@ -5,7 +5,7 @@ import { router } from "expo-router";
 import { atom, useAtom } from "jotai";
 import { nanoid } from "nanoid/non-secure";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { BackHandler, View } from "react-native";
+import { BackHandler, Platform, View } from "react-native";
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { ROUTES } from "routes";
 import { Colors } from "theme";
@@ -384,7 +384,7 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
         flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
         paddingTop: 12,
         paddingBottom: 12,
-        paddingHorizontal: 12
+        paddingHorizontal: Platform.OS === 'ios' ? 24 : 12
       }}>
         <View style={{ flexDirection: 'row', gap: 24 }}>
           <Pressable onPress={goBack} disabled={!canGoBack} style={{ opacity: canGoBack ? 1 : 0.5 }}>

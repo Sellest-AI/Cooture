@@ -14,13 +14,13 @@ export const Texts = {
   },
   h1: {
     fontSize: 36,
-    lineHeight: Platform.select({ ios: 36, android: 40, default: 36 }),
+    lineHeight: Platform.select({ ios: 40, android: 40, default: 36 }),
     letterSpacing: -1.8,
     fontWeight: 700,
     alt: {
       fontSize: 40,
       letterSpacing: -2,
-      lineHeight: Platform.select({ ios: 36, android: 44, default: 36 }),
+      lineHeight: Platform.select({ ios: 44, android: 44, default: 36 }),
       fontWeight: 600,
       fontFamily: 'Murays'
     }
@@ -32,7 +32,7 @@ export const Texts = {
     fontWeight: 600,
     alt: {
       fontSize: 32,
-      lineHeight: 29,
+      lineHeight: Platform.select({ ios: 32, android: 32, default: 29 }),
       letterSpacing: -0.3,
       fontWeight: 600,
       fontFamily: 'Murays'

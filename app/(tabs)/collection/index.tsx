@@ -10,7 +10,7 @@ import { ModalHeader } from "@ui/modal";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { Text } from "@ui/text";
 import { useEffect, useMemo, useState } from "react";
-import { FlatList, View, ViewStyle } from "react-native";
+import { FlatList, Platform, View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 
 const PADDING_HORIZONTAL = 12;
@@ -128,7 +128,8 @@ export default function SavedScreen() {
     <SafeScrollView
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: TOTAL_TABS_SPACE + 32 }}
-      edges={{ top: 'padding', bottom: 'maximum' }}
+      edges={{ top: 'padding', bottom: 'android' }}
+      style={{ paddingTop: Platform.OS !== 'ios' ? 8 : 0 }}
     >
       <ModalHeader
         title="Collection"
@@ -138,7 +139,6 @@ export default function SavedScreen() {
           <CreditsButton />
         </View>}
         style={{
-          paddingTop: 12,
           paddingLeft: 16,
           paddingRight: 12,
         }}

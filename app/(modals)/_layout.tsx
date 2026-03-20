@@ -17,7 +17,7 @@ export default function ModalsLayout() {
         borderTopWidth: 1,
         overflow: 'hidden',
       }}
-      edges={{ top: 'off' }}
+      edges={{ top: 'off', bottom: 'android' }}
     >
       <Stack
         screenOptions={{

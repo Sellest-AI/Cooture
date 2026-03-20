@@ -1,15 +1,14 @@
-import { KeyboardAvoidingView, SafeAreaView, useSafeAreaInsets } from '@ui/safe-area-view';
+import { EdgeModeExtended, KeyboardAvoidingView, SafeAreaView, useSafeAreaInsets } from '@ui/safe-area-view';
 import { ComponentProps } from 'react';
 import { Platform, ScrollView, ViewStyle } from "react-native";
-import { EdgeMode } from 'react-native-safe-area-context';
 
 export { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type Edges = {
-  top?: EdgeMode | 'padding',
-  bottom?: EdgeMode,
-  left?: EdgeMode,
-  right?: EdgeMode,
+  top?: EdgeModeExtended | 'padding',
+  bottom?: EdgeModeExtended,
+  left?: EdgeModeExtended,
+  right?: EdgeModeExtended,
 }
 
 type Props = {

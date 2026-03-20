@@ -15,24 +15,26 @@ export default function Screen() {
 
   return (
     <View style={{ padding: 12, flex: 1 }}>
-      <View style={{
-        height: 6,
-        width: 96,
-        backgroundColor: Colors.blur.medium,
-        borderRadius: 99,
-        marginBottom: 20,
-        alignSelf: 'center'
-      }} />
-      <ModalHeader
-        title="Select a friend"
-        style={{ marginBottom: 12 }}
-      />
       <FlatList
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingTop: 8 }}
         onEndReached={() => loadMore(20)}
         data={results}
         keyExtractor={item => item._id}
         numColumns={3}
+        ListHeaderComponent={
+          <>
+            <ModalHeader
+              title="Select a friend"
+              style={{ marginBottom: 8 }}
+            />
+            <TextInput
+              startIcon={Search}
+              placeholder="Search"
+              style={{ marginBottom: 32 }}
+            />
+          </>
+        }
         // style={{ paddingHorizontal: 12 }}
         renderItem={({ item }) => (
           <Pressable
@@ -67,10 +69,6 @@ export default function Screen() {
             </Text.Base>
           </Pressable>
         )}
-      />
-      <TextInput
-        startIcon={Search}
-        placeholder="Search"
       />
     </View>
   )

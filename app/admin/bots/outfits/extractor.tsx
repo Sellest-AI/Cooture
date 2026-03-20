@@ -120,7 +120,7 @@ export default function Screen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }} edges={{ bottom: 'android' }}>
       <Browser.Provider>
         <Browser
           autoExtractDelay={1000}

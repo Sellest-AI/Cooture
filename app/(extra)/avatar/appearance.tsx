@@ -173,6 +173,7 @@ export default function Screen() {
 
   return (
     <SafeScrollView
+      edges={{ bottom: 'android' }}
       style={{
         backgroundColor: Colors.background,
         flex: 1,

@@ -251,7 +251,7 @@ export const Bots = (props: SharedProps) => {
 
 export default function Screen() {
   return (
-    <SafeScrollView contentContainerStyle={{ padding: 12 }}>
+    <SafeScrollView contentContainerStyle={{ padding: 12 }} edges={{ bottom: 'android' }}>
       <ModalHeader
         title="Bots"
         onBack={router.canGoBack() ? router.back : undefined}

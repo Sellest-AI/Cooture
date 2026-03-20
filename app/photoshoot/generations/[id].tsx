@@ -333,7 +333,8 @@ export default function Screen() {
             defaultIndex={currentIndex}
             ref={carouselRef}
             onProgressChange={(_, v) => {
-              const value = v > visibleItems.length - 1 ? visibleItems.length - 1 : v < 0 ? 0 : v;
+              const length = visibleItems.length + 1;
+              const value = v > length - 1 ? length - 1 : v < 0 ? 0 : v;
               setCurrentIndex(Math.ceil(value));
             }}
             scaleAnimation={true}

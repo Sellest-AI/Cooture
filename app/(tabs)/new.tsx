@@ -12,7 +12,7 @@ import { SafeScrollView } from "@ui/safe-scroll-view";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
 import { useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, Platform, StyleSheet, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -75,7 +75,8 @@ export default function Screen() {
       <SafeScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: TOTAL_TABS_SPACE }}
-        edges={{ top: 'padding', bottom: 'maximum' }}
+        style={{ paddingTop: Platform.OS !== 'ios' ? 8 : 0 }}
+        edges={{ top: 'padding', bottom: 'android' }}
       // stickyHeaderIndices={[0]}
       >
         <ModalHeader
@@ -87,7 +88,6 @@ export default function Screen() {
             <Notification />
           </View>}
           style={{
-            paddingTop: 12,
             paddingLeft: 16,
             paddingRight: 12,
             backgroundColor: Colors.background,

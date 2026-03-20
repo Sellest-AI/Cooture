@@ -101,7 +101,7 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
   if (!user) return null;
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={{ top: 'off' }}>
+    <SafeAreaView style={{ flex: 1 }} edges={{ top: 'off', bottom: 'android' }}>
       <ParallaxScrollView
         ref={scrollRef}
         contentNegativeSpace={56}
@@ -116,7 +116,6 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
               alignItems: "flex-start",
               paddingLeft: !isSelf ? 12 : 20,
               paddingRight: 12,
-              marginTop: 12,
               height: 286
             }}
           >

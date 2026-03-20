@@ -136,6 +136,6 @@ export default function Screen() {
           {user?.username ? "Edit profile" : "Claim my username"}
         </Button>
       </View>
-    </View >
+    </View>
   )
 }

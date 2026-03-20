@@ -1,5 +1,5 @@
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Modal as NativeModal, Pressable, ScrollView, View, ViewStyle } from 'react-native';
+import { Animated, Modal as NativeModal, Platform, Pressable, ScrollView, View, ViewStyle } from 'react-native';
 import { Colors } from 'theme';
 import { Block } from './block';
 import { BLUR_PROPS, BlurView } from './blur-view';
@@ -70,7 +70,8 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
   }, []);
 
   const FinalView = scrollable ? ScrollView : View;
-  const { bottom } = useSafeAreaInsets();
+  const { bottom: _bottom } = useSafeAreaInsets();
+  const bottom = Platform.OS === 'ios' ? 0 : _bottom;
 
   return (
     <NativeModal

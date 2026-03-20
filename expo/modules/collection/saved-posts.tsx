@@ -106,7 +106,7 @@ export const SavedPosts = ({ style, direction, numColumns, header, itemWidth, in
       {direction === "vertical" && <FlashList
         onEndReached={() => loadMore(12)}
         numColumns={numColumns}
-        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: 10,
           paddingLeft: PADDING_HORIZONTAL,

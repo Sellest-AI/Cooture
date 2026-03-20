@@ -91,7 +91,7 @@ export const SavedOutfits = ({ style, direction, numColumns, header, itemWidth, 
       {direction === "vertical" && <FlashList
         onEndReached={() => loadMore(12)}
         numColumns={numColumns}
-        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: 10,
           paddingLeft: PADDING_HORIZONTAL - 4,

@@ -10,11 +10,11 @@ import { Loader, Search } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { Pressable as AnimatedPressable } from "@ui/pressable";
-import { SafeAreaView } from "@ui/safe-area-view";
+import { SafeAreaView, useSafeAreaInsets } from "@ui/safe-area-view";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
-import { Pressable, View, ViewStyle } from "react-native";
+import { Platform, Pressable, RefreshControl, View, ViewStyle } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -110,47 +110,55 @@ const Post = ({ id, type, style, size = 'large' }: PostProps) => {
 }
 
 export default function Screen() {
-  const { feed, canLoadMore, loadMore, updateSeed } = useFeed({ initialNumItems: 16 });
+  const { feed, canLoadMore, loadMore, updateSeed, isLoading } = useFeed({ initialNumItems: 16 });
+
+  const { top } = useSafeAreaInsets();
 
   const empty = (feed ?? []).length === 0;
 
   return (
     <BlurTargetView blurKey={BlurKeys.EXPLORE}>
-      <SafeAreaView edges={{ top: 'additive', bottom: 'maximum' }}>
+      <SafeAreaView edges={{ top: 'off', bottom: 'android' }}>
         <FlashList
+          refreshControl={<RefreshControl
+            refreshing={isLoading}
+            onRefresh={() => { updateSeed(); }}
+            tintColor={Colors.primary[500]}
+            progressViewOffset={top}
+          />}
           onEndReached={() => loadMore(24)}
-          onRefresh={() => updateSeed()}
           style={{ flex: empty ? 1 : undefined }}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             paddingBottom: TOTAL_TABS_SPACE,
-            paddingHorizontal: 4,
+            paddingTop: Platform.OS !== 'ios' ? 8 : 0,
           }}
           ListHeaderComponent={
-            <ModalHeader
-              title="Discover"
-              type="alt"
-              size="big"
-              endContent={
-                <AnimatedPressable onPress={() => router.push(ROUTES.SEARCH)}>
-                  <Block
-                    variant="blur"
-                    style={{
-                      borderRadius: 99,
-                      padding: 10,
-                    }}
-                  >
-                    <Search size={24} color={Colors.foreground} />
-                  </Block>
-                </AnimatedPressable>
-              }
-              style={{
-                paddingTop: 12,
-                paddingLeft: 16,
-                paddingRight: 12,
-                backgroundColor: Colors.background,
-              }}
-            />
+            <SafeAreaView edges={{ bottom: 'off' }}>
+              <ModalHeader
+                title="Discover"
+                type="alt"
+                size="big"
+                endContent={
+                  <AnimatedPressable onPress={() => router.push(ROUTES.SEARCH)}>
+                    <Block
+                      variant="blur"
+                      style={{
+                        borderRadius: 99,
+                        padding: 10,
+                      }}
+                    >
+                      <Search size={24} color={Colors.foreground} />
+                    </Block>
+                  </AnimatedPressable>
+                }
+                style={{
+                  paddingLeft: 16,
+                  paddingRight: 12,
+                  backgroundColor: Colors.background,
+                }}
+              />
+            </SafeAreaView>
           }
           ListEmptyComponent={<GridSkeleton />}
           ListFooterComponent={<>
@@ -176,7 +184,7 @@ export default function Screen() {
             const cycleIndex = index;
             const posts = item;
             return (
-              <View key={cycleIndex} style={{ gap: GAP, marginBottom: 4 }}>
+              <View key={cycleIndex} style={{ gap: GAP, marginBottom: 4, paddingHorizontal: 4 }}>
                 {/* First grid: 2 small left, 1 large right */}
                 {posts.length > 0 && (
                   <Grid style={{ height: HEIGHT, gap: GAP }}>

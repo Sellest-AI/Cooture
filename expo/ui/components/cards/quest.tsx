@@ -127,7 +127,7 @@ export const Quest = ({ style, source, title, description, progress, credits, cl
           paddingBottom: 5,
           borderRadius: 99,
         }}>
-        {completed ? <Check size={14} /> : <Credits size={14} />}
+        {completed ? <Check size={14} color={Colors.primary[700]} /> : <Credits size={14} />}
         <Text.Sm color={completed ? Colors.primary[700] : Colors.neutral[200]} weight={600}>
           {credits}
         </Text.Sm>

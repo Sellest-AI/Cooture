@@ -39,7 +39,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         state.index === 3 ? BlurKeys.COLLECTION :
           state.index === 4 ? BlurKeys.PROFILE : undefined;
   return (
-    <SafeAreaView style={styles.tabBarContainer} edges={{ top: 'off' }}>
+    <SafeAreaView style={styles.tabBarContainer} edges={{ top: 'off', bottom: 'android' }}>
       <Block
         blurKey={blurKey}
         variant="blur"

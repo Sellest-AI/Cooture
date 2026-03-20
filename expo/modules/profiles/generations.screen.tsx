@@ -57,6 +57,7 @@ export function Screen() {
 
   return (
     <FlashList
+      scrollEnabled={false}
       data={predictions}
       style={{ paddingHorizontal: 0 }}
       renderItem={({ item, index }) => {

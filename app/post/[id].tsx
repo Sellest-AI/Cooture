@@ -51,10 +51,9 @@ export default function Screen() {
     return <Redirect href={ROUTES.TABS.DISCOVER} />
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }} edges={{ bottom: 'android' }}>
       <ModalHeader
         style={{
-          paddingTop: 12,
           backgroundColor: Colors.background,
           paddingHorizontal: 12
         }}

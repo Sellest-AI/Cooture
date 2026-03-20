@@ -38,6 +38,7 @@ export function Screen() {
   return (
     <FlashList
       data={outfits}
+      scrollEnabled={false}
       style={{ paddingHorizontal: 12 }}
       renderItem={({ item, index }) => {
         const marginLeft = index % 2 === 0 ? 6 : 20;

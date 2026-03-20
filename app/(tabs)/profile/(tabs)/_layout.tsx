@@ -3,6 +3,7 @@ import { api, usePaginatedQueryCached, useQueryCached } from "@/lib/convex/clien
 import { Screen } from "@/modules/profiles/page";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { notEmpty } from "@utils/convex-allowed";
+import { Platform } from "react-native";
 
 export const unstable_settings = {
   initialRouteName: 'outfits',
@@ -21,7 +22,7 @@ export default function Layout() {
 
   return (
     <Screen
-      style={{ paddingBottom: TOTAL_TABS_SPACE }}
+      style={{ paddingBottom: TOTAL_TABS_SPACE, paddingTop: Platform.OS !== 'ios' ? 8 : 0 }}
       user={user}
       isSelf={true}
       recentPosts={

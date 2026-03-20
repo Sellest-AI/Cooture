@@ -138,10 +138,12 @@ export default function Screen() {
   ], query), [items, outfits, query]);
 
   return (
-    <SafeAreaView style={{
-      padding: 12,
-      flex: 1
-    }}>
+    <SafeAreaView
+      edges={{ bottom: 'android' }}
+      style={{
+        padding: 12,
+        flex: 1
+      }}>
       <View style={{
         flexDirection: 'row',
         alignItems: 'center',

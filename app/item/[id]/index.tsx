@@ -219,12 +219,14 @@ export default function ItemScreen() {
           <DeleteOutfitButton />
         </SafeAreaView>
       </ParallaxScrollView>
-      <SafeAreaView style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 8,
-        right: 8,
-      }}>
+      <SafeAreaView
+        edges={{ bottom: 'android' }}
+        style={{
+          position: 'absolute',
+          bottom: Platform.OS === 'ios' ? 20 : 0,
+          left: 8,
+          right: 8,
+        }}>
         <Button
           variant="primary"
           onPress={() => {
