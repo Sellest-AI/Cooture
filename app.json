@@ -11,6 +11,9 @@
       "supportsTablet": false,
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.cooture.app",
+      "associatedDomains": [
+        "applinks:cooture.app"
+      ],
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -35,6 +38,48 @@
         "android.permission.ACCESS_MEDIA_LOCATION",
         "android.permission.READ_MEDIA_IMAGES",
         "com.android.vending.BILLING"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ],
+          "data": [
+            {
+              "scheme": "https",
+              "host": "cooture.app",
+              "pathPrefix": "/p"
+            },
+            {
+              "scheme": "https",
+              "host": "cooture.app",
+              "pathPrefix": "/u"
+            },
+            {
+              "scheme": "https",
+              "host": "cooture.app",
+              "pathPrefix": "/o"
+            },
+            {
+              "scheme": "https",
+              "host": "cooture.app",
+              "pathPrefix": "/i"
+            },
+            {
+              "scheme": "https",
+              "host": "cooture.app",
+              "pathPrefix": "/share"
+            },
+            {
+              "scheme": "https",
+              "host": "cooture.app",
+              "pathPrefix": "/link"
+            }
+          ]
+        }
       ]
     },
     "web": {
