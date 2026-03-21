@@ -5,50 +5,17 @@ import { Button } from "@ui/button";
 import { ArrowLeft, Bell, Camera, ChevronRight, Gem, Lock, Package, Settings, TriangleAlert, TShirt } from "@ui/icons";
 import { Image } from "@ui/image";
 import { LinearGradient } from "@ui/linear-gradient";
+import { MenuGroup, MenuItem } from "@ui/menu";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
 import { fetchUpdateAsync, reloadAsync, useUpdates } from 'expo-updates';
 import { WEBSITE } from "global";
-import { ReactNode } from "react";
-import { Linking, Platform, Pressable, View, ViewStyle } from "react-native";
+import { Linking, Platform, Pressable, View } from "react-native";
 import Purchases from "react-native-purchases";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
-
-type Props = {
-  icon: React.ComponentType<{ size?: number, color?: string }>,
-  text: ReactNode,
-  style?: ViewStyle,
-  onPress?: () => void,
-}
-const SectionButton = ({ icon, text, style, onPress }: Props) => {
-  const Icon = icon;
-  return (
-    <Pressable
-      onPress={onPress}
-      style={[{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingVertical: 8,
-      }, style]}
-    >
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
-        <Block
-          variant="blur"
-          style={{ padding: 14 }}>
-          <Icon color={Colors.neutral[50]} size={20} />
-        </Block>
-        <Text.Base color={Colors.neutral[50]} weight={500} numberOfLines={1}>
-          {text}
-        </Text.Base>
-      </View>
-      <ChevronRight size={20} color={Colors.neutral[400]} />
-    </Pressable>
-  )
-}
 
 export default function Screen() {
   const { currentlyRunning, isUpdateAvailable } = useUpdates();
@@ -125,73 +92,68 @@ export default function Screen() {
         }
       >
 
-        {isAdmin && <View style={{ marginTop: 36 }}>
-          <Text.Sm weight={500} color={Colors.neutral[400]} style={{ marginBottom: 4 }}>Admin</Text.Sm>
-          <SectionButton
+        {isAdmin && <MenuGroup title="Admin" style={{ marginTop: 36 }}>
+          <MenuItem
             icon={Lock}
             text="Access admin panel"
             onPress={() => replace("/admin/bots")}
           />
-        </View>}
+        </MenuGroup>}
 
-        <View style={{ marginTop: 24 }}>
-          <Text.Sm weight={500} color={Colors.neutral[400]} style={{ marginBottom: 4 }}>Content</Text.Sm>
-          <SectionButton
+        <MenuGroup title="Content">
+          <MenuItem
             icon={TShirt}
             text="Saved Outfits"
             onPress={() => push(ROUTES.COLLECTION.SAVED_OUTFITS)}
           />
-          <SectionButton
+          <MenuItem
             icon={Camera}
             text="Saved Posts"
             onPress={() => push(ROUTES.COLLECTION.SAVED_POSTS)}
           />
-          <SectionButton
+          <MenuItem
             icon={Bell}
             text="Notifications"
             onPress={() => push(ROUTES.EXTRA.NOTIFICATIONS)}
           />
-        </View>
+        </MenuGroup>
 
-        <View style={{ marginTop: 24 }}>
-          <Text.Sm weight={500} color={Colors.neutral[400]} style={{ marginBottom: 4 }}>Preferences</Text.Sm>
-          <SectionButton
+        <MenuGroup title="Preferences">
+          <MenuItem
             icon={Bell}
             text="Notifications settings"
             onPress={async () => Linking.openSettings()}
           />
-          <SectionButton
+          <MenuItem
             icon={Settings}
             text="Settings"
             onPress={async () => Linking.openSettings()}
           />
-        </View>
+        </MenuGroup>
 
-        <View style={{ marginTop: 24 }}>
-          <Text.Sm weight={500} color={Colors.neutral[400]} style={{ marginBottom: 4 }}>Account</Text.Sm>
-          <SectionButton
+        <MenuGroup title="Account">
+          <MenuItem
             icon={Gem}
             text="Manage subscription"
             onPress={async () => await manageSubscription()}
           />
-          <SectionButton
+          <MenuItem
             icon={TriangleAlert}
             text="Delete account"
             onPress={async () => Linking.openURL(WEBSITE.HELP.DELETE_ACCOUNT)}
           />
-        </View>
+        </MenuGroup>
 
-        <View style={{ marginTop: 24 }}>
-          <Text.Sm weight={500} color={Colors.neutral[400]} style={{ marginBottom: 4 }}>System</Text.Sm>
-          <SectionButton
+        <MenuGroup title="System">
+          <MenuItem
             icon={Package}
             text={`${currentlyRunning.runtimeVersion} - ${currentlyRunning.createdAt?.toLocaleDateString() ?? 'X'} - ${isUpdateAvailable ? "Update available" : "Up to date"}`}
             onPress={async () => { await fetchUpdateAsync(); await reloadAsync(); }}
           />
-        </View>
+        </MenuGroup>
+
         <SafeAreaView edges={{ top: 'off', bottom: 'android' }} style={{ paddingBottom: 12 }}>
           <Button
-            style={{ marginTop: 16 }}
             variant="destructive"
             onPress={() => { signOut(); }}
           >

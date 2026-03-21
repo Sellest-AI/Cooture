@@ -40,6 +40,7 @@ export const WaitlistBlock = ({ style }: Props) => {
           {/* <Text.H3>💎</Text.H3> */}
           <Users
             size={28}
+            color={Colors.primary[900]}
           />
         </Block>
         <View style={{ flex: 1, paddingHorizontal: 12, gap: 6 }}>

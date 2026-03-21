@@ -1,6 +1,6 @@
 import { cn } from '@ui/utils';
 import { ComponentProps, useMemo } from 'react';
-import { View, ViewStyle } from 'react-native';
+import { ColorValue, View, ViewStyle } from 'react-native';
 import { Colors } from 'theme';
 import { BLUR_PROPS, BlurView } from './blur-view';
 import { LinearGradient } from './linear-gradient';
@@ -53,6 +53,31 @@ export const getBlockColors = (variant: Props['variant'], disabled?: boolean) =>
   }
 }
 
+const BorderTop = ({ style, disabled, variant }: { style?: ViewStyle, disabled?: boolean, variant: Props['variant'] }) => {
+  const colors = useMemo(() => getBlockColors(variant, disabled), [disabled, variant]);
+  const borderColor = colors.borderColor ?? 'transparent';
+  const backgroundColor = variant === "blur" ? 'transparent' : (colors.backgroundColor ?? 'transparent');
+
+  const colorsArray = variant === "blur" ? [backgroundColor, borderColor, borderColor, borderColor, backgroundColor] :
+    [backgroundColor, borderColor, backgroundColor] as const;
+
+  return (
+    <LinearGradient
+      colors={colorsArray as readonly [ColorValue, ColorValue, ...ColorValue[]]}
+      start={{ x: 0, y: 0.5 }} // Left center
+      end={{ x: 1, y: 0.5 }}   // Right center
+      style={{
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        height: 1.5,
+        opacity: style?.opacity
+      }}
+    />
+  )
+}
+
 export const Block = ({ className = "", children, variant, style, disabled, blurComponent, blurKey }: Props) => {
   const VariantColors = useMemo(() => getBlockColors(variant, disabled), [disabled, variant]);
 
@@ -69,7 +94,6 @@ export const Block = ({ className = "", children, variant, style, disabled, blur
         overflow: 'hidden',
         position: 'relative',
         ...VariantColors,
-        borderTopWidth: disabled ? 0 : 1,
         borderLeftWidth: disabled ? 0 : 2,
         borderRadius: 18,
         ...style,
@@ -77,18 +101,10 @@ export const Block = ({ className = "", children, variant, style, disabled, blur
       }}
       className={cn(className)}
     >
-      {showTopBorder && <LinearGradient
-        colors={[VariantColors.borderColor ?? 'transparent', VariantColors.borderColor ?? 'transparent', VariantColors.borderColor ?? 'transparent', 'transparent']}
-        start={{ x: 0, y: 0.5 }} // Left center
-        end={{ x: 1, y: 0.5 }}   // Right center
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          top: 0,
-          height: 1,
-          opacity: style?.opacity
-        }}
+      {showTopBorder && <BorderTop
+        style={style}
+        disabled={disabled}
+        variant={variant}
       />}
       <LinearGradient
         colors={['transparent', 'rgba(0, 0, 0, 0.3)', 'transparent']}

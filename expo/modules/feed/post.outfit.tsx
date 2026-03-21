@@ -43,7 +43,6 @@ export const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle
         message: env.PUBLIC_APP_URL + ROUTES.OUTFIT.ID(id),
       })
     }}
-    onLongPress={() => push(ROUTES.OUTFIT.PATH, { pathParams: { id: outfit._id } })}
     users={user ? [{
       name: user.name ?? 'Anonymous',
       username: user.username ?? 'anon',
@@ -52,11 +51,10 @@ export const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle
         pathParams: { id: user!._id }
       })
     }] : undefined}
+    onRecreate={() => push(ROUTES.PHOTOSHOOT.NEW, { params: { presetId: null, outfitId: outfit._id } })}
     outfit={{
-      itemUrls: outfit.items.map((i) => i.image.sizes.thumbnail.url),
-      onPress: () => push(ROUTES.PHOTOSHOOT.NEW, {
-        params: { outfitId: outfit._id }
-      })
+      itemUrls: outfit.items.map(i => i.image.sizes.thumbnail.url),
+      onPress: () => push(ROUTES.OUTFIT.PATH, { pathParams: { id: outfit._id } })
     }}
   // user={outfit.}
   />;

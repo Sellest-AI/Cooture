@@ -10,6 +10,9 @@ type ZoomableImageProps = {
   width: number;
   aspectRatio?: number;
   onPinchChange?: (pinching: boolean) => void;
+  onTap?: () => void;
+  onDoubleTap?: () => void;
+  onLongPress?: () => void;
 };
 
 export const ZoomableImage = ({
@@ -20,6 +23,9 @@ export const ZoomableImage = ({
   width,
   aspectRatio = 1,
   onPinchChange,
+  onTap,
+  onDoubleTap,
+  onLongPress,
 }: ZoomableImageProps) => {
   if (Platform.OS === 'web') {
     return (
@@ -39,6 +45,9 @@ export const ZoomableImage = ({
       onPinchStart={() => { onPinchChange?.(true); }}
       onPinchEnd={() => { onPinchChange?.(false); }}
       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      onTap={() => { onTap?.(); }}
+      onDoubleTap={() => { onDoubleTap?.(); }}
+      onLongPress={() => { onLongPress?.(); }}
     >
       <Image
         source={source}

@@ -37,8 +37,6 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
     onToggleBookmark={() => toggleBookmark({ generationId: id })}
     onToggleLike={(v) => toggleLike({ generationId: id, value: v })}
     likedAccounts={likes?.latestLikers.map(l => l.image).filter(notEmpty)}
-    onLongPress={disableLongPress ? undefined :
-      (_id) => push(ROUTES.POST.PATH, { pathParams: { id: _id } })}
     isLiked={liked}
     onShare={async (_id) => {
       Share.share({
@@ -60,6 +58,9 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
         pathParams: { id: user!._id }
       })
     }))}
+    onRecreate={() => push(ROUTES.PHOTOSHOOT.RECAP, {
+      params: { presetId: post.preset?._id, outfitId: post.outfit?._id }
+    })}
     preset={post.preset?.cover ? {
       imageUrl: post.preset.cover.sizes.thumbnail.url,
       onPress: () => push(ROUTES.PHOTOSHOOT.RECAP, {
@@ -68,9 +69,7 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
     } : undefined}
     outfit={post.outfit ? {
       itemUrls: post.outfit.items.map(i => i.image.sizes.thumbnail.url),
-      onPress: () => push(ROUTES.OUTFIT.PATH, {
-        pathParams: { id: post.outfit!._id }
-      })
+      onPress: () => push(ROUTES.OUTFIT.PATH, { pathParams: { id: post.outfit!._id } })
     } : undefined}
   />
   )
