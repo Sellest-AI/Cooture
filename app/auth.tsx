@@ -157,7 +157,7 @@ const LoginButtons = () => {
           </Button>
         )
       }))}
-      {env.PUBLIC_NODE_ENV === 'production' && (
+      {env.PUBLIC_NODE_ENV !== 'production' && (
         <Pressable style={{ marginTop: 12 }} onPress={() => signInTester()}>
           <Text.Base color={Colors.neutral[400]}>
             Sign in with test account
