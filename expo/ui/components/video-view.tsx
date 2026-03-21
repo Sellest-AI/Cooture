@@ -1,5 +1,6 @@
+import { useFocusEffect } from "expo-router";
 import { VideoView as ExpoVideoView, useVideoPlayer } from "expo-video";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { ViewStyle } from "react-native";
 
 type VideoViewProps = {
@@ -18,6 +19,11 @@ export const VideoView = ({ style, source, contentFit }: VideoViewProps) => {
     if (!player) return;
     try { player.play(); } catch { }
   }, [player, source]);
+
+  useFocusEffect(useCallback(() => {
+    if (!player) return;
+    try { player.play(); } catch { }
+  }, [player]));
 
   return (
     <ExpoVideoView

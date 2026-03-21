@@ -47,11 +47,12 @@ const Max = ({ children, color, weight, className, style, ...props }: Props) => 
 
   const fontWeight = weight ? { fontWeight: weight } : {};
   const overflow = props.numberOfLines ? 'hidden' : undefined;
+  const paddingRight = 2 + (Number(style?.padding || style?.paddingRight) || 0);
 
   return (
     <NativeText
       className={cn(className)}
-      style={{ ...Texts.max, ...fontWeight, color, ...styles.shared, overflow, ...style }}
+      style={{ ...Texts.max, ...fontWeight, color, ...styles.shared, overflow, paddingRight, ...style }}
       {...props}
       {...textBreakProps}
     >

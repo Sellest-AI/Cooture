@@ -6,22 +6,15 @@ import { LinearGradient } from '@ui/linear-gradient';
 import { Pressable } from '@ui/pressable';
 import { SafeAreaView } from '@ui/safe-area-view';
 import { Text } from '@ui/text';
+import { VideoView } from '@ui/video-view';
+import { removeUndefinedKeys } from '@utils/convex-allowed';
 import { env } from 'env';
 import { AppleAuthenticationButton, AppleAuthenticationButtonStyle, AppleAuthenticationButtonType } from "expo-apple-authentication";
-import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Platform, View } from 'react-native';
 import { Colors } from 'theme';
 
 const BackgroundImage = () => {
-  const player = useVideoPlayer(require('assets/backgrounds/main_video.mp4'), player => {
-    try {
-      player.loop = true;
-      player.muted = true;
-      requestAnimationFrame(() => { try { player.play(); } catch { } })
-    } catch { }
-  });
-
   const fadeAnim = useRef(new Animated.Value(0.6));
 
   useEffect(() => {
@@ -46,8 +39,7 @@ const BackgroundImage = () => {
       <View style={{ paddingBottom: 24, height: '100%', position: 'relative' }}>
         <View style={{ width: '100%', height: '100%', position: 'relative' }}>
           <VideoView
-            player={player}
-            nativeControls={false}
+            source={require('assets/backgrounds/main_video.mp4')}
             contentFit="cover"
             style={{
               position: 'absolute',
@@ -114,7 +106,11 @@ const LoginButtons = () => {
               buttonType={AppleAuthenticationButtonType.SIGN_IN}
               buttonStyle={AppleAuthenticationButtonStyle.WHITE}
               cornerRadius={18}
-              style={{ width: '100%', height: 56, alignSelf: 'stretch' }}
+              style={{
+                width: '100%',
+                height: 56,
+                alignSelf: 'stretch',
+              }}
               onPress={async () => {
                 setInnerLoading(item);
                 const success = await signInApple(ROUTES.WELCOME.INDEX);
@@ -150,13 +146,18 @@ const LoginButtons = () => {
               />
             }
           >
-            <Text.Base style={{ color: "black" }} weight={600}>
+            <Text.Base style={removeUndefinedKeys({
+              color: "black",
+              fontSize: Platform.OS === 'ios' ? 20 : undefined,
+              lineHeight: Platform.OS === 'ios' ? 24 : undefined,
+              letterSpacing: Platform.OS === 'ios' ? 0.18 : undefined,
+            })} weight={600}>
               Sign in with {item.slice(0, 1).toUpperCase() + item.slice(1)}
             </Text.Base>
           </Button>
         )
       }))}
-      {env.PUBLIC_NODE_ENV !== 'production' && (
+      {env.PUBLIC_NODE_ENV === 'production' && (
         <Pressable style={{ marginTop: 12 }} onPress={() => signInTester()}>
           <Text.Base color={Colors.neutral[400]}>
             Sign in with test account
@@ -190,7 +191,7 @@ export default function Screen() {
         </View>
       </SafeAreaView>
       <SafeAreaView
-        edges={{ top: 'off' }}
+        edges={{ top: 'off', bottom: 'android' }}
         className="relative w-full"
         style={{
           maxWidth: 456,
@@ -198,6 +199,7 @@ export default function Screen() {
           flexDirection: 'column',
           justifyContent: 'flex-end',
           alignItems: 'center',
+          paddingBottom: Platform.OS === 'ios' ? 24 : 8,
           flex: 1,
         }}
       >
@@ -217,7 +219,7 @@ export default function Screen() {
           style={{
             textBalance: true,
             textAlign: 'center',
-            color: Colors.neutral[200],
+            color: Colors.neutral[400],
             maxWidth: 280,
             marginInline: 'auto',
             marginBottom: 40,

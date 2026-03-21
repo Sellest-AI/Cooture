@@ -1,5 +1,6 @@
 import React, { ComponentProps, useRef, useState } from "react";
-import { Animated, PanResponder, StyleSheet, View } from "react-native";
+import { Animated, StyleSheet, View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { Colors } from "theme";
 import { Button } from "./button";
 import { ChevronRight, Loader } from "./icons";
@@ -15,7 +16,7 @@ type Props = {
 export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disabled }: Props) => {
   const [layoutWidth, setLayoutWidth] = useState<number | null>(null);
   const TRACK_HEIGHT = 52;
-  const KNOB_WIDTH = 170; // default/fallback
+  const KNOB_WIDTH = 170;
   const GAP = 8;
 
   const translateX = useRef(new Animated.Value(0)).current;
@@ -26,18 +27,10 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
   const knobOpacity = useRef(new Animated.Value(1)).current;
   const knobScale = useRef(new Animated.Value(1)).current;
   const [showLoader, setShowLoader] = useState(false);
+  const showLoaderRef = useRef(false);
 
-  // Keep onComplete reference up-to-date to avoid stale closures in PanResponder
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
-
-  // Track disabled state in ref for PanResponder
-  const disabledRef = useRef(disabled);
-  disabledRef.current = disabled;
-
-  const onLayout = (e: any) => {
-    setLayoutWidth(e.nativeEvent.layout.width);
-  };
 
   const getMax = () => {
     const w = layoutWidth ?? 320;
@@ -54,90 +47,83 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
     ]).start(({ finished }) => {
       if (finished) currentX.current = 0;
     });
-  }
+  };
 
-  const sharedFinish = async ({ finished, max }: { finished: boolean, max: number }) => {
-    if (showLoader) return; // Prevent multiple triggers
+  const sharedFinish = async ({ finished, max }: { finished: boolean; max: number }) => {
+    if (showLoaderRef.current) return;
     if (finished) {
       currentX.current = max;
+      showLoaderRef.current = true;
       setShowLoader(true);
       await onCompleteRef.current?.();
-      requestAnimationFrame(() => { setShowLoader(false); reset(); })
+      requestAnimationFrame(() => {
+        showLoaderRef.current = false;
+        setShowLoader(false);
+        reset();
+      });
     }
-  }
+  };
 
-  const pan = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => false,
-      onStartShouldSetPanResponderCapture: () => false,
-      // Only become responder if horizontal movement dominates to avoid blocking vertical ScrollView
-      onMoveShouldSetPanResponder: (_, gs) => !disabledRef.current && Math.abs(gs.dx) > Math.abs(gs.dy) && Math.abs(gs.dx) > 6,
-      onMoveShouldSetPanResponderCapture: (_, gs) => !disabledRef.current && Math.abs(gs.dx) > Math.abs(gs.dy) && Math.abs(gs.dx) > 6,
-      // Prevent parent from taking over during an active horizontal drag
-      onPanResponderTerminationRequest: () => false,
-      onPanResponderGrant: () => {
-        startX.current = currentX.current;
-      },
-      onPanResponderMove: (_, gestureState) => {
-        const dx = gestureState.dx ?? 0;
-        const max = getMax();
-        let value = startX.current + dx;
-        if (value < 0) value = 0;
-        if (value > max) value = max;
-        translateX.setValue(value);
-        currentX.current = value;
-        // Auto-complete at 90%
-        const autoThreshold = max * 0.9;
-        if (!completed.current && value >= autoThreshold) {
-          completed.current = true;
-          Animated.parallel([
-            Animated.timing(translateX, { toValue: max, duration: 180, useNativeDriver: false }),
-            Animated.timing(knobOpacity, { toValue: 0, duration: 180, useNativeDriver: false }),
-            Animated.timing(knobScale, { toValue: 1.1, duration: 180, useNativeDriver: false }),
-          ]).start(async ({ finished }) => sharedFinish({ finished, max }));
-        }
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        const vx = gestureState.vx ?? 0; // velocity in px/s (approx)
-        const max = getMax();
-        const val = currentX.current;
-        const threshold = max * 0.9;
+  const completeSlide = (max: number, duration = 180) => {
+    if (completed.current) return;
+    completed.current = true;
+    Animated.parallel([
+      Animated.timing(translateX, { toValue: max, duration, useNativeDriver: false }),
+      Animated.timing(knobOpacity, { toValue: 0, duration, useNativeDriver: false }),
+      Animated.timing(knobScale, { toValue: 1.1, duration, useNativeDriver: false }),
+    ]).start(async ({ finished }) => sharedFinish({ finished, max }));
+  };
 
-        // Projected position based on fling velocity. Multiplier tuned to give ~200-300ms projection.
-        const VELOCITY_MS = 0.2; // seconds to project
-        const projected = val + vx * VELOCITY_MS;
+  const snapBack = () => {
+    Animated.parallel([
+      Animated.spring(translateX, { toValue: 0, useNativeDriver: false }),
+      Animated.timing(knobOpacity, { toValue: 1, duration: 120, useNativeDriver: false }),
+      Animated.spring(knobScale, { toValue: 1, useNativeDriver: false }),
+    ]).start(({ finished }) => {
+      if (finished) currentX.current = 0;
+    });
+  };
 
-        if (!completed.current && projected >= threshold) {
-          // velocity fling will reach threshold -> complete
-          completed.current = true;
-          Animated.parallel([
-            Animated.timing(translateX, { toValue: max, duration: 220, useNativeDriver: false }),
-            Animated.timing(knobOpacity, { toValue: 0, duration: 220, useNativeDriver: false }),
-            Animated.timing(knobScale, { toValue: 1.1, duration: 220, useNativeDriver: false }),
-          ]).start(async ({ finished }) => sharedFinish({ finished, max }));
-          return;
-        }
-
-        // If no fling to complete, use current position to decide
-        if (val >= threshold) {
-          if (!completed.current) completed.current = true;
-          Animated.parallel([
-            Animated.timing(translateX, { toValue: max, duration: 180, useNativeDriver: false }),
-            Animated.timing(knobOpacity, { toValue: 0, duration: 180, useNativeDriver: false }),
-            Animated.timing(knobScale, { toValue: 1.1, duration: 180, useNativeDriver: false }),
-          ]).start(async ({ finished }) => sharedFinish({ finished, max }));
-        } else {
-          Animated.parallel([
-            Animated.spring(translateX, { toValue: 0, useNativeDriver: false }),
-            Animated.timing(knobOpacity, { toValue: 1, duration: 120, useNativeDriver: false }),
-            Animated.spring(knobScale, { toValue: 1, useNativeDriver: false }),
-          ]).start(({ finished }) => {
-            if (finished) currentX.current = 0;
-          });
-        }
-      },
+  const pan = Gesture.Pan()
+    .enabled(!disabled)
+    // Claim gesture once user moves 10px right; fail immediately on leftward swipe
+    // so the iOS swipe-back still works naturally from the screen edge.
+    .activeOffsetX([0, 10])
+    .failOffsetX(-5)
+    .runOnJS(true) // run callbacks on JS thread so we can call Animated + setState
+    .onBegin(() => {
+      startX.current = currentX.current;
     })
-  ).current;
+    .onUpdate((e) => {
+      if (completed.current) return;
+      const max = getMax();
+      let value = startX.current + e.translationX;
+      if (value < 0) value = 0;
+      if (value > max) value = max;
+      translateX.setValue(value);
+      currentX.current = value;
+
+      if (value >= max * 0.9) {
+        completeSlide(max, 180);
+      }
+    })
+    .onEnd((e) => {
+      if (completed.current) return;
+      const max = getMax();
+      const val = currentX.current;
+      const threshold = max * 0.9;
+      const projected = val + (e.velocityX ?? 0) * 0.2;
+
+      if (projected >= threshold || val >= threshold) {
+        completeSlide(max, 220);
+      } else {
+        snapBack();
+      }
+    })
+    .onFinalize(() => {
+      // Covers cancellation (e.g. incoming call interrupts gesture)
+      if (!completed.current) snapBack();
+    });
 
   const knobStyle = {
     opacity: knobOpacity,
@@ -145,50 +131,51 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
   } as any;
 
   return (
-    <View onLayout={onLayout} style={[
-      styles.container,
-      { height: TRACK_HEIGHT + 8 },
-    ]}>
-      <View style={[styles.track, {
-        height: TRACK_HEIGHT + GAP,
-        backgroundColor: disabled ? Colors.primary[700] : Colors.primary[500],
-        opacity: disabled ? 0.7 : 1,
-      }]} />
+    <View
+      onLayout={(e) => setLayoutWidth(e.nativeEvent.layout.width)}
+      style={[styles.container, { height: TRACK_HEIGHT + 8 }]}
+    >
+      <View
+        style={[styles.track, {
+          height: TRACK_HEIGHT + GAP,
+          backgroundColor: disabled ? Colors.primary[700] : Colors.primary[500],
+          opacity: disabled ? 0.7 : 1,
+        }]}
+      />
 
-      {!showLoader && <View style={{
-        position: "absolute",
-        right: 12,
-        flexDirection: "row",
-        alignItems: "center",
-      }}
-      >
-        <ChevronRight color={Colors.primary[900]} style={{ opacity: 0.45, marginRight: -8 }} size={24} />
-        <ChevronRight color={Colors.primary[900]} style={{ opacity: 0.5, marginRight: -8 }} size={24} />
-        <ChevronRight color={Colors.primary[900]} style={{ opacity: 0.6 }} size={24} />
-      </View>}
+      {!showLoader && (
+        <View style={{ position: "absolute", right: 12, flexDirection: "row", alignItems: "center" }}>
+          <ChevronRight color={Colors.primary[900]} style={{ opacity: 0.45, marginRight: -8 }} size={24} />
+          <ChevronRight color={Colors.primary[900]} style={{ opacity: 0.5, marginRight: -8 }} size={24} />
+          <ChevronRight color={Colors.primary[900]} style={{ opacity: 0.6 }} size={24} />
+        </View>
+      )}
 
-      {showLoader && <View style={{ position: 'absolute', inset: 0, justifyContent: 'center', alignItems: 'center' }}>
-        <Loader color={Colors.primary[900]} />
-      </View>}
+      {showLoader && (
+        <View style={{ position: 'absolute', inset: 0, justifyContent: 'center', alignItems: 'center' }}>
+          <Loader color={Colors.primary[900]} />
+        </View>
+      )}
 
-      <Animated.View
-        {...pan.panHandlers}
-        style={[styles.knob, knobStyle, { height: TRACK_HEIGHT, left: GAP / 2 }]}
-        onLayout={(e) => {
-          const w = e.nativeEvent.layout.width;
-          if (w && knobWidth.current !== w) knobWidth.current = w;
-        }}
-      >
-        <Button
-          disabled={disabled}
-          variant="primary"
-          startIcon={startIcon}
-          endIcon={endIcon}
-          style={{ borderRadius: 20, height: TRACK_HEIGHT }}
+      <GestureDetector gesture={pan}>
+        <Animated.View
+          style={[styles.knob, knobStyle, { height: TRACK_HEIGHT, left: GAP / 2 }]}
+          onLayout={(e) => {
+            const w = e.nativeEvent.layout.width;
+            if (w && knobWidth.current !== w) knobWidth.current = w;
+          }}
         >
-          {children}
-        </Button>
-      </Animated.View>
+          <Button
+            disabled={disabled}
+            variant="primary"
+            startIcon={startIcon}
+            endIcon={endIcon}
+            style={{ borderRadius: 20, height: TRACK_HEIGHT }}
+          >
+            {children}
+          </Button>
+        </Animated.View>
+      </GestureDetector>
     </View>
   );
 };

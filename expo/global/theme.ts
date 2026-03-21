@@ -8,7 +8,7 @@ import { Platform } from 'react-native';
 export const Texts = {
   max: {
     fontSize: 74,
-    lineHeight: Platform.select({ ios: 67, android: 76, default: 67 }),
+    lineHeight: Platform.select({ ios: 76, android: 76, default: 67 }),
     letterSpacing: -3.7,
     fontFamily: 'Murays'
   },
