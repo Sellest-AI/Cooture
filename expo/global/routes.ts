@@ -51,10 +51,10 @@ export const ROUTES = {
     }
   },
   USER: {
-    PATH: '/users/[id]',
-    ID: (id: string) => `/users/${id}` as const,
-    FOLLOWERS: '/users/u/[id]/followers',
-    FOLLOWING: '/users/u/[id]/following',
+    PATH: '/user/[id]',
+    ID: (id: string) => `/user/${id}` as const,
+    FOLLOWERS: '/user/u/[id]/followers',
+    FOLLOWING: '/user/u/[id]/following',
   },
   EXTRA: {
     SETINGS: '/settings',
