@@ -7,6 +7,7 @@ type Args = {
   type: 'generation_ready';
 }
 
+/** Reads unread notifications for a user and marks them as read */
 export const readNotification = async (ctx: MutationCtx, args: Args) => {
   const { generationId, type, userId } = args;
 

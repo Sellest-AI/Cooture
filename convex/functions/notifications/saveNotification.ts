@@ -5,8 +5,9 @@ import { MutationCtx, QueryCtx } from "../../procedures";
 import { NOTIFICATION_CHANNEL, NOTIFICATION_TYPE } from '../../schema/notifications';
 
 type Type = typeof NOTIFICATION_TYPE['type'];
-type SingleObject = { generationId: Id<'generations'>, outfitId?: never } |
-{ generationId?: never, outfitId: Id<'outfits'> }
+
+type SingleObject = { generationId: Id<'generations'>, outfitId?: never } | { generationId?: never, outfitId: Id<'outfits'> }
+type NewLike = { type: "new_like", actorId: Id<'users'> } & SingleObject
 
 type GenerationReady = {
   type: "generation_ready",
@@ -25,25 +26,35 @@ type TaggedInGeneration = {
 
 type NewFollower = { type: "new_follower", actorId: Id<'users'>, userId: Id<'users'> }
 
-type NewLike = { type: "new_like", actorId: Id<'users'> } & SingleObject
+type OutfitUsed = {
+  type: "outfit_used",
+  outfitId: Id<'outfits'>,
+  /** The actor who used the outfit */
+  actorId: Id<'users'>,
+}
 
 type Args<T extends Type> = {
   type: T,
+  /** The user to notify */
   userId?: Id<'users'>,
   pushToDevice?: boolean,
+  /** Delay before pushing the notification (in milliseconds) */
+  delayPushMs?: number,
 } & (
     T extends "generation_ready" ? GenerationReady :
     T extends "new_like" ? NewLike :
     T extends "new_follower" ? NewFollower :
     T extends "tagged_in_generation" ? TaggedInGeneration :
+    T extends "outfit_used" ? OutfitUsed :
     never
   )
 
 type ArgsExtended<T extends Type> = Args<T> & (
   T extends "generation_ready" ? { generation: Nullable<Doc<'generations'>>, type: "generation_ready" } :
   T extends "tagged_in_generation" ? { generation: Nullable<Doc<'generations'>>, type: "tagged_in_generation" } :
-  T extends "new_like" ? { generation?: Nullable<Doc<'generations'>>, outfit?: Nullable<Doc<'outfits'>>, user?: Nullable<Doc<'usersExtended'>>, type: "new_like" } :
+  T extends "new_like" ? { generation?: Nullable<Doc<'generations'>>, outfit?: Nullable<Doc<'outfits'>>, actor?: Nullable<Doc<'usersExtended'>>, type: "new_like" } :
   T extends "new_follower" ? { follower: Nullable<Doc<'usersExtended'>>, type: "new_follower" } :
+  T extends "outfit_used" ? { outfit: Nullable<Doc<'outfits'>>, type: "outfit_used", actor?: Nullable<Doc<'usersExtended'>> } :
   never
 )
 
@@ -84,15 +95,23 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
         return {
           title: `+${aggregationCount} people liked your post`,
           body: "Tap to view",
-          image: args.user?.imageUrl,
+          image: args.actor?.imageUrl,
           redirectUrl: FALLBACK_ROUTE
         }
-
       return {
         title: "You have a new like",
         body: "Tap to view",
-        image: args.user?.imageUrl,
+        image: args.actor?.imageUrl,
         redirectUrl: FALLBACK_ROUTE
+      }
+    case "outfit_used":
+      return {
+        title:
+          aggregationCount > 1 ? `+${aggregationCount} people used your outfit` :
+            `${args.actor?.name ?? "Someone"} used your outfit`,
+        body: "Tap to view",
+        image: args.actor?.imageUrl,
+        redirectUrl: ROUTES.SHARE.USER(args.actorId)
       }
   }
 }
@@ -107,6 +126,8 @@ const aggregationKey = (args: Args<Type>) => {
       return `new_follower:${args.userId}`
     case "new_like":
       return `new_like:${args.userId}:${args.generationId ?? args.outfitId}`
+    case "outfit_used":
+      return `outfit_used:${args.outfitId}`
   }
 }
 
@@ -120,6 +141,8 @@ const getUserId = (args: ArgsExtended<Type>) => {
       return args.actorId;
     case "new_like":
       return args.generation?.userId ?? args.outfit?.userId;
+    case "outfit_used":
+      return args.outfit?.userId;
   }
 }
 
@@ -140,15 +163,21 @@ async function getObjects(ctx: QueryCtx, args: Args<Type>): Promise<ArgsExtended
   }
 
   if (args.type === "new_like") {
-    const user = await ctx.db.query("usersExtended").withIndex("by_user_id", q => q.eq("userId", args.actorId)).first();
+    const actor = await ctx.db.query("usersExtended").withIndex("by_user_id", q => q.eq("userId", args.actorId)).first();
     if (args.generationId) {
       const generation = await ctx.db.query("generations").withIndex("by_id", q => q.eq("_id", args.generationId)).first();
-      return { ...args, generation, user };
+      return { ...args, generation, actor };
     }
     else if (args.outfitId) {
       const outfit = await ctx.db.query("outfits").withIndex("by_id", q => q.eq("_id", args.outfitId)).first();
-      return { ...args, outfit, user };
+      return { ...args, outfit, actor };
     }
+  }
+
+  if (args.type === "outfit_used") {
+    const outfit = await ctx.db.query("outfits").withIndex("by_id", q => q.eq("_id", args.outfitId)).first();
+    const actor = await ctx.db.query("usersExtended").withIndex("by_user_id", q => q.eq("userId", args.actorId)).first();
+    return { ...args, outfit, actor };
   }
 
   return args;
@@ -185,7 +214,7 @@ export const saveNotification = async <T extends Type>(ctx: MutationCtx, args: A
   const sendPushNotification = async () => {
     if (!args.pushToDevice) return false;
     // Schedule a push notification to be sent immediately with the notification details to user's decides. 
-    const result = await ctx.scheduler.runAfter(0, internal.router.notifications.sendPushNotification._internal, {
+    const result = await ctx.scheduler.runAfter((args.delayPushMs ?? 0), internal.router.notifications.sendPushNotification._internal, {
       ...(await createPushNotification(argsExtended, existingNotification)),
       data: argsExtended,
       userId: userId,

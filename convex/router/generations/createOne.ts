@@ -38,13 +38,26 @@ export const _internal = internalMutation({
     const userIds = Array.from(new Set([userId, ...(extraUserIds ?? [])]));
     const extraUsers = (extraUserIds ?? []).filter((id) => id !== userId);
 
+    // Send notifications
     await Promise.all(extraUsers.map((id) => saveNotification(ctx, {
       userId: id,
       actorId: userId,
       type: "tagged_in_generation",
       generationId,
-      pushToDevice: true
+      pushToDevice: true,
+      // Delay the notification by 3 minutes to wait for the generation to be completed
+      delayPushMs: 3 * 60 * 1000,
     })));
+
+    if (preset?.outfitId)
+      await saveNotification(ctx, {
+        actorId: userId,
+        outfitId: preset.outfitId,
+        type: "outfit_used",
+        pushToDevice: true,
+        // Delay the notification by 5 minutes to wait for the generation to be completed
+        delayPushMs: 5 * 60 * 1000,
+      })
 
     if (preset) {
       await ctx.db.insert("presetGenerations", {
