@@ -20,8 +20,8 @@ import { Pressable } from "@ui/pressable";
 import { SafeAreaView, useSafeAreaInsets } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import { TextInput } from "@ui/text-input";
-import { env } from "env";
 import { router } from "expo-router";
+import { WEBSITE } from "global";
 import { useMemo, useState } from "react";
 import { Keyboard, Share, View } from "react-native";
 import { ROUTES } from "routes";
@@ -347,9 +347,9 @@ export default function ItemScreen() {
                     startIcon={ShareIcon}
                     onPress={() => {
                       Share.share({
-                        title: env.PUBLIC_APP_URL + ROUTES.OUTFIT.ID(id),
-                        url: env.PUBLIC_APP_URL + ROUTES.OUTFIT.ID(id),
-                        message: env.PUBLIC_APP_URL + ROUTES.OUTFIT.ID(id),
+                        title: WEBSITE.URL + ROUTES.SHARE.OUTFIT(id),
+                        url: WEBSITE.URL + ROUTES.SHARE.OUTFIT(id),
+                        message: WEBSITE.URL + ROUTES.SHARE.OUTFIT(id),
                       })
                     }}
                   >

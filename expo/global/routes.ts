@@ -40,6 +40,12 @@ export const ROUTES = {
     SAVED_POSTS: '/collection/saved-posts',
     SAVED_OUTFITS: '/collection/saved-outfits',
   },
+  SHARE: {
+    POST: (postId: string) => `/p/${postId}`,
+    OUTFIT: (outfitId: string) => `/o/${outfitId}`,
+    ITEM: (itemId: string) => `/i/${itemId}`,
+    USER: (userId: string) => `/u/${userId}`,
+  },
   PHOTOSHOOT: {
     NEW: '/photoshoot/create',
     PRESETS: '/photoshoot/create/presets',

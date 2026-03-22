@@ -3,7 +3,7 @@ import { api, Id } from "@/lib/convex/api";
 import { useMutation, useQuery, useQueryCached, useQueryCachedData } from "@/lib/convex/client";
 import { Post } from "@ui/cards";
 import { notEmpty } from "@utils/convex-allowed";
-import { env } from "env";
+import { WEBSITE } from "global";
 import { Share, ViewStyle } from "react-native";
 
 type Props = {
@@ -40,9 +40,9 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
     isLiked={liked}
     onShare={async (_id) => {
       Share.share({
-        title: env.PUBLIC_APP_URL + ROUTES.POST.ID(_id),
-        url: env.PUBLIC_APP_URL + ROUTES.POST.ID(_id),
-        message: env.PUBLIC_APP_URL + ROUTES.POST.ID(_id),
+        title: WEBSITE.URL + ROUTES.SHARE.POST(_id),
+        url: WEBSITE.URL + ROUTES.SHARE.POST(_id),
+        message: WEBSITE.URL + ROUTES.POST.ID(_id),
       })
     }}
     images={images?.map((img) => ({

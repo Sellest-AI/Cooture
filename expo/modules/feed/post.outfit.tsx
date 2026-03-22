@@ -3,7 +3,7 @@ import { api, Id } from "@/lib/convex/api";
 import { useMutation, useQuery, useQueryCachedData } from "@/lib/convex/client";
 import { Post } from "@ui/cards";
 import { notEmpty } from "@utils/convex-allowed";
-import { env } from "env";
+import { WEBSITE } from "global";
 import { Share, ViewStyle } from "react-native";
 
 export const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle }) => {
@@ -38,9 +38,9 @@ export const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle
     isLiked={liked}
     onShare={async (id) => {
       Share.share({
-        title: env.PUBLIC_APP_URL + ROUTES.OUTFIT.ID(id),
-        url: env.PUBLIC_APP_URL + ROUTES.OUTFIT.ID(id),
-        message: env.PUBLIC_APP_URL + ROUTES.OUTFIT.ID(id),
+        title: WEBSITE.URL + ROUTES.SHARE.OUTFIT(id),
+        url: WEBSITE.URL + ROUTES.SHARE.OUTFIT(id),
+        message: WEBSITE.URL + ROUTES.SHARE.OUTFIT(id),
       })
     }}
     users={user ? [{
