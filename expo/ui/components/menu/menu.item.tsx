@@ -10,13 +10,13 @@ type Props = {
   variant?: "default" | "primary" | "secondary" | "destructive",
   icon: React.ComponentType<{ size?: number, color?: string, weight?: 'regular' | 'fill' }>,
   iconWeight?: 'regular' | 'fill',
-  iconRight?: false,
+  rightIcon?: false,
   text: ReactNode,
   style?: ViewStyle,
   onPress?: () => void,
   disabled?: boolean,
 }
-export const MenuItem = ({ icon, iconRight, text, style, onPress, variant, disabled, iconWeight }: Props) => {
+export const MenuItem = ({ icon, rightIcon, text, style, onPress, variant, disabled, iconWeight }: Props) => {
   const Icon = icon;
 
   const colors = () => {
@@ -95,7 +95,7 @@ export const MenuItem = ({ icon, iconRight, text, style, onPress, variant, disab
           {text}
         </Text.Base>
       </View>
-      {iconRight !== false && (
+      {rightIcon !== false && (
         <ChevronRight
           size={20}
           color={theme.color}

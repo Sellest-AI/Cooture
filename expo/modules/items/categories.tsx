@@ -27,17 +27,18 @@ export const Categories = <T extends string>({ value, categories, categoryTitle,
       />
       <Modal
         onOpenChange={setOpen}
-        scrollable={false}
+        scrollable={categories.length > 12 ? true : false}
         open={open}
         style={{ maxHeight: '80%' }}
         header={{ title: categoryTitle }}
       >
         <FlatList
+          scrollEnabled={false}
           showsVerticalScrollIndicator={false}
           data={categories}
           numColumns={2}
           keyExtractor={(i) => i.value}
-          contentContainerStyle={{ paddingTop: 12, paddingBottom: 12 }}
+          contentContainerStyle={{ paddingBottom: 12 }}
           renderItem={({ item }) => (
             <View style={{ padding: 2, flex: 1 }}>
               <Category

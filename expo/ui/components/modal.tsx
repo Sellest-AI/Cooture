@@ -1,5 +1,5 @@
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { Modal as NativeModal, Platform, Pressable, Animated as RNAnimated, View, ViewStyle } from 'react-native';
+import { Modal as NativeModal, Platform, Pressable, View, ViewStyle } from 'react-native';
 import { Gesture, GestureDetector, GestureType } from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
@@ -114,14 +114,9 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
     if (open) setCurrentStep(0);
   }, [open]);
 
-  const opacityAnim = useRef(new RNAnimated.Value(0)).current;
-  useEffect(() => { RNAnimated.timing(opacityAnim, { toValue: open ? 1 : 0, delay: 0, duration: 200, useNativeDriver: true }).start(); }, [open, opacityAnim]);
-
   const closeAnimation = useCallback(() => {
-    RNAnimated.timing(opacityAnim, { toValue: 0, duration: 150, useNativeDriver: true }).start();
-    // small delay to allow animation
-    setTimeout(() => onOpenChange?.(false), 100);
-  }, [onOpenChange, opacityAnim]);
+    onOpenChange && onOpenChange(false);
+  }, [onOpenChange]);
 
   // navigation helpers that reference current steps length
   const next = useCallback(() => {
@@ -141,9 +136,7 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
   }, []);
 
   const FinalView = scrollable ? Animated.ScrollView : View;
-  const { bottom: _bottom } = useSafeAreaInsets();
-  const bottom = Platform.OS === 'ios' ? 0 : _bottom;
-
+  const { bottom: bottom } = useSafeAreaInsets();
   return (
     <NativeModal
       visible={open}
@@ -193,9 +186,9 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
             <GestureDetector gesture={nativeScroll}>
               <FinalView
                 showsVerticalScrollIndicator={false}
-                style={{ paddingBottom: scrollable ? 0 : bottom }}
+                style={{ paddingBottom: scrollable ? 0 : (Platform.OS === 'ios' ? 0 : bottom) }}
                 // bottom + Pan handler offset
-                contentContainerStyle={{ paddingBottom: bottom + 28 }}
+                contentContainerStyle={{ paddingBottom: bottom }}
                 bounces={false}
                 onScroll={scrollable ? scrollHandler : undefined}
                 scrollEventThrottle={16}

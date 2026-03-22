@@ -71,24 +71,26 @@ export const PostMenu = ({ open, onOpenChange, ...props }: Props) => {
         edges={{ top: 'off', bottom: 'android' }}
         style={{ paddingTop: 24 }}
       >
-        <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-          <RoundButton
-            title={liked ? "Liked" : "Like"}
-            onPress={() => onToggleLike?.(!liked)}
-            weight={liked ? "fill" : "regular"}
-            icon={HeartIcon}
-          />
-          <RoundButton
-            title={bookmarked ? "Bookmarked" : "Bookmark"}
-            onPress={() => onToggleBookmark?.(!bookmarked)}
-            weight={bookmarked ? "fill" : "regular"}
-            icon={BookmarkIcon}
-          />
-          <RoundButton
-            title="Share"
-            icon={ShareIcon}
-          />
-        </View>
+        {(onToggleLike || onToggleBookmark || onShare) && (
+          <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+            {onToggleLike && <RoundButton
+              title={liked ? "Liked" : "Like"}
+              onPress={() => onToggleLike?.(!liked)}
+              weight={liked ? "fill" : "regular"}
+              icon={HeartIcon}
+            />}
+            {onToggleBookmark && <RoundButton
+              title={bookmarked ? "Bookmarked" : "Bookmark"}
+              onPress={() => onToggleBookmark?.(!bookmarked)}
+              weight={bookmarked ? "fill" : "regular"}
+              icon={BookmarkIcon}
+            />}
+            {onShare && <RoundButton
+              title="Share"
+              icon={ShareIcon}
+              onPress={() => { onShare?.(); onOpenChange?.(false); }}
+            />}
+          </View>)}
         {(onOutfitPress || onRecreate) && <MenuGroup title="Quick Access" style={{ marginTop: 28 }}>
           {onRecreate && <MenuItem
             icon={Camera}
@@ -109,24 +111,10 @@ export const PostMenu = ({ open, onOpenChange, ...props }: Props) => {
             text="View profile"
             onPress={() => { onProfilePress?.(); onOpenChange?.(false); }}
           />}
-          {onToggleBookmark && <MenuItem
-            icon={BookmarkIcon}
-            text={bookmarked ? "Remove bookmark" : "Bookmark post"}
-            iconWeight={bookmarked ? "fill" : "regular"}
-            onPress={() => { onToggleBookmark?.(!bookmarked); }}
-            iconRight={false}
-          />}
-          {onToggleLike && <MenuItem
-            icon={HeartIcon}
-            text={liked ? "Unlike post" : "Like post"}
-            iconWeight={liked ? "fill" : "regular"}
-            onPress={() => { onToggleLike?.(!liked); }}
-            iconRight={false}
-          />}
           {onShare && <MenuItem
             icon={ShareIcon}
             text="Share post"
-            iconRight={false}
+            rightIcon={false}
             onPress={() => { onShare?.(); onOpenChange?.(false); }}
           />}
         </MenuGroup>

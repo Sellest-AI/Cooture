@@ -2,7 +2,8 @@ import { api, Id } from '@/lib/convex/api';
 import { useQuery } from '@/lib/convex/client';
 import { Button } from '@ui/button';
 import { CardItem } from '@ui/cards/card-item';
-import { ExternalLink, Globe, Trash } from '@ui/icons';
+import { ExternalLink, Globe, Trash, User } from '@ui/icons';
+import { MenuGroup, MenuItem } from '@ui/menu';
 import { Modal, ModalProps } from '@ui/modal';
 import * as Linking from 'expo-linking';
 import { router } from 'expo-router';
@@ -19,53 +20,53 @@ export const SelectedItemModal = ({ itemId, onRemove, ...props }: SelectedItemMo
   const open = !!item && props.open;
 
   return (
-    <Modal {...props} open={open}
+    <Modal {...props}
+      open={open}
       header={{ title: item?.name ?? '' }}
+      scrollable={true}
     >
-      {({ close }) => !item ? null : (
-        <View style={{ paddingTop: 12, paddingBottom: 12 }}>
-          <CardItem
-            image={item.image}
-            source={item.image.sizes.medium.url}
-            title={item.name}
-            subtitle={item.category}
-            animate={false}
-            style={{ height: 256 }}
-          />
-          <Button
-            variant="destructive"
-            startIcon={Trash}
-            style={{ marginTop: 28 }}
+      {({ close }) => <View style={{ paddingVertical: 12 }}>
+        {item && <CardItem
+          image={item.image}
+          source={item.image.sizes.medium.url}
+          title={item.name}
+          subtitle={item.category}
+          animate={false}
+          style={{ height: 256 }}
+        />}
+        <MenuGroup title="Danger" style={{ marginTop: 24 }}>
+          {onRemove && <MenuItem
+            icon={Trash}
+            text="Remove"
             onPress={onRemove}
-            disabled={!onRemove}
-          >
-            Remove
-          </Button>
-          {item.link && <Button
-            variant="blur"
-            startIcon={Globe}
-            style={{ marginTop: 8 }}
-            onPress={() => item.link && Linking.openURL(item.link)}
-          >
-            Open Website
-          </Button>}
-          <Button
-            variant="blur"
-            startIcon={ExternalLink}
-            style={{ marginTop: 8 }}
-            onPress={() => router.push(ROUTES.ITEM.ID(item._id))}
-          >
-            View Details
-          </Button>
-          <Button
-            style={{ marginTop: 8 }}
-            variant="blur"
-            onPress={() => close()}
-          >
-            Close
-          </Button>
-        </View>
-      )}
+            variant="destructive"
+          />}
+        </MenuGroup>
+        <MenuGroup title="More actions">
+          <MenuItem
+            icon={User}
+            text="User profile"
+            onPress={!item ? undefined : () => { router.push(ROUTES.USER.ID(item.userId)); close(); }}
+          />
+          {item?.link && <MenuItem
+            icon={Globe}
+            text="View on website"
+            onPress={!item?.link ? undefined : () => { Linking.openURL(item.link!); close(); }}
+          />}
+          <MenuItem
+            icon={ExternalLink}
+            text="View details"
+            onPress={!item ? undefined : () => { router.push(ROUTES.ITEM.ID(item._id)); close(); }}
+          />
+        </MenuGroup>
+        <Button
+          style={{ marginTop: 8 }}
+          variant="blur"
+          onPress={() => close()}
+        >
+          Close
+        </Button>
+      </View>}
     </Modal>
   )
 }
