@@ -79,7 +79,7 @@ export const Colors = {
     light: 'hsla(0, 0%, 84%, 0.20)',
     medium: 'hsla(0, 0%, 24%, 0.60)',
     dark: 'hsla(0, 0%, 14%, 0.8)',
-    darkest: 'hsla(0, 0%, 6%, 0.80)',
+    darkest: 'hsla(0, 0%, 6%, 0.92)',
   },
   primary: {
     200: 'hsl(74, 100%, 82%)',

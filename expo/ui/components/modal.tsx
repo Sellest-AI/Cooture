@@ -1,8 +1,11 @@
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Modal as NativeModal, Platform, Pressable, ScrollView, View, ViewStyle } from 'react-native';
+import { Modal as NativeModal, Platform, Pressable, Animated as RNAnimated, View, ViewStyle } from 'react-native';
+import { Gesture, GestureDetector, GestureType } from 'react-native-gesture-handler';
+import type { SharedValue } from 'react-native-reanimated';
+import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import { runOnJS } from 'react-native-worklets';
 import { Colors } from 'theme';
 import { Block } from './block';
-import { BLUR_PROPS, BlurView } from './blur-view';
 import { ArrowLeft } from './icons';
 import { useSafeAreaInsets } from './safe-area-view';
 import { Text } from './text';
@@ -24,30 +27,98 @@ type Props = {
 
 export type ModalProps = Omit<Props, 'children'>;
 
+export const SlideToDismiss = ({
+  children,
+  onDismiss,
+  threshold = 150,
+  scrollY,
+  simultaneousHandlers,
+  canDismiss,
+}: {
+  children: ReactNode,
+  onDismiss: () => void,
+  threshold?: number,
+  scrollY?: SharedValue<number>,
+  simultaneousHandlers?: GestureType,
+  canDismiss: SharedValue<boolean>,
+}) => {
+  const translateY = useSharedValue(0);
+
+  const gesture = Gesture.Pan()
+    .onBegin((event) => {
+      // If we aren't tapping explicitly on the grab handle, check scroll layout
+      if (!canDismiss.value) {
+        canDismiss.value = !scrollY || scrollY.value <= 1;
+      }
+    })
+    .onChange((event) => {
+      if (!canDismiss.value) return;
+
+      // If we are at the default position and the user drags UP (negative changeY),
+      // they are trying to scroll down the content. Disable dismiss for this gesture stroke.
+      if (translateY.value === 0 && event.changeY < 0) {
+        canDismiss.value = false;
+        return;
+      }
+
+      translateY.value = Math.max(0, translateY.value + event.changeY);
+    })
+    .onEnd((event) => {
+      if (!canDismiss.value) return;
+
+      // Allow dismissing if translated past threshold OR if throwing it down hard enough
+      if (translateY.value > threshold || event.velocityY > 1000) {
+        // Animate the rest of the way out before unmounting so it doesn't freeze awkwardly
+        translateY.value = withTiming(translateY.value + 500, { duration: 150 });
+        runOnJS(onDismiss)();
+      } else {
+        translateY.value = withSpring(0, { damping: 20, stiffness: 200, mass: 0.5 });
+      }
+    });
+
+  if (simultaneousHandlers) {
+    gesture.simultaneousWithExternalGesture(simultaneousHandlers);
+  }
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    flex: 1,
+    justifyContent: 'flex-end',
+    transform: [{ translateY: translateY.value }],
+  }));
+
+  return (
+    <GestureDetector gesture={gesture}>
+      <Animated.View style={[animatedStyle, { pointerEvents: 'auto' }]}>
+        <Pressable style={{ position: 'absolute', inset: 0 }} onPress={() => onDismiss()} />
+        {children}
+      </Animated.View>
+    </GestureDetector>
+  );
+};
+
 export const Modal = ({ children, open, onOpenChange, style, header, scrollable = true }: Props) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const opacityAnim = useRef(new Animated.Value(0)).current;
   const stepsLengthRef = useRef<number>(0);
+
+  const scrollY = useSharedValue(0);
+  const canDismiss = useSharedValue(false);
+  const nativeScroll = Gesture.Native();
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
 
   useEffect(() => {
     if (open) setCurrentStep(0);
   }, [open]);
 
-  useEffect(() => {
-    Animated.timing(opacityAnim, {
-      toValue: open ? 1 : 0,
-      delay: 100,
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
-  }, [open, opacityAnim]);
+  const opacityAnim = useRef(new RNAnimated.Value(0)).current;
+  useEffect(() => { RNAnimated.timing(opacityAnim, { toValue: open ? 1 : 0, delay: 0, duration: 200, useNativeDriver: true }).start(); }, [open, opacityAnim]);
 
   const closeAnimation = useCallback(() => {
-    Animated.timing(opacityAnim, {
-      toValue: 0,
-      duration: 150,
-      useNativeDriver: true,
-    }).start();
+    RNAnimated.timing(opacityAnim, { toValue: 0, duration: 150, useNativeDriver: true }).start();
     // small delay to allow animation
     setTimeout(() => onOpenChange?.(false), 100);
   }, [onOpenChange, opacityAnim]);
@@ -69,108 +140,103 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
     setCurrentStep((s) => Math.max(0, s - 1));
   }, []);
 
-  const FinalView = scrollable ? ScrollView : View;
+  const FinalView = scrollable ? Animated.ScrollView : View;
   const { bottom: _bottom } = useSafeAreaInsets();
   const bottom = Platform.OS === 'ios' ? 0 : _bottom;
 
   return (
     <NativeModal
-      transparent
       visible={open}
-      onRequestClose={() => { if (onOpenChange) closeAnimation(); }}
+      onDismiss={() => { if (onOpenChange) closeAnimation(); }}
       animationType="slide"
-      backdropColor="rgba(0,0,0,0.8)"
-      statusBarTranslucent={true}
+      transparent
     >
-      <Animated.View style={{
-        backgroundColor: "rgba(0,0,0,0.8)",
-        position: 'absolute',
-        flex: 1,
-        width: '100%',
-        height: '100%',
-        opacity: opacityAnim,
-      }}>
-        <BlurView
-          {...BLUR_PROPS}
-          intensity={80}
-          style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-          }}
-        />
-      </Animated.View>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-        }}
-      >
-        <Pressable
-          style={{ position: 'absolute', width: '100%', height: '100%' }}
-          onPress={() => {
-            if (onOpenChange) { closeAnimation(); }
-          }}
-        />
-        <Block
-          variant="blur"
-          style={{
-            width: '100%',
-            maxWidth: 540,
-            maxHeight: '95%',
-            borderTopLeftRadius: 32,
-            borderTopRightRadius: 32,
-            borderBottomLeftRadius: 0,
-            borderBottomRightRadius: 0,
-            borderLeftWidth: 0,
-            overflow: 'hidden',
-            justifyContent: 'flex-end',
-            backgroundColor: Colors.blur.darkest,
-            paddingHorizontal: 12,
-            ...style,
-            paddingBottom: 0,
-          }}
+      <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+        <SlideToDismiss
+          onDismiss={() => { if (onOpenChange) closeAnimation(); }}
+          scrollY={scrollable ? scrollY : undefined}
+          simultaneousHandlers={scrollable ? nativeScroll : undefined}
+          canDismiss={canDismiss}
         >
-          <FinalView showsVerticalScrollIndicator={false}
-            style={{ paddingBottom: scrollable ? 0 : bottom }}
-            contentContainerStyle={{ paddingBottom: bottom }}
+          <Block
+            variant="blur"
+            style={{
+              width: '100%',
+              maxWidth: 540,
+              maxHeight: '95%',
+              borderTopLeftRadius: 32,
+              borderTopRightRadius: 32,
+              borderBottomLeftRadius: 0,
+              borderBottomRightRadius: 0,
+              borderLeftWidth: 0,
+              overflow: 'hidden',
+              backgroundColor: Colors.blur.darkest,
+              paddingHorizontal: 12,
+              pointerEvents: 'auto',
+              ...style,
+              paddingBottom: 0,
+            }}
           >
-            {header && <ModalHeader
-              type={header.type}
-              style={{ marginTop: 16 }}
-              title={header.title}
-              onBack={(header.showBackButton || currentStep > 0) ? () => {
-                back?.();
-                if (currentStep === 0 && onOpenChange) closeAnimation();
-              } : undefined}
-            />}
+            <GestureDetector gesture={Gesture.Tap().onBegin(() => {
+              'worklet';
+              canDismiss.value = true;
+            }).onEnd(() => {
+              'worklet';
+              canDismiss.value = scrollY ? scrollY.value <= 1 : true;
+            }).simultaneousWithExternalGesture(nativeScroll)}>
+              <Animated.View style={{ width: '100%', paddingVertical: 12, alignItems: 'center' }}>
+                <View
+                  style={{ width: 56, height: 4, borderRadius: 2, backgroundColor: Colors.neutral[400] }}
+                />
+              </Animated.View>
+            </GestureDetector>
+            <GestureDetector gesture={nativeScroll}>
+              <FinalView
+                showsVerticalScrollIndicator={false}
+                style={{ paddingBottom: scrollable ? 0 : bottom }}
+                // bottom + Pan handler offset
+                contentContainerStyle={{ paddingBottom: bottom + 28 }}
+                bounces={false}
+                onScroll={scrollable ? scrollHandler : undefined}
+                scrollEventThrottle={16}
+              >
+                {header && <ModalHeader
+                  type={header.type}
+                  style={{ marginTop: 10 }}
+                  title={header.title}
+                  onBack={(header.showBackButton || currentStep > 0) ? () => {
+                    back?.();
+                    if (currentStep === 0 && onOpenChange) closeAnimation();
+                  } : undefined}
+                />}
 
-            {/* handle children as array of steps, render-prop, or single node */}
-            {(() => {
-              // if children is a function, call it with actions
-              if (typeof children === 'function') {
-                const res = (children as Children)({ next, back, close: () => { if (onOpenChange) closeAnimation(); } });
-                if (Array.isArray(res)) {
-                  stepsLengthRef.current = res.length;
-                  return res[currentStep] ?? null;
-                }
-                stepsLengthRef.current = 0;
-                return res;
-              }
+                {/* handle children as array of steps, render-prop, or single node */}
+                {(() => {
+                  // if children is a function, call it with actions
+                  if (typeof children === 'function') {
+                    const res = (children as Children)({ next, back, close: () => { if (onOpenChange) closeAnimation(); } });
+                    if (Array.isArray(res)) {
+                      stepsLengthRef.current = res.length;
+                      return res[currentStep] ?? null;
+                    }
+                    stepsLengthRef.current = 0;
+                    return res;
+                  }
 
-              // if children is an array, treat as steps
-              if (Array.isArray(children)) {
-                const arr = children as ReactNode[];
-                stepsLengthRef.current = arr.length;
-                return arr[currentStep] ?? null;
-              }
+                  // if children is an array, treat as steps
+                  if (Array.isArray(children)) {
+                    const arr = children as ReactNode[];
+                    stepsLengthRef.current = arr.length;
+                    return arr[currentStep] ?? null;
+                  }
 
-              stepsLengthRef.current = 0;
-              return children;
-            })()}
-          </FinalView>
-        </Block>
+                  stepsLengthRef.current = 0;
+                  return children;
+                })()}
+              </FinalView>
+            </GestureDetector>
+          </Block>
+        </SlideToDismiss>
       </View>
     </NativeModal>
   )
