@@ -20,6 +20,7 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
   const imageIds = post?.predictions.map((p) => p.imageId).filter(notEmpty) ?? [];
   const { data: images } = useQueryCached(api.router.storage.images.getMany.anon, imageIds.length > 0 ? { imageIds } : 'skip');
 
+  const { data: wearCount } = useQuery(api.router.outfits.wearCount.anon, post?.outfitId ? { outfitId: post.outfitId } : 'skip');
   const { data: isBookmarked } = useQuery(api.router.collection.getBookmarked.authed, { generationId: id });
   const { mutate: toggleBookmark } = useMutation(api.router.collection.toggleBookmark.authed);
 
@@ -33,6 +34,7 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
     style={{ ...style }}
     paddingHorizontal={12}
     postedAt={post.completedAt ? new Date(post.completedAt) : undefined}
+    recreateCount={wearCount}
     isBookmarked={isBookmarked}
     onToggleBookmark={() => toggleBookmark({ generationId: id })}
     onToggleLike={(v) => toggleLike({ generationId: id, value: v })}

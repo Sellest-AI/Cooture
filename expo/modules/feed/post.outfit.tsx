@@ -12,6 +12,7 @@ export const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle
   const { data: user } = useQuery(api.router.users.getAccount.anon, outfit ? { userId: outfit.userId } : 'skip');
   const { data: isBookmarked } = useQuery(api.router.collection.getBookmarked.authed, { outfitId: id });
   const { mutate: toggleBookmark } = useMutation(api.router.collection.toggleBookmark.authed);
+  const { data: wearCount } = useQuery(api.router.outfits.wearCount.anon, { outfitId: id });
 
   const { data: liked } = useQuery(api.router.likes.getLiked.authed, { outfitId: id });
   const { data: likes } = useQueryCachedData(api.router.likes.getLikes.anon, { outfitId: id, key: "likes" });
@@ -30,6 +31,7 @@ export const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle
     style={style}
     paddingHorizontal={12}
     postedAt={outfit._creationTime ? new Date(outfit._creationTime) : undefined}
+    recreateCount={wearCount}
     image={cover}
     isBookmarked={isBookmarked}
     onToggleBookmark={() => toggleBookmark({ outfitId: id })}

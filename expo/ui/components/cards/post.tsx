@@ -1,7 +1,7 @@
 import { Badge } from '@ui/badge';
 import { Button } from '@ui/button';
 import { GhostIconWrapper } from '@ui/ghost-animation';
-import { ArrowRight, BookmarkIcon, CircleFadingArrowUp, EllipsisVertical, HeartIcon, ShareIcon } from '@ui/icons';
+import { ArrowRight, BookmarkIcon, CircleFadingArrowUp, EllipsisVertical, HeartIcon, RefreshCcw, ShareIcon } from '@ui/icons';
 import { Skeleton } from '@ui/skeleton';
 import { MotiView } from 'moti';
 import { useCallback, useRef, useState } from 'react';
@@ -17,6 +17,7 @@ type Props = {
   style?: ViewStyle;
   paddingHorizontal?: number;
   postedAt?: Date;
+  recreateCount?: number;
   isLiked?: boolean;
   onToggleLike?: (value: boolean) => void;
   isBookmarked?: boolean;
@@ -54,7 +55,9 @@ type Props = {
 }
 
 export const Post = ({ style, image, users, preset, outfit, images, likedAccounts, onRecreate,
-  onShare, paddingHorizontal, isBookmarked, onPress, onToggleBookmark, onToggleLike, isLiked }: Props) => {
+  onShare, paddingHorizontal, isBookmarked, onPress, onToggleBookmark, onToggleLike, isLiked,
+  recreateCount,
+}: Props) => {
   const [showMenu, setShowMenu] = useState(false);
   const [doubleTap, setDoubleTap] = useState<number | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -79,6 +82,7 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
   ]);
 
   const user = users?.[0];
+  const recreateCountStr = recreateCount !== undefined && recreateCount > 0 ? recreateCount.toString() : null;
 
   return (
     <>
@@ -330,6 +334,10 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
               </View>}
             </View>
             <View style={{ gap: 12, flexDirection: 'row', alignItems: 'center' }}>
+              {recreateCountStr && <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <RefreshCcw size={18} color={Colors.neutral[400]} />
+                <Text.Base color={Colors.neutral[400]}>{recreateCountStr}</Text.Base>
+              </View>}
               <GhostIconWrapper
                 style={{ padding: 4 }}
                 icon={BookmarkIcon}

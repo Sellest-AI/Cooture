@@ -12,7 +12,7 @@ import { ImageGeneration } from "@ui/cards";
 import { CardItem } from "@ui/cards/card-item";
 import { FlashList } from "@ui/flat-list";
 import { GhostIconWrapper } from "@ui/ghost-animation";
-import { ArrowRight, ArrowUpRight, BookmarkIcon, Pencil, ShareIcon, SquirishPlus, Trash } from "@ui/icons";
+import { ArrowRight, ArrowUpRight, BookmarkIcon, Pencil, RefreshCcw, ShareIcon, SquirishPlus, Trash } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
@@ -104,18 +104,25 @@ const Generations = ({ customText }: { customText?: string }) => {
   const { outfit } = useOutfit(id);
 
   const { data: generations } = useQuery(api.router.feed.getFromOutfit.anon, outfit ? { outfitId: outfit._id } : 'skip');
+  const { data: wearCount } = useQuery(api.router.outfits.wearCount.anon, { outfitId: id });
 
   if (!outfit) return null;
   if (generations?.length === 0) return null;
 
   return (
     <>
-      <Text.H3
-        color={Colors.neutral[50]}
-        style={{ textAlign: 'center', marginTop: 32 }}
-      >
-        Generations
-      </Text.H3>
+      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6, marginTop: 32 }}>
+        <Text.H3
+          color={Colors.neutral[50]}
+          style={{ textAlign: 'center' }}
+        >
+          Generations
+        </Text.H3>
+        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6 }}>
+          <RefreshCcw size={18} color={Colors.neutral[400]} />
+          <Text.Base color={Colors.neutral[400]} weight={500}>{wearCount}</Text.Base>
+        </View>
+      </View>
       <FlashList
         data={generations}
         scrollEnabled={false}

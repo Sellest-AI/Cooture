@@ -165,6 +165,7 @@ import type * as router_outfits_getOne from "../router/outfits/getOne.js";
 import type * as router_outfits_searchMany from "../router/outfits/searchMany.js";
 import type * as router_outfits_updateCover from "../router/outfits/updateCover.js";
 import type * as router_outfits_updateCoverInternal from "../router/outfits/updateCoverInternal.js";
+import type * as router_outfits_wearCount from "../router/outfits/wearCount.js";
 import type * as router_presets_createOne from "../router/presets/createOne.js";
 import type * as router_presets_getAll from "../router/presets/getAll.js";
 import type * as router_presets_getByCategory from "../router/presets/getByCategory.js";
@@ -397,6 +398,7 @@ declare const fullApi: ApiFromModules<{
   "router/outfits/searchMany": typeof router_outfits_searchMany;
   "router/outfits/updateCover": typeof router_outfits_updateCover;
   "router/outfits/updateCoverInternal": typeof router_outfits_updateCoverInternal;
+  "router/outfits/wearCount": typeof router_outfits_wearCount;
   "router/presets/createOne": typeof router_presets_createOne;
   "router/presets/getAll": typeof router_presets_getAll;
   "router/presets/getByCategory": typeof router_presets_getByCategory;

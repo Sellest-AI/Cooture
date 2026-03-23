@@ -10,7 +10,7 @@ export const anon = publicQuery({
     const fromPresets = await ctx.db.query('presetGenerations')
       .withIndex('by_outfit_id', (q) => q.eq('outfitId', outfitId))
       .order('desc')
-      .take(20);
+      .take(48);
 
     const generationIds = fromPresets.map((p) => p.generationId);
 
