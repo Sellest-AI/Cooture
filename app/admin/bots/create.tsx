@@ -18,13 +18,15 @@ import { Colors } from "theme";
 
 type PlusImageProps = {
   children: string;
-  onPress: () => void;
+  onPress?: () => void;
 }
 const PlusImage = ({ children, onPress }: PlusImageProps) => {
   const [loading, setLoading] = useState(false);
-  return (<Pressable style={{ height: '100%' }} onPress={async () => {
+  const Component = onPress ? Pressable : View;
+
+  return (<Component style={{ height: '100%' }} onPress={async () => {
     setLoading(true);
-    await onPress();
+    await onPress?.();
     setLoading(false);
   }}>
     <Block
@@ -46,7 +48,7 @@ const PlusImage = ({ children, onPress }: PlusImageProps) => {
         {children}
       </Text.Base>
     </Block>
-  </Pressable>)
+  </Component>)
 }
 
 type ContainerProps = {
@@ -203,22 +205,30 @@ const Images = () => {
         horizontal
         showsHorizontalScrollIndicator={false}
       >
-        {images?.front ? <Image
-          style={{ height: '100%', aspectRatio: 0.9, borderRadius: 32 }}
-          source={images.front.url ?? images.front.base64}
-        /> : <PlusImage onPress={() => handlePickImage('front')}>Front Image</PlusImage>}
-        {images?.smiling ? <Image
-          style={{ height: '100%', aspectRatio: 0.9, borderRadius: 32 }}
-          source={images.smiling.url ?? images.smiling.base64}
-        /> : <PlusImage onPress={() => handlePickImage('smiling')}>Smile Image</PlusImage>}
-        {images?.side ? <Image
-          style={{ height: '100%', aspectRatio: 0.9, borderRadius: 32 }}
-          source={images.side.url ?? images.side.base64}
-        /> : <PlusImage onPress={() => handlePickImage('side')}>Side Image</PlusImage>}
-        {images?.profilePicture ? <Image
-          style={{ height: '100%', aspectRatio: 0.9, borderRadius: 32 }}
-          source={images.profilePicture.url ?? images.profilePicture.base64}
-        /> : <PlusImage onPress={() => handlePickImage('profilePicture')}>Profile Picture</PlusImage>}
+        <Pressable onPress={() => handlePickImage('front')}>
+          {images?.front ? <Image
+            style={{ height: '100%', aspectRatio: 0.9, borderRadius: 32 }}
+            source={images.front.url ?? images.front.base64}
+          /> : <PlusImage>Front Image</PlusImage>}
+        </Pressable>
+        <Pressable onPress={() => handlePickImage('smiling')}>
+          {images?.smiling ? <Image
+            style={{ height: '100%', aspectRatio: 0.9, borderRadius: 32 }}
+            source={images.smiling.url ?? images.smiling.base64}
+          /> : <PlusImage>Smile Image</PlusImage>}
+        </Pressable>
+        <Pressable onPress={() => handlePickImage('side')}>
+          {images?.side ? <Image
+            style={{ height: '100%', aspectRatio: 0.9, borderRadius: 32 }}
+            source={images.side.url ?? images.side.base64}
+          /> : <PlusImage >Side Image</PlusImage>}
+        </Pressable>
+        <Pressable onPress={() => handlePickImage('profilePicture')}>
+          {images?.profilePicture ? <Image
+            style={{ height: '100%', aspectRatio: 0.9, borderRadius: 32 }}
+            source={images.profilePicture.url ?? images.profilePicture.base64}
+          /> : <PlusImage>Profile Picture</PlusImage>}
+        </Pressable>
       </ScrollView>
       <Button
         startIcon={Gem}

@@ -102,6 +102,8 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
 
   if (!user) return null;
 
+  const showRecentPosts = isSelf && recentPosts && recentPosts.length > 3;
+
   return (
     <SafeAreaView style={{ flex: 1 }} edges={{ top: 'off', bottom: 'android' }}>
       <ParallaxScrollView
@@ -164,7 +166,7 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
         </View>
         <View style={{ paddingHorizontal: 8, gap: 8, marginTop: 16 }}>
           <FollowersFollowing userId={user._id} />
-          {(recentPosts ?? []).length > 3 && <Block
+          {showRecentPosts && <Block
             variant="blur"
             style={{
               borderRadius: 28,
@@ -224,7 +226,7 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
           />}
           <StickyView
             topOffset={Platform.OS === 'web' ? -48 : -12}
-            style={{ marginBottom: 24, marginTop: 0 }}
+            style={{ marginBottom: 24, marginTop: showRecentPosts ? 0 : 24 }}
             onLayout={(e) => {
               slotRef.current = e.nativeEvent.layout;
             }}
