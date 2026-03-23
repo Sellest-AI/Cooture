@@ -6,8 +6,9 @@ import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, w
 import { runOnJS } from 'react-native-worklets';
 import { Colors } from 'theme';
 import { Block } from './block';
+import { BlurKeys } from './blur-view';
 import { ArrowLeft } from './icons';
-import { useSafeAreaInsets } from './safe-area-view';
+import { SafeAreaView, useSafeAreaInsets } from './safe-area-view';
 import { Text } from './text';
 
 type Children = (actions: { next: () => void, back: () => void, close: () => void }) => ReactNode[] | ReactNode;
@@ -137,6 +138,7 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
 
   const FinalView = scrollable ? Animated.ScrollView : View;
   const { bottom: bottom } = useSafeAreaInsets();
+
   return (
     <NativeModal
       visible={open}
@@ -152,6 +154,7 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
           canDismiss={canDismiss}
         >
           <Block
+            blurKey={BlurKeys.FEED}
             variant="blur"
             style={{
               width: '100%',
@@ -184,49 +187,58 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
               </Animated.View>
             </GestureDetector>
             <GestureDetector gesture={nativeScroll}>
-              <FinalView
-                showsVerticalScrollIndicator={false}
-                style={{ paddingBottom: scrollable ? 0 : (Platform.OS === 'ios' ? 0 : bottom) }}
-                // bottom + Pan handler offset
-                contentContainerStyle={{ paddingBottom: bottom }}
-                bounces={false}
-                onScroll={scrollable ? scrollHandler : undefined}
-                scrollEventThrottle={16}
+              <SafeAreaView
+                edges={{
+                  top: 'off',
+                  bottom: Platform.OS === 'android' ? 'additive' : (scrollable ? 'additive' : 'off'),
+                }}
               >
-                {header && <ModalHeader
-                  type={header.type}
-                  style={{ marginTop: 10 }}
-                  title={header.title}
-                  onBack={(header.showBackButton || currentStep > 0) ? () => {
-                    back?.();
-                    if (currentStep === 0 && onOpenChange) closeAnimation();
-                  } : undefined}
-                />}
+                <FinalView
+                  showsVerticalScrollIndicator={false}
+                  // bottom + Pan handler offset
+                  contentContainerStyle={{
+                    paddingBottom:
+                      bottom + (Platform.OS === 'android' ? 8 : 0)
+                  }}
+                  bounces={false}
+                  onScroll={scrollable ? scrollHandler : undefined}
+                  scrollEventThrottle={16}
+                >
+                  {header && <ModalHeader
+                    type={header.type}
+                    style={{ marginTop: 10 }}
+                    title={header.title}
+                    onBack={(header.showBackButton || currentStep > 0) ? () => {
+                      back?.();
+                      if (currentStep === 0 && onOpenChange) closeAnimation();
+                    } : undefined}
+                  />}
 
-                {/* handle children as array of steps, render-prop, or single node */}
-                {(() => {
-                  // if children is a function, call it with actions
-                  if (typeof children === 'function') {
-                    const res = (children as Children)({ next, back, close: () => { if (onOpenChange) closeAnimation(); } });
-                    if (Array.isArray(res)) {
-                      stepsLengthRef.current = res.length;
-                      return res[currentStep] ?? null;
+                  {/* handle children as array of steps, render-prop, or single node */}
+                  {(() => {
+                    // if children is a function, call it with actions
+                    if (typeof children === 'function') {
+                      const res = (children as Children)({ next, back, close: () => { if (onOpenChange) closeAnimation(); } });
+                      if (Array.isArray(res)) {
+                        stepsLengthRef.current = res.length;
+                        return res[currentStep] ?? null;
+                      }
+                      stepsLengthRef.current = 0;
+                      return res;
                     }
+
+                    // if children is an array, treat as steps
+                    if (Array.isArray(children)) {
+                      const arr = children as ReactNode[];
+                      stepsLengthRef.current = arr.length;
+                      return arr[currentStep] ?? null;
+                    }
+
                     stepsLengthRef.current = 0;
-                    return res;
-                  }
-
-                  // if children is an array, treat as steps
-                  if (Array.isArray(children)) {
-                    const arr = children as ReactNode[];
-                    stepsLengthRef.current = arr.length;
-                    return arr[currentStep] ?? null;
-                  }
-
-                  stepsLengthRef.current = 0;
-                  return children;
-                })()}
-              </FinalView>
+                    return children;
+                  })()}
+                </FinalView>
+              </SafeAreaView>
             </GestureDetector>
           </Block>
         </SlideToDismiss>
