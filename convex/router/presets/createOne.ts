@@ -18,8 +18,7 @@ export const admin = adminAction({
     })
 
     const promptPromises = Promise.all(images.map((img) => ctx.runAction(internal.llm.triggers.presetCreator._internal, {
-      userId: ctx.userId,
-      imageId: img._id
+      imageId: img._id,
     })))
 
     const depthMapPromises = Promise.all(images.map((img) => ctx.runAction(internal.llm.triggers.generateDepthMap._internal, {
@@ -84,20 +83,38 @@ export const server = serverAction({
       userId: null
     })
 
-    const prompts = [args.prompt];
+    try {
+      const prompts = [args.prompt];
 
-    const categories = await Promise.all(covers.map((img) => imageCategorizer.handler(ctx, { imageUrl: img.url })));
+      const categories = await Promise.all(covers.map((img) =>
+        imageCategorizer.handler(ctx, { imageUrl: img.url })));
 
-    const presetId = await ctx.runMutation(internal.router.presets.createOne._internal_mutation, {
-      name: args.name,
-      imageIds: covers.map((img) => img._id),
-      depthMaps: depthMaps.map((dm) => dm._id),
-      prompts: prompts,
-      categories: categories.flat().map((c) => ({ name: c.name, score: c.confidence })),
-      contentRating: args.contentRating,
-    })
+      const presetId = await ctx.runMutation(internal.router.presets.createOne._internal_mutation, {
+        name: args.name,
+        imageIds: covers.map((img) => img._id),
+        depthMaps: depthMaps.map((dm) => dm._id),
+        prompts: prompts,
+        categories: categories.flat().map((c) => ({ name: c.name, score: c.confidence })),
+        contentRating: args.contentRating,
+      })
 
-    return presetId;
+      return presetId;
+    }
+    catch {
+      // Cleanup uploaded image on failure
+      for (const img of covers) {
+        await ctx.scheduler.runAfter(10000,
+          internal.router.storage.images.deleteOne._internal, { imageId: img._id });
+      }
+
+      // Cleanup generated depth maps on failure
+      for (const dm of await depthMaps) {
+        await ctx.scheduler.runAfter(10000,
+          internal.router.storage.images.deleteOne._internal, { imageId: dm._id });
+      }
+
+      return null;
+    }
   }
 })
 
@@ -115,7 +132,7 @@ export const _internal_mutation = internalMutation({
   },
   handler: async (ctx, { name, imageIds, depthMaps, prompts, categories, contentRating }) => {
     const presetId = await ctx.db.insert("presets", {
-      name,
+      name: name.trim(),
       imageIds,
       depthMaps,
       prompts,
