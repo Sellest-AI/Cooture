@@ -57,7 +57,7 @@ This JSON is used in a pipeline where the User and the Outfit can be swapped ind
 
 CONTENT RATING FOR THE SCENE:
 - SAFE = Appropriate for all audiences
-- SUGGESTIVE = Implicit posing or clothing, but not explicit.
+- SUGGESTIVE = Implicit posing or clothing or weaponry, but not explicit.
 - EXPLICIT = Highly revealing or explicit poses or clothing. Still safe to share online.
 - NSFW = When the image contains highly revealing, fetish wear, or explicit content. Use this rating only for images that are clearly adult in nature.
 When in doubt about content rating, default to the most conservative option.
