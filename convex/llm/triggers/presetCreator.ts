@@ -1,4 +1,3 @@
-"use node"
 import { removeUndefinedKeys } from "@shared/utils";
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
@@ -18,7 +17,7 @@ type Return = {
 
 export const _internal = internalAction({
   args: {
-    userId: v.id("users"),
+    userId: v.optional(v.id("users")),
     imageId: v.id("images"),
   },
   handler: async (ctx, { imageId, userId }): Promise<Return> => {

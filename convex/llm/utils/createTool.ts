@@ -1,8 +1,8 @@
 import { createTool as _createTool, type ToolCtx as _ToolCtx, } from "@convex-dev/agent";
 import type { Tool } from "ai";
-import { Id } from "../../_generated/dataModel";
 
-type ToolCtx = Omit<_ToolCtx, 'userId'> & { userId: Id<'users'>; };
+// type ToolCtx = Omit<_ToolCtx, 'userId'> & { userId: Id<'users'>|null; };
+type ToolCtx = _ToolCtx;
 
 type Params<INPUT, OUTPUT, Ctx extends ToolCtx = ToolCtx> = Parameters<typeof _createTool<INPUT, OUTPUT, Ctx>>[0];
 

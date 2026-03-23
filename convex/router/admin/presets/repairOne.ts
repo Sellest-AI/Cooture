@@ -6,15 +6,13 @@ import { PRESET_CATEGORIES, PRESET_PROMPT } from "../../../schema/presets";
 export const _internal = internalAction({
   args: {
     presetId: v.id('presets'),
-    userId: v.id('users'),
   },
-  handler: async (ctx, { presetId, userId }) => {
+  handler: async (ctx, { presetId }) => {
     const preset = await ctx.runQuery(internal.router.presets.getOne._internal, { presetId });
     if (!preset) throw new Error("Preset not found");
 
     const images = preset.imageIds;
     const prompts = await Promise.all(images.map((img) => ctx.runAction(internal.llm.triggers.presetCreator._internal, {
-      userId: userId,
       imageId: img
     })))
 

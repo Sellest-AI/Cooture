@@ -1,7 +1,8 @@
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { Id } from "../../_generated/dataModel";
-import { adminAction, internalMutation } from "../../procedures";
+import { imageCategorizer } from "../../llm/tools/imageCategorizer";
+import { adminAction, internalMutation, serverAction } from "../../procedures";
 import { CONTENT_RATINGS, CONTENT_RATINGS_ORDER } from "../../schema/constants";
 import { PRESET_CATEGORIES, PRESET_PROMPT } from "../../schema/presets";
 
@@ -61,6 +62,42 @@ export const admin = adminAction({
 
       return null;
     }
+  }
+})
+
+export const server = serverAction({
+  args: {
+    name: v.string(),
+    imageBase64: v.string(),
+    depthMapBase64: v.string(),
+    contentRating: CONTENT_RATINGS,
+    prompt: PRESET_PROMPT,
+  },
+  handler: async (ctx, args): Promise<Id<'presets'> | null> => {
+    const covers = await ctx.runAction(internal.router.storage.images.uploadMany._internal, {
+      images: [{ base64: args.imageBase64 }],
+      userId: null
+    })
+
+    const depthMaps = await ctx.runAction(internal.router.storage.images.uploadMany._internal, {
+      images: [{ base64: args.depthMapBase64 }],
+      userId: null
+    })
+
+    const prompts = [args.prompt];
+
+    const categories = await Promise.all(covers.map((img) => imageCategorizer.handler(ctx, { imageUrl: img.url })));
+
+    const presetId = await ctx.runMutation(internal.router.presets.createOne._internal_mutation, {
+      name: args.name,
+      imageIds: covers.map((img) => img._id),
+      depthMaps: depthMaps.map((dm) => dm._id),
+      prompts: prompts,
+      categories: categories.flat().map((c) => ({ name: c.name, score: c.confidence })),
+      contentRating: args.contentRating,
+    })
+
+    return presetId;
   }
 })
 
