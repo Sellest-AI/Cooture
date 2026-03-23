@@ -17,7 +17,6 @@ type Args = {
 export const createItem = async (ctx: ActionCtx, data: Args): Promise<Id<"items">> => {
   const schema = await ctx.runAction(internal.llm.triggers.itemCategorizer._internal, {
     imageId: data.imageId,
-    userId: data.userId,
     extractText: true,
     metadata: data.metadata ? {
       brand: data.metadata.brand,

@@ -7,7 +7,6 @@ import { itemCategorizer } from "../tools/itemCategorizer";
 
 export const _internal = internalAction({
   args: {
-    userId: v.id("users"),
     imageId: v.id("images"),
     extractText: v.optional(v.boolean()),
     metadata: v.optional(v.object({
@@ -16,7 +15,7 @@ export const _internal = internalAction({
       description: v.optional(v.string()),
     })),
   },
-  handler: async (ctx, { imageId, userId, extractText, metadata }) => {
+  handler: async (ctx, { imageId, extractText, metadata }) => {
     const image = await ctx.runQuery(internal.router.storage.images.getOne._internal, { id: imageId });
     if (!image) { throw new Error("Image not found"); }
 
@@ -28,7 +27,7 @@ export const _internal = internalAction({
       auth: ctx.auth,
       storage: ctx.storage,
       vectorSearch: ctx.vectorSearch,
-      userId: userId,
+      userId: undefined,
     }
 
     const object = await itemCategorizer.handler(toolCtx, { imageUrl: image.url, extractText, metadata });

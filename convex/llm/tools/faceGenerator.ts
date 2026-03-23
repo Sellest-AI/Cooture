@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { z } from "zod";
 import { defaultAgent } from "../agents/default";
 import { models } from "../config";
-import { createTool } from "../utils";
+import { createTool, wrapAgent } from "../utils";
 
 const INSTRUCTIONS = `
 You are a highly detailed facial feature generator. Given a person's basic attributes, generate an extremely detailed JSON representation of their face.
@@ -213,7 +213,7 @@ export const faceGenerator = createTool({
       eyesColor,
     }
 
-    const result = await defaultAgent.generateObject(ctx, { userId: ctx.userId }, {
+    const result = await wrapAgent(defaultAgent).generateObject(ctx, {}, {
       providerOptions: models.reasoning.smartest.providerOptions({ effort: 'none' }),
       model: models.reasoning.smartest.model,
       system: INSTRUCTIONS,

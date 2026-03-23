@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { defaultAgent } from "../agents/default";
 import { models } from "../config";
-import { createTool } from "../utils";
+import { createTool, wrapAgent } from "../utils";
 
 // --- REUSABLE INSTRUCTION STRINGS ---
 const NO_CLOTHING = "Describe visual elements only. Do NOT describe the subject's clothes, colors of clothes, or fashion brands here.";
@@ -188,7 +188,7 @@ export const presetCreator = createTool({
     imageUrl: z.string(),
   }),
   handler: async (ctx, args) => {
-    const result = await defaultAgent.generateObject(ctx, { userId: ctx.userId }, {
+    const result = await wrapAgent(defaultAgent).generateObject(ctx, {}, {
       providerOptions: models.vision.smart.providerOptions({ effort: 'max' }),
       model: models.vision.smart.model,
       system: INSTRUCTIONS,

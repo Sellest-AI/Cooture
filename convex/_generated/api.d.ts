@@ -99,6 +99,7 @@ import type * as llm_utils_photoshoot_jsonCreator from "../llm/utils/photoshoot/
 import type * as llm_utils_photoshoot_toMarkdown from "../llm/utils/photoshoot/toMarkdown.js";
 import type * as llm_utils_sanitizeAiText from "../llm/utils/sanitizeAiText.js";
 import type * as llm_utils_usageHandler from "../llm/utils/usageHandler.js";
+import type * as llm_utils_wrapAgent from "../llm/utils/wrapAgent.js";
 import type * as migrations from "../migrations.js";
 import type * as procedures from "../procedures.js";
 import type * as router_admin_bots_createIdentity from "../router/admin/bots/createIdentity.js";
@@ -332,6 +333,7 @@ declare const fullApi: ApiFromModules<{
   "llm/utils/photoshoot/toMarkdown": typeof llm_utils_photoshoot_toMarkdown;
   "llm/utils/sanitizeAiText": typeof llm_utils_sanitizeAiText;
   "llm/utils/usageHandler": typeof llm_utils_usageHandler;
+  "llm/utils/wrapAgent": typeof llm_utils_wrapAgent;
   migrations: typeof migrations;
   procedures: typeof procedures;
   "router/admin/bots/createIdentity": typeof router_admin_bots_createIdentity;

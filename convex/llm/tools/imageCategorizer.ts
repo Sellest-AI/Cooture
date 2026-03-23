@@ -2,7 +2,7 @@ import { z } from "zod";
 import { PRESET_CATEGORY_VALUES } from "../../schema/presets";
 import { defaultAgent } from "../agents/default";
 import { models } from "../config";
-import { createTool } from "../utils";
+import { createTool, wrapAgent } from "../utils";
 
 const INSTRUCTIONS = `You are an expert at analyzing preset images and categorizing them.
 
@@ -79,7 +79,7 @@ export const imageCategorizer = createTool({
     imageUrl: z.string(),
   }),
   handler: async (ctx, args) => {
-    const result = await defaultAgent.generateObject(ctx, { userId: ctx.userId }, {
+    const result = await wrapAgent(defaultAgent).generateObject(ctx, { userId: ctx.userId }, {
       providerOptions: models.vision.smart.providerOptions({ effort: 'none' }),
       model: models.vision.smart.model,
       system: INSTRUCTIONS,

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { ITEM_STYLES } from "../../schema/items";
 import { defaultAgent } from "../agents/default";
 import { models } from "../config";
-import { createTool } from "../utils";
+import { createTool, wrapAgent } from "../utils";
 
 const INSTRUCTIONS = `You are a fashion analyst AI. Analyze clothing and accessory items from images and extract detailed information.
 
@@ -90,7 +90,7 @@ export const itemCategorizer = createTool({
 
 
     const generateCategories = async () => retryPromise(() =>
-      defaultAgent.generateObject(ctx, { userId: ctx.userId }, {
+      wrapAgent(defaultAgent).generateObject(ctx, {}, {
         // Vison model
         providerOptions: models.vision.smart.providerOptions({ effort: 'none' }),
         model: models.vision.smart.model,

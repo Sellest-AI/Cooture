@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { defaultAgent } from "../agents/default";
 import { models } from "../config";
-import { createTool } from "../utils";
+import { createTool, wrapAgent } from "../utils";
 
 const INSTRUCTIONS = `You are an expert photography prompt engineer specializing in converting structured schemas into highly detailed, production-ready image generation prompts.
 
@@ -37,7 +37,7 @@ export const photoshootPrompter = createTool({
   handler: async (ctx, args) => {
     const schemaString = JSON.stringify(args.schema, null, 2);
 
-    const result = await defaultAgent.generateText(ctx, { userId: ctx.userId }, {
+    const result = await wrapAgent(defaultAgent).generateText(ctx, {}, {
       providerOptions: models.vision.smart.providerOptions({ effort: 'none' }),
       model: models.vision.smart.model,
       system: INSTRUCTIONS,
