@@ -213,7 +213,7 @@ export default function Screen() {
             maxWidth: 280
           }}
         >
-          The Future of Digital Influencers
+          A new version of you, everyday
         </Text.H1>
         <Text.H4
           style={{
@@ -225,7 +225,7 @@ export default function Screen() {
             marginBottom: 40,
           }}
         >
-          Create your outfits and turn yourself into a professional model.
+          Try infinite looks and see what feels like you.
         </Text.H4>
         <LoginButtons />
       </SafeAreaView>
