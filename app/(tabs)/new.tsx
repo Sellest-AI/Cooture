@@ -31,7 +31,7 @@ const Actions = () => {
       }}
     >
       <Pressable
-        onPress={() => { push(ROUTES.PHOTOSHOOT.NEW); }}
+        onPress={() => { push(ROUTES.PHOTOSHOOT.NEW) }}
         style={{
           borderTopColor: Colors.primary[200],
           backgroundColor: Colors.primary[500],
@@ -63,7 +63,9 @@ const SectionPresets = ({ category, style }: { category: Category, style: ViewSt
   const { push } = useRouter(ROUTES.TABS.NEW);
   const { results, isLoading } = usePaginatedQuery(api.router.presets.getByCategory.anon, { category: category.value }, { initialNumItems: 8 });
 
-  if (results.length < 3) return null;
+  const [date] = useState(new Date());
+
+  if (!isLoading && results.length < 3) return null;
 
   return (
     <View style={style}>
@@ -85,7 +87,7 @@ const SectionPresets = ({ category, style }: { category: Category, style: ViewSt
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ gap: 32, paddingHorizontal: 16, paddingTop: 6 }}
-        data={shuffleWithSeed(results?.slice(0, 6) || [], category.label)}
+        data={shuffleWithSeed(results?.slice(0, 4) || [], `${date.getTime()}-${category.value}`)}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <Collection
@@ -165,7 +167,11 @@ export default function Screen() {
 
   const [date] = useState(new Date());
 
+  const isLoading = isPresetsPending || isOutfitsPending;
+
   const list = useMemo(() => {
+    if (isLoading) return [];
+
     // Batch outfits in groups of 4 to ensure better distribution in the UI
     const outfitBatches = outfits ? outfits.reduce((acc, outfit, index) => {
       const batchIndex = Math.floor(index / 4);
@@ -180,9 +186,7 @@ export default function Screen() {
     ]
 
     return shuffleWithSeed(items, date.toString());
-  }, [date, outfits, presets]);
-
-  const isLoading = isPresetsPending || isOutfitsPending;
+  }, [date, isLoading, outfits, presets]);
 
   return (
     <BlurTargetView blurKey={BlurKeys.NEW}>
