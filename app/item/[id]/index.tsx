@@ -59,7 +59,7 @@ const ColorsBlock = () => {
   )
 }
 
-const DeleteOutfitButton = () => {
+const DeleteItemButton = () => {
   const [disabled, setDisabled] = useState(false);
 
   const { user } = useAccount();
@@ -153,7 +153,7 @@ export default function ItemScreen() {
   const disabled = (id: Id<'users'>) => user?._id !== id;
 
   if (isLoading || !item) {
-    return <LoadingBlock style={{ height: 'auto' }} />
+    return <LoadingBlock style={{ height: 'auto' }} type="logo" />
   }
 
   return (
@@ -216,7 +216,7 @@ export default function ItemScreen() {
             <FeelCategory title={item.materialFeel} onPress={(materialFeel) => update({ materialFeel })} disabled={disabled(item.userId)} />
             <GenderCategory title={item.gender} onPress={(gender) => update({ gender })} disabled={disabled(item.userId)} />
           </View>
-          <DeleteOutfitButton />
+          <DeleteItemButton />
         </SafeAreaView>
       </ParallaxScrollView>
       <SafeAreaView

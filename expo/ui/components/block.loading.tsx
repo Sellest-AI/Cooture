@@ -1,13 +1,14 @@
 import { View, ViewStyle } from 'react-native';
 import { Colors } from 'theme';
-import { Loader } from './icons';
+import { Loader, LogoLoading } from './icons';
 
 type Props = {
   className?: string;
-  style?: ViewStyle
+  style?: ViewStyle;
+  type?: 'logo' | 'loader'
 }
 
-export const LoadingBlock = ({ style }: Props) => {
+export const LoadingBlock = ({ style, type = 'loader' }: Props) => {
   return (
     <View
       style={{
@@ -18,7 +19,11 @@ export const LoadingBlock = ({ style }: Props) => {
         ...style,
       }}
     >
-      <Loader color={Colors.primary[500]} size={28} />
+      {type === 'loader' ? (
+        <Loader color={Colors.primary[500]} size={28} />
+      ) : (
+        <LogoLoading size={64} variant="primary" />
+      )}
     </View>
   )
 }

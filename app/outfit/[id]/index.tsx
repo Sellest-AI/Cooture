@@ -197,7 +197,7 @@ export default function ItemScreen() {
   }
 
   if (!outfit || isLoadingGenerations) {
-    return <LoadingBlock style={{ height: 'auto', flex: 1 }} />
+    return <LoadingBlock style={{ height: 'auto', flex: 1 }} type="logo" />
   }
 
   return (
