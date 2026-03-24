@@ -12,7 +12,7 @@ import RulerSlider from "@ui/slider.ruler";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { Colors } from "theme";
 
 const centimetersToFeet = (cm: number) => {
@@ -178,6 +178,7 @@ export function Content() {
   return (
     <SafeScrollView
       edges={{ bottom: 'android' }}
+      contentContainerStyle={{ paddingBottom: Platform.OS === 'ios' ? 12 : 0 }}
       style={{
         backgroundColor: Colors.background,
         flex: 1,

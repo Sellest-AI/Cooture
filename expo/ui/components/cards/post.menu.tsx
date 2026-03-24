@@ -30,16 +30,20 @@ const RoundButton = ({ title, icon, weight, onPress }: RoundButtonProps) => {
         width: 96,
       }}
     >
-      <View style={{
-        padding: 12,
-        borderRadius: 99,
-        borderWidth: 1,
-        borderColor: Colors.neutral[400],
-      }}
+      <View
+        style={{
+          padding: 16,
+          borderRadius: 99,
+          backgroundColor: Colors.blur.dark,
+          borderColor: Colors.blur.medium,
+          borderBottomColor: 'transparent',
+          borderRightColor: 'transparent',
+          borderWidth: 1,
+        }}
       >
         <Icon size={24} color={Colors.neutral[50]} weight={weight || "regular"} />
       </View>
-      <Text.Sm color={Colors.neutral[200]} style={{ marginTop: 8 }}>
+      <Text.Sm color={Colors.neutral[200]} style={{ marginTop: 10 }}>
         {title}
       </Text.Sm>
     </Pressable>
@@ -69,7 +73,7 @@ export const PostMenu = ({ open, onOpenChange, ...props }: Props) => {
     >
       <SafeAreaView
         edges={{ top: 'off', bottom: 'android' }}
-        style={{ paddingTop: 24 }}
+        style={{ paddingTop: 20 }}
       >
         {(onToggleLike || onToggleBookmark || onShare) && (
           <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>

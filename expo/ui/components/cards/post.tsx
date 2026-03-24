@@ -3,6 +3,7 @@ import { Button } from '@ui/button';
 import { GhostIconWrapper } from '@ui/ghost-animation';
 import { ArrowRight, BookmarkIcon, CircleFadingArrowUp, EllipsisVertical, HeartIcon, RefreshCcw, ShareIcon } from '@ui/icons';
 import { Skeleton } from '@ui/skeleton';
+import * as Haptics from 'expo-haptics';
 import { MotiView } from 'moti';
 import { useCallback, useRef, useState } from 'react';
 import { Dimensions, FlatList, Pressable, View, ViewStyle } from 'react-native';
@@ -222,7 +223,10 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
                     if (!isLiked) onToggleLike?.(true);
                   } : undefined}
                   onTap={() => img && onPress?.(img._id)}
-                  onLongPress={() => setShowMenu(true)}
+                  onLongPress={() => {
+                    setShowMenu(true);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+                  }}
                   style={{
                     borderRadius: 28,
                     backgroundColor: img?.backgroundColor ?? Colors.blur.dark,
