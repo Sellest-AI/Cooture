@@ -3,6 +3,7 @@ import { Block } from "@ui/block";
 import { BlurKeys } from "@ui/blur-view";
 import { BookmarkIcon, Compass, Home, Plus, User } from "@ui/icons";
 import { SafeAreaView } from "@ui/safe-area-view";
+import * as Haptics from 'expo-haptics';
 import { Tabs } from "expo-router";
 import { useRef } from "react";
 import { Animated, Pressable, StyleSheet, View } from "react-native";
@@ -50,6 +51,8 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
           const { options } = descriptors[route.key];
           const isFocused = state.index === index;
 
+          const isCenterButton = route.name === 'new';
+
           const onPress = () => {
             const event = navigation.emit({
               type: 'tabPress',
@@ -60,11 +63,12 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             if (!isFocused && !event.defaultPrevented) {
               navigation.navigate(route.name);
             }
+
+            if (isCenterButton) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
           };
 
           const color = isFocused ? Colors.primary[500] : Colors.neutral[50];
           const size = 24;
-          const isCenterButton = route.name === 'new';
 
           const iconContent = options.tabBarIcon?.({ focused: isFocused, color, size });
 

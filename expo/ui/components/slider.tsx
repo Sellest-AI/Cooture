@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics';
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { LayoutChangeEvent, Pressable, View, ViewStyle } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -133,16 +134,35 @@ export const Slider = ({ value, label, labels, onValueChange, style, customHeigh
 
   // Pan gesture with modern API
   const startX = useSharedValue(0);
+  const lastClosestValue = useSharedValue(value);
+
+  const triggerHaptic = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
 
   const panGesture = Gesture.Pan()
     .onStart(() => {
       isDragging.value = true;
       startX.value = translationX.value;
+
+      const maxTranslation = width - KNOB_SIZE;
+      const normalizedValue = maxTranslation > 0 ? translationX.value / maxTranslation : 0;
+      const actualValue = normalizedToValue(normalizedValue);
+      lastClosestValue.value = findClosestLabel(actualValue);
     })
     .onUpdate((event) => {
       const maxTranslation = width - KNOB_SIZE;
       const newX = startX.value + event.translationX;
       translationX.value = Math.max(0, Math.min(newX, maxTranslation));
+
+      const normalizedValue = maxTranslation > 0 ? translationX.value / maxTranslation : 0;
+      const actualValue = normalizedToValue(normalizedValue);
+      const closestValue = findClosestLabel(actualValue);
+
+      if (closestValue !== lastClosestValue.value) {
+        lastClosestValue.value = closestValue;
+        runOnJS(triggerHaptic)();
+      }
     })
     .onEnd((event) => {
       isDragging.value = false;
@@ -252,6 +272,7 @@ export const Slider = ({ value, label, labels, onValueChange, style, customHeigh
                   // Snap to closest label
                   translationX.value = withSpring(position);
                   runOnJS(updateValue)(position);
+                  runOnJS(triggerHaptic)();
                 }}
               />
             );

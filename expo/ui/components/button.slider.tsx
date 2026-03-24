@@ -1,6 +1,8 @@
+import * as Haptics from 'expo-haptics';
 import React, { ComponentProps, useRef, useState } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { runOnJS } from "react-native-worklets";
 import { Colors } from "theme";
 import { Button } from "./button";
 import { ChevronRight, Loader } from "./icons";
@@ -67,6 +69,7 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
   const completeSlide = (max: number, duration = 180) => {
     if (completed.current) return;
     completed.current = true;
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     Animated.parallel([
       Animated.timing(translateX, { toValue: max, duration, useNativeDriver: false }),
       Animated.timing(knobOpacity, { toValue: 0, duration, useNativeDriver: false }),
@@ -82,6 +85,18 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
     ]).start(({ finished }) => {
       if (finished) currentX.current = 0;
     });
+  };
+
+  const lastHaptic = useRef(0);
+  const triggerHaptic = (pourcent: number) => {
+    const now = Date.now();
+    if (now - lastHaptic.current < 100) return;
+    lastHaptic.current = now;
+    Haptics.impactAsync(
+      pourcent > 0.5 ? Haptics.ImpactFeedbackStyle.Heavy :
+        pourcent > 0.2 ? Haptics.ImpactFeedbackStyle.Medium :
+          Haptics.ImpactFeedbackStyle.Soft
+    );
   };
 
   const pan = Gesture.Pan()
@@ -103,7 +118,10 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
       translateX.setValue(value);
       currentX.current = value;
 
-      if (value >= max * 0.9) {
+      const pourcent = value / max;
+      runOnJS(triggerHaptic)(pourcent);
+
+      if (value >= max * 0.95) {
         completeSlide(max, 180);
       }
     })

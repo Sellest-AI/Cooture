@@ -47,7 +47,7 @@
     "expo-dev-client": "~55.0.16",
     "expo-file-system": "~55.0.0",
     "expo-font": "~55.0.0",
-    "expo-haptics": "~55.0.0",
+    "expo-haptics": "~55.0.9",
     "expo-image": "~55.0.6",
     "expo-image-manipulator": "~55.0.10",
     "expo-image-picker": "~55.0.12",

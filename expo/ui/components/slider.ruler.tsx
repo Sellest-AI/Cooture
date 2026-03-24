@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics';
 import React, { useCallback, useRef, useState } from 'react';
 import {
   Dimensions,
@@ -41,6 +42,12 @@ export default function RulerSlider({
   const sidePadding = Math.round((SCREEN_WIDTH - TICK_SPACING) / 2);
   const initialOffset = (cachedInitialValue - minValue) * TICK_SPACING;
 
+  const ticks = Array.from({ length: totalTicks }, (_, i) => {
+    const tickValue = minValue + i;
+    const isMajor = tickValue % MAJOR_TICK_EVERY === 0;
+    return { tickValue, isMajor, index: i };
+  });
+
   const offsetToValue = useCallback((offsetX: number) => {
     const index = Math.round(offsetX / TICK_SPACING);
     return Math.min(maxValue, Math.max(minValue, minValue + index));
@@ -62,9 +69,13 @@ export default function RulerSlider({
       if (newValue !== currentValue.current) {
         currentValue.current = newValue;
         onValueChange?.(newValue);
+
+        if (ticks.find(t => t.tickValue === newValue)?.isMajor)
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        else Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
       }
     },
-    [offsetToValue, onValueChange]
+    [offsetToValue, onValueChange, ticks]
   );
 
   const handleMomentumEnd = useCallback(
@@ -90,12 +101,6 @@ export default function RulerSlider({
     },
     [offsetToValue, snapToValue]
   );
-
-  const ticks = Array.from({ length: totalTicks }, (_, i) => {
-    const tickValue = minValue + i;
-    const isMajor = tickValue % MAJOR_TICK_EVERY === 0;
-    return { tickValue, isMajor, index: i };
-  });
 
   return (
     <View style={styles.container}>
