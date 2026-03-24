@@ -1,12 +1,15 @@
 import { Button } from '@ui/button';
 import { Col, Grid, Row } from '@ui/grid';
 import { Image } from '@ui/image';
+import { useSafeAreaInsets } from '@ui/safe-area-view';
 import { Text } from '@ui/text';
 import { View } from 'react-native';
 import { ROUTES } from 'routes';
 import { Colors } from 'theme';
 
 export default function Screen() {
+  const { top } = useSafeAreaInsets();
+
   return (
     <View
       style={{
@@ -14,7 +17,7 @@ export default function Screen() {
         justifyContent: 'space-between',
         alignItems: 'center',
         flex: 1,
-        marginTop: 144,
+        marginTop: 128 + top,
         padding: 8,
       }}
     >

@@ -2,6 +2,7 @@ import { Badge } from '@ui/badge';
 import { Button } from '@ui/button';
 import { ImageGeneration } from '@ui/cards';
 import { HeartIcon } from '@ui/icons';
+import { useSafeAreaInsets } from '@ui/safe-area-view';
 import { Carousel } from '@ui/screen-carousel';
 import { Text } from '@ui/text';
 import { View } from 'react-native';
@@ -40,12 +41,13 @@ const CarouselComponent = () => {
     >
       <Carousel
         scaleAnimation={true}
-        itemHeight={320}
+        itemHeight={460}
         items={[1, 2, 3].map((_, i) => {
           if (i === 0)
             return (
               <View key={i}>
                 <ImageGeneration
+                  style={{ flex: 0, marginBottom: 16 }}
                   source={require('assets/placeholders/onboarding/posts/outfit/outfit.webp')}
                   disabled
                 />
@@ -82,6 +84,7 @@ const CarouselComponent = () => {
             return (
               <View key={i}>
                 <ImageGeneration
+                  style={{ flex: 0, marginBottom: 16 }}
                   source={require('assets/placeholders/onboarding/posts/duo/photoshoot.webp')}
                   disabled
                 />
@@ -113,6 +116,7 @@ const CarouselComponent = () => {
             return (
               <View key={i}>
                 <ImageGeneration
+                  style={{ flex: 0, marginBottom: 16 }}
                   source={require('assets/placeholders/onboarding/posts/neon-coffee/photoshootXavatar.webp')}
                   disabled
                 />
@@ -151,6 +155,8 @@ const CarouselComponent = () => {
 }
 
 export default function Screen() {
+  const { top } = useSafeAreaInsets();
+
   return (
     <View
       style={{
@@ -158,7 +164,7 @@ export default function Screen() {
         justifyContent: 'space-between',
         alignItems: 'center',
         flex: 1,
-        marginTop: 196,
+        marginTop: 172 + top,
         overflow: 'hidden'
       }}
     >

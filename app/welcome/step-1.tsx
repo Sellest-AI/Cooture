@@ -3,12 +3,15 @@ import { Plus } from '@ui/icons';
 import { Image } from '@ui/image';
 import { LinearGradient } from '@ui/linear-gradient';
 import { MotiView } from '@ui/motion';
+import { useSafeAreaInsets } from '@ui/safe-area-view';
 import { Text } from '@ui/text';
 import { View } from 'react-native';
 import { ROUTES } from 'routes';
 import { Colors } from 'theme';
 
 export default function Screen() {
+  const { top } = useSafeAreaInsets();
+
   return (
     <View
       style={{
@@ -16,7 +19,7 @@ export default function Screen() {
         justifyContent: 'space-between',
         alignItems: 'center',
         flex: 1,
-        marginTop: 196,
+        marginTop: 172 + top,
         padding: 8,
       }}
     >
@@ -52,16 +55,18 @@ export default function Screen() {
           style={{
             flex: 1,
             marginHorizontal: 40,
-            paddingBottom: 40,
-            paddingTop: 16,
+            paddingBottom: 48,
+            paddingTop: 32,
             justifyContent: 'center',
-            maxWidth: 310,
+            width: 320,
           }}
         >
           <View style={{
             justifyContent: 'center',
-            width: '100%',
-            aspectRatio: 3 / 4,
+            alignItems: 'center',
+            height: '100%',
+            aspectRatio: 5 / 7,
+            marginHorizontal: 'auto',
           }}>
             <View style={{ width: '100%', height: '100%', borderRadius: 28, overflow: 'hidden' }}>
               <Image
