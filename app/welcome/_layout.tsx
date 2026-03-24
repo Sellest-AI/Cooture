@@ -4,7 +4,7 @@ import { Stepper } from "@ui/stepper";
 import { Text } from "@ui/text";
 import { Stack, usePathname } from "expo-router";
 import { useEffect, useRef } from "react";
-import { Animated, View, ViewStyle } from "react-native";
+import { Animated, Platform, View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 
 const AnimatedScaleView = ({ children, show, style }: { children: React.ReactNode; show: boolean, style: ViewStyle }) => {
@@ -51,6 +51,7 @@ export default function WelcomeLayout() {
       style={{
         flex: 1,
         backgroundColor: Colors.background,
+        paddingBottom: Platform.OS === 'ios' ? 12 : 0,
       }}
     >
       <Image

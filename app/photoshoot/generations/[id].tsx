@@ -93,7 +93,6 @@ const UnlockMore = () => {
         {isPremium && <View style={{
           alignItems: 'center',
           justifyContent: 'center',
-          transform: [{ scale: 1.2 }],
           flex: 1,
         }}>
           <Text.H3 color={Colors.primary[500]} style={{ maxWidth: '65%', textAlign: 'center' }}>
@@ -140,7 +139,6 @@ const UnlockMore = () => {
         {!isPremium && <View style={{
           alignItems: 'center',
           justifyContent: 'center',
-          transform: [{ scale: 1.2 }],
           flex: 1,
         }}>
           <Text.H3 color={Colors.primary[500]} style={{ maxWidth: '65%', textAlign: 'center' }}>
@@ -173,12 +171,12 @@ const UnlockMore = () => {
         justifyContent: 'space-between',
         flexDirection: 'row',
       }}>
-        <Text.Base color={Colors.neutral[400]} style={{
+        <Text.Sm color={Colors.neutral[400]} style={{
           transform: [{ scale: 1.2 }],
           transformOrigin: 'left top',
         }}>
           Locked
-        </Text.Base>
+        </Text.Sm>
         <Lock size={18} color={Colors.primary[500]} />
       </View>
     </View>
