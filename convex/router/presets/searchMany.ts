@@ -35,6 +35,8 @@ export const anon = publicQuery({
 
     return (await Promise.all(presetIds.map((id) => results.find(r => r._id === id) ?? matchingPresets.find(p => p._id === id))
       .filter(notEmpty).map(async (preset) => {
+        if (preset.archived) return null;
+
         const cover = await getImage(ctx, preset.imageIds[0]);
         if (!cover) return null;
 

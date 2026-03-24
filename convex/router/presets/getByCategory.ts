@@ -20,6 +20,8 @@ export const anon = publicQuery({
       .map(async (categories) => {
         const preset = await ctx.db.get(categories.presetId);
         if (!preset) return null;
+        if (preset.archived) return null;
+
         const cover = await getImage(ctx, preset.imageIds[0]);
         if (!cover) return null;
 
