@@ -48,6 +48,7 @@ export const ZoomableImage = ({
       onTap={() => { onTap?.(); }}
       onDoubleTap={() => { onDoubleTap?.(); }}
       onLongPress={() => { onLongPress?.(); }}
+      longPressDuration={251}
     >
       <Image
         source={source}
