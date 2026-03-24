@@ -45,8 +45,8 @@ const CarouselComponent = ({ animationValue, item, animate, style }: CarouselIma
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'visible',
-          height: style?.height,
         },
+        style,
         animatedStyle
       ]}
     >
@@ -60,6 +60,7 @@ type CarouselProps<T extends ReactNode> = {
   itemWidth?: number;
   itemHeight?: number;
   itemsOffset?: number;
+  itemStyle?: ViewStyle;
   scaleAnimation?: boolean;
   style?: ViewStyle;
   ref?: RefObject<ICarouselInstance | null>;
@@ -67,27 +68,34 @@ type CarouselProps<T extends ReactNode> = {
   defaultIndex?: ComponentProps<typeof CarouselRNRC>['defaultIndex'];
 }
 
-export const Carousel = <T extends ReactNode>({ scaleAnimation, items, itemWidth, itemsOffset, style, ref, defaultIndex, onProgressChange, ...props }: CarouselProps<T>) => {
-  const itemHeight = props.itemHeight ? props.itemHeight * 1.2 : undefined;
+export const Carousel = <T extends ReactNode>({ scaleAnimation, items, itemWidth, itemsOffset, itemStyle, style, ref, defaultIndex, onProgressChange, ...props }: CarouselProps<T>) => {
+  const itemHeight = props.itemHeight ? props.itemHeight : undefined;
 
   return (
     <View style={{
       width: '100%',
       overflow: 'visible',
-      flex: 1,
+      // flex: 1,
+      justifyContent: 'center',
       ...style
     }}
     >
       <CarouselRNRC
         ref={ref}
-        style={{ flex: 1, marginTop: -((itemHeight ?? 0) / 20), width: '100%', overflow: 'visible' }}
+        style={{
+          flex: itemHeight ? 0 : 1,
+          width: '100%',
+          overflow: 'visible',
+          height: itemHeight,
+        }}
         data={items}
         mode="parallax"
         itemWidth={itemWidth}
         itemHeight={itemHeight}
         modeConfig={{
-          parallaxAdjacentItemScale: 0.75,
-          parallaxScrollingOffset: itemsOffset ?? 80,
+          parallaxAdjacentItemScale: 0.8,
+          parallaxScrollingScale: 1,
+          parallaxScrollingOffset: 92,
         }}
         defaultIndex={defaultIndex}
         onProgressChange={onProgressChange}
@@ -96,7 +104,7 @@ export const Carousel = <T extends ReactNode>({ scaleAnimation, items, itemWidth
 
           return <CarouselComponent
             key={index}
-            style={{ height: itemHeight }}
+            style={{ height: itemHeight, paddingHorizontal: 48, ...itemStyle }}
             animationValue={animationValue}
             animate={scaleAnimation}
             item={Component}

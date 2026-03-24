@@ -25,7 +25,7 @@ export const ImageGeneration = ({ text, textScale = 1, source, disabled, loading
 
   return (
     <Pressable
-      style={{ flex: 1, width: '100%' }}
+      style={{ flex: style?.flex ?? 1, width: '100%' }}
       onPress={onPresss}
       animated={disabled ? false : true}
     >

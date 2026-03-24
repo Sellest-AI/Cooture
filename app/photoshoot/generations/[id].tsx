@@ -16,10 +16,9 @@ import { Pressable } from "@ui/pressable";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Carousel, ICarouselInstance } from "@ui/screen-carousel";
 import { Text } from "@ui/text";
-import { notEmpty } from "@utils/convex-allowed";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Dimensions, View } from "react-native";
+import { View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -213,10 +212,9 @@ export default function Screen() {
   // Filter out animated items
   const visibleItems = items.filter(item => !animatedItemIds.has(item._id));
 
-  const isCurrentLoading = visibleItems[currentIndex]?.status === 'LOADING';
+  const currentStatus = visibleItems[currentIndex] ? (
+    visibleItems[currentIndex].status === 'LOADING' ? 'LOADING' : 'READY') : 'UNLOCK';
   const currentItem = visibleItems[currentIndex];
-
-  const hasLoading = visibleItems.some((i) => i.status === 'LOADING');
 
   // Functions
   const next = (validated: boolean) => {
@@ -305,11 +303,13 @@ export default function Screen() {
         marginHorizontal: "auto",
       }}>
         <Text.H1 color={Colors.primary[200]}>
-          {isCurrentLoading ? "Generating" : "Generated"}
+          {currentStatus === 'LOADING' ? "Generating" :
+            currentStatus === 'READY' ? "Generated" : "Unlock"}
         </Text.H1>
         <Text.Base color={Colors.neutral[400]} style={{ marginTop: 8, textAlign: 'center' }} weight={500}>
-          {isCurrentLoading ? "This can take up to two minutes." :
-            "Save the images you want in your library."}
+          {currentStatus === 'LOADING' ? "This can take up to two minutes." :
+            currentStatus === 'READY' ? "Save the images you want in your library." :
+              "Unlock more generations."}
         </Text.Base>
       </View>
       <View style={{ flex: 1, justifyContent: 'center' }}>
@@ -327,9 +327,13 @@ export default function Screen() {
             <X size={48} color={Colors.neutral[400]} />
           </View>}
         </View>}
-        <View style={{ flex: 1, maxHeight: Dimensions.get('window').height / 2, overflow: 'visible' }}>
+        <View style={{
+          flex: 1,
+          overflow: 'visible',
+          justifyContent: 'center',
+        }}>
           {visibleItems.length > 0 && <Carousel
-            itemHeight={456}
+            itemHeight={430}
             defaultIndex={currentIndex}
             ref={carouselRef}
             onProgressChange={(_, v) => {
@@ -339,7 +343,6 @@ export default function Screen() {
             }}
             scaleAnimation={true}
             items={[...visibleItems, undefined]
-              .filter((i) => hasLoading ? notEmpty(i) : true)
               .map((s, i) => {
                 if (s === undefined)
                   return (
@@ -358,7 +361,6 @@ export default function Screen() {
                       loading={s.status === 'LOADING'}
                       source={s.url}
                       text={s.status === 'LOADING' ? "Generating..." : "Ready in 13s."}
-                      textScale={1.2}
                       onDownload={s.url ? () => downloadImageCrossPlatform(s.url!) : undefined}
                     />
                   </AnimatedGeneration>
