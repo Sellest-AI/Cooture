@@ -33,7 +33,7 @@ export const useAuthActions = () => {
       const code = new URL(url).searchParams.get("code")!;
       await convex.signIn(provider, { code });
 
-      if (route) router.dismissTo(route);
+      if (route) setTimeout(() => router.dismissTo(route), 500);
 
       // Don't auto redirect, the router will do it on its own
       // router.replace(route || ROUTES.TABS.DISCOVER);
