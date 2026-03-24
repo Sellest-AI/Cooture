@@ -17,7 +17,6 @@ export const useAppearance = () => {
     await mutate({ gender })
   }
 
-
   return {
     isPending,
     frontImage: appearance?.frontImage,

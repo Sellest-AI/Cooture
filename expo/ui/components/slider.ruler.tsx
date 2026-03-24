@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import {
   Dimensions,
   NativeScrollEvent,
@@ -32,15 +32,14 @@ export default function RulerSlider({
   onValueChange,
   color = '#ffffff',
 }: RulerSliderProps) {
-  const scrollRef = useRef<ScrollView>(null);
-  const currentValue = useRef(initialValue);
+  const [cachedInitialValue] = useState(initialValue);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { snapToValue(initialValue) }, [])
+  const scrollRef = useRef<ScrollView>(null);
+  const currentValue = useRef(cachedInitialValue);
 
   const totalTicks = maxValue - minValue + 1;
   const sidePadding = Math.round((SCREEN_WIDTH - TICK_SPACING) / 2);
-  const initialOffset = (initialValue - minValue) * TICK_SPACING;
+  const initialOffset = (cachedInitialValue - minValue) * TICK_SPACING;
 
   const offsetToValue = useCallback((offsetX: number) => {
     const index = Math.round(offsetX / TICK_SPACING);
@@ -52,9 +51,9 @@ export default function RulerSlider({
     return index * TICK_SPACING;
   }, [minValue]);
 
-  const snapToValue = useCallback((value: number) => {
+  const snapToValue = useCallback((value: number, animated?: boolean) => {
     const offset = valueToOffset(value);
-    scrollRef.current?.scrollTo({ x: offset, animated: true });
+    scrollRef.current?.scrollTo({ x: offset, animated: animated ?? true });
   }, [valueToOffset]);
 
   const handleScroll = useCallback(
@@ -66,6 +65,30 @@ export default function RulerSlider({
       }
     },
     [offsetToValue, onValueChange]
+  );
+
+  const handleMomentumEnd = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const x = e.nativeEvent.contentOffset.x;
+      const newValue = offsetToValue(x);
+      // Snap to perfectly aligned offset
+      snapToValue(newValue, true);
+    },
+    [offsetToValue, snapToValue]
+  );
+
+  const handleScrollEndDrag = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      // If there's no momentum, we snap immediately.
+      // If there is momentum, onMomentumScrollEnd will handle it.
+      const velocity = e.nativeEvent.velocity?.x ?? 0;
+      if (Math.abs(velocity) < 0.1) {
+        const x = e.nativeEvent.contentOffset.x;
+        const newValue = offsetToValue(x);
+        snapToValue(newValue, false);
+      }
+    },
+    [offsetToValue, snapToValue]
   );
 
   const ticks = Array.from({ length: totalTicks }, (_, i) => {
@@ -101,11 +124,12 @@ export default function RulerSlider({
         ref={scrollRef}
         horizontal
         showsHorizontalScrollIndicator={false}
-        snapToOffsets={ticks.map((_, i) => i * TICK_SPACING)}
-        snapToAlignment="start"
-        decelerationRate="fast"
+        decelerationRate="normal"
         contentOffset={{ x: initialOffset, y: 0 }}
+        onLayout={() => snapToValue(cachedInitialValue, true)}
         onScroll={handleScroll}
+        onScrollEndDrag={handleScrollEndDrag}
+        onMomentumScrollEnd={handleMomentumEnd}
         scrollEventThrottle={16}
         contentContainerStyle={[
           styles.scrollContent,
@@ -165,12 +189,11 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 11,
     fontWeight: '400',
-    marginTop: 4,
+    width: 32,
     textAlign: 'center',
     letterSpacing: 0.2,
     position: 'absolute',
-    bottom: 2,
-    transform: [{ translateY: "100%" }],
+    bottom: -14,
   },
   indicator: {
     pointerEvents: 'none',

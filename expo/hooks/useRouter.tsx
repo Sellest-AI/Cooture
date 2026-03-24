@@ -283,7 +283,7 @@ export { ROUTES } from 'routes';
 
 const Redirect = <T extends Route>({ href, currentRoute, ...props }: { href: T, currentRoute?: Route } & Omit<RouterParams<T>, 'redirectHere'>) => {
   const { _routerFunction, _toUrl } = useRouter(currentRoute);
-  ;
+
   useEffect(() => {
     _routerFunction(href, { ...props });
     // eslint-disable-next-line react-hooks/exhaustive-deps

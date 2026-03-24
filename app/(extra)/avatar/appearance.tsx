@@ -37,13 +37,8 @@ const PhysicalAppearance = ({ value, onValueChange }: { value: SizeValue, onValu
   // Size
   const flashListRef = useRef<FlashListRef<number>>(null);
 
-  const handleSizeChange = (v: number) => {
-    const matched = SIZES.find(s => s.value === v);
-    if (!matched) return;
-
-    onValueChange(matched.valueText);
-
-    const index = SIZES.findIndex(s => s.value === v);
+  const scrollToValue = (v: SizeValue) => {
+    const index = SIZES.findIndex(s => s.valueText === v);
     const offsetIndex = index !== SIZES.length - 1 ? index - 1 : index; // if not last item, scroll to next item to show partial next item as visual cue of scrollability
 
     const viewOffset = offsetIndex <= 0 ? 0 : 72;
@@ -53,6 +48,15 @@ const PhysicalAppearance = ({ value, onValueChange }: { value: SizeValue, onValu
       viewOffset: viewOffset,
       animated: true
     });
+  }
+
+  const handleSizeChange = (v: number) => {
+    const matched = SIZES.find(s => s.value === v);
+    if (!matched) return;
+
+    onValueChange(matched.valueText);
+
+    scrollToValue(matched.valueText);
   };
 
   return (
@@ -63,7 +67,8 @@ const PhysicalAppearance = ({ value, onValueChange }: { value: SizeValue, onValu
       <FlashList
         ref={flashListRef}
         horizontal
-        style={{ marginTop: 24 }}
+        style={{ marginTop: 24, minHeight: 172 }}
+        onLoad={() => scrollToValue(value)}
         showsHorizontalScrollIndicator={false}
         data={[0, 2, 4, 6, 8, 10]}
         renderItem={({ index }) => {
@@ -152,7 +157,7 @@ const GenderButton = ({ gender, onPress, selected }: { gender: string; onPress: 
   )
 }
 
-export default function Screen() {
+export function Content() {
   const { redirect } = useRouter();
 
   // Height
@@ -162,7 +167,7 @@ export default function Screen() {
 
   // Size
   const { size, updateSize } = useAppearance();
-  const [innerSize, setInnerSize] = useState(size || "average");
+  const [innerSize, setInnerSize] = useState(size || "athletic");
   useEffect(() => { if (size) setInnerSize(size) }, [size])
 
   // Gender
@@ -233,6 +238,7 @@ export default function Screen() {
             style={{ marginBottom: 24 }}
           />
           <RulerSlider
+            key={heightCm}
             initialValue={innerHeight}
             minValue={140}
             maxValue={220}
@@ -265,5 +271,9 @@ export default function Screen() {
       </View>
     </SafeScrollView>
   )
+}
 
+
+export default function Screen() {
+  return <Content />
 }
