@@ -90,6 +90,7 @@ export const useAccount = () => {
   const isAdmin = useIsAdmin();
 
   const isPremium = !!user?.plan;
+  const userId = user?._id;
 
   // Determine the account status
   const accountStatus = user?.accountStatus === "FLAGGED" && !isPremium ?
@@ -100,6 +101,7 @@ export const useAccount = () => {
 
   return {
     user,
+    userId,
     isAuthenticated,
     isPremium,
     isAdmin,

@@ -1,3 +1,4 @@
+import { notEmpty } from "@shared/utils";
 import { Doc } from "../../_generated/dataModel";
 import { QueryCtx } from "../../procedures";
 import { getImage } from "../images";
@@ -18,5 +19,5 @@ export const sanitizePresets = async (ctx: QueryCtx, presets: Doc<'presets'>[]) 
     }
   }));
 
-  return sanitizedPresets;
+  return sanitizedPresets.filter(notEmpty);
 }

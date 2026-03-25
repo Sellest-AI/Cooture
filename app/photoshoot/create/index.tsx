@@ -14,6 +14,7 @@ import { Pressable } from "@ui/pressable";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
 import { TextInput } from "@ui/text-input";
+import { notEmpty } from "@utils/convex-allowed";
 import React, { useRef, useState } from "react";
 import { View } from "react-native";
 import { ROUTES } from "routes";
@@ -22,7 +23,7 @@ import { Colors } from "theme";
 const loading = false;
 
 export default function Screen() {
-  const { isPremium, isAdmin } = useAccount();
+  const { isPremium, isAdmin, userId } = useAccount();
   const { push } = useRouter('/photoshoot/create');
   const { setPresetId, presetId, outfitId, friendId } = usePhotoshoot.New();
 
@@ -33,17 +34,25 @@ export default function Screen() {
   const seed = new Date().getHours();
   const { data: presets } = useQueryCached(api.router.presets.getAll.anon, { seed });
 
+  const [filterOwn, setFilterOwn] = useState(false);
+  const { data: userPresets } = useQueryCached(api.router.presets.getByUser.anon, userId ? { userId } : 'skip');
+
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 800);
   const query = search !== debouncedSearch ? '' : search;
 
   const { data: searchedPresets, isPending } = useQuery(api.router.presets.searchMany.anon, query.length > 0 ? { query } : 'skip');
 
-  const mergedSearchPresets = (searchedPresets ?? []).length > 0 ? (searchedPresets ?? []) : (presets ?? []);
-  const finalPresets = category ? presetsByCategory : mergedSearchPresets;
-  const sanitizedPresets = outfitId ? finalPresets.filter((p) => !p.hasMultipleSubjects) : finalPresets;
+  // If the user has created a preset in the last 24h, we want to showcase it at the beginning of the list
+  const showcasedPreset = (userPresets?.[0]._creationTime ?? 0) > (Date.now() - 24 * 60 * 60 * 1000);
+  const mergedPresets = [showcasedPreset ? userPresets?.[0] : null, ...(presets ?? [])
+    .filter(p => showcasedPreset ? p._id !== userPresets?.[0]._id : true)].filter(notEmpty);
 
-  const listRef = useRef<FlashListRef<typeof sanitizedPresets[number] | string>>(null);
+  const mergedSearchPresets = (searchedPresets ?? []).length > 0 ? (searchedPresets ?? []) : (mergedPresets ?? []);
+  const finalPresets = filterOwn ? (userPresets ?? []) : (category ? presetsByCategory : mergedSearchPresets);
+  const displayedPresets = outfitId ? finalPresets.filter((p) => !p.hasMultipleSubjects) : finalPresets;
+
+  const listRef = useRef<FlashListRef<typeof displayedPresets[number] | string>>(null);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -56,7 +65,7 @@ export default function Screen() {
           value={search}
           onChangeText={(v) => {
             setSearch(v);
-            if (v.length > 0) setCategory(null);
+            if (v.length > 0) { setCategory(null); setFilterOwn(false); }
             listRef.current?.scrollToTop({ animated: true });
           }}
         />
@@ -68,7 +77,7 @@ export default function Screen() {
           contentContainerStyle={{
             paddingBottom: presetId !== null ? 72 : 0,
           }}
-          data={['header', 'new', ...(sanitizedPresets ?? [])]}
+          data={['header', 'new', ...(displayedPresets ?? [])]}
           keyExtractor={(item) => typeof item === 'string' ? item : item._id}
           stickyHeaderIndices={[0]}
           stickyHeaderHiddenOnScroll={true}
@@ -130,6 +139,7 @@ export default function Screen() {
                         setCategory((c) => c === item.value ? null : item.value);
                         listRef.current?.scrollToTop({ animated: true });
                         setSearch('');
+                        setFilterOwn(false);
                       }}
                     >
                       <Block

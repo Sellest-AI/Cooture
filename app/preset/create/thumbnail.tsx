@@ -1,4 +1,4 @@
-import { ROUTES, useRoute } from "@/hooks";
+import { ROUTES, useRoute, useRouter } from "@/hooks";
 import { api, Id, useAction, useQuery } from "@/lib/convex/client";
 import { Button } from "@ui/button";
 import { ImageGeneration } from "@ui/cards";
@@ -13,6 +13,8 @@ import { Colors } from "theme";
 const generatingAtom = atom(false);
 
 export default function Screen() {
+  const { dismissTo } = useRouter(ROUTES.PRESETS.CREATE.THUMBNAIL);
+
   const [images, setImages] = useState<string[]>([]);
   const [selectedThumbnail, setSelectedThumbnail] = useState<string | null>(null);
   const [generating, setGenerating] = useAtom(generatingAtom);
@@ -106,7 +108,7 @@ export default function Screen() {
               archived: false,
             });
 
-            router.dismissTo(ROUTES.PHOTOSHOOT.NEW);
+            dismissTo(ROUTES.PHOTOSHOOT.NEW, { params: { presetId } });
           }}
         >
           Publish preset

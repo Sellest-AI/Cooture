@@ -175,6 +175,7 @@ import type * as router_presets_createOne from "../router/presets/createOne.js";
 import type * as router_presets_deleteOne from "../router/presets/deleteOne.js";
 import type * as router_presets_getAll from "../router/presets/getAll.js";
 import type * as router_presets_getByCategory from "../router/presets/getByCategory.js";
+import type * as router_presets_getByUser from "../router/presets/getByUser.js";
 import type * as router_presets_getCategories from "../router/presets/getCategories.js";
 import type * as router_presets_getOne from "../router/presets/getOne.js";
 import type * as router_presets_searchMany from "../router/presets/searchMany.js";
@@ -416,6 +417,7 @@ declare const fullApi: ApiFromModules<{
   "router/presets/deleteOne": typeof router_presets_deleteOne;
   "router/presets/getAll": typeof router_presets_getAll;
   "router/presets/getByCategory": typeof router_presets_getByCategory;
+  "router/presets/getByUser": typeof router_presets_getByUser;
   "router/presets/getCategories": typeof router_presets_getCategories;
   "router/presets/getOne": typeof router_presets_getOne;
   "router/presets/searchMany": typeof router_presets_searchMany;
