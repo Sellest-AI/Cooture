@@ -15,8 +15,10 @@ type Args = {
 
 export const canPay = async (ctx: Ctx, args: Args, options?: Options): Promise<boolean> => {
   const userId = ctx.userId;
+  const throwOnReject = options?.throwOnReject ?? true;
+
   if (!userId) {
-    if (options?.throwOnReject) throw new Error("User not authenticated");
+    if (throwOnReject) throw new Error("User not authenticated");
     return false;
   }
 

@@ -2,13 +2,17 @@ import { v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { authAction, internalMutation } from "../../procedures";
 
+const args = {
+  presetId: v.id("presets"),
+  coverUrl: v.optional(v.string()),
+  archived: v.optional(v.boolean()),
+};
+
 export const authed = authAction({
-  args: {
-    presetId: v.id("presets"),
-    coverUrl: v.optional(v.string()),
-    archived: v.optional(v.boolean()),
-  },
+  args,
   handler: async (ctx, args) => {
+    await ctx.runQuery(internal.utils.isAuthorized._internal, { userId: ctx.userId, id: args.presetId });
+
     const images = args.coverUrl ?
       await ctx.runAction(internal.router.storage.images.uploadMany._internal, {
         images: [{ url: args.coverUrl }],

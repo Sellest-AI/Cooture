@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { Id } from "../../_generated/dataModel";
+import { isAuthorized } from "../../functions/users";
 import { authMutation } from "../../procedures";
 
 type Return = {
@@ -15,7 +16,8 @@ export const authed = authMutation({
   handler: async (ctx, { itemId }): Promise<Return> => {
     const item = await ctx.db.get(itemId);
     if (!item) throw new Error("Item not found");
-    if (item.userId !== ctx.userId) throw new Error("Unauthorized");
+
+    await isAuthorized(ctx, item);
 
     // If item in an outfit, prevent
     const outfitItems = await ctx.db.query('outfitItems')

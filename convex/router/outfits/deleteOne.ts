@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { updateQuest } from "../../functions/quests";
+import { isAuthorized } from "../../functions/users";
 import { authMutation } from "../../procedures";
 
 export const authed = authMutation({
@@ -7,6 +8,8 @@ export const authed = authMutation({
     outfitId: v.id("outfits")
   },
   handler: async (ctx, args) => {
+    await isAuthorized(ctx, args.outfitId);
+
     // Delete outfit items
     const items = await ctx.db.query('outfitItems')
       .withIndex('by_outfit_id', q => q.eq('outfitId', args.outfitId)).collect();

@@ -2,6 +2,7 @@ import { removeUndefinedKeys } from "@shared/utils";
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { ContentRating, isOutfitNFSW } from "../../functions/outfits";
+import { isAuthorized } from "../../functions/users";
 import { authMutation } from "../../procedures";
 
 export const authed = authMutation({
@@ -11,6 +12,8 @@ export const authed = authMutation({
     items: v.optional(v.array(v.id("items"))),
   },
   handler: async (ctx, args) => {
+    await isAuthorized(ctx, args.outfitId);
+
     let contentRating: ContentRating | undefined = undefined;
 
     if (args.items !== undefined) {

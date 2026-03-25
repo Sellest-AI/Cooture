@@ -41,6 +41,8 @@ import type * as functions_outfits_getBackgroundColor from "../functions/outfits
 import type * as functions_outfits_getOutfit from "../functions/outfits/getOutfit.js";
 import type * as functions_outfits_index from "../functions/outfits/index.js";
 import type * as functions_outfits_isOutfitNFSW from "../functions/outfits/isOutfitNFSW.js";
+import type * as functions_presets_index from "../functions/presets/index.js";
+import type * as functions_presets_sanitizePresets from "../functions/presets/sanitizePresets.js";
 import type * as functions_quests_index from "../functions/quests/index.js";
 import type * as functions_quests_updateQuest from "../functions/quests/updateQuest.js";
 import type * as functions_subscriptions_getUserSubscription from "../functions/subscriptions/getUserSubscription.js";
@@ -129,7 +131,6 @@ import type * as router_credits_getTransactionsPaginated from "../router/credits
 import type * as router_credits_getUserWallet from "../router/credits/getUserWallet.js";
 import type * as router_credits_grantCredits from "../router/credits/grantCredits.js";
 import type * as router_credits_refundCredits from "../router/credits/refundCredits.js";
-import type * as router_examples_query from "../router/examples/query.js";
 import type * as router_feed_getFromOutfit from "../router/feed/getFromOutfit.js";
 import type * as router_feed_getPaginated from "../router/feed/getPaginated.js";
 import type * as router_generations_createOne from "../router/generations/createOne.js";
@@ -239,6 +240,7 @@ import type * as schema_subscriptions from "../schema/subscriptions.js";
 import type * as schema_users from "../schema/users.js";
 import type * as schema_waitlist from "../schema/waitlist.js";
 import type * as schema_wallets from "../schema/wallets.js";
+import type * as utils_isAuthorized from "../utils/isAuthorized.js";
 
 import type {
   ApiFromModules,
@@ -280,6 +282,8 @@ declare const fullApi: ApiFromModules<{
   "functions/outfits/getOutfit": typeof functions_outfits_getOutfit;
   "functions/outfits/index": typeof functions_outfits_index;
   "functions/outfits/isOutfitNFSW": typeof functions_outfits_isOutfitNFSW;
+  "functions/presets/index": typeof functions_presets_index;
+  "functions/presets/sanitizePresets": typeof functions_presets_sanitizePresets;
   "functions/quests/index": typeof functions_quests_index;
   "functions/quests/updateQuest": typeof functions_quests_updateQuest;
   "functions/subscriptions/getUserSubscription": typeof functions_subscriptions_getUserSubscription;
@@ -368,7 +372,6 @@ declare const fullApi: ApiFromModules<{
   "router/credits/getUserWallet": typeof router_credits_getUserWallet;
   "router/credits/grantCredits": typeof router_credits_grantCredits;
   "router/credits/refundCredits": typeof router_credits_refundCredits;
-  "router/examples/query": typeof router_examples_query;
   "router/feed/getFromOutfit": typeof router_feed_getFromOutfit;
   "router/feed/getPaginated": typeof router_feed_getPaginated;
   "router/generations/createOne": typeof router_generations_createOne;
@@ -478,6 +481,7 @@ declare const fullApi: ApiFromModules<{
   "schema/users": typeof schema_users;
   "schema/waitlist": typeof schema_waitlist;
   "schema/wallets": typeof schema_wallets;
+  "utils/isAuthorized": typeof utils_isAuthorized;
 }>;
 
 /**

@@ -1,5 +1,6 @@
 import { removeUndefinedKeys } from "@shared/utils";
 import { v } from "convex/values";
+import { isAuthorized } from "../../functions/users";
 import { authMutation } from "../../procedures";
 import { ITEM_CATEGORIES, ITEM_COLOR_TONES, ITEM_GENDERS, ITEM_MATERIAL_FEEL, ITEM_WEATHERS } from "../../schema/items";
 
@@ -16,7 +17,8 @@ export const authed = authMutation({
     // Ensure the user own the item
     const item = await ctx.db.get(args.itemId);
     if (!item) throw new Error("Item not found");
-    if (item.userId !== ctx.userId) { throw new Error("Unauthorized"); }
+
+    await isAuthorized(ctx, item);
 
     const data = {
       ...args,

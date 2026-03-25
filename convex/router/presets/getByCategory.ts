@@ -1,6 +1,6 @@
 import { notEmpty } from "@shared/utils";
 import { paginationOptsValidator } from "convex/server";
-import { getImage } from "../../functions/images";
+import { sanitizePresets } from "../../functions/presets";
 import { publicQuery } from "../../procedures";
 import { PRESET_CATEGORIES } from "../../schema/presets";
 
@@ -15,26 +15,15 @@ export const anon = publicQuery({
       .paginate(args.paginationOpts);
 
     // Sanitize presets by removing prompts
-    const sanitizedPresets = await Promise.all(categories.page
+    const presets = await Promise.all(categories.page
       .sort((a, b) => b.score - a.score) // Sort by category score
       .map(async (categories) => {
         const preset = await ctx.db.get(categories.presetId);
         if (!preset) return null;
-        if (preset.archived) return null;
-
-        const cover = await getImage(ctx, preset.imageIds[0]);
-        if (!cover) return null;
-
-        const { prompts, ...rest } = preset;
-        const hasMultipleSubjects = prompts.some((p) => p.subjects.length > 1);
-
-        return {
-          ...rest,
-          expectedResults: preset.prompts.length,
-          hasMultipleSubjects,
-          cover,
-        }
+        return preset;
       }));
+
+    const sanitizedPresets = await sanitizePresets(ctx, presets.filter(notEmpty));
 
     const page = sanitizedPresets.filter(notEmpty);
 
