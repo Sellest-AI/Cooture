@@ -111,3 +111,26 @@ export const predictImage = async (params: PredictImageParams) => {
   return prediction;
 }
 
+type RunImageParams = {
+  width: number;
+  height: number;
+  prompt: string;
+  model: "prunaai/z-image-turbo"
+}
+
+export const runImage = (params: RunImageParams) => {
+  const { width, height, prompt, model } = params;
+
+  return replicate.run(model, {
+    input: {
+      prompt,
+      width,
+      height,
+      go_fast: false,
+      output_format: "webp",
+      guidance_scale: 0,
+      output_quality: 100,
+      num_inference_steps: 8
+    }
+  })
+}

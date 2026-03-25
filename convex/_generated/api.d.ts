@@ -12,6 +12,7 @@ import type * as auth from "../auth.js";
 import type * as cron_feedRecentUpdate from "../cron/feedRecentUpdate.js";
 import type * as crons from "../crons.js";
 import type * as env from "../env.js";
+import type * as functions_credits_canPay from "../functions/credits/canPay.js";
 import type * as functions_credits_createUserWallet from "../functions/credits/createUserWallet.js";
 import type * as functions_credits_deductCredits from "../functions/credits/deductCredits.js";
 import type * as functions_credits_getUserWallet from "../functions/credits/getUserWallet.js";
@@ -49,6 +50,7 @@ import type * as functions_users_getAccount from "../functions/users/getAccount.
 import type * as functions_users_getPortraits from "../functions/users/getPortraits.js";
 import type * as functions_users_index from "../functions/users/index.js";
 import type * as functions_users_isAuthorized from "../functions/users/isAuthorized.js";
+import type * as functions_users_isPremium from "../functions/users/isPremium.js";
 import type * as functions_waitlist_index from "../functions/waitlist/index.js";
 import type * as functions_waitlist_updateWaitlist from "../functions/waitlist/updateWaitlist.js";
 import type * as http from "../http.js";
@@ -91,6 +93,7 @@ import type * as llm_triggers_generateFace from "../llm/triggers/generateFace.js
 import type * as llm_triggers_itemCategorizer from "../llm/triggers/itemCategorizer.js";
 import type * as llm_triggers_photoshoot from "../llm/triggers/photoshoot.js";
 import type * as llm_triggers_presetCreator from "../llm/triggers/presetCreator.js";
+import type * as llm_triggers_presetPreview from "../llm/triggers/presetPreview.js";
 import type * as llm_triggers_removeBackground from "../llm/triggers/removeBackground.js";
 import type * as llm_utils_createTool from "../llm/utils/createTool.js";
 import type * as llm_utils_index from "../llm/utils/index.js";
@@ -168,11 +171,13 @@ import type * as router_outfits_updateCover from "../router/outfits/updateCover.
 import type * as router_outfits_updateCoverInternal from "../router/outfits/updateCoverInternal.js";
 import type * as router_outfits_wearCount from "../router/outfits/wearCount.js";
 import type * as router_presets_createOne from "../router/presets/createOne.js";
+import type * as router_presets_deleteOne from "../router/presets/deleteOne.js";
 import type * as router_presets_getAll from "../router/presets/getAll.js";
 import type * as router_presets_getByCategory from "../router/presets/getByCategory.js";
 import type * as router_presets_getCategories from "../router/presets/getCategories.js";
 import type * as router_presets_getOne from "../router/presets/getOne.js";
 import type * as router_presets_searchMany from "../router/presets/searchMany.js";
+import type * as router_presets_updateOne from "../router/presets/updateOne.js";
 import type * as router_quests_getAll from "../router/quests/getAll.js";
 import type * as router_quests_getOne from "../router/quests/getOne.js";
 import type * as router_quests_initAll from "../router/quests/initAll.js";
@@ -246,6 +251,7 @@ declare const fullApi: ApiFromModules<{
   "cron/feedRecentUpdate": typeof cron_feedRecentUpdate;
   crons: typeof crons;
   env: typeof env;
+  "functions/credits/canPay": typeof functions_credits_canPay;
   "functions/credits/createUserWallet": typeof functions_credits_createUserWallet;
   "functions/credits/deductCredits": typeof functions_credits_deductCredits;
   "functions/credits/getUserWallet": typeof functions_credits_getUserWallet;
@@ -283,6 +289,7 @@ declare const fullApi: ApiFromModules<{
   "functions/users/getPortraits": typeof functions_users_getPortraits;
   "functions/users/index": typeof functions_users_index;
   "functions/users/isAuthorized": typeof functions_users_isAuthorized;
+  "functions/users/isPremium": typeof functions_users_isPremium;
   "functions/waitlist/index": typeof functions_waitlist_index;
   "functions/waitlist/updateWaitlist": typeof functions_waitlist_updateWaitlist;
   http: typeof http;
@@ -325,6 +332,7 @@ declare const fullApi: ApiFromModules<{
   "llm/triggers/itemCategorizer": typeof llm_triggers_itemCategorizer;
   "llm/triggers/photoshoot": typeof llm_triggers_photoshoot;
   "llm/triggers/presetCreator": typeof llm_triggers_presetCreator;
+  "llm/triggers/presetPreview": typeof llm_triggers_presetPreview;
   "llm/triggers/removeBackground": typeof llm_triggers_removeBackground;
   "llm/utils/createTool": typeof llm_utils_createTool;
   "llm/utils/index": typeof llm_utils_index;
@@ -402,11 +410,13 @@ declare const fullApi: ApiFromModules<{
   "router/outfits/updateCoverInternal": typeof router_outfits_updateCoverInternal;
   "router/outfits/wearCount": typeof router_outfits_wearCount;
   "router/presets/createOne": typeof router_presets_createOne;
+  "router/presets/deleteOne": typeof router_presets_deleteOne;
   "router/presets/getAll": typeof router_presets_getAll;
   "router/presets/getByCategory": typeof router_presets_getByCategory;
   "router/presets/getCategories": typeof router_presets_getCategories;
   "router/presets/getOne": typeof router_presets_getOne;
   "router/presets/searchMany": typeof router_presets_searchMany;
+  "router/presets/updateOne": typeof router_presets_updateOne;
   "router/quests/getAll": typeof router_quests_getAll;
   "router/quests/getOne": typeof router_quests_getOne;
   "router/quests/initAll": typeof router_quests_initAll;

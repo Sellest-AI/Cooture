@@ -2,6 +2,7 @@ export const CREDITS_CONFIG = {
   // Generation cost
   COST_PER_GENERATION: 100,
   COST_PER_ITEM: 5,
+  COST_PER_PRESET: 20,
 
   // Daily rewards
   WEEKLY_REWARDS: 120, // Total credits earned over a 7-day streak (1.2 × COST_PER_GENERATION)

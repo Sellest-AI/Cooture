@@ -104,7 +104,9 @@ export const presets = defineTable({
   prompts: v.array(PRESET_PROMPT),
   contentRating: CONTENT_RATINGS,
   archived: v.boolean(),
+  userId: v.optional(v.id("users")),
 })
+  .index("by_user_id", ["userId"])
   .index("by_archived", ["archived"])
   .searchIndex("search_name", { searchField: "name" })
 
@@ -123,5 +125,6 @@ export const presetGenerations = defineTable({
   prompts: v.array(v.string()),
   userIds: v.optional(v.array(v.id("users"))),
 })
+  .index("by_preset_id", ["presetId"])
   .index("by_generation_id", ["generationId"])
   .index("by_outfit_id", ["outfitId"])

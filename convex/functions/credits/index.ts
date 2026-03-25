@@ -1,3 +1,4 @@
+export * from './canPay';
 export * from './createUserWallet';
 export * from './credits.config';
 export * from './deductCredits';

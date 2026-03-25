@@ -106,7 +106,7 @@ export default function Screen() {
                     style={{}}
                     title="New preset"
                     onPress={() => {
-                      if (isPremium || isAdmin) push('/presets/new', { redirectHere: true })
+                      if (isPremium || isAdmin) push(ROUTES.PRESETS.CREATE.PATH, { redirectHere: true })
                       else push(ROUTES.MODALS.UPGRADE);
                     }}
                   />

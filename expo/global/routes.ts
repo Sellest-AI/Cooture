@@ -46,9 +46,15 @@ export const ROUTES = {
     ITEM: (itemId: string) => `/i/${itemId}`,
     USER: (userId: string) => `/u/${userId}`,
   },
+  PRESETS: {
+    CREATE: {
+      PATH: '/preset/create',
+      DISCLAIMER: '/preset/create/disclaimer',
+      THUMBNAIL: '/preset/create/thumbnail',
+    }
+  },
   PHOTOSHOOT: {
     NEW: '/photoshoot/create',
-    PRESETS: '/photoshoot/create/presets',
     RECAP: '/photoshoot/create/recap',
     GENERATIONS: {
       NEXT: '/photoshoot/generations/next',

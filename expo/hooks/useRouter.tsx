@@ -15,10 +15,12 @@ type ParamsDefault<T extends Route> =
   T extends "/add-item" ? { outfitId?: Id<'outfits'>, itemIds?: Id<'items'>[] } :
   T extends "/admin/bots/generate" ? { userId?: Id<'users'> | null } :
   T extends "/admin/bots/outfits/extractor" ? { userId?: Id<'users'> | null } :
+  T extends "/preset/create/thumbnail" ? { presetId: Id<'presets'> } :
   never;
 
 const LINKED_ROUTES: { parent: Route, child: Route }[] = [
   { parent: "/photoshoot/create", child: "/photoshoot/create/recap" },
+  { parent: "/preset/create", child: "/preset/create/thumbnail" },
 ];
 
 type Params<T extends Route> = ParamsDefault<T> & {
