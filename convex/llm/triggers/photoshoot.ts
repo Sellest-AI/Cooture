@@ -18,8 +18,8 @@ const generateFunction = async (ctx: ActionCtx, args: {
   extraUserIds?: Id<'users'>[],
   numberToGenerate?: number,
 }) => {
-  const AMOUNT_OF_IMAGES = args.numberToGenerate ?? 1;
-  const COST = CREDITS_CONFIG.COST_PER_GENERATION * AMOUNT_OF_IMAGES;
+  const NUMBER_OF_IMAGES = args.numberToGenerate ?? 1;
+  const COST = CREDITS_CONFIG.COST_PER_GENERATION * NUMBER_OF_IMAGES;
 
   // 1. Check if can pay
   const canPay = await ctx.runQuery(internal.router.credits.canPay._internal, {
@@ -53,7 +53,7 @@ const generateFunction = async (ctx: ActionCtx, args: {
   // so we need to shrink the prompt if it's too long
   const shrinkedPrompt = sliceText(prompt, 2000);
 
-  const predictions = await Promise.all(Array.from({ length: AMOUNT_OF_IMAGES }).map(async () => predictImage({
+  const predictions = await Promise.all(Array.from({ length: NUMBER_OF_IMAGES }).map(async () => predictImage({
     model: 'bytedance/seedream-4.5',
     images: schema.images,
     prompt: shrinkedPrompt,
@@ -79,7 +79,7 @@ const generateFunction = async (ctx: ActionCtx, args: {
 
   // 3. Update transaction with generationId (optional - for better tracking)
   await ctx.runMutation(internal.router.credits.deductCredits._internal, {
-    amount: CREDITS_CONFIG.COST_PER_GENERATION * AMOUNT_OF_IMAGES,
+    amount: CREDITS_CONFIG.COST_PER_GENERATION * NUMBER_OF_IMAGES,
     userId: args.userId,
     generationId,
   }).catch(() => null);

@@ -325,7 +325,7 @@ export default function Screen() {
           >
             You will generate {numberToGenerate} image{numberToGenerate > 1 ? 's' : ''} for
           </Text.Sm>}
-          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 4 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
             <Credits size={12} />
             <Text.Base
               color={Colors.primary[200]} weight={600}

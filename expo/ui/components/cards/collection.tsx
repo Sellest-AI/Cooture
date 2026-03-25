@@ -139,26 +139,28 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
             left: "2.5%",
             backgroundColor: _backgroundColor,
             borderRadius: 12,
-            overflow: 'hidden',
             borderBottomWidth: 1,
             borderRightWidth: 1,
             borderColor: borderColor,
             shadowColor: 'rgba(0,0,0,0.3)',
+            shadowOffset: { width: 0, height: 4 },
             shadowRadius: 10,
             shadowOpacity: 1,
             padding: contentFit === 'contain' ? 16 : undefined,
             opacity: contentFit === 'contain' ? 0.9 : 1,
           }}
         >
-          {source && <Image
-            source={source}
-            contentFit={contentFit}
-            style={{
-              opacity: 0.4,
-              width: '100%',
-              height: '100%',
-            }}
-          />}
+          <View style={{ flex: 1, overflow: 'hidden', borderRadius: 12 }}>
+            {source && <Image
+              source={source}
+              contentFit={contentFit}
+              style={{
+                opacity: 0.4,
+                width: '100%',
+                height: '100%',
+              }}
+            />}
+          </View>
         </Animated.View>
         <Animated.View
           style={{
@@ -172,44 +174,46 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
             left: "2.5%",
             width: '95%',
             height: '95%',
-            overflow: 'hidden',
             shadowColor: 'rgba(0,0,0,0.3)',
+            shadowOffset: { width: 0, height: 4 },
             shadowRadius: 10,
             shadowOpacity: 1,
             padding: contentFit === 'contain' ? 16 : undefined,
           }}
         >
-          {source && <Image
-            source={source}
-            contentFit={contentFit}
-            style={{
-              width: '100%',
-              height: '100%',
-              opacity: selected ? 0.7 : 1,
-            }}
-          />}
-          {!source && <View
-            style={{
-              position: 'relative',
-              justifyContent: 'center',
-              alignItems: 'center',
-              flex: 1,
-            }}
-          >
-            <Explozish
-              color={Colors.primary[700]}
-              strokeColor={Colors.blur.light}
-              strokeWidth={1}
-              size={86}
-            />
-            <Plus
+          <View style={{ flex: 1, overflow: 'hidden', borderRadius: 12 }}>
+            {source && <Image
+              source={source}
+              contentFit={contentFit}
               style={{
-                position: 'absolute'
+                width: '100%',
+                height: '100%',
+                opacity: selected ? 0.7 : 1,
               }}
-              color={Colors.primary[500]}
-              size={30}
-            />
-          </View>}
+            />}
+            {!source && <View
+              style={{
+                position: 'relative',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flex: 1,
+              }}
+            >
+              <Explozish
+                color={Colors.primary[700]}
+                strokeColor={Colors.blur.light}
+                strokeWidth={1}
+                size={86}
+              />
+              <Plus
+                style={{
+                  position: 'absolute'
+                }}
+                color={Colors.primary[500]}
+                size={30}
+              />
+            </View>}
+          </View>
         </Animated.View>
       </Animated.View>
       {showText && <View

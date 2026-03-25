@@ -28,7 +28,10 @@ export default function Layout() {
   });
 
   const pathname = usePathname();
-  const step = pathname === '/photoshoot/create' ? 1 : 2;
+  const step = (
+    (pathname === '/photoshoot/create/recap') ||
+    (pathname.startsWith('/photoshoot/generations'))
+  ) ? 2 : 1;
 
   const title = step === 1 ? "Preset" : "Recap";
   const subtitle = step === 1 ?

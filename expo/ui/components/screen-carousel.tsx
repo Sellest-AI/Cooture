@@ -42,6 +42,7 @@ const CarouselComponent = ({ animationValue, item, animate, style }: CarouselIma
         {
           flex: 1,
           paddingHorizontal: 18,
+          paddingVertical: 8,
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'visible',

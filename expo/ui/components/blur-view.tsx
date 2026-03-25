@@ -26,7 +26,9 @@ export const BlurView = ({ style, blurKey, children, className, ...props }: Blur
 
   const { padding, paddingLeft, paddingRight, paddingHorizontal, paddingVertical,
     paddingBottom, paddingTop, gap, justifyContent, alignItems,
-    flexDirection, backgroundColor, ...rest } = style ?? {};
+    flexDirection, backgroundColor, aspectRatio, borderRadius,
+    borderWidth, borderColor, overflow,
+    ...rest } = style ?? {};
 
   const [blurTarget, setBlurTarget] = useState(blurKey ? blurTargets?.[blurKey] : null);
   useEffect(() => {
@@ -45,7 +47,7 @@ export const BlurView = ({ style, blurKey, children, className, ...props }: Blur
     {...props}
     blurTarget={target}
     blurMethod={method}
-    style={rest}
+    style={{ borderRadius, overflow, ...rest }}
   >
     <View
       style={{
@@ -55,6 +57,10 @@ export const BlurView = ({ style, blurKey, children, className, ...props }: Blur
         alignItems,
         gap,
         backgroundColor,
+        borderRadius,
+        borderWidth,
+        borderColor,
+        overflow,
         padding,
         paddingLeft,
         paddingRight,
@@ -62,6 +68,7 @@ export const BlurView = ({ style, blurKey, children, className, ...props }: Blur
         paddingVertical,
         paddingTop,
         paddingBottom,
+        aspectRatio,
         width,
         height,
       }}

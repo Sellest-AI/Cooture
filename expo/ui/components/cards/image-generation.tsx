@@ -17,16 +17,16 @@ type ImageGenerationProps = {
   style?: ViewStyle;
   disabled?: boolean;
   onDownload?: () => void;
-  onPresss?: () => void;
+  onPress?: () => void;
 }
 
-export const ImageGeneration = ({ text, textScale = 1, source, disabled, loading, style, onDownload, onPresss }: ImageGenerationProps) => {
+export const ImageGeneration = ({ text, textScale = 1, source, disabled, loading, style, onDownload, onPress }: ImageGenerationProps) => {
   const [downloading, setDownloading] = useState(false);
 
   return (
     <Pressable
       style={{ flex: style?.flex ?? 1, width: '100%' }}
-      onPress={onPresss}
+      onPress={onPress}
       animated={disabled ? false : true}
     >
       <Block
@@ -37,6 +37,7 @@ export const ImageGeneration = ({ text, textScale = 1, source, disabled, loading
           width: '100%',
           pointerEvents: 'none',
           borderColor: Colors.blur.dark,
+          overflow: 'hidden',
           ...style
         }}
       >
