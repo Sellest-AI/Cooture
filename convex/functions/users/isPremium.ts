@@ -8,6 +8,7 @@ type Options = {
 }
 
 export const isPremium = async (ctx: Ctx & User, options?: Options) => {
+  const throwOnReject = options?.throwOnReject ?? true;
   const user = ctx.user;
 
   const isAdmin = user.role === "ADMIN";
@@ -16,7 +17,7 @@ export const isPremium = async (ctx: Ctx & User, options?: Options) => {
   // If user has a plan, he's premium;
   const isPremium = !!user?.plan?.id;
 
-  if (!isPremium && options?.throwOnReject) { throw new Error("User is not premium") }
+  if (!isPremium && throwOnReject) { throw new Error("User is not premium") }
 
   return isPremium;
 }

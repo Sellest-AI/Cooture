@@ -14,8 +14,8 @@ export const authed = authAction({
     base64: v.string(),
   },
   handler: async (ctx, { name, base64 }): Promise<Id<'presets'> | null> => {
-    await isPremium(ctx, { throwOnReject: true });
-    await canPay(ctx, { type: "PRESET_CREATION_COST" }, { throwOnReject: true });
+    await isPremium(ctx);
+    await canPay(ctx, { type: "PRESET_CREATION_COST" });
 
     const images = await ctx.runAction(internal.router.storage.images.uploadMany._internal, {
       images: [{ base64 }],
