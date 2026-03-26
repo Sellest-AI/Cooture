@@ -26,7 +26,7 @@ export function Screen() {
         style={{ paddingVertical: 72 }}
         icon={TShirt}
         title="No Items Yet"
-        description="You haven't added any items yet. Start scanning to see your items here."
+        description="You haven't added any items yet. Start scanning your wardrobe to see your collection grow here."
         cta={isOwnProfile && {
           label: "Scan an item",
           onPress: () => router.push(ROUTES.OUTFIT.NEW)

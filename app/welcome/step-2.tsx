@@ -184,7 +184,7 @@ export default function Screen() {
             maxWidth: 224
           }}
         >
-          Where are you ?
+          Where are you?
         </Text.H3>
         <Text.Lg
           style={{

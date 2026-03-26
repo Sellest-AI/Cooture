@@ -4,7 +4,7 @@ import { OutfitPost } from "@/modules/feed/post.outfit";
 import { CreditsButton } from "@/modules/premium/credits.button";
 import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
-import { WaitlistBlock } from "@/modules/waitlist/walitlist-block";
+import { WaitlistBlock } from "@/modules/waitlist/waitlist-block";
 import { useScrollToTop } from "@react-navigation/native";
 import { BlurKeys, BlurTargetView } from "@ui/blur-view";
 import { Post } from "@ui/cards";

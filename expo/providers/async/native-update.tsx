@@ -61,7 +61,7 @@ export const NativeUpdateProvider = ({
       }}>
         <EmptyBlock
           title="Update Required"
-          description="A new version of the app is available. Please update to continue using the application."
+          description="A new version of the app is available. Update now to keep using Cooture and access the latest features and improvements."
           cta={{
             label: 'Update Now',
             onPress: () => {

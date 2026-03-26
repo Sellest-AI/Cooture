@@ -17,7 +17,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { LayoutRectangle, PanResponder, Platform, ScrollView, View, ViewStyle } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
-import { WaitlistBlock } from "../waitlist/walitlist-block";
+import { WaitlistBlock } from "../waitlist/waitlist-block";
 import { FollowersFollowing } from "./followers-following";
 
 const TABS = ['generations', 'outfits', 'items'] as const;
