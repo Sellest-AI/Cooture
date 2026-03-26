@@ -48,14 +48,15 @@ export const ParallaxScrollView = ({
   const scrollRef = useRef<ScrollView>(null);
   useImperativeHandle(ref, () => scrollRef.current!, []);
 
-  // Force reset background inset (IOS BUG)
-  const [headerBackgroundInset, setHeaderBackgroundKey] = useState(0);
+  // Force reset layout to fix iOS black bar without flickering
+  const [layoutToggle, setLayoutToggle] = useState(0);
   useFocusEffect(useCallback(() => {
     if (Platform.OS !== 'ios') return;
     requestAnimationFrame(() => {
-      if (scrollRef.current?.getNativeScrollRef()?.scrollTop === 0) return;
-      setHeaderBackgroundKey((k) => k === 0 ? -1 : 0);
-      requestAnimationFrame(() => setHeaderBackgroundKey((k) => k === 0 ? -1 : 0))
+      // Toggle a sub-pixel value to force native layout recalculation
+      // without causing a visual 1px jump (flicker)
+      setLayoutToggle((k) => k === 0 ? 0.01 : 0);
+      requestAnimationFrame(() => setLayoutToggle((k) => k > 0 ? 0 : 0.01));
     });
   }, []));
 
@@ -130,7 +131,9 @@ export const ParallaxScrollView = ({
               source={headerBackgroundImage}
               style={[{
                 position: 'absolute',
-                inset: headerBackgroundInset,
+                width: '100%',
+                height: '100%',
+                paddingTop: layoutToggle,
               }, headerBackgroundImageStyle]}
               contentPosition={headerBackgroundImagePosition}
               contentFit="cover"
