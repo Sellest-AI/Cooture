@@ -59,6 +59,16 @@ export const _internal = internalMutation({
         delayPushMs: 5 * 60 * 1000,
       })
 
+    if (preset?.presetId)
+      await saveNotification(ctx, {
+        actorId: userId,
+        presetId: preset.presetId,
+        type: "preset_used",
+        pushToDevice: true,
+        // Delay the notification by 5 minutes to wait for the generation to be completed
+        delayPushMs: 5 * 60 * 1000,
+      })
+
     if (preset) {
       await ctx.db.insert("presetGenerations", {
         presetId: preset.presetId,

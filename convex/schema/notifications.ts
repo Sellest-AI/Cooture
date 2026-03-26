@@ -7,12 +7,14 @@ export const NOTIFICATION_TYPE = v.union(
   v.literal("new_follower"),
   v.literal("tagged_in_generation"),
   v.literal("waitlist_approval"),
-  v.literal("outfit_used")
+  v.literal("outfit_used"),
+  v.literal("preset_used"),
 )
 
 export const NOTIFICATION_CHANNEL: Record<typeof NOTIFICATION_TYPE['type'], string> = {
   "generation_ready": "generation_ready",
   "outfit_used": "social",
+  "preset_used": "social",
   "new_like": "social",
   "new_follower": "social",
   "tagged_in_generation": "social",

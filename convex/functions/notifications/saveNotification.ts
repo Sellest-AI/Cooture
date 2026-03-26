@@ -33,6 +33,13 @@ type OutfitUsed = {
   actorId: Id<'users'>,
 }
 
+type PresetUsed = {
+  type: "preset_used",
+  presetId: Id<'presets'>,
+  /** The actor who used the preset */
+  actorId: Id<'users'>,
+}
+
 type Args<T extends Type> = {
   type: T,
   /** The user to notify */
@@ -46,6 +53,7 @@ type Args<T extends Type> = {
     T extends "new_follower" ? NewFollower :
     T extends "tagged_in_generation" ? TaggedInGeneration :
     T extends "outfit_used" ? OutfitUsed :
+    T extends "preset_used" ? PresetUsed :
     never
   )
 
@@ -55,6 +63,7 @@ type ArgsExtended<T extends Type> = Args<T> & (
   T extends "new_like" ? { generation?: Nullable<Doc<'generations'>>, outfit?: Nullable<Doc<'outfits'>>, actor?: Nullable<Doc<'usersExtended'>>, type: "new_like" } :
   T extends "new_follower" ? { follower: Nullable<Doc<'usersExtended'>>, type: "new_follower" } :
   T extends "outfit_used" ? { outfit: Nullable<Doc<'outfits'>>, type: "outfit_used", actor?: Nullable<Doc<'usersExtended'>> } :
+  T extends "preset_used" ? { preset: Nullable<Doc<'presets'>>, type: "preset_used", actor?: Nullable<Doc<'usersExtended'>> } :
   never
 )
 
@@ -104,6 +113,15 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
         image: args.actor?.imageUrl,
         redirectUrl: FALLBACK_ROUTE
       }
+    case "preset_used":
+      return {
+        title:
+          aggregationCount > 1 ? `+${aggregationCount} people used your preset` :
+            `${args.actor?.name ?? "Someone"} used your preset`,
+        body: "Tap to view",
+        image: args.actor?.imageUrl,
+        redirectUrl: FALLBACK_ROUTE
+      }
     case "outfit_used":
       return {
         title:
@@ -128,6 +146,8 @@ const aggregationKey = (args: Args<Type>) => {
       return `new_like:${args.userId}:${args.generationId ?? args.outfitId}`
     case "outfit_used":
       return `outfit_used:${args.outfitId}`
+    case "preset_used":
+      return `preset_used:${args.presetId}`
   }
 }
 
@@ -143,6 +163,8 @@ const getUserId = (args: ArgsExtended<Type>) => {
       return args.generation?.userId ?? args.outfit?.userId;
     case "outfit_used":
       return args.outfit?.userId;
+    case "preset_used":
+      return args.preset?.userId;
   }
 }
 
@@ -178,6 +200,12 @@ async function getObjects(ctx: QueryCtx, args: Args<Type>): Promise<ArgsExtended
     const outfit = await ctx.db.query("outfits").withIndex("by_id", q => q.eq("_id", args.outfitId)).first();
     const actor = await ctx.db.query("usersExtended").withIndex("by_user_id", q => q.eq("userId", args.actorId)).first();
     return { ...args, outfit, actor };
+  }
+
+  if (args.type === "preset_used") {
+    const preset = await ctx.db.query("presets").withIndex("by_id", q => q.eq("_id", args.presetId)).first();
+    const actor = await ctx.db.query("usersExtended").withIndex("by_user_id", q => q.eq("userId", args.actorId)).first();
+    return { ...args, preset, actor };
   }
 
   return args;
