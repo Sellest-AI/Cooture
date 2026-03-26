@@ -47,6 +47,9 @@ export const ROUTES = {
     USER: (userId: string) => `/u/${userId}`,
   },
   PRESETS: {
+    ID: {
+      PATH: '/preset/[id]',
+    },
     CREATE: {
       PATH: '/preset/create',
       DISCLAIMER: '/preset/create/disclaimer',

@@ -132,6 +132,7 @@ import type * as router_credits_getUserWallet from "../router/credits/getUserWal
 import type * as router_credits_grantCredits from "../router/credits/grantCredits.js";
 import type * as router_credits_refundCredits from "../router/credits/refundCredits.js";
 import type * as router_feed_getFromOutfit from "../router/feed/getFromOutfit.js";
+import type * as router_feed_getFromPreset from "../router/feed/getFromPreset.js";
 import type * as router_feed_getPaginated from "../router/feed/getPaginated.js";
 import type * as router_generations_createOne from "../router/generations/createOne.js";
 import type * as router_generations_getAll from "../router/generations/getAll.js";
@@ -178,6 +179,7 @@ import type * as router_presets_getByCategory from "../router/presets/getByCateg
 import type * as router_presets_getByUser from "../router/presets/getByUser.js";
 import type * as router_presets_getCategories from "../router/presets/getCategories.js";
 import type * as router_presets_getOne from "../router/presets/getOne.js";
+import type * as router_presets_recreateCount from "../router/presets/recreateCount.js";
 import type * as router_presets_searchMany from "../router/presets/searchMany.js";
 import type * as router_presets_updateOne from "../router/presets/updateOne.js";
 import type * as router_quests_getAll from "../router/quests/getAll.js";
@@ -375,6 +377,7 @@ declare const fullApi: ApiFromModules<{
   "router/credits/grantCredits": typeof router_credits_grantCredits;
   "router/credits/refundCredits": typeof router_credits_refundCredits;
   "router/feed/getFromOutfit": typeof router_feed_getFromOutfit;
+  "router/feed/getFromPreset": typeof router_feed_getFromPreset;
   "router/feed/getPaginated": typeof router_feed_getPaginated;
   "router/generations/createOne": typeof router_generations_createOne;
   "router/generations/getAll": typeof router_generations_getAll;
@@ -421,6 +424,7 @@ declare const fullApi: ApiFromModules<{
   "router/presets/getByUser": typeof router_presets_getByUser;
   "router/presets/getCategories": typeof router_presets_getCategories;
   "router/presets/getOne": typeof router_presets_getOne;
+  "router/presets/recreateCount": typeof router_presets_recreateCount;
   "router/presets/searchMany": typeof router_presets_searchMany;
   "router/presets/updateOne": typeof router_presets_updateOne;
   "router/quests/getAll": typeof router_quests_getAll;

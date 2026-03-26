@@ -65,8 +65,8 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
     })}
     preset={post.preset?.cover ? {
       imageUrl: post.preset.cover.sizes.thumbnail.url,
-      onPress: () => push(ROUTES.PHOTOSHOOT.RECAP, {
-        params: { presetId: post.preset?._id, outfitId: post.outfit?._id }
+      onPress: () => push(ROUTES.PRESETS.ID.PATH, {
+        pathParams: { id: post.preset?._id },
       })
     } : undefined}
     outfit={post.outfit ? {

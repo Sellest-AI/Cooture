@@ -12,7 +12,7 @@ import { ImageGeneration } from "@ui/cards";
 import { CardItem } from "@ui/cards/card-item";
 import { FlashList } from "@ui/flat-list";
 import { GhostIconWrapper } from "@ui/ghost-animation";
-import { ArrowRight, ArrowUpRight, BookmarkIcon, CircleFadingArrowUp, Pencil, ShareIcon, SquirishPlus, Trash } from "@ui/icons";
+import { ArrowUpRight, BookmarkIcon, CircleFadingArrowUp, Pencil, ShareIcon, SquirishPlus, Trash } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
@@ -274,7 +274,7 @@ export default function ItemScreen() {
           >
             <Button
               variant="primary"
-              endIcon={ArrowRight}
+              startIcon={CircleFadingArrowUp}
               onPress={async () => {
                 push(ROUTES.PHOTOSHOOT.NEW, {
                   params: { outfitId: outfit._id }

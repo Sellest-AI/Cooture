@@ -248,7 +248,7 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
                       source={preset.imageUrl}
                       contentFit="cover"
                       contentPosition="top center"
-                      style={{ width: 32, height: 32 }}
+                      style={{ width: 40, height: 40 }}
                     />
                   </Pressable>}
                   {outfit && <Pressable
@@ -265,11 +265,11 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
                       key={url}
                       source={url}
                       contentFit="contain"
-                      style={{ marginLeft: -14, width: 32, height: 32 }}
+                      style={{ marginLeft: -14, width: 40, height: 40 }}
                     />)}
                     {outfit.itemUrls.length > 2 &&
                       <Badge text={`+${outfit.itemUrls.length - 2}`}
-                        style={{ marginLeft: -14, width: 32, height: 32 }}
+                        style={{ marginLeft: -14, width: 40, height: 40 }}
                       />}
                   </Pressable>}
                 </View>}
@@ -337,7 +337,9 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
               </View>}
             </View>
             <View style={{ gap: 12, flexDirection: 'row', alignItems: 'center' }}>
-              {recreateCountStr && <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              {recreateCountStr && <Pressable
+                onPress={preset?.onPress ?? outfit?.onPress}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                 <CircleFadingArrowUp size={20} color={Colors.neutral[200]} />
                 <Text.Base color={Colors.neutral[200]}>{recreateCountStr}</Text.Base>
               </Pressable>}
@@ -387,6 +389,7 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
         onToggleBookmark={onToggleBookmark}
         onProfilePress={users?.[0].onPress}
         onOutfitPress={outfit?.onPress}
+        onPresetPress={preset?.onPress}
         onRecreate={onRecreate ?? preset?.onPress}
         onShare={() => {
           const id = images?.[currentIndex]._id ?? image?._id;

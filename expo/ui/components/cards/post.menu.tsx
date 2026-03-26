@@ -4,7 +4,7 @@ import { Text } from "@ui/text"
 import { ComponentProps } from "react"
 import { Platform, View } from "react-native"
 import { Colors } from "theme"
-import { BookmarkIcon, Camera, HeartIcon, ShareIcon, TShirt, User } from "../icons"
+import { BookmarkIcon, Camera, HeartIcon, ImageIcon, ShareIcon, TShirt, User } from "../icons"
 import { MenuGroup, MenuItem } from "../menu"
 import { Modal } from "../modal"
 import { Pressable } from "../pressable"
@@ -59,11 +59,12 @@ type Props = {
   onProfilePress?: () => void;
   onRecreate?: () => void;
   onOutfitPress?: () => void;
+  onPresetPress?: () => void;
 } & Omit<ComponentProps<typeof Modal>, 'children'>
 
 export const PostMenu = ({ open, onOpenChange, ...props }: Props) => {
   const { liked, onToggleLike, bookmarked, onRecreate, onOutfitPress,
-    onToggleBookmark, onShare, onProfilePress } = props;
+    onToggleBookmark, onShare, onProfilePress, onPresetPress } = props;
 
   return (
     <Modal
@@ -110,6 +111,11 @@ export const PostMenu = ({ open, onOpenChange, ...props }: Props) => {
           />}
         </MenuGroup>}
         <MenuGroup title="More">
+          {onPresetPress && <MenuItem
+            icon={ImageIcon}
+            text="View preset"
+            onPress={() => { onPresetPress?.(); onOpenChange?.(false); }}
+          />}
           {onProfilePress && <MenuItem
             icon={User}
             text="View profile"
