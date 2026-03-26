@@ -292,14 +292,14 @@ export default function Screen() {
               placeholder="First name"
               style={{ flexShrink: 1 }}
               value={identity?.firstName}
-              onChangeText={(v) => setIdentity(p => p ? ({ ...p, firstName: v }) : null)}
+              onChangeText={(v) => setIdentity(p => p ? ({ ...p, firstName: v, name: `${v} ${identity?.lastName ?? ''}` }) : null)}
             />
             <TextInput
               startIcon={ALargeSmall}
               placeholder="Last name"
               style={{ flexShrink: 1 }}
               value={identity?.lastName}
-              onChangeText={(v) => setIdentity(p => p ? ({ ...p, lastName: v }) : null)}
+              onChangeText={(v) => setIdentity(p => p ? ({ ...p, lastName: v, name: `${identity?.firstName ?? ''} ${v}` }) : null)}
             />
           </View>
           <TextInput

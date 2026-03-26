@@ -94,8 +94,8 @@ export const _internal_step_1 = internalMutation({
   args: { ...sharedArgs, image: v.string() },
   handler: async (ctx, args) => {
     const userId = await ctx.db.insert("users", {
-      name: args.name,
-      email: args.email,
+      name: args.name.trim(),
+      email: args.email.trim(),
       image: args.image,
     })
 
@@ -131,10 +131,10 @@ export const _internal_step_2 = internalMutation({
       stripeCustomerId: args.stripeCustomerId,
       accountStatus: "ACTIVE",
       role: "BOT",
-      firstName: args.firstName,
-      lastName: args.lastName,
-      username: args.username,
-      name: args.displayName ?? args.name,
+      firstName: args.firstName.trim(),
+      lastName: args.lastName.trim(),
+      username: args.username.trim(),
+      name: args.displayName ?? args.name.trim(),
       imageId: image?._id,
       imageUrl: image?.url,
     })
