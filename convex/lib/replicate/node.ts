@@ -101,8 +101,8 @@ export const predictImage = async (params: PredictImageParams) => {
       max_images: 1,
       aspect_ratio: aspectRatio ?? '3:4',
       size: '4K',
-      enhance_prompt: true,
-      sequential_image_generation: "disabled"
+      sequential_image_generation: "disabled",
+      disable_safety_checker: false,
     },
     webhook: env.CONVEX_SITE_URL + '/api/replicate/webhook',
     webhook_events_filter: ['completed']
