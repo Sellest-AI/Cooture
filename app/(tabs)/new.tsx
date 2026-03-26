@@ -5,10 +5,11 @@ import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { BlurKeys, BlurTargetView } from "@ui/blur-view";
 import { Collection } from "@ui/cards";
+import { FlashList } from "@ui/flat-list";
 import { ArrowUpRight, Camera } from "@ui/icons";
 import { ModalHeader } from "@ui/modal";
 import { Pressable } from "@ui/pressable";
-import { SafeScrollView } from "@ui/safe-scroll-view";
+import { useSafeAreaInsets } from "@ui/safe-area-view";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
 import { shuffleWithSeed } from "@utils/convex-allowed";
@@ -160,7 +161,8 @@ const SectionOutfits = ({ outfits, style }: { outfits: Outfits, style?: ViewStyl
 }
 
 export default function Screen() {
-  const scrollRef = useScrollToTop();
+  const scrollRef = useScrollToTop.FlashList();
+  const { top, bottom } = useSafeAreaInsets();
 
   const { data: presets, isPending: isPresetsPending } = useQueryCached(api.router.presets.getCategories.anon);
   const { data: outfits, isLoading: isOutfitsPending } = useQueryCachedData(api.router.outfits.getLatest.anon, { key: 'latestOutfits' });
@@ -190,68 +192,74 @@ export default function Screen() {
 
   return (
     <BlurTargetView blurKey={BlurKeys.NEW}>
-      <SafeScrollView
+      <FlashList
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: TOTAL_TABS_SPACE }}
-        style={{ paddingTop: Platform.OS !== 'ios' ? 8 : 0 }}
-        edges={{ top: 'padding', bottom: 'android' }}
-      // stickyHeaderIndices={[0]}
-      >
-        <ModalHeader
-          title="Create"
-          type="alt"
-          size="big"
-          endContent={<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <CreditsButton />
-            <Notification />
-          </View>}
-          style={{
-            paddingLeft: 16,
-            paddingRight: 12,
-            backgroundColor: Colors.background,
-          }}
-        />
-        <Actions />
-        {isLoading && (<View style={{ paddingHorizontal: 12 }}>
-          <Skeleton style={{ width: 96, height: 14, marginTop: 32 }} />
-          <View style={{ marginTop: 16, flexDirection: 'row', paddingHorizontal: 4, gap: 32 }}>
-            <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
-            <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
-            <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
+        style={{ paddingBottom: Platform.OS === 'android' ? bottom : 0 }}
+        contentContainerStyle={{
+          paddingTop: Platform.OS !== 'ios' ? top + 8 : top,
+          paddingBottom: TOTAL_TABS_SPACE
+        }}
+        data={list.length > 0 ? list : undefined}
+        ListEmptyComponent={
+          <View style={{ paddingHorizontal: 12 }}>
+            <Skeleton style={{ width: 96, height: 14, marginTop: 32 }} />
+            <View style={{ marginTop: 16, flexDirection: 'row', paddingHorizontal: 4, gap: 32 }}>
+              <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
+              <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
+              <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
+            </View>
+            <Skeleton style={{ width: 96, height: 14, marginTop: 32 }} />
+            <View style={{ marginTop: 16, flexDirection: 'row', paddingHorizontal: 4, gap: 32 }}>
+              <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
+              <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
+              <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
+            </View>
+            <Skeleton style={{ width: 96, height: 14, marginTop: 32 }} />
+            <View style={{ marginTop: 16, flexDirection: 'row', paddingHorizontal: 4, gap: 32 }}>
+              <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
+              <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
+              <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
+            </View>
           </View>
-          <Skeleton style={{ width: 96, height: 14, marginTop: 32 }} />
-          <View style={{ marginTop: 16, flexDirection: 'row', paddingHorizontal: 4, gap: 32 }}>
-            <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
-            <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
-            <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
-          </View>
-          <Skeleton style={{ width: 96, height: 14, marginTop: 32 }} />
-          <View style={{ marginTop: 16, flexDirection: 'row', paddingHorizontal: 4, gap: 32 }}>
-            <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
-            <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
-            <Skeleton style={{ width: 132, aspectRatio: 4 / 5 }} />
-          </View>
-        </View>)}
-        {!isLoading && list?.map((p) => {
-          if (p.type === 'outfit')
+        }
+        ListHeaderComponent={<>
+          <ModalHeader
+            title="Create"
+            type="alt"
+            size="big"
+            endContent={<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <CreditsButton />
+              <Notification />
+            </View>}
+            style={{
+              paddingLeft: 16,
+              paddingRight: 12,
+              backgroundColor: Colors.background,
+            }}
+          />
+          <Actions />
+        </>}
+        renderItem={({ item }) => {
+          if (item.type === 'outfit')
             return (
               <SectionOutfits
-                key={p.data.reduce((acc, outfit) => acc + outfit._id, '')}
-                outfits={p.data}
+                key={item.data.reduce((acc, outfit) => acc + outfit._id, '')}
+                outfits={item.data}
                 style={{ marginTop: 40 }}
               />)
 
-          if (p.type === 'preset')
+          if (item.type === 'preset')
             return (
               <SectionPresets
-                key={p.data.value}
-                category={p.data}
+                key={item.data.value}
+                category={item.data}
                 style={{ marginTop: 40 }}
               />
             )
-        })}
-      </SafeScrollView>
+          return null;
+        }}
+      />
     </BlurTargetView>
   )
 }
