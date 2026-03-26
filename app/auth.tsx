@@ -10,6 +10,7 @@ import { VideoView } from '@ui/video-view';
 import { removeUndefinedKeys } from '@utils/convex-allowed';
 import { env } from 'env';
 import { AppleAuthenticationButton, AppleAuthenticationButtonStyle, AppleAuthenticationButtonType } from "expo-apple-authentication";
+import { isTestFlight } from 'expo-testflight';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Platform, View } from 'react-native';
 import { Colors } from 'theme';
@@ -96,6 +97,8 @@ const LoginButtons = () => {
   const list: ("google" | "apple")[]
     = Platform.OS === "ios" ? ["apple", "google"] : ["google"];
 
+  const showTestAccount = (env.PUBLIC_NODE_ENV !== 'production' || isTestFlight);
+
   return (
     <>
       {list.map(((item, i) => {
@@ -157,7 +160,7 @@ const LoginButtons = () => {
           </Button>
         )
       }))}
-      {env.PUBLIC_NODE_ENV !== 'production' && (
+      {showTestAccount && (
         <Pressable style={{ marginTop: 12 }} onPress={() => signInTester()}>
           <Text.Base color={Colors.neutral[400]}>
             Sign in with test account
