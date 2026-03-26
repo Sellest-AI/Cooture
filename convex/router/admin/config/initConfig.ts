@@ -28,8 +28,8 @@ export const _internal = internalMutation({
     const config = await ctx.db.query("config").collect();
     if (config.length === 0) {
       await ctx.db.insert("config", {
-        appVersion: "0.9.2",
-        minAppVersion: "0.9.1",
+        appVersion: "0.9.0",
+        minAppVersion: "0.9.0",
         maintenance: false,
       })
     }
