@@ -1,6 +1,7 @@
 import { ROUTES, useRoute } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
 import { usePaginatedQuery, useQuery } from "@/lib/convex/client";
+import { useFeed } from "@/modules/feed/_hooks";
 import { GenerationPost } from "@/modules/feed/post.generation";
 import { PremiumBlock } from "@/modules/premium/premium-block";
 import { Post } from "@ui/cards";
@@ -16,9 +17,14 @@ import { Colors } from "theme";
 export default function Screen() {
   const { id } = useRoute.Params<{ id: Id<'predictions'> }>();
   const { data: post, isPending } = useQuery(api.router.generations.getFromPrediction.anon, { id });
-  const { results: postsFromUser, isLoading, loadMore } = usePaginatedQuery(api.router.generations.getPaginated.anon, post?.user?._id ? { userId: post?.user?._id } : 'skip', { initialNumItems: 8 });
+  const { results: postsFromUser, isLoading, status, loadMore } = usePaginatedQuery(api.router.generations.getPaginated.anon, post?.user?._id ? { userId: post?.user?._id } : 'skip', { initialNumItems: 8 });
+  const { feed, loadMore: loadMoreFeed } = useFeed({ initialNumItems: 1 });
 
-  const posts = (postsFromUser ?? []).filter((p) => p._id !== post?._id);
+  // Combine the post from the route, other posts from the same user, and the feed,
+  // while ensuring uniqueness and excluding the current post.
+  const _posts = [...(postsFromUser ?? []), ...feed.filter((p) => p.type === 'generation')]
+    .filter((p, i, arr) => arr.findIndex(pp => pp._id === p._id) === i);
+  const posts = _posts.filter((p) => p._id !== post?._id);
 
   const items = useMemo(() => [
     { id: post?._id },
@@ -64,7 +70,10 @@ export default function Screen() {
       <FlashList
         data={items}
         renderItem={renderItem}
-        onEndReached={() => loadMore(8)}
+        onEndReached={() => {
+          if (status === 'Exhausted') loadMoreFeed(8);
+          else loadMore(8);
+        }}
         showsVerticalScrollIndicator={false}
         keyExtractor={(i, index) => i?.id ?? `${index}`}
         ListEmptyComponent={<>
