@@ -403,7 +403,7 @@ export default function Screen() {
         from={{ opacity: 0, translateY: 20 }}
         animate={{ opacity: 1, translateY: 0 }}
         transition={{ delay: DELAYS.slider, duration: 1000 }}
-        style={{ width: '100%' }}
+        style={{ width: '100%', paddingBottom: 12 }}
       >
         <ButtonSlider
           startIcon={Gift}
