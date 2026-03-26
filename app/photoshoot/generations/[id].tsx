@@ -103,7 +103,6 @@ const UnlockMore = () => {
               maxWidth: '55%',
               textAlign: 'center',
               marginTop: 16,
-
             }}
           >
             Get access to this image for {cost} credits
@@ -149,7 +148,6 @@ const UnlockMore = () => {
               maxWidth: '55%',
               textAlign: 'center',
               marginTop: 16,
-
             }}
           >
             Get access to this image and way more
