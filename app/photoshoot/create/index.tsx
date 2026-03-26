@@ -44,9 +44,9 @@ export default function Screen() {
   const { data: searchedPresets, isPending } = useQuery(api.router.presets.searchMany.anon, query.length > 0 ? { query } : 'skip');
 
   // If the user has created a preset in the last 24h, we want to showcase it at the beginning of the list
-  const showcasedPreset = (userPresets?.[0]._creationTime ?? 0) > (Date.now() - 24 * 60 * 60 * 1000);
+  const showcasedPreset = (userPresets?.[0]?._creationTime ?? 0) > (Date.now() - 24 * 60 * 60 * 1000);
   const mergedPresets = [showcasedPreset ? userPresets?.[0] : null, ...(presets ?? [])
-    .filter(p => showcasedPreset ? p._id !== userPresets?.[0]._id : true)].filter(notEmpty);
+    .filter(p => showcasedPreset ? p._id !== userPresets?.[0]?._id : true)].filter(notEmpty);
 
   const mergedSearchPresets = (searchedPresets ?? []).length > 0 ? (searchedPresets ?? []) : (mergedPresets ?? []);
   const finalPresets = filterOwn ? (userPresets ?? []) : (category ? presetsByCategory : mergedSearchPresets);

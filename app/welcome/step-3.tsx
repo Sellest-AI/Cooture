@@ -3,7 +3,8 @@ import { Col, Grid, Row } from '@ui/grid';
 import { Image } from '@ui/image';
 import { useSafeAreaInsets } from '@ui/safe-area-view';
 import { Text } from '@ui/text';
-import { View } from 'react-native';
+import { router } from 'expo-router';
+import { Dimensions, View } from 'react-native';
 import { ROUTES } from 'routes';
 import { Colors } from 'theme';
 
@@ -54,7 +55,7 @@ export default function Screen() {
             <Grid
               style={{
                 flex: 1,
-                height: 472,
+                height: Dimensions.get('screen').height - 56 - 328,
                 width: '100%',
                 paddingHorizontal: 8,
                 gap: 8
@@ -144,7 +145,7 @@ export default function Screen() {
       </View>
       <Button
         variant="primary"
-        href={ROUTES.TABS.DISCOVER}
+        onPress={() => router.dismissTo(ROUTES.TABS.DISCOVER)}
       >
         Discover the future
       </Button>

@@ -12,7 +12,7 @@ import { ImageGeneration } from "@ui/cards";
 import { CardItem } from "@ui/cards/card-item";
 import { FlashList } from "@ui/flat-list";
 import { GhostIconWrapper } from "@ui/ghost-animation";
-import { ArrowRight, ArrowUpRight, BookmarkIcon, Pencil, RefreshCcw, ShareIcon, SquirishPlus, Trash } from "@ui/icons";
+import { ArrowRight, ArrowUpRight, BookmarkIcon, CircleFadingArrowUp, Pencil, ShareIcon, SquirishPlus, Trash } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
@@ -90,7 +90,7 @@ const Generation = ({ imageId, predictionId }: { imageId: Id<'images'>, predicti
   return (
     <ImageGeneration
       source={image?.sizes.medium.url}
-      onPresss={() => {
+      onPress={() => {
         push(ROUTES.POST.PATH, {
           pathParams: { id: predictionId }
         })
@@ -119,8 +119,8 @@ const Generations = ({ customText }: { customText?: string }) => {
           Generations
         </Text.H3>
         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6 }}>
-          <RefreshCcw size={18} color={Colors.neutral[400]} />
-          <Text.Base color={Colors.neutral[400]} weight={500}>{wearCount}</Text.Base>
+          <CircleFadingArrowUp size={20} color={Colors.neutral[200]} />
+          <Text.Base color={Colors.neutral[200]} weight={500}>{wearCount}</Text.Base>
         </View>
       </View>
       <FlashList
@@ -197,17 +197,12 @@ export default function ItemScreen() {
   }
 
   if (!outfit || isLoadingGenerations) {
-    return <LoadingBlock style={{ height: 'auto', flex: 1 }} type="logo" />
+    return <LoadingBlock style={{ height: 'auto', flex: 1 }} type="loader" />
   }
 
   return (
     <>
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: Colors.background
-        }}
-      >
+      <View style={{ flex: 1 }}>
         <ParallaxScrollView
           showsVerticalScrollIndicator={false}
           style={{

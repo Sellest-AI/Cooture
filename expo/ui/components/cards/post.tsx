@@ -1,7 +1,7 @@
 import { Badge } from '@ui/badge';
 import { Button } from '@ui/button';
 import { GhostIconWrapper } from '@ui/ghost-animation';
-import { ArrowRight, BookmarkIcon, CircleFadingArrowUp, EllipsisVertical, HeartIcon, RefreshCcw, ShareIcon } from '@ui/icons';
+import { BookmarkIcon, CircleFadingArrowUp, EllipsisVertical, HeartIcon, ShareIcon } from '@ui/icons';
 import { Skeleton } from '@ui/skeleton';
 import * as Haptics from 'expo-haptics';
 import { MotiView } from 'moti';
@@ -305,9 +305,8 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
         {(type === 'preset' || type === 'outfit') && <Button
           onPress={() => { onRecreate?.(); }}
           style={{ marginTop: 8, marginHorizontal: PADDING_HORIZONTAL }}
-          variant={type === 'preset' ? 'secondary' : 'primary'}
-          endIcon={type === 'outfit' && ArrowRight}
-          startIcon={type === 'preset' && CircleFadingArrowUp}
+          variant={type === 'preset' ? 'primary' : 'secondary'}
+          startIcon={CircleFadingArrowUp}
         >
           {type === 'preset' ? 'Recreate' : 'Try on'}
         </Button>}
@@ -338,10 +337,10 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
               </View>}
             </View>
             <View style={{ gap: 12, flexDirection: 'row', alignItems: 'center' }}>
-              {recreateCountStr && <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <RefreshCcw size={18} color={Colors.neutral[400]} />
-                <Text.Base color={Colors.neutral[400]}>{recreateCountStr}</Text.Base>
-              </View>}
+              {recreateCountStr && <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <CircleFadingArrowUp size={20} color={Colors.neutral[200]} />
+                <Text.Base color={Colors.neutral[200]}>{recreateCountStr}</Text.Base>
+              </Pressable>}
               <GhostIconWrapper
                 style={{ padding: 4 }}
                 icon={BookmarkIcon}
