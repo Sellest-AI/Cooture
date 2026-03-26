@@ -85,6 +85,7 @@
     "react-native-reanimated": "~4.2.1",
     "react-native-reanimated-carousel": "5.0.0-beta.3",
     "react-native-safe-area-context": "~5.6.2",
+    "react-native-screen-transitions": "^3.3.0",
     "react-native-screens": "~4.23.0",
     "react-native-svg": "^15.15.3",
     "react-native-web": "~0.21.0",
