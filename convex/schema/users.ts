@@ -14,6 +14,7 @@ const accountStatus = v.union(
   v.literal("FLAGGED"),
   v.literal("SUSPENDED"),
   v.literal("WAITLIST"),
+  v.literal("DELETED"),
 );
 
 export const userSizes = v.union(
@@ -39,8 +40,6 @@ export const usersExtended = defineTable({
   canTakeFreeTrial: v.boolean(),
   stripeCustomerId: v.string(),
   revenueCatUserId: v.optional(v.string()),
-  accountStatus: accountStatus,
-  role: role,
   plan: v.optional(userPlan),
   // Profile
   firstName: v.optional(v.string()),
@@ -50,6 +49,10 @@ export const usersExtended = defineTable({
   // Image
   imageId: v.optional(v.id('images')),
   imageUrl: v.optional(v.string()),
+  // Settings
+  deleteFunctionId: v.optional(v.id('_scheduled_functions')),
+  accountStatus: accountStatus,
+  role: role,
 }).index("by_user_id", ["userId"])
   .index("by_username", ["username"])
   .index("by_stripe_customer_id", ["stripeCustomerId"])

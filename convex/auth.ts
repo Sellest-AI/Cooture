@@ -23,11 +23,29 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
         return redirectTo;
       }
     },
+    async beforeSessionCreation(ctx: MutationCtx, { userId }) {
+      // avoid duplicate
+      const existing = await ctx.db.query('usersExtended')
+        .withIndex('by_user_id', (q) => q.eq('userId', userId)).first();
+
+      if (!existing) return;
+
+      if (existing.accountStatus === "DELETED")
+        throw new Error("This account has been deleted.");
+
+      // Cancel pending account deletion if user signs in again
+      if (existing.deleteFunctionId) {
+        await ctx.scheduler.cancel(existing.deleteFunctionId);
+        await ctx.db.patch(existing._id, { deleteFunctionId: undefined });
+      }
+    },
     async afterUserCreatedOrUpdated(ctx: MutationCtx, { userId }) {
       // avoid duplicate
       const existing = await ctx.db.query('usersExtended')
         .withIndex('by_user_id', (q) => q.eq('userId', userId)).first();
-      if (existing) return;
+      if (existing) {
+        return;
+      }
 
       const user = await ctx.db.get(userId);
       await ctx.scheduler.runAfter(1, internal.router.auth.postCreateOrUpdate.action, {

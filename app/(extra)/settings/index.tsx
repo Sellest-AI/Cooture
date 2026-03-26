@@ -11,7 +11,6 @@ import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
 import { fetchUpdateAsync, reloadAsync, useUpdates } from 'expo-updates';
-import { WEBSITE } from "global";
 import { Linking, Platform, Pressable, View } from "react-native";
 import Purchases from "react-native-purchases";
 import { ROUTES } from "routes";
@@ -140,7 +139,8 @@ export default function Screen() {
           <MenuItem
             icon={TriangleAlert}
             text="Delete account"
-            onPress={async () => Linking.openURL(WEBSITE.HELP.DELETE_ACCOUNT)}
+            // onPress={async () => Linking.openURL(WEBSITE.HELP.DELETE_ACCOUNT)}
+            onPress={async () => push('/settings/delete-account')}
           />
         </MenuGroup>
 

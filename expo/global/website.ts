@@ -6,4 +6,5 @@ export const WEBSITE = {
   },
   URL_ANDROID: "https://play.google.com/store/apps/details?id=com.cooture.app",
   URL_IOS: "https://apps.apple.com/app/id6448037325",
+  SUPPORT_EMAIL: "support@cooture.app"
 }

@@ -206,6 +206,7 @@ import type * as router_subscriptions_endOne from "../router/subscriptions/endOn
 import type * as router_subscriptions_getUserSubscription from "../router/subscriptions/getUserSubscription.js";
 import type * as router_subscriptions_updateSubscriptionStatus from "../router/subscriptions/updateSubscriptionStatus.js";
 import type * as router_users_checkUsername from "../router/users/checkUsername.js";
+import type * as router_users_deleteAccount from "../router/users/deleteAccount.js";
 import type * as router_users_follows_checkFollowing from "../router/users/follows/checkFollowing.js";
 import type * as router_users_follows_getFollowStats from "../router/users/follows/getFollowStats.js";
 import type * as router_users_follows_getFollowersPaginated from "../router/users/follows/getFollowersPaginated.js";
@@ -448,6 +449,7 @@ declare const fullApi: ApiFromModules<{
   "router/subscriptions/getUserSubscription": typeof router_subscriptions_getUserSubscription;
   "router/subscriptions/updateSubscriptionStatus": typeof router_subscriptions_updateSubscriptionStatus;
   "router/users/checkUsername": typeof router_users_checkUsername;
+  "router/users/deleteAccount": typeof router_users_deleteAccount;
   "router/users/follows/checkFollowing": typeof router_users_follows_checkFollowing;
   "router/users/follows/getFollowStats": typeof router_users_follows_getFollowStats;
   "router/users/follows/getFollowersPaginated": typeof router_users_follows_getFollowersPaginated;
