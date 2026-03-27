@@ -36,8 +36,8 @@ const uploadImage = async (ctx: ActionCtx, base64orUrl: string, extra: Extra) =>
 
   const userId = extra.userId;
 
-  console.time('StorageCloud.uploadFile');
   // UPLOAD FILE
+  console.time('StorageCloud.uploadFile');
   const folder = userId ? StorageCloud.FOLDERS.USER(userId) : StorageCloud.FOLDERS.PUBLIC;
   const uploadedFile = await StorageCloud.uploadFile(compressedImage, folder);
   console.timeEnd('StorageCloud.uploadFile');

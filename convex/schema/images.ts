@@ -38,3 +38,10 @@ export const imageObjects = defineTable({
   updatedAt: v.number(),
 }).index("by_image_id", ["imageId"])
   .index("by_base_image_id", ["baseImageId"]);
+
+export const userImages = defineTable({
+  userId: v.id('users'),
+  imageId: v.id('images'),
+})
+  .index("by_image_id", ["imageId"])
+  .index("by_user_id", ["userId"]);

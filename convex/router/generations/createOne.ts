@@ -15,22 +15,26 @@ export const _internal = internalMutation({
   args: {
     userId: v.id("users"),
     extraUserIds: v.optional(v.array(v.id("users"))),
-    predictionIds: v.array(v.string()),
+    predictions: v.array(v.object({
+      id: v.string(),
+      baseImageId: v.optional(v.id("images")),
+    })),
     preset: v.optional(v.object({
       presetId: v.id("presets"),
       outfitId: v.optional(v.id("outfits")),
       prompts: v.array(v.string()),
     })),
   },
-  handler: async (ctx, { userId, extraUserIds, predictionIds, preset }): Promise<Id<'generations'>> => {
+  handler: async (ctx, { userId, extraUserIds, predictions, preset }): Promise<Id<'generations'>> => {
     const generationId = await ctx.db.insert("generations", {
       userId,
       status: "LOADING",
       publication: "DRAFT",
     });
 
-    await Promise.all(predictionIds.map(predictionId => ctx.db.insert('predictions', {
-      predictionId,
+    await Promise.all(predictions.map(prediction => ctx.db.insert('predictions', {
+      predictionId: prediction.id,
+      imageId: prediction.baseImageId,
       generationId,
       status: 'LOADING',
     })));

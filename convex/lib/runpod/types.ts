@@ -1,15 +1,17 @@
 import type { EndpointOutput } from "runpod-sdk";
+import { GenerateVideoOutput } from "./generateVideo/run";
 import type { RemoveBackgroundOutput } from "./removeBackground";
 
 export const taskStatus = ["IN_QUEUE", "IN_PROGRESS", "COMPLETING", "COMPLETED", "FAILED", "CANCELLED", "TIMED_OUT"] as const;
 export type TaskStatus = typeof taskStatus[number];
 
-export const taskNames = ["REMOVE_BACKGROUND"] as const;
+export const taskNames = ["REMOVE_BACKGROUND", "GENERATE_VIDEO"] as const;
 export type TaskName = typeof taskNames[number];
 
 type TaskTypeGeneric = { name: TaskName, version: string }
 const taskTypes = [
   { name: 'REMOVE_BACKGROUND', version: '1.0' } as const,
+  { name: 'GENERATE_VIDEO', version: '1.0' } as const,
 ] satisfies readonly TaskTypeGeneric[];
 
 export type TaskType = typeof taskTypes[number];
@@ -26,6 +28,7 @@ type TaskOutputShared<T extends TaskType> = { callback?: TaskInputInternal<T>['c
 type TaskOutput<T extends TaskType> = TaskOutputShared<T> &
   (
     T['name'] extends "REMOVE_BACKGROUND" ? RemoveBackgroundOutput :
+    T['name'] extends "GENERATE_VIDEO" ? GenerateVideoOutput :
     object);
 
 

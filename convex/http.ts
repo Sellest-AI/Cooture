@@ -2,7 +2,8 @@ import { httpRouter } from "convex/server";
 import { auth } from "./auth";
 import { replicateHandler } from "./http/replicate";
 import { revenueCatHandler } from "./http/revenuecat";
-import { runpodHandler } from "./http/runpod";
+import { runpodGenerateVideoHandler } from "./http/runpod/generateVideo";
+import { runpodRemoveBackgroundHandler } from "./http/runpod/removeBackground";
 import { stripeWebhookHttpAction } from "./router/stripe/http.webhook";
 
 const http = httpRouter();
@@ -26,9 +27,15 @@ http.route({
 })
 
 http.route({
-  path: "/api/runpod/webhook",
+  path: "/api/runpod/webhook/remove-background",
   method: "POST",
-  handler: runpodHandler,
+  handler: runpodRemoveBackgroundHandler,
+})
+
+http.route({
+  path: "/api/runpod/webhook/video-generation",
+  method: "POST",
+  handler: runpodGenerateVideoHandler,
 })
 
 auth.addHttpRoutes(http);

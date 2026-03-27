@@ -67,15 +67,19 @@ const updatePrediction = async (ctx: MutationCtx, args: {
   prediction: Doc<'predictions'>,
   status?: Doc<'predictions'>['status'],
   imageId?: Id<'images'>,
+  videoId?: Id<'videos'>,
 }) => {
-  const { prediction, imageId } = args;
+  const { prediction, imageId, videoId } = args;
 
-  const status = args.status ?? (imageId ? "PENDING" : undefined);
-  const readyAt = prediction.readyAt ?? (imageId ? Date.now() : undefined);
+  const hasResult = !!imageId || !!videoId;
+
+  const status = args.status ?? (hasResult ? "PENDING" : undefined);
+  const readyAt = prediction.readyAt ?? (hasResult ? Date.now() : undefined);
 
   const patch = removeUndefinedKeys({
     status,
     imageId,
+    videoId,
     readyAt
   });
 
@@ -92,6 +96,7 @@ export const _internal = internalMutation({
     predictionId: v.string(),
     status: v.optional(PREDICTION_STATUS),
     imageId: v.optional(v.id("images")),
+    videoId: v.optional(v.id("videos")),
   },
   handler: async (ctx, args) => {
     const prediction = await ctx.db.query("predictions").withIndex("by_prediction_id", (q) =>

@@ -61,13 +61,6 @@ export const usersExtended = defineTable({
   .searchIndex("search_username", { searchField: "username" })
   .searchIndex("search_name", { searchField: "name" });
 
-export const userImages = defineTable({
-  userId: v.id('users'),
-  imageId: v.id('images'),
-})
-  .index("by_image_id", ["imageId"])
-  .index("by_user_id", ["userId"]);
-
 export const usersAppearance = defineTable({
   userId: v.id('users'),
   frontImageId: v.optional(v.id('images')),

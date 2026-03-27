@@ -1,6 +1,6 @@
 "use node"
-import { runAsync } from "./run";
-import { TaskInput } from "./types";
+import { runAsync } from "../run";
+import { TaskInput } from "../types";
 
 type TaskInputExtended = Omit<TaskInput, 'callback'> & { callback: Callback }
 type Callback = TaskInput['callback'] & { nextStep: 'SAVE_IMAGE' | 'CREATE_ITEM', nextArgs?: object };

@@ -5,7 +5,7 @@ import { config } from "./schema/config";
 import { feedScores } from "./schema/feed";
 import { follows, followStats } from "./schema/follows";
 import { generations, predictions } from "./schema/generations";
-import { imageObjects, images, imageSizes } from "./schema/images";
+import { imageObjects, images, imageSizes, userImages } from "./schema/images";
 import { items } from "./schema/items";
 import { likes, likeStats } from "./schema/likes";
 import { notifications, pushTokens } from "./schema/notifications";
@@ -13,7 +13,8 @@ import { outfitItems, outfits } from "./schema/outfits";
 import { presetCategories, presetGenerations, presets } from "./schema/presets";
 import { quests, userQuestProgress } from "./schema/quests";
 import { subscriptions, subscriptionsHistory } from "./schema/subscriptions";
-import { bots, userImages, usersAppearance, usersExtended } from "./schema/users";
+import { bots, usersAppearance, usersExtended } from "./schema/users";
+import { userVideos, videos } from "./schema/videos";
 import { waitlist, waitlistCodes } from "./schema/waitlist";
 import { creditTransactions, userWallets } from "./schema/wallets";
 
@@ -22,6 +23,8 @@ export default defineSchema({
   config,
   usersExtended,
   bots,
+  videos,
+  userVideos,
   images,
   imageSizes,
   imageObjects,

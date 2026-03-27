@@ -1,9 +1,9 @@
 import { taskNames, taskStatus } from "@/lib/runpod";
 import { v } from "convex/values";
 import { z } from "zod";
-import { internal } from "../_generated/api";
-import { Id } from "../_generated/dataModel";
-import { httpAction, internalAction } from "../_generated/server";
+import { internal } from "../../_generated/api";
+import { Id } from "../../_generated/dataModel";
+import { httpAction, internalAction } from "../../_generated/server";
 
 const CallbackSchema = z.object({
   userId: z.string(),
@@ -98,7 +98,7 @@ export const _internal_process = internalAction({
   }
 })
 
-export const runpodHandler = httpAction(async (ctx, request) => {
+export const runpodRemoveBackgroundHandler = httpAction(async (ctx, request) => {
   // Handle the Replicate webhook request here
   const json = await request.json();
 
@@ -111,7 +111,7 @@ export const runpodHandler = httpAction(async (ctx, request) => {
   const callback = body.output.callback;
   const userId = callback.userId as Id<'users'>;
 
-  await ctx.scheduler.runAfter(0, internal.http.runpod._internal_process, {
+  await ctx.scheduler.runAfter(0, internal.http.runpod.removeBackground._internal_process, {
     removeBackgroundData: {
       url: body.output.url,
       callback: {

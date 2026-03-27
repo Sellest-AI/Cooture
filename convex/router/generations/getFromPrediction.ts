@@ -1,6 +1,21 @@
 import { v } from "convex/values";
-import { publicQuery } from "../../../convex/procedures";
+import { internalQuery, publicQuery } from "../../../convex/procedures";
 import { getGenerationMax } from "../../functions/generations";
+
+export const _internal = internalQuery({
+  args: {
+    id: v.id("predictions"),
+  },
+  handler: async (ctx, args) => {
+    const prediction = await ctx.db.get(args.id);
+    if (!prediction?.generationId) return null;
+
+    const generation = await getGenerationMax(ctx, prediction.generationId);
+    if (!generation) return null;
+
+    return generation;
+  }
+})
 
 export const anon = publicQuery({
   args: {

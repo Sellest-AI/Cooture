@@ -69,7 +69,7 @@ const generateFunction = async (ctx: ActionCtx, args: {
     await ctx.runMutation(internal.router.generations.createOne._internal, {
       userId: args.userId,
       extraUserIds: extraUsers,
-      predictionIds: predictions.map(p => p.id),
+      predictions: predictions.map(p => ({ id: p.id })),
       preset: {
         presetId: preset._id,
         outfitId: args.outfit?._id,

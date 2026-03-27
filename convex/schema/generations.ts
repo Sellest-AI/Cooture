@@ -23,6 +23,7 @@ export const PUBLICATION_STATUS = v.union(
 
 export const predictions = defineTable({
   imageId: v.optional(v.id("images")),
+  videoId: v.optional(v.id("videos")),
   generationId: v.optional(v.id("generations")),
   predictionId: v.string(),
   status: PREDICTION_STATUS,

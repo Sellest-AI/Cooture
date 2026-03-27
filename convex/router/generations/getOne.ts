@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { getGenerationMax } from "../../functions/generations";
-import { adminQuery, authQuery } from "../../procedures";
+import { adminQuery, authQuery, internalQuery } from "../../procedures";
 
 export const authed = authQuery({
   args: { generationId: v.id("generations") },
@@ -12,6 +12,10 @@ export const admin = adminQuery({
   handler: async (ctx, { generationId }) => getGenerationMax(ctx, generationId)
 })
 
+export const _internal = internalQuery({
+  args: { generationId: v.id("generations") },
+  handler: async (ctx, { generationId }) => getGenerationMax(ctx, generationId)
+})
 
 export const anon = authQuery({
   args: {
