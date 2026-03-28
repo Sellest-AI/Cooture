@@ -237,7 +237,7 @@ export const saveNotification = async <T extends Type>(ctx: MutationCtx, args: A
   if (!isNotificationAllowed(argsExtended)) return false;
 
   const userId = args.userId ?? getUserId(argsExtended);
-  if (!userId) throw new Error("Unable to determine userId for notification");
+  if (!userId) return false;
 
   const sendPushNotification = async () => {
     if (!args.pushToDevice) return false;
