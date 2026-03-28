@@ -1,6 +1,7 @@
 import { ROUTES, useRouter } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
 import { useMutation, useQuery, useQueryCached, useQueryCachedData } from "@/lib/convex/client";
+import { downloadImageCrossPlatform } from "@/lib/image/client";
 import { Post } from "@ui/cards";
 import { notEmpty } from "@utils/convex-allowed";
 import { WEBSITE } from "global";
@@ -61,6 +62,9 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
         pathParams: { id: user!._id }
       })
     }))}
+    onDownload={async (url) => {
+      await downloadImageCrossPlatform(url).catch(() => null)
+    }}
     onRecreate={() => push(ROUTES.PHOTOSHOOT.RECAP, {
       params: { presetId: post.preset?._id, outfitId: post.outfit?._id }
     })}

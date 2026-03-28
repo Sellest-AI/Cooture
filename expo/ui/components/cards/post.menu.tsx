@@ -1,10 +1,10 @@
 import { Button } from "@ui/button"
 import { SafeAreaView } from "@ui/safe-area-view"
 import { Text } from "@ui/text"
-import { ComponentProps } from "react"
+import { ComponentProps, useState } from "react"
 import { Platform, View } from "react-native"
 import { Colors } from "theme"
-import { BookmarkIcon, Camera, HeartIcon, ImageIcon, ShareIcon, TShirt, User } from "../icons"
+import { BookmarkIcon, Camera, Download, HeartIcon, ImageIcon, Loader, ShareIcon, TShirt, User } from "../icons"
 import { MenuGroup, MenuItem } from "../menu"
 import { Modal } from "../modal"
 import { Pressable } from "../pressable"
@@ -13,21 +13,26 @@ type RoundButtonProps = {
   title: string;
   icon: React.ComponentType<{ size?: number, color?: string, weight?: 'regular' | 'fill' }>;
   weight?: 'regular' | 'fill';
-  onPress?: () => void;
+  onPress?: (() => Promise<void>) | (() => void);
 }
 
 const RoundButton = ({ title, icon, weight, onPress }: RoundButtonProps) => {
-  const Icon = icon;
+  const [loading, setLoading] = useState(false);
+  const Icon = loading ? Loader : icon;
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={onPress ? async () => {
+        setLoading(true);
+        try { await onPress(); }
+        finally { setLoading(false); }
+      } : undefined}
       style={{
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'center',
-        width: 96,
+        width: 92,
       }}
     >
       <View
@@ -55,6 +60,7 @@ type Props = {
   onToggleLike?: (liked: boolean) => void;
   bookmarked?: boolean;
   onToggleBookmark?: (bookmarked: boolean) => void;
+  onDownload?: () => Promise<void>;
   onShare?: () => void;
   onProfilePress?: () => void;
   onRecreate?: () => void;
@@ -64,7 +70,7 @@ type Props = {
 
 export const PostMenu = ({ open, onOpenChange, ...props }: Props) => {
   const { liked, onToggleLike, bookmarked, onRecreate, onOutfitPress,
-    onToggleBookmark, onShare, onProfilePress, onPresetPress } = props;
+    onToggleBookmark, onShare, onProfilePress, onPresetPress, onDownload } = props;
 
   return (
     <Modal
@@ -121,11 +127,11 @@ export const PostMenu = ({ open, onOpenChange, ...props }: Props) => {
             text="View profile"
             onPress={() => { onProfilePress?.(); onOpenChange?.(false); }}
           />}
-          {onShare && <MenuItem
-            icon={ShareIcon}
-            text="Share post"
+          {onDownload && <MenuItem
+            icon={Download}
+            text="Download"
             rightIcon={false}
-            onPress={() => { onShare?.(); onOpenChange?.(false); }}
+            onPress={async () => { await onDownload?.(); onOpenChange?.(false); }}
           />}
         </MenuGroup>
         <Button

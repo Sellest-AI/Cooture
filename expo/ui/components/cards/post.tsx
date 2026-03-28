@@ -25,6 +25,7 @@ type Props = {
   onToggleBookmark?: () => void;
   onShare?: (_id: string) => void;
   onPress?: (_id: string) => void;
+  onDownload?: (url: string) => Promise<void>;
   image?: {
     _id: string;
     url: string;
@@ -58,7 +59,7 @@ type Props = {
 
 export const Post = ({ style, image, users, preset, outfit, images, likedAccounts, onRecreate,
   onShare, paddingHorizontal, isBookmarked, onPress, onToggleBookmark, onToggleLike, isLiked,
-  recreateCount,
+  recreateCount, onDownload,
 }: Props) => {
   const [showMenu, setShowMenu] = useState(false);
   const [doubleTap, setDoubleTap] = useState<number | null>(null);
@@ -395,6 +396,10 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
         onOutfitPress={outfit?.onPress}
         onPresetPress={preset?.onPress}
         onRecreate={onRecreate ?? preset?.onPress}
+        onDownload={onDownload ? async () => {
+          const url = images?.[currentIndex].url ?? image?.url;
+          if (url) await onDownload?.(url);
+        } : undefined}
         onShare={() => {
           const id = images?.[currentIndex]._id ?? image?._id;
           if (id) onShare?.(id);

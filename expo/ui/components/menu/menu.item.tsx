@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 import { Block } from "../block";
-import { ChevronRight } from "../icons";
+import { ChevronRight, Loader } from "../icons";
 import { Pressable } from "../pressable";
 import { Text } from "../text";
 
@@ -13,11 +13,12 @@ type Props = {
   rightIcon?: false,
   text: ReactNode,
   style?: ViewStyle,
-  onPress?: () => void,
+  onPress?: (() => Promise<void>) | (() => void),
   disabled?: boolean,
 }
 export const MenuItem = ({ icon, rightIcon, text, style, onPress, variant, disabled, iconWeight }: Props) => {
-  const Icon = icon;
+  const [loading, setLoading] = useState(false);
+  const Icon = loading ? Loader : icon;
 
   const colors = () => {
     switch (variant) {
@@ -64,7 +65,11 @@ export const MenuItem = ({ icon, rightIcon, text, style, onPress, variant, disab
 
   return (
     <Pressable
-      onPress={onPress}
+      onPress={async () => {
+        setLoading(true);
+        try { await onPress?.(); }
+        finally { setLoading(false); }
+      }}
       intensity={0.99}
       disabled={disabled}
       style={{
