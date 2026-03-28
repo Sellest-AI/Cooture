@@ -302,6 +302,7 @@ export const saveNotification = async <T extends Type>(ctx: MutationCtx, args: A
     actorId: args.actorId,
     generationId: "generationId" in args ? args.generationId : undefined,
     outfitId: "outfitId" in args ? args.outfitId : undefined,
+    presetId: "presetId" in args ? args.presetId : undefined,
     aggregationCount: 1,
     aggregationKey: aggregationKey(args),
     aggregatedUntil: NEW_AGGREGATION_WINDOW,

@@ -49,6 +49,7 @@ export const ROUTES = {
   PRESETS: {
     ID: {
       PATH: '/preset/[id]',
+      toString: (id: string) => `/preset/${id}` as const,
     },
     CREATE: {
       PATH: '/preset/create',

@@ -42,6 +42,7 @@ import type * as functions_outfits_getBackgroundColor from "../functions/outfits
 import type * as functions_outfits_getOutfit from "../functions/outfits/getOutfit.js";
 import type * as functions_outfits_index from "../functions/outfits/index.js";
 import type * as functions_outfits_isOutfitNFSW from "../functions/outfits/isOutfitNFSW.js";
+import type * as functions_presets_getPreset from "../functions/presets/getPreset.js";
 import type * as functions_presets_index from "../functions/presets/index.js";
 import type * as functions_presets_sanitizePresets from "../functions/presets/sanitizePresets.js";
 import type * as functions_quests_index from "../functions/quests/index.js";
@@ -303,6 +304,7 @@ declare const fullApi: ApiFromModules<{
   "functions/outfits/getOutfit": typeof functions_outfits_getOutfit;
   "functions/outfits/index": typeof functions_outfits_index;
   "functions/outfits/isOutfitNFSW": typeof functions_outfits_isOutfitNFSW;
+  "functions/presets/getPreset": typeof functions_presets_getPreset;
   "functions/presets/index": typeof functions_presets_index;
   "functions/presets/sanitizePresets": typeof functions_presets_sanitizePresets;
   "functions/quests/index": typeof functions_quests_index;

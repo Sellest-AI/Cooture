@@ -60,7 +60,7 @@ const GenericNotification = ({ id, onPress, read, data }: GenereticNotificationP
 
   const notification = unread.find((n) => n._id === id) ?? data;
 
-  const rightImageId = notification?.generation?.coverId ?? notification?.outfit?.coverId;
+  const rightImageId = notification?.generation?.coverId ?? notification?.outfit?.coverId ?? notification?.preset?.imageIds[0];
   const { data: rightImage } = useQueryCached(api.router.storage.images.getOne.anon, rightImageId ? { id: rightImageId } : 'skip');
 
   const TextComponent = useCallback(() => {
@@ -88,6 +88,21 @@ const GenericNotification = ({ id, onPress, read, data }: GenereticNotificationP
         </>
     }
 
+    if (notification.type === "outfit_used")
+      if (notification.outfit)
+        return <>
+          <Text.Base color={Colors.foreground} weight={600}>{notification.actor?.name} </Text.Base>
+          {aggregationCount > 1 ? `and ${aggregationCount} people used your outfit` : "used your outfit"} <Text.Base color={Colors.foreground} weight={600}>{`"${notification.outfit.name}"`}</Text.Base>.
+        </>
+
+    if (notification.type === "preset_used") {
+      if (notification.preset)
+        return <>
+          <Text.Base color={Colors.foreground} weight={600}>{notification.actor?.name} </Text.Base>
+          {aggregationCount > 1 ? `and ${aggregationCount} people used your preset` : "used your preset"} <Text.Base color={Colors.foreground} weight={600}>{`"${notification.preset.name}"`}</Text.Base>.
+        </>
+    }
+
   }, [notification])
 
   if (!notification) return null;
@@ -107,6 +122,13 @@ const GenericNotification = ({ id, onPress, read, data }: GenereticNotificationP
           }
           if (notification.type === "tagged_in_generation") {
             if (notification.generation) router.push(ROUTES.POST.ID(notification.generation.firstPredictionId));
+          }
+          if (notification.type === "outfit_used") {
+            if (notification.generation) router.push(ROUTES.POST.ID(notification.generation.firstPredictionId));
+            else if (notification.outfitId) router.push(ROUTES.OUTFIT.ID(notification.outfitId));
+          }
+          if (notification.type === "preset_used") {
+            if (notification.presetId) router.push(ROUTES.PRESETS.ID.toString(notification.presetId));
           }
         });
       }}
