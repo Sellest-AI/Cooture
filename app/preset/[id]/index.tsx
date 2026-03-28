@@ -9,7 +9,7 @@ import { Button } from "@ui/button";
 import { ImageGeneration } from "@ui/cards";
 import { FlashList } from "@ui/flat-list";
 import { Col, Grid } from "@ui/grid";
-import { CircleFadingArrowUp, Loader, Trash } from "@ui/icons";
+import { CircleFadingArrowUp, Credits, Loader, Trash } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
@@ -191,7 +191,7 @@ export default function ItemScreen() {
                 />
               </View>
               <Text.Base color={Colors.neutral[200]} weight={600}>
-                Created by {user.name}
+                Created by {user.name} {user.isPremium && <Credits size={12} />}
               </Text.Base>
             </Pressable>}
           </View>

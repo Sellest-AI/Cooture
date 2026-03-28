@@ -2,7 +2,7 @@ import { useRouter } from "@/hooks";
 import { useAccount, useAuthActions } from "@/lib/convex/auth";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
-import { ArrowLeft, Bell, Camera, ChevronRight, Gem, Lock, Package, Settings, TriangleAlert, TShirt } from "@ui/icons";
+import { ArrowLeft, Bell, Camera, ChevronRight, Credits, Gem, Lock, Package, Settings, TriangleAlert, TShirt } from "@ui/icons";
 import { Image } from "@ui/image";
 import { LinearGradient } from "@ui/linear-gradient";
 import { MenuGroup, MenuItem } from "@ui/menu";
@@ -74,7 +74,10 @@ export default function Screen() {
                 style={{ width: 72, height: 72, borderRadius: 99, marginBottom: 12 }}
                 source={user.imageUrl}
               />
-              <Text.Lg weight={500} color={Colors.neutral[50]}>{user.name}</Text.Lg>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Text.Lg weight={500} color={Colors.neutral[50]}>{user.name}</Text.Lg>
+                {isPremium && <Credits size={14} />}
+              </View>
               <Text.Base color={Colors.neutral[400]} style={{ marginTop: 4 }}>@{user.username}</Text.Base>
               <Button
                 onPress={() => push(ROUTES.EXTRA.AVATAR.PROFILE)}

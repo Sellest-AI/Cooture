@@ -1,5 +1,6 @@
 import { Id } from "../../_generated/dataModel";
 import { QueryCtx } from "../../_generated/server";
+import { isPremium } from "./isPremium";
 
 export const getAccount = async (ctx: QueryCtx, userId: Id<'users'>) => {
   const user = await ctx.db.get(userId);
@@ -10,7 +11,9 @@ export const getAccount = async (ctx: QueryCtx, userId: Id<'users'>) => {
 
   if (!userExtended) return null;
 
-  return { ...userExtended, ...user };
+  const premium = await isPremium({ ...ctx, user: userExtended }, { throwOnReject: false });
+
+  return { ...userExtended, ...user, isPremium: premium };
 }
 
 export const getUserPublic = async (ctx: QueryCtx, userId: Id<'users'>) => {
@@ -21,11 +24,14 @@ export const getUserPublic = async (ctx: QueryCtx, userId: Id<'users'>) => {
   if (!user.username) return null;
   if (!user.name) return null;
 
+  const premium = await isPremium({ ...ctx, user }, { throwOnReject: false });
+
   return {
     _id: userId,
     _creationTime: user._creationTime,
     name: user.name,
     username: user.username,
     image: user.imageUrl,
+    isPremium: premium,
   }
 }

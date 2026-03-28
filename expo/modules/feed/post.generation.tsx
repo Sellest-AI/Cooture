@@ -56,6 +56,7 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
       name: user.name ?? 'Anonymous',
       username: user.username ?? 'anon',
       imageUrl: user.image,
+      isPremium: user.isPremium,
       onPress: () => push(ROUTES.USER.PATH, {
         pathParams: { id: user!._id }
       })
@@ -67,7 +68,7 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
       imageUrl: post.preset.cover.sizes.thumbnail.url,
       onPress: () => push(ROUTES.PRESETS.ID.PATH, {
         pathParams: { id: post.preset?._id },
-      })
+      }),
     } : undefined}
     outfit={post.outfit ? {
       itemUrls: post.outfit.items.map(i => i.image.sizes.thumbnail.url),

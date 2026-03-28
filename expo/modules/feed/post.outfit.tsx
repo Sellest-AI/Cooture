@@ -48,6 +48,7 @@ export const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle
     users={user ? [{
       name: user.name ?? 'Anonymous',
       username: user.username ?? 'anon',
+      isPremium: user.isPremium,
       imageUrl: user.image,
       onPress: () => push(ROUTES.USER.PATH, {
         pathParams: { id: user!._id }

@@ -44,6 +44,7 @@ export const getGenerationMax = async (ctx: QueryCtx, generationId: Id<'generati
     name: _user.name,
     username: _user.username,
     image: _user.image,
+    isPremium: _user.isPremium,
   } : null;
 
   const sanitizedUser = sanitizeUser(user);

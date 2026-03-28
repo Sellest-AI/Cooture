@@ -1,7 +1,7 @@
 import { Badge } from '@ui/badge';
 import { Button } from '@ui/button';
 import { GhostIconWrapper } from '@ui/ghost-animation';
-import { BookmarkIcon, CircleFadingArrowUp, EllipsisVertical, HeartIcon, ShareIcon } from '@ui/icons';
+import { BookmarkIcon, CircleFadingArrowUp, Credits, EllipsisVertical, HeartIcon, ShareIcon } from '@ui/icons';
 import { Skeleton } from '@ui/skeleton';
 import * as Haptics from 'expo-haptics';
 import { MotiView } from 'moti';
@@ -40,6 +40,7 @@ type Props = {
   likedAccounts?: string[];
   users?: {
     onPress?: () => void;
+    isPremium?: boolean;
     imageUrl?: string;
     name: string;
     username: string;
@@ -173,7 +174,10 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
                 />
               </View>
               <View>
-                <Text.Sm color={Colors.neutral[50]} weight={600}>{user.name}</Text.Sm>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Text.Sm color={Colors.neutral[50]} weight={600}>{user.name}</Text.Sm>
+                  {user.isPremium && <Credits size={12} />}
+                </View>
                 <Text.Sm color={Colors.neutral[400]} style={{ marginTop: 2 }}>@{user.username}</Text.Sm>
               </View>
             </Pressable>

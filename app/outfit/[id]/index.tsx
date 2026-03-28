@@ -12,7 +12,7 @@ import { ImageGeneration } from "@ui/cards";
 import { CardItem } from "@ui/cards/card-item";
 import { FlashList } from "@ui/flat-list";
 import { GhostIconWrapper } from "@ui/ghost-animation";
-import { ArrowUpRight, BookmarkIcon, CircleFadingArrowUp, Pencil, ShareIcon, SquirishPlus, Trash } from "@ui/icons";
+import { ArrowUpRight, BookmarkIcon, CircleFadingArrowUp, Credits, Pencil, ShareIcon, SquirishPlus, Trash } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
@@ -67,7 +67,10 @@ const UserBlock = () => {
           />
         </View>
         <View>
-          <Text.Sm color={Colors.neutral[50]} weight={600}>{user.name}</Text.Sm>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Text.Sm color={Colors.neutral[50]} weight={600}>{user.name}</Text.Sm>
+            {user.isPremium && <Credits size={12} />}
+          </View>
           <Text.Sm color={Colors.neutral[400]} style={{ marginTop: 2 }}>@{user.username}</Text.Sm>
         </View>
         <ArrowUpRight
@@ -257,7 +260,7 @@ export default function ItemScreen() {
                   />
                 </View>
                 <Text.Base color={Colors.neutral[200]} weight={600}>
-                  Created by {user.name}
+                  Created by {user.name} {user.isPremium && <Credits size={12} />}
                 </Text.Base>
               </Pressable>}
             </View>

@@ -3,7 +3,7 @@ import { Id } from "@/lib/convex/client";
 import { useScrollToTop } from "@react-navigation/native";
 import { Block } from "@ui/block";
 import { BlurKeys } from "@ui/blur-view";
-import { Camera, Settings } from "@ui/icons";
+import { Camera, Credits, Settings } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
@@ -28,6 +28,7 @@ type Props = {
     name?: string;
     _id: Id<'users'>;
     _creationTime: number;
+    isPremium?: boolean;
   }
   isSelf?: boolean;
   recentPosts?: {
@@ -156,9 +157,10 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
             @{user.username}
           </Text.Lg>}
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-            <Text.H3 color={Colors.foreground} numberOfLines={1}>
-              {user.name}
-            </Text.H3>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <Text.H3 color={Colors.foreground} numberOfLines={1}>{user.name}</Text.H3>
+              {user.isPremium && <Credits size={18} />}
+            </View>
             <Text.Base color={Colors.neutral[400]} weight={600} >
               Since {new Date(user._creationTime).getFullYear()}
             </Text.Base>

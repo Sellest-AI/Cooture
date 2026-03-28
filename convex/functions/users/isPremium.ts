@@ -1,18 +1,25 @@
-import { ActionCtx, MutationCtx, QueryCtx, userCheck } from "../../procedures";
+import { Doc } from "../../_generated/dataModel";
+import { ActionCtx, MutationCtx, QueryCtx } from "../../procedures";
 
-type User = Awaited<ReturnType<typeof userCheck>>;
 type Ctx = QueryCtx | ActionCtx | MutationCtx;
 
 type Options = {
   throwOnReject?: boolean;
 }
 
-export const isPremium = async (ctx: Ctx & User, options?: Options) => {
+type AuthCtx = Ctx & {
+  user: Pick<Doc<'usersExtended'>, 'plan' | 'role'>
+}
+
+export const isPremium = async (ctx: AuthCtx, options?: Options) => {
   const throwOnReject = options?.throwOnReject ?? true;
   const user = ctx.user;
 
   const isAdmin = user.role === "ADMIN";
   if (isAdmin) return true;
+
+  const isBot = user.role === 'BOT';
+  if (isBot) return true;
 
   // If user has a plan, he's premium;
   const isPremium = !!user?.plan?.id;
