@@ -30,7 +30,7 @@
         "image": "latest"
       },
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "apk"
       },
       "environment": "preview",
       "env": {
