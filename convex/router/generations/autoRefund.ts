@@ -38,7 +38,10 @@ export const _internal = internalMutation({
       .filter((t) => t.type === 'GENERATION_COST')
       .find((t) => t.metadata?.generationId === prediction.generationId);
 
-    const amountToRefund = CREDITS_CONFIG.COST_PER_GENERATION;
+    // If has baseImageId, it's a video generation, otherwise it's an image generation
+    const amountToRefund = prediction.imageId ?
+      CREDITS_CONFIG.COST_PER_VIDEO_GENERATION :
+      CREDITS_CONFIG.COST_PER_IMAGE_GENERATION;
 
     // If we can't find the original transaction it means no payment was registered for this generation, 
     // so we shouldn't refund.

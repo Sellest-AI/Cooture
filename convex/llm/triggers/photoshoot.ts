@@ -19,7 +19,7 @@ const generateFunction = async (ctx: ActionCtx, args: {
   numberToGenerate?: number,
 }) => {
   const NUMBER_OF_IMAGES = args.numberToGenerate ?? 1;
-  const COST = CREDITS_CONFIG.COST_PER_GENERATION * NUMBER_OF_IMAGES;
+  const COST = CREDITS_CONFIG.COST_PER_IMAGE_GENERATION * NUMBER_OF_IMAGES;
 
   // 1. Check if can pay
   const canPay = await ctx.runQuery(internal.router.credits.canPay._internal, {
@@ -79,7 +79,7 @@ const generateFunction = async (ctx: ActionCtx, args: {
 
   // 3. Update transaction with generationId (optional - for better tracking)
   await ctx.runMutation(internal.router.credits.deductCredits._internal, {
-    amount: CREDITS_CONFIG.COST_PER_GENERATION * NUMBER_OF_IMAGES,
+    amount: COST,
     userId: args.userId,
     generationId,
   }).catch(() => null);
@@ -111,7 +111,7 @@ export const admin = adminAction({
   args: { ...sharedArgs, userId: v.id("users") },
   handler: async (ctx, args): Promise<Id<'generations'>> => {
     await ctx.runMutation(internal.router.credits.grantCredits._internal, {
-      amount: CREDITS_CONFIG.COST_PER_GENERATION * (args.numberToGenerate ?? 1),
+      amount: CREDITS_CONFIG.COST_PER_IMAGE_GENERATION * (args.numberToGenerate ?? 1),
       userId: args.userId,
       metadata: {
         reason: "Admin grant for photoshoot generation",

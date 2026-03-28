@@ -159,7 +159,7 @@ export default function Screen() {
   const itemImage = item?.images?.[0];
 
   const { wallet } = useAccount.Wallet();
-  const { data: cost } = useQueryCached(api.router.credits.getCost.anon, { type: 'GENERATION_COST', amount: items.length + 1 });
+  const { data: cost } = useQueryCached(api.router.credits.getCost.anon, { type: 'IMAGE_GENERATION_COST', amount: items.length + 1 });
   const canPay = wallet ? cost !== undefined && wallet.credits >= cost : false;
 
   return (

@@ -7,7 +7,7 @@ type Options = {
   throwOnReject?: boolean;
 }
 
-type Type = "GENERATION_COST" | "ITEM_CREATION_COST" | "PRESET_CREATION_COST";
+type Type = "IMAGE_GENERATION_COST" | "VIDEO_GENERATION_COST" | "ITEM_CREATION_COST" | "PRESET_CREATION_COST";
 type Args = {
   type: Type;
   amount?: number;

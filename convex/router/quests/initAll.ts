@@ -3,7 +3,7 @@ import { internalMutation } from "../../procedures";
 import type { QuestCategory, QuestType } from "../../schema/quests";
 
 const getCreditsAmount = (percent: number) => {
-  return Math.round(CREDITS_CONFIG.COST_PER_GENERATION * (percent / 100));
+  return Math.round(CREDITS_CONFIG.COST_PER_IMAGE_GENERATION * (percent / 100));
 };
 
 type Quest = {

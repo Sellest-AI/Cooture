@@ -54,7 +54,7 @@ const UnlockMore = () => {
   const { id } = useLocalSearchParams<{ id: Id<'generations'> }>();
   const { preset, photoshoot } = usePhotoshoot(id);
 
-  const { data: cost } = useQueryCached(api.router.credits.getCost.anon, { type: "GENERATION_COST", amount: 1 });
+  const { data: cost } = useQueryCached(api.router.credits.getCost.anon, { type: "IMAGE_GENERATION_COST", amount: 1 });
   const { data: canPay } = useQueryCached(api.router.credits.canPay.authed, cost ? { amount: cost } : 'skip');
 
   const { isPremium } = useAccount();
