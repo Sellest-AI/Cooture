@@ -3,6 +3,8 @@ import { Button } from '@ui/button';
 import { GhostIconWrapper } from '@ui/ghost-animation';
 import { BookmarkIcon, CircleFadingArrowUp, Credits, EllipsisVertical, HeartIcon, ShareIcon } from '@ui/icons';
 import { Skeleton } from '@ui/skeleton';
+import { VideoView } from '@ui/video-view';
+import { ZoomableWrapper } from '@ui/zoomable-wrapper';
 import * as Haptics from 'expo-haptics';
 import { MotiView } from 'moti';
 import { useCallback, useRef, useState } from 'react';
@@ -11,7 +13,6 @@ import { Colors } from 'theme';
 import { Image } from '../image';
 import { Pressable as AnimatedPressable } from '../pressable';
 import { Text } from '../text';
-import { ZoomableImage } from '../zoomable-image';
 import { PostMenu } from './post.menu';
 
 type Props = {
@@ -32,6 +33,10 @@ type Props = {
     contentFit?: 'cover' | 'contain';
     backgroundColor?: string;
   }
+  videos?: {
+    _id: string;
+    url: string;
+  }[],
   images?: {
     _id: string;
     url: string;
@@ -59,7 +64,7 @@ type Props = {
 
 export const Post = ({ style, image, users, preset, outfit, images, likedAccounts, onRecreate,
   onShare, paddingHorizontal, isBookmarked, onPress, onToggleBookmark, onToggleLike, isLiked,
-  recreateCount, onDownload,
+  recreateCount, onDownload, videos,
 }: Props) => {
   const [showMenu, setShowMenu] = useState(false);
   const [doubleTap, setDoubleTap] = useState<number | null>(null);
@@ -86,6 +91,11 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
 
   const user = users?.[0];
   const recreateCountStr = recreateCount !== undefined && recreateCount > 0 ? recreateCount.toString() : null;
+
+  const items = [
+    ...((videos ?? []).map((v) => ({ ...v, type: 'video' as const }))),
+    ...((images ?? [image]).map((img) => ({ ...img, type: 'image' as const })))
+  ]
 
   return (
     <>
@@ -192,117 +202,140 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
         </View>}
         <FlatList
           horizontal
-          scrollEnabled={(!images || images.length <= 1) ? false : !pinching}
+          scrollEnabled={(items.length < 2) ? false : !pinching}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
             gap: GAP,
             paddingHorizontal: PADDING_HORIZONTAL,
           }}
           decelerationRate="fast"
-          data={(images ?? [image])}
-          keyExtractor={(item) => item?.url ?? ''}
+          data={items}
+          keyExtractor={(item) => item?._id ?? item?.url ?? ''}
           snapToInterval={Dimensions.get('window').width - (PADDING_HORIZONTAL * 2) + GAP}
           numColumns={1}
           viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
-          renderItem={({ item: img, index }) => {
+          renderItem={({ item, index }) => {
+            const backgroundColor = "backgroundColor" in item ? item.backgroundColor : undefined;
+
             return (
               <AnimatedPressable
                 animated={false}
-                key={img?.url ?? index}
+                key={item?._id ?? item?.url ?? index}
                 style={{
                   width: Dimensions.get('window').width - (PADDING_HORIZONTAL * 2),
                   aspectRatio: 3 / 4,
                   zIndex: pinching && pinching.index === index ? 10 : 0,
-                  backgroundColor: img?.backgroundColor ?? Colors.blur.dark,
+                  backgroundColor: backgroundColor ?? Colors.blur.dark,
                   borderRadius: 28,
-                }}>
-                {img && <ZoomableImage
+                }}
+              >
+                <ZoomableWrapper
                   onPinchChange={(pinching) => setPinching(pinching ? { index } : false)}
-                  source={img.url}
-                  contentFit={img.contentFit}
-                  width={Dimensions.get('window').width - (PADDING_HORIZONTAL * 2)}
-                  aspectRatio={3 / 4}
                   onDoubleTap={onToggleLike ? () => {
                     const rotate = Math.random() * 40 - 20;
                     setDoubleTap(rotate);
                     if (!isLiked) onToggleLike?.(true);
                   } : undefined}
-                  onTap={() => img && onPress?.(img._id)}
+                  onTap={() => item._id && onPress?.(item._id)}
                   onLongPress={() => {
                     setShowMenu(true);
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
                   }}
-                  style={{
-                    borderRadius: 28,
-                    backgroundColor: img?.backgroundColor ?? Colors.blur.dark,
-                    borderColor: !pinching ? Colors.blur.dark : undefined,
-                    borderTopWidth: 0, // Removed borders
-                    flex: 1,
-                  }}
-                />}
-                {!pinching && <View style={{
-                  position: 'absolute',
-                  top: 16,
-                  right: 16,
-                  left: 16,
-                  flexDirection: 'row',
-                  justifyContent: 'space-between'
-                }}>
-                  {preset && <Pressable onPress={(e) => { e.stopPropagation(); preset.onPress?.(); }}>
-                    <Badge
-                      source={preset.imageUrl}
-                      contentFit="cover"
-                      contentPosition="top center"
-                      style={{ width: 40, height: 40 }}
-                    />
-                  </Pressable>}
-                  {outfit && <Pressable
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      outfit.onPress?.()
-                    }}
-                    style={{
-                      flexDirection: 'row',
-                      gap: 0,
-                      marginLeft: preset ? 0 : 16,
-                    }}>
-                    {outfit.itemUrls.slice(0, 2).map((url) => <Badge
-                      key={url}
-                      source={url}
-                      contentFit="contain"
-                      style={{ marginLeft: -14, width: 40, height: 40 }}
-                    />)}
-                    {outfit.itemUrls.length > 2 &&
-                      <Badge text={`+${outfit.itemUrls.length - 2}`}
-                        style={{ marginLeft: -14, width: 40, height: 40 }}
-                      />}
-                  </Pressable>}
-                </View>}
-                {doubleTap && (
-                  <MotiView
-                    from={{ scale: 1, opacity: 1 }}
-                    animate={{ scale: 2, opacity: 0 }}
-                    transition={{ type: 'timing', duration: 400 }}
-                    onDidAnimate={() => setDoubleTap(null)}
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      width: '100%',
-                      height: '100%',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <HeartIcon
-                      color={Colors.secondary[500]}
-                      weight={'fill'}
-                      size={56}
+                >
+                  <>
+                    {item.type === "video" &&
+                      <VideoView
+                        source={item.url}
+                        style={{
+                          width: Dimensions.get('window').width - (PADDING_HORIZONTAL * 2),
+                          height: 3 / 4,
+                          borderRadius: 28,
+                          flex: 1
+                        }}
+                      />
+                    }
+                    {item.type === "image" && <Image
+                      source={item.url}
+                      contentFit={item.contentFit}
                       style={{
-                        transform: [{ rotate: `${doubleTap}deg` }]
+                        borderRadius: 28,
+                        width: Dimensions.get('window').width - (PADDING_HORIZONTAL * 2),
+                        aspectRatio: 3 / 4,
+                        backgroundColor: item?.backgroundColor ?? Colors.blur.dark,
+                        borderColor: !pinching ? Colors.blur.dark : undefined,
+                        borderTopWidth: 0, // Removed borders
+                        flex: 1,
                       }}
-                    />
-                  </MotiView>
-                )}
+                    />}
+                  </>
+                </ZoomableWrapper>
+                {
+                  !pinching && <View style={{
+                    position: 'absolute',
+                    top: 16,
+                    right: 16,
+                    left: 16,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between'
+                  }}>
+                    {preset && <Pressable onPress={(e) => { e.stopPropagation(); preset.onPress?.(); }}>
+                      <Badge
+                        source={preset.imageUrl}
+                        contentFit="cover"
+                        contentPosition="top center"
+                        style={{ width: 40, height: 40 }}
+                      />
+                    </Pressable>}
+                    {outfit && <Pressable
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        outfit.onPress?.()
+                      }}
+                      style={{
+                        flexDirection: 'row',
+                        gap: 0,
+                        marginLeft: preset ? 0 : 16,
+                      }}>
+                      {outfit.itemUrls.slice(0, 2).map((url) => <Badge
+                        key={url}
+                        source={url}
+                        contentFit="contain"
+                        style={{ marginLeft: -14, width: 40, height: 40 }}
+                      />)}
+                      {outfit.itemUrls.length > 2 &&
+                        <Badge text={`+${outfit.itemUrls.length - 2}`}
+                          style={{ marginLeft: -14, width: 40, height: 40 }}
+                        />}
+                    </Pressable>}
+                  </View>
+                }
+                {
+                  doubleTap && (
+                    <MotiView
+                      from={{ scale: 1, opacity: 1 }}
+                      animate={{ scale: 2, opacity: 0 }}
+                      transition={{ type: 'timing', duration: 400 }}
+                      onDidAnimate={() => setDoubleTap(null)}
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        width: '100%',
+                        height: '100%',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <HeartIcon
+                        color={Colors.secondary[500]}
+                        weight={'fill'}
+                        size={56}
+                        style={{
+                          transform: [{ rotate: `${doubleTap}deg` }]
+                        }}
+                      />
+                    </MotiView>
+                  )
+                }
               </AnimatedPressable>
             )
           }}
@@ -384,7 +417,7 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
             </View>}
           </View>
         </View>
-      </View>
+      </View >
       <PostMenu
         open={showMenu}
         onOpenChange={setShowMenu}
