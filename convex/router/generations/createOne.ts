@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { Id } from "../../_generated/dataModel";
+import { createPrediction } from "../../functions/generations";
 import { saveNotification } from "../../functions/notifications";
 import { updateQuest } from "../../functions/quests";
 import { internalMutation, MutationCtx } from "../../procedures";
@@ -32,7 +33,7 @@ export const _internal = internalMutation({
       publication: "DRAFT",
     });
 
-    await Promise.all(predictions.map(prediction => ctx.db.insert('predictions', {
+    await Promise.all(predictions.map(prediction => createPrediction(ctx, {
       predictionId: prediction.id,
       imageId: prediction.baseImageId,
       generationId,

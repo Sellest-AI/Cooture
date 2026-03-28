@@ -44,9 +44,9 @@ const updateGenerationStatus = async (ctx: MutationCtx, generationId: Id<'genera
   const hasLoading = predictions.some(prediction => prediction.status === "LOADING");
   if (hasLoading) return ctx.db.patch(generationId, { status: "LOADING", publication: "DRAFT" });
 
-  if (generation.status === "PENDING") return;
+  if (generation.status === "REVIEW") return;
 
-  await ctx.db.patch(generationId, { status: "PENDING", publication: "DRAFT" });
+  await ctx.db.patch(generationId, { status: "REVIEW", publication: "DRAFT" });
 
   // Update quests
   await updateQuest(ctx, {
@@ -73,7 +73,7 @@ const updatePrediction = async (ctx: MutationCtx, args: {
 
   const hasResult = !!imageId || !!videoId;
 
-  const status = args.status ?? (hasResult ? "PENDING" : undefined);
+  const status = args.status ?? (hasResult ? "REVIEW" : undefined);
   const readyAt = prediction.readyAt ?? (hasResult ? Date.now() : undefined);
 
   const patch = removeUndefinedKeys({

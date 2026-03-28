@@ -20,6 +20,7 @@ import type * as functions_credits_grantCredits from "../functions/credits/grant
 import type * as functions_credits_index from "../functions/credits/index.js";
 import type * as functions_feed_index from "../functions/feed/index.js";
 import type * as functions_feed_updateFeedScore from "../functions/feed/updateFeedScore.js";
+import type * as functions_generations_createPrediction from "../functions/generations/createPrediction.js";
 import type * as functions_generations_getGenerationDetails from "../functions/generations/getGenerationDetails.js";
 import type * as functions_generations_getGenerationMax from "../functions/generations/getGenerationMax.js";
 import type * as functions_generations_getPrediction from "../functions/generations/getPrediction.js";
@@ -142,6 +143,7 @@ import type * as router_credits_refundCredits from "../router/credits/refundCred
 import type * as router_feed_getFromOutfit from "../router/feed/getFromOutfit.js";
 import type * as router_feed_getFromPreset from "../router/feed/getFromPreset.js";
 import type * as router_feed_getPaginated from "../router/feed/getPaginated.js";
+import type * as router_generations_autoRefund from "../router/generations/autoRefund.js";
 import type * as router_generations_createOne from "../router/generations/createOne.js";
 import type * as router_generations_getAll from "../router/generations/getAll.js";
 import type * as router_generations_getFromPrediction from "../router/generations/getFromPrediction.js";
@@ -279,6 +281,7 @@ declare const fullApi: ApiFromModules<{
   "functions/credits/index": typeof functions_credits_index;
   "functions/feed/index": typeof functions_feed_index;
   "functions/feed/updateFeedScore": typeof functions_feed_updateFeedScore;
+  "functions/generations/createPrediction": typeof functions_generations_createPrediction;
   "functions/generations/getGenerationDetails": typeof functions_generations_getGenerationDetails;
   "functions/generations/getGenerationMax": typeof functions_generations_getGenerationMax;
   "functions/generations/getPrediction": typeof functions_generations_getPrediction;
@@ -401,6 +404,7 @@ declare const fullApi: ApiFromModules<{
   "router/feed/getFromOutfit": typeof router_feed_getFromOutfit;
   "router/feed/getFromPreset": typeof router_feed_getFromPreset;
   "router/feed/getPaginated": typeof router_feed_getPaginated;
+  "router/generations/autoRefund": typeof router_generations_autoRefund;
   "router/generations/createOne": typeof router_generations_createOne;
   "router/generations/getAll": typeof router_generations_getAll;
   "router/generations/getFromPrediction": typeof router_generations_getFromPrediction;

@@ -4,14 +4,14 @@ import { v } from "convex/values";
 export const PREDICTION_STATUS = v.union(
   v.literal("LOADING"),
   v.literal("FAILED"),
-  v.literal("PENDING"),
+  v.literal("REVIEW"),
   v.literal("ACCEPTED"),
   v.literal("REJECTED"),
 )
 
 export const GENERATION_STATUS = v.union(
   v.literal("LOADING"),
-  v.literal("PENDING"),
+  v.literal("REVIEW"),
   v.literal("COMPLETED"),
 )
 

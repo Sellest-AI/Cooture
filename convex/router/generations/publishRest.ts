@@ -23,7 +23,7 @@ export const authed = authMutation(({
     if (!canBePublished) return false;
 
     for (const prediction of predictions) {
-      if (prediction.status === "PENDING")
+      if (prediction.status === "REVIEW")
         await ctx.runMutation(internal.router.generations.updatePrediction._internal, {
           predictionId: prediction._id,
           status: "REJECTED",
