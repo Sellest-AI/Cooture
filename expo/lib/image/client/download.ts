@@ -10,6 +10,7 @@ export async function downloadImageCrossPlatform(source: string) {
 
   const { File, Paths } = await import('expo-file-system');
   const { createAlbumAsync, createAssetAsync, requestPermissionsAsync } = await import('expo-media-library');
+  const { ImageManipulator, SaveFormat } = await import('expo-image-manipulator');
 
   // native mobile
   // Try to request media library permissions, but Expo Go may not allow full library access.
@@ -43,8 +44,15 @@ export async function downloadImageCrossPlatform(source: string) {
 
   if (!localUri) throw new Error('Failed to resolve file URI.');
 
+  // Convert to JPEG
+  const ctx = ImageManipulator.manipulate(localUri);
+  const result = await (await ctx.renderAsync()).saveAsync({
+    format: SaveFormat.JPEG,
+    base64: false,
+  });
+
   if (canSaveToLibrary) {
-    const asset = await createAssetAsync(localUri);
+    const asset = await createAssetAsync(result.uri);
     try {
       await createAlbumAsync('Cooture', asset, false);
     } catch { }
