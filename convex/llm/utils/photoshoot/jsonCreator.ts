@@ -106,6 +106,7 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: SubjectExt
 
   // ---- CUSTOM OUTFIT ----
   const customOutfit = {
+    isCustom: true,
     description: [outfitSize, description].filter(notEmpty).join('. '),
     references: references.map((ref) => ref.text),
     top: top ? {
@@ -127,7 +128,7 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: SubjectExt
       ? accessories.map(acc => ({
         [acc.name]: `${acc.materials.map(m => m.toLowerCase()).slice(0, 2).join(' ')}`
       }))
-      : subject.prompt.outfit.accessories,
+      : [],
     shoes: shoesObject,
   }
 
@@ -271,6 +272,7 @@ export type PromptExtended = Omit<Prompt, 'subjects' | 'style' | 'composition' |
     size?: string;
     height?: string;
     outfit?: Outfit & {
+      isCustom?: boolean;
       references?: string[];
       top?: Outfit['top'] & { reference?: string };
       bottom?: Outfit['bottom'] & { reference?: string };

@@ -43,16 +43,17 @@ export const schemaToMarkdown = (schema: PromptExtended): string => {
     ]))
 
     const outfit = subject.outfit;
+    const isCustomOutfit = outfit.isCustom === true;
     // If only one subject is present, we can afford to include more detailed information about the outfit, 
     // as there is no risk of confusing the model with multiple outfits.
     if (schema.subjects.length === 1) {
       prompt.push(sectionCreator(`SUBJECT ${index + 1} OUTFIT (VERY IMPORTANT)`, [
         { "Description": sliceText(outfit?.description, 125) },
         { "References": outfit.references },
-        { "Outerwear": [outfit.outerwear?.type, outfit.outerwear?.reference] },
-        { "Top": [outfit.top?.type, outfit.top?.reference] },
+        { "Outerwear": [isCustomOutfit ? outfit.outerwear?.type : outfit.outerwear?.details, outfit.outerwear?.reference] },
+        { "Top": [isCustomOutfit ? outfit.top?.type : outfit.top?.details, outfit.top?.reference] },
         { "Inner Layer": outfit.innerLayer },
-        { "Bottom": [outfit.bottom?.type, outfit.bottom?.reference] },
+        { "Bottom": [isCustomOutfit ? outfit.bottom?.type : outfit.bottom?.details, outfit.bottom?.reference] },
         { "Shoes": outfit.shoes },
         ...outfit.accessories.map((accessory, i) => ({ [`Accessory ${i + 1}`]: [Object.keys(accessory)[0], Object.values(accessory)[0]] }))
       ]))
