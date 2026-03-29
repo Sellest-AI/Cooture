@@ -9,7 +9,7 @@ import { env } from "../../env";
 const CallbackSchema = z.object({
   userId: z.string(),
   task: z.object({ name: z.enum(taskNames), version: z.string() }),
-  videos: z.object({
+  video: z.object({
     width: z.number(),
     height: z.number(),
     durationMs: z.number(),
@@ -83,6 +83,9 @@ export const runpodGenerateVideoHandler = httpAction(async (ctx, request) => {
 
   const body = WebhookTaskSchema.parse(json);
 
+  if (body.status !== 'COMPLETED')
+    return Response.json({ received: true }, { status: 200 });
+
   if (!body.output) {
     return Response.json({ received: true }, { status: 200 });
   }
@@ -100,10 +103,10 @@ export const runpodGenerateVideoHandler = httpAction(async (ctx, request) => {
     predictionId: body.id,
     videoTmpPath,
     video: {
-      durationMs: callback.videos.durationMs,
-      width: callback.videos.width,
-      height: callback.videos.height,
-      fps: callback.videos.fps,
+      durationMs: callback.video.durationMs,
+      width: callback.video.width,
+      height: callback.video.height,
+      fps: callback.video.fps,
     }
   })
 
