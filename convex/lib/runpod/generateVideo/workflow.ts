@@ -37,19 +37,6 @@ export const compileWorkflow = ({ imageUrl, durationS, prompt }: Params) => {
         "title": "FPS"
       }
     },
-    "249": {
-      "inputs": {
-        "output": "",
-        "input": [
-          "577:551",
-          0
-        ]
-      },
-      "class_type": "Display Int (rgthree)",
-      "_meta": {
-        "title": "No. of Frames"
-      }
-    },
     "345": {
       "inputs": {
         "lora_name": "ltx-2-19b-ic-lora-detailer.safetensors",
@@ -76,27 +63,6 @@ export const compileWorkflow = ({ imageUrl, durationS, prompt }: Params) => {
       "class_type": "LoraLoaderModelOnly",
       "_meta": {
         "title": "LoraLoaderModelOnly"
-      }
-    },
-    "357": {
-      "inputs": {
-        "PowerLoraLoaderHeaderWidget": {
-          "type": "PowerLoraLoaderHeaderWidget"
-        },
-        "lora_1": {
-          "on": false,
-          "lora": "94_LTX2\\LTX-2-Image2Vid-Adapter.safetensors",
-          "strength": 1
-        },
-        "➕ Add Lora": "",
-        "model": [
-          "349",
-          0
-        ]
-      },
-      "class_type": "Power Lora Loader (rgthree)",
-      "_meta": {
-        "title": "Power Lora Loader (rgthree) to load additional Loras on first main pass"
       }
     },
     "392": {
@@ -192,7 +158,7 @@ export const compileWorkflow = ({ imageUrl, durationS, prompt }: Params) => {
       "inputs": {
         "skip_blocks": "28",
         "model": [
-          "357",
+          "349",
           0
         ],
         "positive": [
@@ -284,14 +250,17 @@ export const compileWorkflow = ({ imageUrl, durationS, prompt }: Params) => {
       },
       "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
       "_meta": {
-        "title": "LayerUtility: ImageScaleByAspectRatio V2"
+        "title": "LayerUtility: Mise à l'échelle proportionnelle_V2"
       }
     },
     "588": {
       "inputs": {
-        "source_fps": 24,
+        "source_fps": [
+          "615",
+          0
+        ],
         "target_fps": [
-          "597",
+          "607",
           0
         ],
         "scale": 1,
@@ -311,14 +280,14 @@ export const compileWorkflow = ({ imageUrl, durationS, prompt }: Params) => {
     "596": {
       "inputs": {
         "frame_rate": [
-          "597",
+          "607",
           0
         ],
         "loop_count": 0,
         "filename_prefix": "LTX",
         "format": "video/h264-mp4",
         "pix_fmt": "yuv420p",
-        "crf": 28,
+        "crf": 32,
         "save_metadata": false,
         "trim_to_audio": false,
         "pingpong": false,
@@ -337,27 +306,27 @@ export const compileWorkflow = ({ imageUrl, durationS, prompt }: Params) => {
         "title": "Video Combine 🎥🅥🅗🅢"
       }
     },
-    "597": {
-      "inputs": {
-        "value": 32
-      },
-      "class_type": "easy float",
-      "_meta": {
-        "title": "Interpolation FPS"
-      }
-    },
     "602": {
       "inputs": {
-        "url_or_path": imageUrl
+        "url_or_path": imageUrl,
       },
       "class_type": "LoadImageFromUrlOrPath",
       "_meta": {
         "title": "LoadImageFromUrlOrPath"
       }
     },
-    "603": {
+    "607": {
       "inputs": {
-        "filename_prefix": `LTX_${randomId}`,
+        "a": 30
+      },
+      "class_type": "CM_IntToFloat",
+      "_meta": {
+        "title": "Target FPS"
+      }
+    },
+    "611": {
+      "inputs": {
+        "filename_prefix": randomId,
         "filenames": [
           "596",
           0
@@ -368,20 +337,32 @@ export const compileWorkflow = ({ imageUrl, durationS, prompt }: Params) => {
         "title": "Save Video Files to S3"
       }
     },
-    "605": {
+    "613": {
       "inputs": {
         "root_dir": "output",
-        "file": `${randomId}.txt`,
+        "file": "file.txt",
         "append": "overwrite",
         "insert": true,
         "text": [
-          "603",
+          "611",
           0
         ]
       },
       "class_type": "SaveText|pysssss",
       "_meta": {
         "title": "Save Text 🐍"
+      }
+    },
+    "615": {
+      "inputs": {
+        "a": [
+          "248",
+          0
+        ]
+      },
+      "class_type": "CM_IntToFloat",
+      "_meta": {
+        "title": "IntToFloat"
       }
     },
     "577:536": {
@@ -595,7 +576,7 @@ export const compileWorkflow = ({ imageUrl, durationS, prompt }: Params) => {
     },
     "577:549": {
       "inputs": {
-        "noise_seed": 858950739651886
+        "noise_seed": 605516332438803
       },
       "class_type": "RandomNoise",
       "_meta": {
@@ -612,24 +593,6 @@ export const compileWorkflow = ({ imageUrl, durationS, prompt }: Params) => {
       "class_type": "LTXVSeparateAVLatent",
       "_meta": {
         "title": "LTXVSeparateAVLatent"
-      }
-    },
-    "577:552": {
-      "inputs": {
-        "outputs": {
-          "outputs": [
-            "FLOAT"
-          ]
-        },
-        "code": "a",
-        "a": [
-          "248",
-          0
-        ]
-      },
-      "class_type": "Power Puter (rgthree)",
-      "_meta": {
-        "title": "Power Puter (rgthree) FPS convert"
       }
     },
     "577:555": {
@@ -709,18 +672,6 @@ export const compileWorkflow = ({ imageUrl, durationS, prompt }: Params) => {
         "title": "Int Tile Size VAE"
       }
     },
-    "577:563": {
-      "inputs": {
-        "image": [
-          "577:570",
-          0
-        ]
-      },
-      "class_type": "GetImageSize",
-      "_meta": {
-        "title": "Obtenir la taille de l'image"
-      }
-    },
     "577:564": {
       "inputs": {
         "image": [
@@ -736,33 +687,13 @@ export const compileWorkflow = ({ imageUrl, durationS, prompt }: Params) => {
     "577:565": {
       "inputs": {
         "value": [
-          "577:551",
+          "577:603",
           0
         ]
       },
       "class_type": "PrimitiveInt",
       "_meta": {
         "title": "Length"
-      }
-    },
-    "577:566": {
-      "inputs": {
-        "frame_rate": [
-          "577:552",
-          0
-        ],
-        "positive": [
-          "577:548",
-          0
-        ],
-        "negative": [
-          "577:568",
-          0
-        ]
-      },
-      "class_type": "LTXVConditioning",
-      "_meta": {
-        "title": "LTXVConditioning"
       }
     },
     "577:567": {
@@ -794,23 +725,6 @@ export const compileWorkflow = ({ imageUrl, durationS, prompt }: Params) => {
       "class_type": "LTXVImgToVideoInplace",
       "_meta": {
         "title": "LTXVImgToVideoInplace"
-      }
-    },
-    "577:570": {
-      "inputs": {
-        "resize_type": "scale dimensions",
-        "resize_type.width": 720,
-        "resize_type.height": 1280,
-        "resize_type.crop": "center",
-        "scale_method": "lanczos",
-        "input": [
-          "584",
-          0
-        ]
-      },
-      "class_type": "ResizeImageMaskNode",
-      "_meta": {
-        "title": "Redimensionner image/masque"
       }
     },
     "577:571": {
@@ -863,28 +777,6 @@ export const compileWorkflow = ({ imageUrl, durationS, prompt }: Params) => {
       "class_type": "Any Switch (rgthree)",
       "_meta": {
         "title": "Sigma Switch"
-      }
-    },
-    "577:551": {
-      "inputs": {
-        "outputs": {
-          "outputs": [
-            "INT"
-          ]
-        },
-        "code": "(round((a*b)/8)*8)+1",
-        "a": [
-          "247",
-          0
-        ],
-        "b": [
-          "248",
-          0
-        ]
-      },
-      "class_type": "Power Puter (rgthree)",
-      "_meta": {
-        "title": "Power Puter (rgthree) total frames"
       }
     },
     "577:539": {
@@ -981,6 +873,85 @@ export const compileWorkflow = ({ imageUrl, durationS, prompt }: Params) => {
       "class_type": "LTXVAudioVAEDecode",
       "_meta": {
         "title": "Décodage Audio VAE LTXV"
+      }
+    },
+    "577:566": {
+      "inputs": {
+        "frame_rate": [
+          "577:605",
+          1
+        ],
+        "positive": [
+          "577:548",
+          0
+        ],
+        "negative": [
+          "577:568",
+          0
+        ]
+      },
+      "class_type": "LTXVConditioning",
+      "_meta": {
+        "title": "LTXVConditioning"
+      }
+    },
+    "577:603": {
+      "inputs": {
+        "expression": "(round((a*b)/8)*8)+1",
+        "a": [
+          "248",
+          0
+        ],
+        "b": [
+          "247",
+          0
+        ]
+      },
+      "class_type": "MathExpression|pysssss",
+      "_meta": {
+        "title": "Power Puter (rgthree) total frames"
+      }
+    },
+    "577:570": {
+      "inputs": {
+        "resize_type": "scale dimensions",
+        "resize_type.width": 720,
+        "resize_type.height": 1280,
+        "resize_type.crop": "center",
+        "scale_method": "lanczos",
+        "input": [
+          "584",
+          0
+        ]
+      },
+      "class_type": "ResizeImageMaskNode",
+      "_meta": {
+        "title": "Redimensionner image/masque"
+      }
+    },
+    "577:563": {
+      "inputs": {
+        "image": [
+          "577:570",
+          0
+        ]
+      },
+      "class_type": "GetImageSize",
+      "_meta": {
+        "title": "Obtenir la taille de l'image"
+      }
+    },
+    "577:605": {
+      "inputs": {
+        "expression": "a",
+        "a": [
+          "248",
+          0
+        ]
+      },
+      "class_type": "MathExpression|pysssss",
+      "_meta": {
+        "title": "Power Puter (rgthree) FPS convert"
       }
     }
   }
