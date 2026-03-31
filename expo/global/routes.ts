@@ -1,4 +1,3 @@
-import { url } from "../../utils/routes";
 import { WEBSITE } from "./website";
 
 export const SERVER_ROUTE_PATH = '/_next/data';
@@ -22,11 +21,6 @@ export const ROUTES = {
     DAILY_STREAK: '/daily-streak',
     TURN_TO_VIDEO: '/turn-to-video',
   },
-  VIDEOS: {
-    GENERATIONS: {
-      ID: (id: string) => `/videos/generations/${id}`,
-    }
-  },
   POST: {
     PATH: '/post/[id]',
     ID: (id: string) => `/post/${id}` as const,
@@ -48,10 +42,10 @@ export const ROUTES = {
     SAVED_OUTFITS: '/collection/saved-outfits',
   },
   SHARE: {
-    POST: (postId: string) => `/p/${postId}`,
-    OUTFIT: (outfitId: string) => `/o/${outfitId}`,
-    ITEM: (itemId: string) => `/i/${itemId}`,
-    USER: (userId: string) => `/u/${userId}`,
+    POST: (postId: string) => `/p/${postId}` as const,
+    OUTFIT: (outfitId: string) => `/o/${outfitId}` as const,
+    ITEM: (itemId: string) => `/i/${itemId}` as const,
+    USER: (userId: string) => `/u/${userId}` as const,
   },
   PRESETS: {
     ID: {
@@ -108,19 +102,11 @@ export const ROUTES = {
   },
   AUTH: '/auth',
   PRICING: '/pricing',
-  REFERRAL: (referralCode: string) => `${WEBSITE.URL}/${referralCode}`,
+  REFERRAL: (referralCode: string) => `${WEBSITE.URL}/${referralCode}` as const,
   ADMIN: {
     BOTS: {
       OUTFITS: {
         EXTRACTOR: '/admin/bots/outfits/extractor',
-      }
-    }
-  },
-  APP: {
-    TOOLS: {
-      PRODUCT_PHOTO: {
-        NEW: (imageId?: string) => url('/app/tools/product-photo', { productId: imageId }),
-        ID: (id: string) => '/app/tools/product-photo/' + id,
       }
     }
   },

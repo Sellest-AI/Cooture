@@ -259,9 +259,12 @@ export default function ItemScreen() {
                     style={{ flex: 1 }}
                   />
                 </View>
-                <Text.Base color={Colors.neutral[200]} weight={600}>
-                  Created by {user.name} {user.isPremium && <Credits size={12} />}
-                </Text.Base>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Text.Base color={Colors.neutral[200]} weight={600}>
+                    Created by {user.name}
+                  </Text.Base>
+                  {user.isPremium && <Credits size={12} />}
+                </View>
               </Pressable>}
             </View>
           }

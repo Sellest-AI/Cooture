@@ -72,6 +72,9 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
   const _backgroundColor = (selected || noSource) ? Colors.primary[500] : (contentFit === 'contain' ? (backgroundColor ?? Colors.neutral[50]) : Colors.blur.dark);
   const showText = title || subtitle;
 
+  const { padding, paddingHorizontal, paddingVertical,
+    paddingLeft, paddingRight, ...rest } = style || {};
+
   return (
     <Pressable
       onPressIn={handlePressIn}
@@ -81,11 +84,19 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
         requestAnimationFrame(() => onPress?.(e));
         setTimeout(() => setLoading(false), 200);
       }}
-      style={{ flex: 1, width: style?.width }}
+      style={{
+        flex: 1,
+        width: style?.width,
+        padding,
+        paddingHorizontal,
+        paddingVertical,
+        paddingLeft,
+        paddingRight,
+      }}
     >
       <Animated.View
         style={{
-          ...style,
+          ...rest,
           aspectRatio: 4 / 5,
           // backgroundColor: 'red',
           transform: [{ scale: scaleAnim }],

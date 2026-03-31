@@ -29,11 +29,14 @@ const OutputSchema = z.object({
   })).optional(),
 });
 
-const WebhookTaskSchema = z.object({
-  delayTime: z.number(),
-  executionTime: z.number(),
+const WebhookBasicTaskSchema = z.object({
   id: z.string(),
   status: z.enum(taskStatus),
+});
+
+const WebhookTaskSchema = WebhookBasicTaskSchema.extend({
+  delayTime: z.number(),
+  executionTime: z.number(),
   input: z.object({
     callback: CallbackSchema,
   }).optional(),
@@ -83,6 +86,14 @@ export const _internal_process = internalAction({
 export const runpodGenerateVideoHandler = httpAction(async (ctx, request) => {
   // Handle the Replicate webhook request here
   const json = await request.json();
+
+  const base = WebhookBasicTaskSchema.parse(json);
+
+  if (base.status === 'FAILED' || base.status === 'TIMED_OUT' || base.status === 'CANCELLED') {
+    await ctx.runMutation(internal.router.generations.updatePrediction._internal,
+      { predictionId: base.id, status: 'FAILED' })
+    return Response.json({ received: true }, { status: 200 });
+  }
 
   const body = WebhookTaskSchema.parse(json);
 

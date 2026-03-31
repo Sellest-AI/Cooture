@@ -195,6 +195,7 @@ export default function Screen() {
           flex: 1,
           overflow: 'visible',
           justifyContent: 'center',
+          paddingVertical: 24,
         }}>
           {visibleItems.length > 0 && <Carousel
             itemHeight={460}

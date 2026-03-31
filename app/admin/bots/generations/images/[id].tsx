@@ -55,13 +55,12 @@ const UnlockMore = () => {
           </Text.H3>
           <Text.Lg color={Colors.neutral[50]} weight={600}
             style={{
-              maxWidth: '55%',
+              maxWidth: '40%',
               textAlign: 'center',
               marginTop: 16,
-
             }}
           >
-            Generate one more image
+            Generate one extra image
           </Text.Lg>
           <Button
             variant="primary"
@@ -101,10 +100,7 @@ const UnlockMore = () => {
         justifyContent: 'space-between',
         flexDirection: 'row',
       }}>
-        <Text.Base color={Colors.neutral[400]} style={{
-          transform: [{ scale: 1.2 }],
-          transformOrigin: 'left top',
-        }}>
+        <Text.Base color={Colors.neutral[400]}>
           New
         </Text.Base>
         <Plus size={18} color={Colors.primary[500]} />
@@ -124,7 +120,7 @@ export default function Screen() {
 
   const items = (photoshoot?.predictions ?? []).map((p) => ({
     _id: p.predictionId,
-    url: results?.find((r) => r._id === p.imageId)?.url,
+    imageUrl: results?.find((r) => r._id === p.imageId)?.url,
     status: p.status,
   }))
 
@@ -166,10 +162,10 @@ export default function Screen() {
           inset: 0,
         }}
       />
-      <View style={{ flex: 1, justifyContent: 'center' }}>
+      <View style={{ flex: 1, justifyContent: 'center', paddingVertical: 24 }}>
         <View style={{ flex: 1, maxHeight: Dimensions.get('window').height / 2, overflow: 'visible' }}>
           {visibleItems.length > 0 && <Carousel
-            itemHeight={430}
+            itemHeight={460}
             defaultIndex={currentIndex}
             ref={carouselRef}
             onProgressChange={(_, v) => {
@@ -192,9 +188,8 @@ export default function Screen() {
                 >
                   <ImageGeneration
                     loading={s.status === 'LOADING'}
-                    source={s.url}
+                    source={s.imageUrl}
                     text={s.status === 'LOADING' ? "Generating..." : "Ready in 13s."}
-                    textScale={1.2}
                   />
                 </AnimatedGeneration>
               )

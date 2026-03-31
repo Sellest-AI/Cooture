@@ -137,7 +137,7 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
   }, []);
 
   const FinalView = scrollable ? Animated.ScrollView : View;
-  const { bottom: bottom } = useSafeAreaInsets();
+  const { bottom } = useSafeAreaInsets();
 
   return (
     <NativeModal

@@ -241,7 +241,7 @@ export default function Screen() {
               } : undefined,
             });
 
-            dismissTo(`/admin/bots/generations/[id]`, { pathParams: { id: generationId } });
+            dismissTo(`/admin/bots/generations/images/[id]`, { pathParams: { id: generationId } });
           }}
         >
           Slide to generate

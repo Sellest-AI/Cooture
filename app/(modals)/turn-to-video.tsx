@@ -4,7 +4,6 @@ import { ButtonSlider } from "@ui/button.slider";
 import { Clapperboard, Credits } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
-import { SafeAreaView } from "@ui/safe-area-view";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
@@ -26,8 +25,7 @@ export default function Screen() {
   const { action, isLoading } = useAction(api.llm.triggers.generateVideo.authed);
 
   return (
-    <SafeAreaView
-      edges={{ top: 'off' }}
+    <View
       style={{ padding: 12, flex: 1 }}
     >
       <ModalHeader
@@ -50,6 +48,7 @@ export default function Screen() {
       <View style={{
         flex: 1,
         justifyContent: 'flex-end',
+        paddingTop: 24,
       }}>
         <ButtonSlider
           startIcon={Clapperboard}
@@ -61,7 +60,7 @@ export default function Screen() {
             }
 
             const generationId = await action({ predictionId });
-            router.replace(ROUTES.VIDEOS.GENERATIONS.ID(generationId));
+            router.dismissTo(ROUTES.GENERATIONS.VIDEO.ID(generationId));
           }}
         >
           Generate video
@@ -93,6 +92,6 @@ export default function Screen() {
           </View>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   )
 }

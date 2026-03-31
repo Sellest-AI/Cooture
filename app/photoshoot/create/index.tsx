@@ -16,7 +16,7 @@ import { Text } from "@ui/text";
 import { TextInput } from "@ui/text-input";
 import { notEmpty } from "@utils/convex-allowed";
 import React, { useRef, useState } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -107,13 +107,19 @@ export default function Screen() {
             </> : undefined
           }
           renderItem={({ item, index }) => {
-            const sharedStyle = { marginBottom: 24, paddingTop: 3, marginLeft: 20, marginRight: 20, paddingHorizontal: 6 }
+            const sharedStyle = {
+              marginBottom: 24,
+              paddingTop: 3,
+              marginLeft: Platform.OS === 'android' ? 12 : 20,
+              marginRight: Platform.OS === 'android' ? 12 : 20,
+              paddingHorizontal: 6
+            }
 
             if (typeof item === 'string') {
               if (item === 'new') return (
                 <View style={sharedStyle}>
                   <Collection
-                    style={{}}
+                    style={{ padding: Platform.OS === 'android' ? 6 : 0 }}
                     title="New preset"
                     onPress={() => {
                       if (isPremium || isAdmin) push(ROUTES.PRESETS.CREATE.PATH, { redirectHere: true })
@@ -168,10 +174,14 @@ export default function Screen() {
             const selected = presetId === item._id;
 
             return (
-              <BlurTargetView style={sharedStyle} blurKey={BlurKeys.PHOOTSHOOT_PRESETS_ITEMS}>
+              <BlurTargetView
+                blurKey={BlurKeys.PHOOTSHOOT_PRESETS_ITEMS}
+                style={sharedStyle}
+              >
                 <Collection
                   selected={selected}
                   source={item.cover.sizes.medium.url}
+                  style={{ padding: Platform.OS === 'android' ? 6 : 0 }}
                   contentFit="cover"
                   title={item.name}
                   onPress={() => {

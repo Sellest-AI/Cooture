@@ -459,7 +459,7 @@ const MainButton = ({ onRecreate, type, style }: MainButtonProps) => {
       variant={'primary'}
       startIcon={Clapperboard}
     >
-      Transform into video
+      Animate
     </Button>
 
   return (

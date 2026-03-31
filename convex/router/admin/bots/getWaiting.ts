@@ -8,7 +8,8 @@ export const admin = adminQuery({
 
     const bots = await Promise.all(results.map(async (r) => {
       const latestGeneration = await ctx.db.query('generations')
-        .withIndex('by_user_id', (q) => q.eq('userId', r.userId)).first();
+        .withIndex('by_user_id', (q) => q.eq('userId', r.userId))
+        .order('desc').first();
 
       const user = await getUserPublic(ctx, r.userId);
 

@@ -1,5 +1,6 @@
 import { useAccount } from "@/lib/convex/auth";
 import { Redirect, Slot, Stack } from "expo-router";
+import { Platform } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -23,7 +24,7 @@ export default function Layout() {
         name="generate"
         options={{
           presentation: 'formSheet',
-          sheetAllowedDetents: [0.93],
+          sheetAllowedDetents: Platform.OS === 'ios' ? 'fitToContents' : [0.93],
           sheetInitialDetentIndex: 0,
           sheetCornerRadius: 28,
         }}

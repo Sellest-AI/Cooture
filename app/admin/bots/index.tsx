@@ -39,7 +39,7 @@ export const PendingBots = (props: SharedProps) => {
               style={{ width: '100%', marginBottom: 8 }}
               key={i.latestGeneration?._id ?? i._id}
               onPress={() => i.latestGeneration ?
-                router.push(`/admin/bots/generations/${i.latestGeneration?._id}`) : null}
+                router.push(`/admin/bots/generations/images/${i.latestGeneration?._id}`) : null}
             >
               <Block
                 variant="blur"
@@ -205,6 +205,7 @@ export const Bots = (props: SharedProps) => {
               </Text.Sm>
             </Pressable>
             <Modal
+              scrollable={false}
               open={modal === item._id}
               onOpenChange={(v) => setModal(v ? item._id : null)}
               header={{
