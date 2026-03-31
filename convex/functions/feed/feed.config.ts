@@ -7,4 +7,9 @@ export const FEED_CONFIG = {
   // Weight for extra score based on likes (e.g. 100 points per like)
   LIKES_WEIGHT: 200,
   SAVES_WEIGHT: 700,
+
+  // Weight for extra score based on post type
+  VIDEO_WEIGHT: 4000,
+  PRESET_WEIGHT: 1000,
+  OUTFIT_WEIGHT: 2000,
 }

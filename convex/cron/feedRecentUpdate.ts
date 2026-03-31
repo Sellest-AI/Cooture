@@ -4,22 +4,59 @@ import { Doc } from "../_generated/dataModel";
 import { FEED_CONFIG } from "../functions/feed/feed.config";
 import { internalMutation, MutationCtx } from "../procedures";
 
+const extractPostDetails = async (ctx: MutationCtx, feedScore: Doc<'feedScores'>) => {
+  const { generationId, outfitId } = feedScore;
+
+  if (!generationId || outfitId)
+    return {
+      hasVideo: false,
+      hasOutfit: true,
+      hasPreset: false,
+    };
+
+  const [predictions, generation] = await Promise.all([
+    await ctx.db.query('predictions')
+      .withIndex('by_generation_id', q => q.eq('generationId', generationId))
+      .collect(),
+    await ctx.db.query('presetGenerations')
+      .withIndex('by_generation_id', q => q.eq('generationId', generationId))
+      .first()
+  ])
+
+  const hasVideo = predictions.some(pred => pred.videoId && pred.status === 'ACCEPTED');
+  const hasPreset = !!generation?.presetId;
+  const hasOutfit = !!generation?.outfitId;
+
+  return {
+    hasVideo,
+    hasOutfit,
+    hasPreset,
+  }
+}
+
 const extraScore = async (ctx: MutationCtx, feedScore: Doc<'feedScores'>) => {
   const KEYS = feedScore.generationId ?
     ['by_generation_id', 'generationId'] as const :
     ['by_outfit_id', 'outfitId'] as const;
 
-  const [_likes, _bookmarks] = await Promise.all([
+  const [_likes, _bookmarks, details] = await Promise.all([
     ctx.db.query('likeStats')
       .withIndex(KEYS[0], q => q.eq(KEYS[1], feedScore.generationId))
       .first(),
     ctx.db.query('bookmarkStats')
       .withIndex(KEYS[0], q => q.eq(KEYS[1], feedScore.generationId))
       .first(),
+    await extractPostDetails(ctx, feedScore),
   ]);
+
   const likes = _likes ? _likes.count * FEED_CONFIG.LIKES_WEIGHT : 0;
   const bookmarks = _bookmarks ? _bookmarks.count * FEED_CONFIG.SAVES_WEIGHT : 0;
-  return likes + bookmarks;
+
+  const outfitScore = details.hasOutfit ? FEED_CONFIG.OUTFIT_WEIGHT : 0;
+  const presetScore = details.hasPreset ? FEED_CONFIG.PRESET_WEIGHT : 0;
+  const videoScore = details.hasVideo ? FEED_CONFIG.VIDEO_WEIGHT : 0;
+
+  return likes + bookmarks + outfitScore + presetScore + videoScore;
 }
 
 const updateScore = async (ctx: MutationCtx, feedScore: Doc<'feedScores'>) => {
@@ -29,15 +66,15 @@ const updateScore = async (ctx: MutationCtx, feedScore: Doc<'feedScores'>) => {
   // Random score between 0 and 4000 based on id
   const randomScore = parseInt(feedScore._id.toString().slice(-6), 16) % FEED_CONFIG.RANDOM_SCORE_RANGE;
   const extra = await extraScore(ctx, feedScore);
-  const baseScore = FEED_CONFIG.DEFAULT_SCORE + randomScore + extra;
+  const mergedScore = FEED_CONFIG.DEFAULT_SCORE + randomScore + extra;
 
   // Linear percentage decay: 0% at creation → 90% at freeze time
   const ageInHoursClamped = Math.min(ageInHours, FEED_CONFIG.FREEZE_AGE_HOURS);
   const decayPercent = (ageInHoursClamped / FEED_CONFIG.FREEZE_AGE_HOURS) * FEED_CONFIG.FREEZE_DECAY_PERCENT;
-  const decay = Math.round(baseScore * (decayPercent / 100));
+  const decay = Math.round(mergedScore * (decayPercent / 100));
 
   // Update the score and timestamp
-  const finalScore = Math.round(Math.max(0, baseScore - decay));
+  const finalScore = Math.round(Math.max(0, mergedScore - decay));
   await ctx.db.patch(feedScore._id, { score: finalScore, updatedAt: now });
 }
 
