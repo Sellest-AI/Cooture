@@ -20,10 +20,17 @@ export const ROUTES = {
     PICK_USER: '/pick-user',
     UPGRADE: '/upgrade',
     DAILY_STREAK: '/daily-streak',
+    TURN_TO_VIDEO: '/turn-to-video',
+  },
+  VIDEOS: {
+    GENERATIONS: {
+      ID: (id: string) => `/videos/generations/${id}`,
+    }
   },
   POST: {
     PATH: '/post/[id]',
     ID: (id: string) => `/post/${id}` as const,
+    SETTINGS: (id: string) => `/post/${id}/settings` as const,
   },
   ITEM: {
     PATH: '/item/[id]',
@@ -57,14 +64,19 @@ export const ROUTES = {
       THUMBNAIL: '/preset/create/thumbnail',
     }
   },
-  PHOTOSHOOT: {
-    NEW: '/photoshoot/create',
-    RECAP: '/photoshoot/create/recap',
-    GENERATIONS: {
+  GENERATIONS: {
+    VIDEO: {
+      ID: (id: string) => `/generations/video/${id}`,
+    },
+    PHOTOSHOOT: {
       NEXT: '/photoshoot/generations/next',
       PATH: '/photoshoot/generations/[id]',
       ID: (id: string) => `/photoshoot/generations/${id}` as const,
     }
+  },
+  PHOTOSHOOT: {
+    NEW: '/photoshoot/create',
+    RECAP: '/photoshoot/create/recap',
   },
   USER: {
     PATH: '/user/[id]',

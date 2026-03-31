@@ -280,7 +280,7 @@ export default function Screen() {
               if (cancel) return;
               if (!outfitId) return;
               cancel = true;
-              dismissTo(ROUTES.PHOTOSHOOT.GENERATIONS.NEXT);
+              dismissTo(ROUTES.GENERATIONS.PHOTOSHOOT.NEXT);
             }, 500);
 
             const friend = hasMultipleSubjects ? (friendId ? [friendId] : undefined) : undefined;
@@ -302,7 +302,7 @@ export default function Screen() {
 
             if (!generationId) return;
 
-            forceDismissTo(ROUTES.PHOTOSHOOT.GENERATIONS.PATH, {
+            forceDismissTo(ROUTES.GENERATIONS.PHOTOSHOOT.PATH, {
               pathParams: { id: generationId },
             })
           }}

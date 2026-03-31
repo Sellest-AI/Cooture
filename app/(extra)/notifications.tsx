@@ -32,7 +32,7 @@ const GenerationNotification = ({ generationId, onPress }: { generationId: Id<'g
       read={generation.status === 'COMPLETED'}
       onPress={() => {
         onPress?.();
-        router.push(ROUTES.PHOTOSHOOT.GENERATIONS.ID(generationId));
+        router.push(ROUTES.GENERATIONS.PHOTOSHOOT.ID(generationId));
       }}
       leftImage={preset?.cover?.sizes.thumbnail.url}
       rightImage={{ url: images?.[0]?.sizes.thumbnail.url }}

@@ -23,7 +23,8 @@ import { Colors } from "theme";
 const loading = false;
 
 export default function Screen() {
-  const { isPremium, isAdmin, userId } = useAccount();
+  const { userId, isPremium } = useAccount();
+  const { isAdmin } = useAccount.Admin();
   const { push } = useRouter('/photoshoot/create');
   const { setPresetId, presetId, outfitId, friendId } = usePhotoshoot.New();
 

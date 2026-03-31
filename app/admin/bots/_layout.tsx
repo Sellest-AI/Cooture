@@ -4,7 +4,7 @@ import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 export default function Layout() {
-  const { isAdmin } = useAccount();
+  const { isAdmin } = useAccount.Admin();
 
   if (!isAdmin) return (
     <Redirect href={ROUTES.TABS.FEED} />

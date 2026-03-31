@@ -87,7 +87,6 @@ export const useAccount = () => {
   const { data: user } = useQueryCached(api.router.users.getAccount.authed, !!token ? undefined : 'skip');
 
   const isAuthenticated = !!token;
-  const isAdmin = useIsAdmin();
 
   const isPremium = !!user?.plan;
   const userId = user?._id;
@@ -104,7 +103,6 @@ export const useAccount = () => {
     userId,
     isAuthenticated,
     isPremium,
-    isAdmin,
     isSuspended,
     isInWaitlist
   };
@@ -114,7 +112,7 @@ export const useIsAdmin = () => {
   const token = useAuthToken();
   const { data: user } = useQueryCached(api.router.users.getAccount.authed, !!token ? undefined : 'skip');
   const isAdmin = user?.role === 'ADMIN';
-  return isAdmin;
+  return { isAdmin };
 }
 
 const useWallet = () => {
@@ -136,5 +134,6 @@ const useAuthenticated = () => {
   }
 }
 
+useAccount.Admin = useIsAdmin;
 useAccount.Wallet = useWallet;
 useAccount.Authenticated = useAuthenticated;

@@ -84,7 +84,7 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
       return {
         title: "Your generation is ready",
         body: "Tap to view",
-        redirectUrl: ROUTES.PHOTOSHOOT.GENERATIONS.ID(args.generationId)
+        redirectUrl: ROUTES.GENERATIONS.PHOTOSHOOT.ID(args.generationId)
       }
     case "tagged_in_generation":
       return {

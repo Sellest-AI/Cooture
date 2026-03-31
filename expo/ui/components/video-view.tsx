@@ -1,12 +1,12 @@
 import { useFocusEffect } from "expo-router";
 import { VideoView as ExpoVideoView, useVideoPlayer } from "expo-video";
 import { useCallback, useEffect, useRef } from "react";
-import { AppState, Dimensions, StyleProp, View, ViewStyle } from "react-native";
+import { AppState, Dimensions, View, ViewStyle } from "react-native";
 
 type VideoViewProps = {
   source: string;
   contentFit?: 'cover' | 'contain' | 'fill';
-  style?: StyleProp<ViewStyle>;
+  style?: ViewStyle;
   autoPlay?: boolean;
   // Percentage of the video that should be visible on screen for it to auto play/pause. Default is 0.5 (50%)
   autoPlayScreenThreshold?: number;
@@ -87,7 +87,7 @@ export const VideoView = ({ style, source, contentFit, autoPlay = true, autoPlay
         player={player}
         nativeControls={false}
         contentFit={contentFit ?? "cover"}
-        style={{ width: '100%', height: '100%' }}
+        style={{ width: '100%', height: '100%', aspectRatio: style?.aspectRatio }}
       />
     </View>
   )

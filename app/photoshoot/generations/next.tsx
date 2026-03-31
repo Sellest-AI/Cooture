@@ -20,7 +20,7 @@ export default function Screen() {
       && (g._creationTime > date - 5000));
 
     if (latestLoading) {
-      replace(ROUTES.PHOTOSHOOT.GENERATIONS.PATH, {
+      replace(ROUTES.GENERATIONS.PHOTOSHOOT.PATH, {
         pathParams: { id: latestLoading._id }
       })
     }

@@ -21,7 +21,8 @@ export default function Screen() {
 
   const { replace, push } = useRouter();
   const { signOut } = useAuthActions();
-  const { user, isAdmin, isPremium } = useAccount();
+  const { user, isPremium } = useAccount();
+  const { isAdmin } = useAccount.Admin();
 
   const manageSubscription = async () => {
     if (isPremium) await Purchases.showManageSubscriptions();
