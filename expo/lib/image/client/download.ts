@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 
 // reuse your existing web download implementation
+import { nanoid } from 'nanoid/non-secure';
 import { download as webDownload } from './download.web';
 
 export async function downloadImageCrossPlatform(source: string) {
@@ -9,20 +10,12 @@ export async function downloadImageCrossPlatform(source: string) {
   }
 
   const { File, Paths } = await import('expo-file-system');
-  const { createAlbumAsync, createAssetAsync, requestPermissionsAsync } = await import('expo-media-library');
+  const { requestPermissionsAsync, saveToLibraryAsync } = await import('expo-media-library');
   const { ImageManipulator, SaveFormat } = await import('expo-image-manipulator');
 
-  // native mobile
-  // Try to request media library permissions, but Expo Go may not allow full library access.
-  // If permissions are unavailable/denied, we'll still download the file to the app documents
-  // directory as a fallback so the user can access it via Files/Downloads.
-  let canSaveToLibrary = true;
-  try {
-    const { status } = await requestPermissionsAsync();
-    canSaveToLibrary = status === 'granted';
-  } catch {
-    canSaveToLibrary = false;
-  }
+  // Request permission
+  const { status } = await requestPermissionsAsync();
+  if (status !== 'granted') return;
 
   let localUri: string | null = null;
 
@@ -36,10 +29,11 @@ export async function downloadImageCrossPlatform(source: string) {
     localUri = file.uri;
   } else {
     // remote URL -> download
-    const filename = (source.split('/').pop() || `img_${Date.now()}`).split('?')[0];
+    const filenameBase = (source.split('/').pop() || `img_${Date.now()}`).split('?')[0];
+    const filename = nanoid(7) + '_' + filenameBase;
     const file = new File(Paths.document, filename);
-    await File.downloadFileAsync(source, file);
-    localUri = file.uri;
+    const { uri } = await File.downloadFileAsync(source, file);
+    localUri = uri;
   }
 
   if (!localUri) throw new Error('Failed to resolve file URI.');
@@ -51,13 +45,7 @@ export async function downloadImageCrossPlatform(source: string) {
     base64: false,
   });
 
-  if (canSaveToLibrary) {
-    const asset = await createAssetAsync(result.uri);
-    try {
-      await createAlbumAsync('Cooture', asset, false);
-    } catch { }
-    // Alert.alert('Saved', 'Image saved to your photos.', undefined, { userInterfaceStyle: 'dark' });
-    return;
-  }
+  // Save to media library (Camera Roll)
+  await saveToLibraryAsync(result.uri);
 
 }
