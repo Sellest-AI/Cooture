@@ -9,6 +9,7 @@ import { env } from "../../env";
 const CallbackSchema = z.object({
   userId: z.string(),
   task: z.object({ name: z.enum(taskNames), version: z.string() }),
+  imageId: z.string().optional(),
   video: z.object({
     width: z.number(),
     height: z.number(),
@@ -43,6 +44,7 @@ const generateVideoSchemaValidator = {
   userId: v.id("users"),
   videoTmpPath: v.string(),
   predictionId: v.string(),
+  baseImageId: v.optional(v.string()),
   video: v.object({
     width: v.number(),
     height: v.number(),
@@ -54,7 +56,7 @@ const generateVideoSchemaValidator = {
 export const _internal_process = internalAction({
   args: generateVideoSchemaValidator,
   handler: async (ctx, args) => {
-    const { userId, predictionId, videoTmpPath, video } = args;
+    const { userId, predictionId, videoTmpPath, baseImageId, video } = args;
 
     const endpoint = `${env.S3_DEFAULT_BUCKET}.${env.S3_ENDPOINT}`;
     const endpointUrl = `${endpoint}/${videoTmpPath}`.replaceAll('//', '/');
@@ -66,6 +68,7 @@ export const _internal_process = internalAction({
       tmpKey: videoTmpPath,
       dimensions: { width: video.width, height: video.height },
       durationMs: video.durationMs,
+      baseImageId: baseImageId as Id<'images'> | undefined,
       fps: video.fps,
     })
 
@@ -101,6 +104,7 @@ export const runpodGenerateVideoHandler = httpAction(async (ctx, request) => {
   await ctx.scheduler.runAfter(0, internal.http.runpod.generateVideo._internal_process, {
     userId,
     predictionId: body.id,
+    baseImageId: callback.imageId,
     videoTmpPath,
     video: {
       durationMs: callback.video.durationMs,

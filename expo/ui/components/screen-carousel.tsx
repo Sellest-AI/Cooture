@@ -84,7 +84,7 @@ export const Carousel = <T extends ReactNode>({ scaleAnimation, items, itemWidth
       <CarouselRNRC
         ref={ref}
         style={{
-          flex: itemHeight ? 0 : 1,
+          flex: itemHeight ? undefined : 1,
           width: '100%',
           overflow: 'visible',
           height: itemHeight,

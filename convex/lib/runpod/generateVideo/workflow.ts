@@ -4,9 +4,11 @@ type Params = {
   imageUrl: string,
   durationS: number,
   prompt: string,
+  outputDimensions?: { width: number, height: number },
+  fps?: number,
 }
 
-export const compileWorkflow = ({ imageUrl, durationS, prompt }: Params) => {
+export const compileWorkflow = ({ imageUrl, durationS, prompt, outputDimensions, fps }: Params) => {
   const randomId = nanoid();
 
   return {
@@ -219,8 +221,8 @@ export const compileWorkflow = ({ imageUrl, durationS, prompt }: Params) => {
     "583": {
       "inputs": {
         "resize_type": "target dimensions",
-        "resize_type.width": 1080,
-        "resize_type.height": 1920,
+        "resize_type.width": outputDimensions?.width || 1080,
+        "resize_type.height": outputDimensions?.height || 1920,
         "quality": "ULTRA",
         "images": [
           "588",
@@ -317,7 +319,7 @@ export const compileWorkflow = ({ imageUrl, durationS, prompt }: Params) => {
     },
     "607": {
       "inputs": {
-        "a": 30
+        "a": fps || 30
       },
       "class_type": "CM_IntToFloat",
       "_meta": {
@@ -953,6 +955,19 @@ export const compileWorkflow = ({ imageUrl, durationS, prompt }: Params) => {
       "_meta": {
         "title": "Power Puter (rgthree) FPS convert"
       }
-    }
+    },
+    "621": {
+      "inputs": {
+        "options": "Intermediate and Utility",
+        "filenames": [
+          "596",
+          0
+        ]
+      },
+      "class_type": "VHS_PruneOutputs",
+      "_meta": {
+        "title": "Prune Outputs 🎥🅥🅗🅢"
+      }
+    },
   }
 }

@@ -53,6 +53,10 @@ export const getGenerationMax = async (ctx: QueryCtx, generationId: Id<'generati
   const coverId = predictions[0].imageId ?? predictions.find((x) => x.imageId)?.imageId;
   const firstPredictionId = predictions[0]._id;
 
+  const isVideosOnly = predictions
+    .filter((p) => p.status === 'ACCEPTED' || p.status === 'REJECTED')
+    .every(p => !!p.videoId);
+
   return {
     firstPredictionId,
     user: sanitizedUser,
@@ -66,5 +70,6 @@ export const getGenerationMax = async (ctx: QueryCtx, generationId: Id<'generati
       cover: presetCover || null,
     } : null,
     outfit,
+    isVideosOnly
   }
 }

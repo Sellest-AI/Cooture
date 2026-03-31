@@ -92,6 +92,7 @@ const args = {
   userId: v.union(v.id("users"), v.null()),
   dimensions: v.object({ width: v.number(), height: v.number() }),
   durationMs: v.number(),
+  baseImageId: v.optional(v.id("images")),
   tags: v.optional(VIDEO_TAGS),
   tmpKey: v.optional(v.string()),
   url: v.string(),
@@ -113,14 +114,18 @@ export const _internal = internalAction({
       format: video.format,
       tags: video.tags,
       size: video.size,
+      thumbnailId: args.baseImageId,
       dimensions: {
         width: video.width,
         height: video.height,
       },
     })
 
-    if (args.tmpKey)
+    if (args.tmpKey) {
       await StorageCloud.deleteFile(args.tmpKey).catch(() => null);
+      // Delete associated thumbnail if exists
+      await StorageCloud.deleteFile(args.tmpKey.replaceAll('.mp4', '.png')).catch(() => null);
+    }
 
     return savedVideo;
   }

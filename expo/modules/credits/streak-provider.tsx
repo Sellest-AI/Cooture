@@ -58,6 +58,7 @@ export const StreakProvider = ({ children }: { children: React.ReactNode }) => {
     if (claimed) return;
     if (!wallet) return;
     if (path.startsWith(ROUTES.MODALS.DAILY_STREAK)) return;
+    if (path.startsWith('/welcome')) return;
 
     // If it's the first day only show the modal on the collection page
     if (isFirstDay && !path.startsWith(ROUTES.COLLECTION.PATH)) return;
