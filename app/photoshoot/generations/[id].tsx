@@ -61,7 +61,7 @@ export default function Screen() {
 
   const items = (photoshoot?.predictions ?? []).map((p) => ({
     _id: p.predictionId,
-    url: results?.find((r) => r._id === p.imageId)?.url,
+    imageUrl: results?.find((r) => r._id === p.imageId)?.url,
     status: p.status,
   }))
 
@@ -107,7 +107,9 @@ export default function Screen() {
       // Check if we should navigate away
       const nextItem = visibleItems.find(item => item._id !== currentItem.id);
       if (!nextItem) {
-        router.dismissTo(ROUTES.PROFILE.GENERATIONS);
+        const predictionId = photoshoot?.predictions[0]?._id;
+        if (predictionId) router.dismissTo(ROUTES.POST.ID(predictionId));
+        else router.dismissTo(ROUTES.PROFILE.GENERATIONS);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -195,7 +197,7 @@ export default function Screen() {
           justifyContent: 'center',
         }}>
           {visibleItems.length > 0 && <Carousel
-            itemHeight={430}
+            itemHeight={460}
             defaultIndex={currentIndex}
             ref={carouselRef}
             onProgressChange={(_, v) => {
@@ -221,9 +223,9 @@ export default function Screen() {
                   >
                     <ImageGeneration
                       loading={s.status === 'LOADING'}
-                      source={s.url}
+                      source={s.imageUrl}
                       text={s.status === 'LOADING' ? "Generating..." : "Ready in 13s."}
-                      onDownload={s.url ? () => downloadImageCrossPlatform(s.url!) : undefined}
+                      onDownload={s.imageUrl ? () => downloadImageCrossPlatform(s.imageUrl!) : undefined}
                     />
                   </AnimatedGeneration>
                 )

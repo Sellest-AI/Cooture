@@ -1,4 +1,5 @@
 import { downloadImageCrossPlatform } from "@/lib/image/client";
+import { downloadVideo } from "@/lib/video";
 import { Block } from "@ui/block";
 import { Button, BUTTON_HEIGHT } from "@ui/button";
 import { HeartIcon, Loader, X } from "@ui/icons";
@@ -10,7 +11,8 @@ import { Colors } from "theme";
 
 type Generation = {
   _id: string,
-  url?: string,
+  imageUrl?: string,
+  videoUrl?: string,
   status: string,
 }
 
@@ -58,7 +60,7 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
                 Please be patient...
               </Text.Base>
               <Text.Sm color={Colors.neutral[400]} weight={600} style={{ marginLeft: 12 }}>
-                {processed} / {processed + loading}
+                {Math.min(processed + 1, processed + loading)} / {processed + loading}
               </Text.Sm>
             </Block>}
             {!isCurrentLoading && <View style={{
@@ -80,9 +82,14 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
                 variant="primary"
                 startIcon={HeartIcon}
                 onPress={async () => {
-                  if (!currentItem?.url) return;
+                  const hasMedia = !!currentItem?.imageUrl || !!currentItem?.videoUrl;
+                  if (!currentItem || !hasMedia) return;
                   try {
-                    await downloadImageCrossPlatform(currentItem.url);
+                    if (currentItem.videoUrl) {
+                      await downloadVideo(currentItem.videoUrl);
+                    } else if (currentItem.imageUrl) {
+                      await downloadImageCrossPlatform(currentItem.imageUrl);
+                    }
                   } catch { }
                   onNext(true);
                 }}

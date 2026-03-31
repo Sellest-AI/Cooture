@@ -16,7 +16,7 @@ export const UnlockMore = ({ predictionId }: { predictionId: Id<'predictions'> }
 
   const { action, isLoading } = useAction(api.llm.triggers.generateVideo.authed);
 
-  const { data: generation } = useQueryCached(api.router.generations.getFromPrediction.anon, { id: predictionId });
+  const { data: generation } = useQueryCached(api.router.generations.getFromPrediction.authed, { id: predictionId });
   const prediction = generation?.predictions.find(p => p._id === predictionId);
 
   const { data: image } = useQueryCached(api.router.storage.images.getOne.anon, prediction?.imageId ? { id: prediction.imageId } : 'skip');
@@ -47,7 +47,7 @@ export const UnlockMore = ({ predictionId }: { predictionId: Id<'predictions'> }
           contentPosition="center"
           blurRadius={20}
         />
-        {isPremium && <View style={{
+        <View style={{
           alignItems: 'center',
           justifyContent: 'center',
           flex: 1,
@@ -81,7 +81,7 @@ export const UnlockMore = ({ predictionId }: { predictionId: Id<'predictions'> }
           >
             Unlock
           </Button>
-        </View>}
+        </View>
       </Pressable>
       <View style={{
         marginTop: 8,

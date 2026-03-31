@@ -66,7 +66,7 @@ export const ROUTES = {
   },
   GENERATIONS: {
     VIDEO: {
-      ID: (id: string) => `/generations/video/${id}`,
+      ID: (id: string) => `/generations/video/${id}` as const,
     },
     PHOTOSHOOT: {
       NEXT: '/photoshoot/generations/next',
