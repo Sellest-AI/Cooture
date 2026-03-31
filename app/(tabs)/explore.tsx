@@ -14,6 +14,7 @@ import { Pressable as AnimatedPressable } from "@ui/pressable";
 import { SafeAreaView, useSafeAreaInsets } from "@ui/safe-area-view";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
+import { VideoView } from "@ui/video-view";
 import { router } from "expo-router";
 import { Platform, Pressable, RefreshControl, View, ViewStyle } from "react-native";
 import { ROUTES } from "routes";
@@ -63,20 +64,32 @@ const GridSkeleton = () => {
 
 const Generation = ({ id, style, size = 'large' }: { id: Id<'generations'>, style?: ViewStyle, size?: 'small' | 'large' }) => {
   const { data: post } = useQuery(api.router.generations.getOne.anon, { id });
-  const { data: image } = useQueryCached(api.router.storage.images.getOne.anon, post?.predictions[0]?.imageId ? { id: post?.predictions[0]?.imageId } : 'skip');
 
-  if (!post || !image) return <Skeleton style={style} />;
+  const prediction = post?.predictions.find(p => p.videoId) ?? post?.predictions[0];
+
+  const { data: image } = useQueryCached(api.router.storage.images.getOne.anon, prediction?.imageId ? { id: prediction?.imageId } : 'skip');
+  const { data: video } = useQueryCached(api.router.storage.videos.getOne.anon, prediction?.videoId ? { id: prediction?.videoId } : 'skip');
+
+  if (!post || (!image && !video)) return <Skeleton style={style} />;
 
   const finalSize = size === 'large' ? 'medium' : 'small';
 
+  const showVideo = (video && size === 'large') || (video && size === 'small' && !image);
+
   return (
     <Pressable style={{ borderRadius: 16, overflow: 'hidden', flex: 1, ...style }}
-      onPress={() => router.push(ROUTES.POST.ID(post.predictions[0]._id))}
+      onPress={prediction ? () => router.push(ROUTES.POST.ID(prediction._id)) : undefined}
     >
-      <Image
+      {showVideo && <VideoView
+        style={{ flex: 1 }}
+        source={video.url}
+        autoPlay={size === 'large'}
+        autoPlayScreenThreshold={0.5}
+      />}
+      {!showVideo && <Image
         style={{ flex: 1 }}
         source={{ uri: image?.sizes[finalSize].url }}
-      />
+      />}
     </Pressable>
   )
 }
@@ -195,7 +208,7 @@ export default function Screen() {
                       {posts[1] ? <Post id={posts[1]._id} type={posts[1].type} size="small" style={{ flex: 1, borderTopLeftRadius: 8 }} /> : <Skeleton style={{ flex: 1 }} />}
                       {posts[2] ? <Post id={posts[2]._id} type={posts[2].type} size="small" style={{ flex: 1 }} /> : <Skeleton style={{ flex: 1 }} />}
                     </Col>
-                    <Col size={2}>
+                    <Col size={2} style={{ height: HEIGHT }}>
                       {posts[0] ? <Post id={posts[0]._id} type={posts[0].type} size="large" style={{ flex: 1, borderTopRightRadius: 8 }} /> : <Skeleton style={{ flex: 1 }} />}
                     </Col>
                   </Grid>
@@ -228,7 +241,7 @@ export default function Screen() {
                 {/* Third grid: 1 large left, 2 small right */}
                 {posts.length > 9 && (
                   <Grid style={{ height: HEIGHT, gap: GAP }}>
-                    <Col size={2}>
+                    <Col size={2} style={{ height: HEIGHT }}>
                       {posts[9] ? <Post id={posts[9]._id} type={posts[9].type} size="large" style={{ flex: 1 }} /> : <Skeleton style={{ flex: 1 }} />}
                     </Col>
                     <Col style={{ height: HEIGHT, gap: GAP }} size={1}>

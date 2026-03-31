@@ -13,13 +13,18 @@ type Props = {
   imageQuality?: 'optimized' | 'full';
   /** Disable long press if the current view is the post */
   disableLongPress?: boolean;
+  ownedByCurrentUser?: boolean;
 }
 
-export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableLongPress }: Props) => {
+export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableLongPress, ownedByCurrentUser }: Props) => {
   const { push } = useRouter('/feed');
   const { data: post } = useQuery(api.router.generations.getOne.anon, { id });
+
   const imageIds = post?.predictions.map((p) => p.imageId).filter(notEmpty) ?? [];
   const { data: images } = useQueryCached(api.router.storage.images.getMany.anon, imageIds.length > 0 ? { imageIds } : 'skip');
+
+  const videoIds = post?.predictions.map((p) => p.videoId).filter(notEmpty) ?? [];
+  const { data: videos } = useQueryCached(api.router.storage.videos.getMany.anon, videoIds.length > 0 ? { videoIds } : 'skip');
 
   const { data: recreateCount } = useQuery(api.router.presets.recreateCount.anon, post?.presetId ? { presetId: post?.presetId } : 'skip');
   const { data: isBookmarked } = useQuery(api.router.collection.getBookmarked.authed, { generationId: id });
@@ -53,6 +58,10 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
       url: imageQuality === 'full' ? img.url : img.sizes.large.url,
       contentFit: img.hasAlpha ? 'contain' : 'cover',
     }))}
+    videos={videos?.map((video) => ({
+      _id: post.predictions.find(p => p.videoId === video._id)?._id ?? post.predictions[0]?._id,
+      url: video.url,
+    }))}
     users={post.users.map((user) => ({
       name: user.name ?? 'Anonymous',
       username: user.username ?? 'anon',
@@ -65,6 +74,11 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
     onDownload={async (url) => {
       await downloadImageCrossPlatform(url).catch(() => null)
     }}
+    onTurnToVideo={ownedByCurrentUser ? (_id: string) => {
+      const prediction = post.predictions.find(p => p._id === _id);
+      if (!prediction) return;
+      push(ROUTES.MODALS.TURN_TO_VIDEO, { params: { predictionId: prediction._id } })
+    } : undefined}
     onRecreate={() => push(ROUTES.PHOTOSHOOT.RECAP, {
       params: { presetId: post.preset?._id, outfitId: post.outfit?._id }
     })}

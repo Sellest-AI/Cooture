@@ -1,5 +1,6 @@
 import { ROUTES, useRoute } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
+import { useAccount } from "@/lib/convex/auth";
 import { usePaginatedQuery, useQuery } from "@/lib/convex/client";
 import { useFeed } from "@/modules/feed/_hooks";
 import { GenerationPost } from "@/modules/feed/post.generation";
@@ -13,8 +14,8 @@ import { Redirect, router } from "expo-router";
 import { useCallback, useMemo } from "react";
 import { Colors } from "theme";
 
-
 export default function Screen() {
+  const { userId } = useAccount();
   const { id } = useRoute.Params<{ id: Id<'predictions'> }>();
   const { data: post, isPending } = useQuery(api.router.generations.getFromPrediction.anon, { id });
   const { results: postsFromUser, isLoading, status, loadMore } = usePaginatedQuery(api.router.generations.getPaginated.anon, post?.user?._id ? { userId: post?.user?._id } : 'skip', { initialNumItems: 8 });
@@ -41,6 +42,7 @@ export default function Screen() {
           style={{ marginTop: 28, marginBottom: 28 }}
           imageQuality={item.id === post?._id ? 'full' : 'optimized'}
           disableLongPress={true}
+          ownedByCurrentUser={post?._id === item.id && post?.user?._id === userId}
         />
       </>
       )
@@ -49,9 +51,10 @@ export default function Screen() {
       id={item.id}
       style={{ marginTop: 8, marginBottom: 28 }}
       imageQuality={item.id === post?._id ? 'full' : 'optimized'}
+      ownedByCurrentUser={post?._id === item.id && post?.user?._id === userId}
       disableLongPress={true}
     />
-  }, [post]);
+  }, [post, userId]);
 
   if (!isPending && !post)
     return <Redirect href={ROUTES.TABS.DISCOVER} />

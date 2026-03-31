@@ -1,6 +1,6 @@
 import { api, Id, useAction, useMutation, useQuery, useQueryCached } from "@/lib/convex/client";
-import { AnimatedGeneration } from "@/modules/photoshoot/animated-generation";
-import { GenerationButtons } from "@/modules/photoshoot/generation-buttons";
+import { AnimatedGeneration } from "@/modules/generations/animated-generation";
+import { GenerationButtons } from "@/modules/generations/generation-buttons";
 import { Button } from "@ui/button";
 import { ImageGeneration } from "@ui/cards";
 import { Plus } from "@ui/icons";

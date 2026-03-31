@@ -1,7 +1,7 @@
 import { Badge } from '@ui/badge';
 import { Button } from '@ui/button';
 import { GhostIconWrapper } from '@ui/ghost-animation';
-import { BookmarkIcon, CircleFadingArrowUp, Credits, EllipsisVertical, HeartIcon, ShareIcon } from '@ui/icons';
+import { BookmarkIcon, CircleFadingArrowUp, Clapperboard, Credits, EllipsisVertical, HeartIcon, ShareIcon } from '@ui/icons';
 import { Skeleton } from '@ui/skeleton';
 import { VideoView } from '@ui/video-view';
 import { ZoomableWrapper } from '@ui/zoomable-wrapper';
@@ -60,17 +60,17 @@ type Props = {
     itemUrls: string[];
   }
   onRecreate?: () => void;
+  onTurnToVideo?: (_id: string) => void;
 }
 
 export const Post = ({ style, image, users, preset, outfit, images, likedAccounts, onRecreate,
   onShare, paddingHorizontal, isBookmarked, onPress, onToggleBookmark, onToggleLike, isLiked,
-  recreateCount, onDownload, videos,
+  recreateCount, onDownload, videos, onTurnToVideo,
 }: Props) => {
   const [showMenu, setShowMenu] = useState(false);
   const [doubleTap, setDoubleTap] = useState<number | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [pinching, setPinching] = useState<{ index: number } | false>(false);
-  const type = preset ? 'preset' : outfit ? 'outfit' : undefined;
 
   const PADDING_HORIZONTAL = paddingHorizontal ?? 12;
   const GAP = 4;
@@ -96,6 +96,11 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
     ...((videos ?? []).map((v) => ({ ...v, type: 'video' as const }))),
     ...((images ?? [image]).map((img) => ({ ...img, type: 'image' as const })))
   ]
+
+  const currentItem = items[currentIndex];
+  const currentItemType = currentItem?.type;
+  const type = (currentItemType === 'image' && preset && onTurnToVideo) ? 'video' :
+    (preset ? 'preset' : outfit ? 'outfit' : undefined);
 
   return (
     <>
@@ -210,7 +215,7 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
           }}
           decelerationRate="fast"
           data={items}
-          keyExtractor={(item) => item?._id ?? item?.url ?? ''}
+          keyExtractor={(item) => `${item?._id}${item?.url}`}
           snapToInterval={Dimensions.get('window').width - (PADDING_HORIZONTAL * 2) + GAP}
           numColumns={1}
           viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
@@ -220,7 +225,7 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
             return (
               <AnimatedPressable
                 animated={false}
-                key={item?._id ?? item?.url ?? index}
+                key={`${item?._id}${item?.url}${index}`}
                 style={{
                   width: Dimensions.get('window').width - (PADDING_HORIZONTAL * 2),
                   aspectRatio: 3 / 4,
@@ -248,7 +253,7 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
                         source={item.url}
                         style={{
                           width: Dimensions.get('window').width - (PADDING_HORIZONTAL * 2),
-                          height: 3 / 4,
+                          aspectRatio: 3 / 4,
                           borderRadius: 28,
                           flex: 1
                         }}
@@ -269,85 +274,84 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
                     />}
                   </>
                 </ZoomableWrapper>
-                {
-                  !pinching && <View style={{
-                    position: 'absolute',
-                    top: 16,
-                    right: 16,
-                    left: 16,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between'
-                  }}>
-                    {preset && <Pressable onPress={(e) => { e.stopPropagation(); preset.onPress?.(); }}>
-                      <Badge
-                        source={preset.imageUrl}
-                        contentFit="cover"
-                        contentPosition="top center"
-                        style={{ width: 40, height: 40 }}
-                      />
-                    </Pressable>}
-                    {outfit && <Pressable
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        outfit.onPress?.()
-                      }}
-                      style={{
-                        flexDirection: 'row',
-                        gap: 0,
-                        marginLeft: preset ? 0 : 16,
-                      }}>
-                      {outfit.itemUrls.slice(0, 2).map((url) => <Badge
-                        key={url}
-                        source={url}
-                        contentFit="contain"
+                {!pinching && <View style={{
+                  position: 'absolute',
+                  top: 16,
+                  right: 16,
+                  left: 16,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between'
+                }}>
+                  {preset && <Pressable onPress={(e) => { e.stopPropagation(); preset.onPress?.(); }}>
+                    <Badge
+                      source={preset.imageUrl}
+                      contentFit="cover"
+                      contentPosition="top center"
+                      style={{ width: 40, height: 40 }}
+                    />
+                  </Pressable>}
+                  {outfit && <Pressable
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      outfit.onPress?.()
+                    }}
+                    style={{
+                      flexDirection: 'row',
+                      gap: 0,
+                      marginLeft: preset ? 0 : 16,
+                    }}>
+                    {outfit.itemUrls.slice(0, 2).map((url) => <Badge
+                      key={url}
+                      source={url}
+                      contentFit="contain"
+                      style={{ marginLeft: -14, width: 40, height: 40 }}
+                    />)}
+                    {outfit.itemUrls.length > 2 &&
+                      <Badge text={`+${outfit.itemUrls.length - 2}`}
                         style={{ marginLeft: -14, width: 40, height: 40 }}
-                      />)}
-                      {outfit.itemUrls.length > 2 &&
-                        <Badge text={`+${outfit.itemUrls.length - 2}`}
-                          style={{ marginLeft: -14, width: 40, height: 40 }}
-                        />}
-                    </Pressable>}
-                  </View>
-                }
-                {
-                  doubleTap && (
-                    <MotiView
-                      from={{ scale: 1, opacity: 1 }}
-                      animate={{ scale: 2, opacity: 0 }}
-                      transition={{ type: 'timing', duration: 400 }}
-                      onDidAnimate={() => setDoubleTap(null)}
+                      />}
+                  </Pressable>}
+                </View>}
+                {doubleTap && (
+                  <MotiView
+                    from={{ scale: 1, opacity: 1 }}
+                    animate={{ scale: 2, opacity: 0 }}
+                    transition={{ type: 'timing', duration: 400 }}
+                    onDidAnimate={() => setDoubleTap(null)}
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      width: '100%',
+                      height: '100%',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <HeartIcon
+                      color={Colors.secondary[500]}
+                      weight={'fill'}
+                      size={56}
                       style={{
-                        position: 'absolute',
-                        inset: 0,
-                        width: '100%',
-                        height: '100%',
-                        justifyContent: 'center',
-                        alignItems: 'center',
+                        transform: [{ rotate: `${doubleTap}deg` }]
                       }}
-                    >
-                      <HeartIcon
-                        color={Colors.secondary[500]}
-                        weight={'fill'}
-                        size={56}
-                        style={{
-                          transform: [{ rotate: `${doubleTap}deg` }]
-                        }}
-                      />
-                    </MotiView>
-                  )
-                }
+                    />
+                  </MotiView>
+                )}
               </AnimatedPressable>
             )
           }}
         />
-        {(type === 'preset' || type === 'outfit') && <Button
-          onPress={() => { onRecreate?.(); }}
+        {type && <MainButton
+          type={type}
           style={{ marginTop: 8, marginHorizontal: PADDING_HORIZONTAL }}
-          variant={type === 'preset' ? 'primary' : 'secondary'}
-          startIcon={CircleFadingArrowUp}
-        >
-          {type === 'preset' ? 'Recreate' : 'Try on'}
-        </Button>}
+          onRecreate={() => {
+            if (type === 'video') {
+              if (!currentItem._id) return;
+              onTurnToVideo?.(currentItem?._id);
+            }
+            else onRecreate?.();
+          }}
+        />}
         <View style={{ paddingHorizontal: PADDING_HORIZONTAL + 4, marginTop: 8 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', gap: 8 }}>
@@ -430,15 +434,43 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
         onPresetPress={preset?.onPress}
         onRecreate={onRecreate ?? preset?.onPress}
         onDownload={onDownload ? async () => {
-          const url = images?.[currentIndex].url ?? image?.url;
+          const url = currentItem?.url;
           if (url) await onDownload?.(url);
         } : undefined}
         onShare={() => {
-          const id = images?.[currentIndex]._id ?? image?._id;
+          const id = currentItem?._id;
           if (id) onShare?.(id);
         }}
       />
     </>
+  )
+}
+
+type MainButtonProps = {
+  onRecreate: () => void;
+  type: 'preset' | 'outfit' | 'video';
+  style?: ViewStyle;
+}
+const MainButton = ({ onRecreate, type, style }: MainButtonProps) => {
+  if (type === 'video')
+    return <Button
+      onPress={onRecreate}
+      style={{ ...style }}
+      variant={'primary'}
+      startIcon={Clapperboard}
+    >
+      Transform into video
+    </Button>
+
+  return (
+    <Button
+      onPress={onRecreate}
+      style={{ ...style }}
+      variant={type === 'preset' ? 'primary' : 'secondary'}
+      startIcon={CircleFadingArrowUp}
+    >
+      {type === 'preset' ? 'Recreate' : 'Try on'}
+    </Button>
   )
 }
 

@@ -209,6 +209,7 @@ import type * as router_storage_images_uploadOne from "../router/storage/images/
 import type * as router_storage_images_uploadSizes from "../router/storage/images/uploadSizes.js";
 import type * as router_storage_videos_deleteOne from "../router/storage/videos/deleteOne.js";
 import type * as router_storage_videos_deleteOneMutationInternal from "../router/storage/videos/deleteOneMutationInternal.js";
+import type * as router_storage_videos_getMany from "../router/storage/videos/getMany.js";
 import type * as router_storage_videos_getOne from "../router/storage/videos/getOne.js";
 import type * as router_storage_videos_saveOne from "../router/storage/videos/saveOne.js";
 import type * as router_storage_videos_uploadOne from "../router/storage/videos/uploadOne.js";
@@ -471,6 +472,7 @@ declare const fullApi: ApiFromModules<{
   "router/storage/images/uploadSizes": typeof router_storage_images_uploadSizes;
   "router/storage/videos/deleteOne": typeof router_storage_videos_deleteOne;
   "router/storage/videos/deleteOneMutationInternal": typeof router_storage_videos_deleteOneMutationInternal;
+  "router/storage/videos/getMany": typeof router_storage_videos_getMany;
   "router/storage/videos/getOne": typeof router_storage_videos_getOne;
   "router/storage/videos/saveOne": typeof router_storage_videos_saveOne;
   "router/storage/videos/uploadOne": typeof router_storage_videos_uploadOne;

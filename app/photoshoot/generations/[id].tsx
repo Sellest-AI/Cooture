@@ -1,16 +1,14 @@
-import { useRouter } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
-import { useAccount } from "@/lib/convex/auth";
-import { useAction, useQuery, useQueryCached } from "@/lib/convex/client";
+import { useQuery } from "@/lib/convex/client";
 import { downloadImageCrossPlatform } from "@/lib/image/client";
+import { AnimatedGeneration } from "@/modules/generations/animated-generation";
+import { GenerationButtons } from "@/modules/generations/generation-buttons";
+import { UnlockMore } from "@/modules/generations/images/unlock-more";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
-import { AnimatedGeneration } from "@/modules/photoshoot/animated-generation";
-import { GenerationButtons } from "@/modules/photoshoot/generation-buttons";
 import { Badge } from "@ui/badge";
 import { Block } from "@ui/block";
-import { Button } from "@ui/button";
 import { ImageGeneration } from "@ui/cards";
-import { ArrowLeft, Check, Lock, X } from "@ui/icons";
+import { ArrowLeft, Check, X } from "@ui/icons";
 import { Image } from "@ui/image";
 import { Pressable } from "@ui/pressable";
 import { SafeAreaView } from "@ui/safe-area-view";
@@ -45,138 +43,6 @@ const Outfit = ({ id }: { id: Id<'outfits'> }) => {
         />
       ))}
       {remaining > 0 && <Badge text={`+${remaining}`} />}
-    </View>
-  )
-}
-
-const UnlockMore = () => {
-  const { push } = useRouter();
-  const { id } = useLocalSearchParams<{ id: Id<'generations'> }>();
-  const { preset, photoshoot } = usePhotoshoot(id);
-
-  const { data: cost } = useQueryCached(api.router.credits.getCost.anon, { type: "IMAGE_GENERATION_COST", amount: 1 });
-  const { data: canPay } = useQueryCached(api.router.credits.canPay.authed, cost ? { amount: cost } : 'skip');
-
-  const { isPremium } = useAccount();
-
-  const disabled = isPremium ? !canPay : false;
-
-  const { outfitSize } = usePhotoshoot.New();
-  const { action, isLoading } = useAction(api.llm.triggers.photoshoot.authed);
-
-  return (
-    <View style={{
-      flex: 1,
-      width: '100%',
-    }}>
-      <Pressable
-        disabled={disabled}
-        animated={disabled}
-        style={{
-          backgroundColor: Colors.blur.darkest,
-          borderColor: Colors.blur.medium,
-          borderTopWidth: 2,
-          borderLeftWidth: 1,
-          borderRadius: 24,
-          aspectRatio: 3 / 4,
-          width: '100%',
-          overflow: 'hidden',
-          opacity: disabled ? 0.4 : 1,
-        }}>
-        <Image
-          style={{ position: 'absolute', inset: 0, opacity: 0.4 }}
-          source={preset?.cover?.sizes.large.url ?? require('assets/backgrounds/dark-gradient.png')}
-          contentFit="cover"
-          contentPosition="center"
-          blurRadius={20}
-        />
-        {isPremium && <View style={{
-          alignItems: 'center',
-          justifyContent: 'center',
-          flex: 1,
-        }}>
-          <Text.H3 color={Colors.primary[500]} style={{ maxWidth: '65%', textAlign: 'center' }}>
-            Unlock
-          </Text.H3>
-          <Text.Lg color={Colors.neutral[50]} weight={600}
-            style={{
-              maxWidth: '55%',
-              textAlign: 'center',
-              marginTop: 16,
-            }}
-          >
-            Get access to this image for {cost} credits
-          </Text.Lg>
-          <Button
-            variant="primary"
-            style={{ marginTop: 32 }}
-            align="center"
-            startIcon={Lock}
-            isLoading={isLoading}
-            onPress={async () => {
-              if (!preset) return;
-              if (!photoshoot) return;
-
-              const friendId = photoshoot.userIds?.find((id) => id !== photoshoot.userId) ?? null;
-              const outfitId = photoshoot.outfitId;
-
-              await action({
-                generationId: photoshoot._id,
-                presetId: preset._id,
-                numberToGenerate: 1,
-                extraUserIds: friendId ? [friendId] : undefined,
-                outfit: outfitId ? {
-                  _id: outfitId,
-                  size: outfitSize
-                } : undefined,
-              });
-            }}
-          >
-            Unlock
-          </Button>
-        </View>}
-        {!isPremium && <View style={{
-          alignItems: 'center',
-          justifyContent: 'center',
-          flex: 1,
-        }}>
-          <Text.H3 color={Colors.primary[500]} style={{ maxWidth: '65%', textAlign: 'center' }}>
-            Unlock
-          </Text.H3>
-          <Text.Lg color={Colors.neutral[50]} weight={600}
-            style={{
-              maxWidth: '55%',
-              textAlign: 'center',
-              marginTop: 16,
-            }}
-          >
-            Get access to this image and way more
-          </Text.Lg>
-          <Button
-            variant="primary"
-            style={{ marginTop: 32 }}
-            align="center"
-            startIcon={Lock}
-            onPress={() => push(ROUTES.MODALS.UPGRADE)}
-          >
-            Unlock
-          </Button>
-        </View>}
-      </Pressable>
-      <View style={{
-        marginTop: 8,
-        paddingHorizontal: 8,
-        justifyContent: 'space-between',
-        flexDirection: 'row',
-      }}>
-        <Text.Sm color={Colors.neutral[400]} style={{
-          transform: [{ scale: 1.2 }],
-          transformOrigin: 'left top',
-        }}>
-          Locked
-        </Text.Sm>
-        <Lock size={18} color={Colors.primary[500]} />
-      </View>
     </View>
   )
 }
@@ -304,7 +170,7 @@ export default function Screen() {
         </Text.H1>
         <Text.Base color={Colors.neutral[400]} style={{ marginTop: 8, textAlign: 'center' }} weight={500}>
           {currentStatus === 'LOADING' ? "This can take up to two minutes." :
-            currentStatus === 'READY' ? "Save the images you want in your library." :
+            currentStatus === 'READY' ? "Save the generations you like in your library." :
               "Unlock more generations."}
         </Text.Base>
       </View>
