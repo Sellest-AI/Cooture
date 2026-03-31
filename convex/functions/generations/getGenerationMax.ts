@@ -1,9 +1,19 @@
 import { notEmpty } from "@shared/utils";
-import { Id } from "../../_generated/dataModel";
+import { Doc, Id } from "../../_generated/dataModel";
 import { QueryCtx } from "../../procedures";
 import { getImage } from "../images";
 import { getItem } from "../items/getItem";
 import { getUserPublic } from "../users";
+
+const checkIfVideosOnly = (predictions: Doc<'predictions'>[]) => {
+  const completedPredictions = predictions.filter((p) => p.status === 'ACCEPTED' || p.status === 'REJECTED');
+  const pendingPredictions = predictions.filter((p) => p.status === 'LOADING');
+
+  const completedAreVideos = completedPredictions.every((p) => !!p.videoId);
+  const pendingAreVideos = pendingPredictions.every((p) => !!p.imageId);
+
+  return completedAreVideos && pendingAreVideos;
+}
 
 export const getGenerationMax = async (ctx: QueryCtx, generationId: Id<'generations'>) => {
   const generation = await ctx.db.get(generationId);
@@ -53,9 +63,7 @@ export const getGenerationMax = async (ctx: QueryCtx, generationId: Id<'generati
   const coverId = predictions[0].imageId ?? predictions.find((x) => x.imageId)?.imageId;
   const firstPredictionId = predictions[0]._id;
 
-  const isVideosOnly = predictions
-    .filter((p) => p.status === 'ACCEPTED' || p.status === 'REJECTED')
-    .every(p => !!p.videoId);
+  const isVideosOnly = checkIfVideosOnly(predictions);
 
   return {
     firstPredictionId,

@@ -63,7 +63,7 @@ const generateFunction = async (ctx: ActionCtx, args: {
     // Add new predictions to existing generation (for multi-step photoshoot)
     await ctx.runMutation(internal.router.generations.newPredictions._internal, {
       generationId: args.generationId,
-      predictionIds: predictions.map(p => p.id),
+      predictions: predictions.map(p => ({ id: p.id })),
     }) :
     // Create new generation
     await ctx.runMutation(internal.router.generations.createOne._internal, {
