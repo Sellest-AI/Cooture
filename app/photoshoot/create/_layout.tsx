@@ -1,4 +1,4 @@
-import { useRoute } from "@/hooks";
+import { useRoute, useRouter } from "@/hooks";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
 import { Badge } from "@ui/badge";
 import { Image } from "@ui/image";
@@ -8,7 +8,7 @@ import { SafeAreaView } from "@ui/safe-area-view";
 import { Skeleton } from "@ui/skeleton";
 import { Stepper } from "@ui/stepper";
 import { Text } from "@ui/text";
-import { router, Slot, usePathname } from "expo-router";
+import { router, Slot } from "expo-router";
 import { MotiView } from "moti";
 import { Platform, View } from "react-native";
 import { Colors } from "theme";
@@ -27,11 +27,10 @@ export default function Layout() {
     }
   });
 
-  const pathname = usePathname();
-  const step = (
-    (pathname === '/photoshoot/create/recap') ||
-    (pathname.startsWith('/photoshoot/generations'))
-  ) ? 2 : 1;
+  const { pathname, previousPathname } = useRouter.Path();
+  const path = pathname.startsWith('/photoshoot/create') ? pathname : previousPathname;
+
+  const step = path?.includes('/photoshoot/create/recap') ? 2 : 1;
 
   const title = step === 1 ? "Preset" : "Recap";
   const subtitle = step === 1 ?

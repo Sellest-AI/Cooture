@@ -6,6 +6,7 @@ import { Redirect as ExpoRedirect, Href, Route, router, useFocusEffect, useLocal
 import { NavigationOptions } from "expo-router/build/global-state/routing";
 import { atom, getDefaultStore, useAtom } from "jotai";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { usePrevious } from "./usePrevious";
 
 type ParamsDefault<T extends Route> =
   T extends "/photoshoot/create" ? { outfitId?: Id<'outfits'> | null, presetId?: Id<'presets'> | null, userId?: Id<'users'> | null } :
@@ -297,10 +298,20 @@ const Redirect = <T extends Route>({ href, currentRoute, ...props }: { href: T, 
   return (<ExpoRedirect href={path} />)
 }
 
-useRoute.Path = usePathname;
+const usePathnameExtended = () => {
+  const pathname = usePathname();
+  const previousPathname = usePrevious(pathname);
+
+  return {
+    pathname,
+    previousPathname
+  }
+}
+
+useRoute.Path = usePathnameExtended;
 useRoute.Params = useLocalSearchParams;
 
-useRouter.Path = usePathname;
+useRouter.Path = usePathnameExtended;
 
 export const Router = () => { }
 Router.Redirect = Redirect;
