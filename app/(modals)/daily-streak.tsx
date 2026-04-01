@@ -416,6 +416,7 @@ export default function Screen() {
             else { router.replace(ROUTES.TABS.FEED); }
 
             setTimeout(() => { claim().catch(() => null); }, 800);
+            return true; // We navigate away, prevent resetting to prevent Fabric layout crash
           }}
         >
           Slide to claim

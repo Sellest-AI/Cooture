@@ -34,17 +34,22 @@ export default function Screen() {
         onBack={router.canGoBack() ? router.back : undefined}
         style={{ marginBottom: 20 }}
       />
-      {!image && <Skeleton
-        style={{ width: '100%', aspectRatio: 3 / 4, borderRadius: 28 }}
-      />}
-      {image && <Image
-        source={image?.sizes.large.url}
-        style={{
-          width: '100%',
-          aspectRatio: 3 / 4,
-          borderRadius: 28
-        }}
-      />}
+      {!image ? (
+        <Skeleton
+          key="skeleton"
+          style={{ width: '100%', aspectRatio: 3 / 4, borderRadius: 28 }}
+        />
+      ) : (
+        <Image
+          key="image"
+          source={image.sizes.large.url}
+          style={{
+            width: '100%',
+            aspectRatio: 3 / 4,
+            borderRadius: 28
+          }}
+        />
+      )}
       <View style={{
         flex: 1,
         justifyContent: 'flex-end',
@@ -56,11 +61,12 @@ export default function Screen() {
           onComplete={async () => {
             if (!canPay) {
               router.push(ROUTES.MODALS.UPGRADE);
-              return;
+              return false; // Did not succeed, remain on screen, slider should reset
             }
 
             const generationId = await action({ predictionId });
-            router.dismissTo(ROUTES.GENERATIONS.VIDEO.ID(generationId));
+            router.replace(ROUTES.GENERATIONS.VIDEO.ID(generationId));
+            return true;
           }}
         >
           Generate video

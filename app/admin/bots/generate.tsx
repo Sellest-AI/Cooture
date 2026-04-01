@@ -227,8 +227,8 @@ export default function Screen() {
           disabled={!userId}
           startIcon={Camera}
           onComplete={async () => {
-            if (!presetId) return;
-            if (!userId) return;
+            if (!presetId) return false;
+            if (!userId) return false;
 
             const generationId = await action({
               userId: userId,
@@ -242,6 +242,7 @@ export default function Screen() {
             });
 
             dismissTo(`/admin/bots/generations/images/[id]`, { pathParams: { id: generationId } });
+            return true;
           }}
         >
           Slide to generate

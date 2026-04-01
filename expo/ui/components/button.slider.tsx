@@ -2,20 +2,19 @@ import * as Haptics from 'expo-haptics';
 import React, { ComponentProps, useRef, useState } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { runOnJS } from "react-native-worklets";
 import { Colors } from "theme";
 import { Button } from "./button";
 import { ChevronRight, Loader } from "./icons";
 
 type Props = {
-  onComplete?: () => Promise<void> | void;
+  onComplete?: () => Promise<boolean> | boolean;
   startIcon?: ComponentProps<typeof Button>['startIcon'];
   endIcon?: ComponentProps<typeof Button>['endIcon'];
   children?: ComponentProps<typeof Button>['children'];
   disabled?: boolean;
 };
 
-export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disabled }: Props) => {
+export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disabled: _disabled }: Props) => {
   const [layoutWidth, setLayoutWidth] = useState<number | null>(null);
   const TRACK_HEIGHT = 52;
   const KNOB_WIDTH = 170;
@@ -28,8 +27,9 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
   const knobWidth = useRef<number>(KNOB_WIDTH);
   const knobOpacity = useRef(new Animated.Value(1)).current;
   const knobScale = useRef(new Animated.Value(1)).current;
-  const [showLoader, setShowLoader] = useState(false);
-  const showLoaderRef = useRef(false);
+
+  const [loading, setLoading] = useState(false);
+  const disabled = _disabled || loading;
 
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
@@ -42,28 +42,33 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
 
   const reset = () => {
     completed.current = false;
+    setLoading(false);
     Animated.parallel([
       Animated.timing(translateX, { toValue: 0, duration: 180, useNativeDriver: false }),
       Animated.timing(knobOpacity, { toValue: 1, duration: 180, useNativeDriver: false }),
       Animated.timing(knobScale, { toValue: 1, duration: 180, useNativeDriver: false }),
-    ]).start(({ finished }) => {
-      if (finished) currentX.current = 0;
-    });
+    ]).start(({ finished }) => { if (finished) currentX.current = 0; });
   };
 
   const sharedFinish = async ({ finished, max }: { finished: boolean; max: number }) => {
-    if (showLoaderRef.current) return;
-    if (finished) {
-      currentX.current = max;
-      showLoaderRef.current = true;
-      setShowLoader(true);
-      await onCompleteRef.current?.();
-      requestAnimationFrame(() => {
-        showLoaderRef.current = false;
-        setShowLoader(false);
-        reset();
-      });
+    if (loading) return;
+    if (!finished) return;
+
+    currentX.current = max;
+    setLoading(true);
+
+    let shouldReset = true;
+    try {
+      const result = await onCompleteRef.current?.();
+      if (result === true) shouldReset = false;
+    } catch (error) {
+      console.error("ButtonSlider onComplete error:", error);
+      shouldReset = true;
     }
+
+    if (!shouldReset) return;
+
+    requestAnimationFrame(() => { reset(); });
   };
 
   const completeSlide = (max: number, duration = 180) => {
@@ -82,9 +87,7 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
       Animated.spring(translateX, { toValue: 0, useNativeDriver: false }),
       Animated.timing(knobOpacity, { toValue: 1, duration: 120, useNativeDriver: false }),
       Animated.spring(knobScale, { toValue: 1, useNativeDriver: false }),
-    ]).start(({ finished }) => {
-      if (finished) currentX.current = 0;
-    });
+    ]).start(({ finished }) => { if (finished) currentX.current = 0; });
   };
 
   const lastHaptic = useRef(0);
@@ -119,7 +122,7 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
       currentX.current = value;
 
       const pourcent = value / max;
-      runOnJS(triggerHaptic)(pourcent);
+      triggerHaptic(pourcent);
 
       if (value >= max * 0.95) {
         completeSlide(max, 180);
@@ -161,19 +164,15 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
         }]}
       />
 
-      {!showLoader && (
-        <View style={{ position: "absolute", right: 12, flexDirection: "row", alignItems: "center" }}>
-          <ChevronRight color={Colors.primary[900]} style={{ opacity: 0.45, marginRight: -8 }} size={24} />
-          <ChevronRight color={Colors.primary[900]} style={{ opacity: 0.5, marginRight: -8 }} size={24} />
-          <ChevronRight color={Colors.primary[900]} style={{ opacity: 0.6 }} size={24} />
-        </View>
-      )}
+      <View style={{ position: "absolute", right: 12, flexDirection: "row", alignItems: "center", opacity: loading ? 0 : 1 }}>
+        <ChevronRight color={Colors.primary[900]} style={{ opacity: 0.45, marginRight: -8 }} size={24} />
+        <ChevronRight color={Colors.primary[900]} style={{ opacity: 0.5, marginRight: -8 }} size={24} />
+        <ChevronRight color={Colors.primary[900]} style={{ opacity: 0.6 }} size={24} />
+      </View>
 
-      {showLoader && (
-        <View style={{ position: 'absolute', inset: 0, justifyContent: 'center', alignItems: 'center' }}>
-          <Loader color={Colors.primary[900]} />
-        </View>
-      )}
+      <View style={{ position: 'absolute', inset: 0, justifyContent: 'center', alignItems: 'center', opacity: loading ? 1 : 0 }}>
+        <Loader color={Colors.primary[900]} />
+      </View>
 
       <GestureDetector gesture={pan}>
         <Animated.View

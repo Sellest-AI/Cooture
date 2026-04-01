@@ -234,7 +234,6 @@ export default function Screen() {
   const { data: canPay } = useQueryCached(api.router.credits.canPay.authed, cost ? { amount: cost } : 'skip');
   const { outfitId, outfitSize, presetId, friendId, disabled, hasMultipleSubjects } = usePhotoshoot.New();
   const { dismissTo, push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
-  const { forceDismissTo } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
 
   const { action, isLoading } = useAction(api.llm.triggers.photoshoot.authed);
 
@@ -267,12 +266,12 @@ export default function Screen() {
           startIcon={Flame}
           disabled={disabled || isLoading}
           onComplete={async () => {
-            if (!presetId) return;
-            if (disabled) return;
+            if (!presetId) return false;
+            if (disabled) return false;
 
             if (!canPay) {
               push(ROUTES.MODALS.UPGRADE, { redirectHere: true });
-              return;
+              return false;
             }
 
             let cancel = false;
@@ -295,16 +294,18 @@ export default function Screen() {
               } : undefined,
             }).catch(() => null);
 
-            if (cancel) return;
+            if (cancel) return true; // Successfully navigating via timer
 
             cancel = true;
             clearTimeout(timer);
 
-            if (!generationId) return;
+            if (!generationId) return false; // Error creating, reset slider
 
-            forceDismissTo(ROUTES.GENERATIONS.PHOTOSHOOT.PATH, {
+            dismissTo(ROUTES.GENERATIONS.PHOTOSHOOT.PATH, {
               pathParams: { id: generationId },
-            })
+            });
+
+            return true; // Navigating away
           }}
         >
           Slide to generate

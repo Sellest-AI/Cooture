@@ -153,16 +153,18 @@ export default function Screen() {
       <ButtonSlider
         disabled={!imageUri || name.length < 3 || !cost || !canPay}
         onComplete={async () => {
-          if (!imageUri || name.length < 3 || !cost || !canPay) return;
+          if (!imageUri || name.length < 3 || !cost || !canPay) return false;
+
           const compressedImage = await compressImage(imageUri);
           const presetId = await createPreset({
             name,
             base64: await compressedImage.toBase64(),
-          })
+          });
 
-          if (!presetId) return;
+          if (!presetId) return false;
 
-          push(ROUTES.PRESETS.CREATE.THUMBNAIL, { params: { presetId } })
+          push(ROUTES.PRESETS.CREATE.THUMBNAIL, { params: { presetId } });
+          return true; // Navigating away
         }}
       >
         Generate preset

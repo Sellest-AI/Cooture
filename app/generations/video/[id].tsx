@@ -90,8 +90,8 @@ export default function Screen() {
       const nextItem = visibleItems.find(item => item._id !== currentItem.id);
       if (!nextItem) {
         const predictionId = generation?.predictions[0]?._id;
-        if (predictionId) router.dismissTo(ROUTES.POST.ID(predictionId));
-        else router.dismissTo(ROUTES.PROFILE.GENERATIONS);
+        if (predictionId) router.replace(ROUTES.POST.ID(predictionId));
+        else router.replace(ROUTES.PROFILE.GENERATIONS);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -31,10 +31,11 @@ const useWithLoader = <A extends unknown[], R>(fn: (...args: A) => Promise<R>) =
         setError(false);
         setLoading(false);
         return result;
-      } catch {
+      } catch (e) {
         setError(true);
         setSuccess(false);
         setLoading(false);
+        throw (e);
       }
     },
     [fn]
