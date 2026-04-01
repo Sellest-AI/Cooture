@@ -141,7 +141,7 @@ export default function Screen() {
             tintColor={Colors.primary[500]}
             progressViewOffset={top}
           />}
-          onEndReachedThreshold={0.5}
+          onEndReachedThreshold={0.3}
           onEndReached={() => loadMore(24)}
           style={{ flex: empty ? 1 : undefined }}
           showsVerticalScrollIndicator={false}

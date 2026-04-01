@@ -10,6 +10,7 @@ import { Text } from "@ui/text";
 import { mergeLoadMoreArrays, notEmpty } from "@utils/convex-allowed";
 import { router } from "expo-router";
 import { useCallback } from "react";
+import { Platform } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -177,7 +178,7 @@ export default function Screen() {
       style={{
         padding: 12,
         paddingHorizontal: 8,
-        paddingTop: 0,
+        paddingTop: Platform.OS !== 'ios' ? 12 : 0,
         flex: isEmpty ? 1 : undefined
       }}
       stickyHeaderIndices={[0]}

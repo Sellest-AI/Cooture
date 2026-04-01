@@ -12,6 +12,7 @@ import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import { Redirect, router } from "expo-router";
 import { useCallback, useMemo } from "react";
+import { Platform } from "react-native";
 import { Colors } from "theme";
 
 export default function Screen() {
@@ -60,7 +61,13 @@ export default function Screen() {
     return <Redirect href={ROUTES.TABS.DISCOVER} />
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={{ bottom: 'android' }}>
+    <SafeAreaView
+      edges={{ bottom: 'android' }}
+      style={{
+        flex: 1,
+        paddingTop: Platform.OS !== 'ios' ? 12 : 0,
+      }}
+    >
       <ModalHeader
         style={{
           backgroundColor: Colors.background,

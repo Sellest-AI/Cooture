@@ -43,7 +43,7 @@ type Props = {
 
 export function Screen({ user, isSelf, recentPosts, style }: Props) {
   const { back, push } = useRouter(ROUTES.USER.PATH);
-  const path = useRouter.Path();
+  const { pathname: path } = useRouter.Path();
   const slotRef = useRef<LayoutRectangle | null>(null);
   const scrollRef = useRef<ScrollView>(null);
   useScrollToTop(scrollRef);
@@ -71,6 +71,7 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
       .replaceAll('/outfits', '/[tabs]')
       .replaceAll('/items', '/[tabs]')
       .replaceAll('[tabs]', tab)
+
     router.replace(newPath as Href);
     // Scroll to the beginning of the slot content
     setTimeout(() => {
