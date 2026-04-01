@@ -99,6 +99,7 @@ import type * as llm_tools_itemCategorizer from "../llm/tools/itemCategorizer.js
 import type * as llm_tools_photoshootPrompter from "../llm/tools/photoshootPrompter.js";
 import type * as llm_tools_presetCreator from "../llm/tools/presetCreator.js";
 import type * as llm_tools_profilePictureGenerator from "../llm/tools/profilePictureGenerator.js";
+import type * as llm_tools_videoPrompter from "../llm/tools/videoPrompter.js";
 import type * as llm_triggers_generateDepthMap from "../llm/triggers/generateDepthMap.js";
 import type * as llm_triggers_generateFace from "../llm/triggers/generateFace.js";
 import type * as llm_triggers_generateVideo from "../llm/triggers/generateVideo.js";
@@ -362,6 +363,7 @@ declare const fullApi: ApiFromModules<{
   "llm/tools/photoshootPrompter": typeof llm_tools_photoshootPrompter;
   "llm/tools/presetCreator": typeof llm_tools_presetCreator;
   "llm/tools/profilePictureGenerator": typeof llm_tools_profilePictureGenerator;
+  "llm/tools/videoPrompter": typeof llm_tools_videoPrompter;
   "llm/triggers/generateDepthMap": typeof llm_triggers_generateDepthMap;
   "llm/triggers/generateFace": typeof llm_triggers_generateFace;
   "llm/triggers/generateVideo": typeof llm_triggers_generateVideo;

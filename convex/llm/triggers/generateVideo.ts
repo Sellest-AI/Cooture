@@ -6,6 +6,7 @@ import { Doc, Id } from "../../_generated/dataModel";
 import { ActionCtx, internalAction } from "../../_generated/server";
 import { CREDITS_CONFIG } from "../../functions/credits";
 import { authAction } from "../../procedures";
+import { videoPrompter } from "../tools/videoPrompter";
 
 type Generation = Doc<'generations'> & {
   presetId?: Id<'presets'>;
@@ -42,7 +43,7 @@ export const handler = async (ctx: ActionCtx, { generation, predictionId, newGen
   const image = await ctx.runQuery(internal.router.storage.images.getOne._internal, { id: imageId });
   if (!image) throw new Error("Image not found");
 
-  const prompt = "Make the scene alive";
+  const prompt = await videoPrompter.handler({ ...ctx }, { imageUrl: image.sizes.large.url });
 
   const run = await generateVideo({
     imageUrl: image.url,

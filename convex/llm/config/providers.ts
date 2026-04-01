@@ -22,16 +22,16 @@ const openrouterGptOss120b = {
   })
 }
 
-const openrouterQwen3vl8b = {
+const openrouterQwen359b = {
   pricing: {
-    inputTokens: 0.12,
-    outputTokens: 0.60,
+    inputTokens: 0.05,
+    outputTokens: 0.15,
   },
   providerOptions: {
     openrouter: {
       provider: {
-        only: ["novita/fp8", "parasail/bf16"],
-        order: ["novita/fp8", "parasail/bf16"],
+        only: ["venice/fp8", "together"],
+        order: ["venice/fp8", "together"],
         allow_fallbacks: true,
       }
     }
@@ -43,9 +43,12 @@ const openrouterGrok41fast = {
     inputTokens: 0.2,
     outputTokens: 0.5,
   },
-  providerOptions: {
+  providerOptions: (options: { effort: 'none' | 'high' }) => ({
     openrouter: {
-      reasoning: {
+      reasoning: options.effort === 'none' ? {
+        enabled: true,
+        effort: 'none'
+      } : {
         enabled: true,
         effort: "high"
       },
@@ -53,7 +56,7 @@ const openrouterGrok41fast = {
         allow_fallbacks: true,
       }
     }
-  }
+  })
 }
 
 const openrouterGemini31pro = {
@@ -116,7 +119,7 @@ export const providerOptions = {
     gemini31pro: openrouterGemini31pro,
     gemini3flash: openrouterGemini3flash,
     gptOss120b: openrouterGptOss120b,
-    qwen3vl8b: openrouterQwen3vl8b,
+    qwen359b: openrouterQwen359b,
     grok41fast: openrouterGrok41fast,
   },
 }

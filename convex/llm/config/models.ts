@@ -15,7 +15,7 @@ const grok41fast = openrouter.chat("x-ai/grok-4.1-fast");
 const gptOss120b = openrouter.chat("openai/gpt-oss-120b");
 
 // Vision support
-const qwen3vl8b = openrouter.chat("qwen/qwen3-vl-8b-instruct");
+const qwen359b = openrouter.chat("qwen/qwen3.5-9b");
 
 export const models = {
   orchestrator: {
@@ -42,8 +42,12 @@ export const models = {
       ...providerOptions.openrouter.gemini3flash,
     },
     mini: {
-      model: qwen3vl8b,
-      ...providerOptions.openrouter.qwen3vl8b
+      model: grok41fast,
+      ...providerOptions.openrouter.grok41fast
+    },
+    nano: {
+      model: qwen359b,
+      ...providerOptions.openrouter.qwen359b
     }
   },
   reasoning: {
