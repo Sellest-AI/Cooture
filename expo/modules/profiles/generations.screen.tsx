@@ -46,7 +46,8 @@ export function Screen() {
         style={{ paddingVertical: 72 }}
         icon={ImageIcon}
         title="No Generations Yet"
-        description="You haven't generated any photoshoots yet. Start creating your AI looks to see them gathered here."
+        description={!isOwnProfile ? "This user hasn't generated any images yet." :
+          "You haven't generated any photoshoots yet. Start creating your AI looks to see them gathered here."}
         cta={isOwnProfile && {
           label: "New Photoshoot",
           onPress: () => push(ROUTES.PHOTOSHOOT.NEW)

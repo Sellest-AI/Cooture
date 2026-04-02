@@ -26,7 +26,8 @@ export function Screen() {
         style={{ paddingVertical: 72 }}
         icon={HoodieIcon}
         title="No Outfits Yet"
-        description="You haven't created any outfits yet. Start mixing and matching to see your creations appear here."
+        description={!isOwnProfile ? "This user hasn't created any outfits yet." :
+          "You haven't created any outfits yet. Start mixing and matching to see your creations appear here."}
         cta={isOwnProfile && {
           label: "Create an outfit",
           onPress: () => router.push(ROUTES.MODALS.NEW_OUTFIT)
