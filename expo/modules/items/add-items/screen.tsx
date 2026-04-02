@@ -95,7 +95,7 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
               return <>
                 <SearchInput
                   value={query}
-                  onValueChange={setQuery}
+                  onBlur={setQuery}
                   isLoading={isLoading}
                   style={{
                     marginHorizontal: PADDING_HORIZONTAL

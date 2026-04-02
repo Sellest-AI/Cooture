@@ -12,7 +12,8 @@ type Props = {
   autoFocus?: boolean;
   startIcon?: React.ComponentType<{ size?: number, color?: string, style?: SvgProps['style'] }>;
   canClear?: boolean;
-} & Omit<ComponentProps<typeof NativeTextInput>, 'style'>;
+  onBlur?: (value: string) => void;
+} & Omit<ComponentProps<typeof NativeTextInput>, 'style' | 'onBlur'>;
 
 export const TextInput = ({ className = "", style, startIcon, canClear, autoFocus, ...props }: Props) => {
   const hasIcon = !!startIcon;
@@ -55,6 +56,7 @@ export const TextInput = ({ className = "", style, startIcon, canClear, autoFocu
       </View>}
       <NativeTextInput
         {...props}
+        onBlur={() => props.onBlur?.(props.value?.toString() ?? '')}
         autoFocus={autoFocus}
         onLayout={autoFocus ? (e) => e.currentTarget.focus() : undefined}
         placeholderTextColor={Colors.neutral[400]}
@@ -70,7 +72,10 @@ export const TextInput = ({ className = "", style, startIcon, canClear, autoFocu
         }]}
       />
       {canClear && <Pressable
-        onPress={() => { props.onChangeText?.(''); }}
+        onPress={() => {
+          if (props.onBlur) props.onBlur('')
+          else props.onChangeText?.('')
+        }}
         style={{ marginLeft: 4, paddingLeft: 8, paddingVertical: 8, paddingRight: 8 }}
       >
         <X

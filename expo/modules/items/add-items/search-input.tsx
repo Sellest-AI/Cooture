@@ -8,10 +8,11 @@ type Props = {
   style?: ViewStyle;
   isLoading?: boolean;
   onValueChange?: (value: string) => void;
+  onBlur?: (value: string) => void;
   value?: string;
 }
 
-export const SearchInput = ({ value, style, isLoading, onValueChange }: Props) => {
+export const SearchInput = ({ value, style, isLoading, onValueChange, onBlur }: Props) => {
   // Search
   const [search, setSearch] = useState(value ?? "");
   const debouncedSearch = useDebounce(search, 800);
@@ -28,6 +29,7 @@ export const SearchInput = ({ value, style, isLoading, onValueChange }: Props) =
       startIcon={isLoading ? Loader : Search}
       value={search}
       onChangeText={setSearch}
+      onBlur={onBlur}
       placeholder="Search for items..."
       style={style}
       canClear
