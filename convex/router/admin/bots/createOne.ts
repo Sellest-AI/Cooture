@@ -1,6 +1,6 @@
 import { createCustomer } from "@/lib/stripe";
 import { v } from "convex/values";
-import { internal } from "../../../_generated/api";
+import { api, internal } from "../../../_generated/api";
 import { Id } from "../../../_generated/dataModel";
 import { createUserWallet } from "../../../functions/credits";
 import { adminAction, internalMutation } from "../../../procedures";
@@ -36,6 +36,12 @@ export const admin = adminAction({
     })
   },
   handler: async (ctx, args): Promise<Id<'users'>> => {
+    const { available, sanitizedUsername } = await ctx.runQuery(api.router.users.checkUsername.anon, {
+      username: args.username,
+    });
+
+    if (!available) throw new Error("Username is already taken");
+
     const extractImage = (url: string) => {
       if (url.startsWith('http')) return { url };
       return { base64: url }
@@ -51,6 +57,7 @@ export const admin = adminAction({
     const user = await ctx.runMutation(internal.router.admin.bots.createOne._internal_step_1, {
       ...shared,
       image: profileImages[0].url,
+      username: sanitizedUsername,
     });
 
     // Stripe User
@@ -73,6 +80,7 @@ export const admin = adminAction({
     // Appearance
     await ctx.runMutation(internal.router.admin.bots.createOne._internal_step_2, {
       ...shared,
+      username: sanitizedUsername,
       userId: user,
       stripeCustomerId: stripeCustomer.id,
       images: {
