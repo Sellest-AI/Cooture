@@ -319,7 +319,7 @@ export default function Screen() {
           router.back();
           reset();
         }}
-        disabled={!images}
+        disabled={!images || !identity}
         variant="primary"
         style={{
           position: 'absolute',

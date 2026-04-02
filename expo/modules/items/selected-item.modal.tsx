@@ -34,38 +34,40 @@ export const SelectedItemModal = ({ itemId, onRemove, ...props }: SelectedItemMo
           animate={false}
           style={{ height: 256 }}
         />}
-        <MenuGroup title="Danger" style={{ marginTop: 24 }}>
-          {onRemove && <MenuItem
-            icon={Trash}
-            text="Remove"
-            onPress={onRemove}
-            variant="destructive"
-          />}
-        </MenuGroup>
-        <MenuGroup title="More actions">
-          <MenuItem
-            icon={User}
-            text="User profile"
-            onPress={!item ? undefined : () => { router.push(ROUTES.USER.ID(item.userId)); close(); }}
-          />
-          {item?.link && <MenuItem
-            icon={Globe}
-            text="View on website"
-            onPress={!item?.link ? undefined : () => { Linking.openURL(item.link!); close(); }}
-          />}
-          <MenuItem
-            icon={ExternalLink}
-            text="View details"
-            onPress={!item ? undefined : () => { router.push(ROUTES.ITEM.ID(item._id)); close(); }}
-          />
-        </MenuGroup>
-        <Button
-          style={{ marginTop: 8 }}
-          variant="blur"
-          onPress={() => close()}
-        >
-          Close
-        </Button>
+        <View style={{ flex: 1, justifyContent: 'flex-end', marginTop: 24 }}>
+          {onRemove && <MenuGroup title="Danger">
+            <MenuItem
+              icon={Trash}
+              text="Remove"
+              onPress={onRemove}
+              variant="destructive"
+            />
+          </MenuGroup>}
+          <MenuGroup title="More actions">
+            <MenuItem
+              icon={User}
+              text="User profile"
+              onPress={!item ? undefined : () => { router.push(ROUTES.USER.ID(item.userId)); close(); }}
+            />
+            {item?.link && <MenuItem
+              icon={Globe}
+              text="View on website"
+              onPress={!item?.link ? undefined : () => { Linking.openURL(item.link!); close(); }}
+            />}
+            <MenuItem
+              icon={ExternalLink}
+              text="View details"
+              onPress={!item ? undefined : () => { router.push(ROUTES.ITEM.ID(item._id)); close(); }}
+            />
+          </MenuGroup>
+          <Button
+            style={{ marginTop: 8 }}
+            variant="blur"
+            onPress={() => close()}
+          >
+            Close
+          </Button>
+        </View>
       </View>}
     </Modal>
   )

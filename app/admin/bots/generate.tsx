@@ -237,7 +237,7 @@ export default function Screen() {
               extraUserIds: duoId ? [duoId] : undefined,
               outfit: outfitId ? {
                 _id: outfitId,
-                size: "LOOSE"
+                size: "DEFAULT"
               } : undefined,
             });
 

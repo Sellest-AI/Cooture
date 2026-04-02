@@ -408,7 +408,7 @@ export default function ItemScreen() {
         </View>}
       </View>
       <SelectedItemModal
-        onRemove={items.length > 1 ? () => {
+        onRemove={(editable && items.length > 1) ? () => {
           setSelectedItem(null);
           setItems((p) => p.filter(x => x._id !== selectedItem))
         } : undefined}

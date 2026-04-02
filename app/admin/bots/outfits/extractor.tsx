@@ -21,7 +21,7 @@ const Save = ({ items }: { items: Item[] }) => {
   const { userId } = useRoute(ROUTES.ADMIN.BOTS.OUTFITS.EXTRACTOR);
 
   const { action: removeBackground } = useAction(api.llm.triggers.removeBackground.admin);
-  const { mutate } = useMutation(api.router.outfits.createOne.admin);
+  const { mutate: createOutfit } = useMutation(api.router.outfits.createOne.admin);
 
   const [startedAt, setStartedAt] = useState<number>();
   const [completed, setCompleted] = useState(false);
@@ -65,7 +65,8 @@ const Save = ({ items }: { items: Item[] }) => {
 
     // If already completed, do nothing
     if (completed) {
-      await mutate({ userId, items: newItems.map((i) => i._id) });
+      await createOutfit({ userId, items: newItems.map((i) => i._id) });
+      setSaving(false);
       if (router.canGoBack()) router.back();
       return;
     }
@@ -73,7 +74,7 @@ const Save = ({ items }: { items: Item[] }) => {
     setStartedAt(Date.now());
     setPendingItems(items);
     for (const item of items) {
-      await saveItem(item);
+      await saveItem(item).catch(() => null);
     }
   }
 

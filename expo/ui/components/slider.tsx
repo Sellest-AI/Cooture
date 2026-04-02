@@ -177,18 +177,17 @@ export const Slider = ({ value, label, labels, onValueChange, style, customHeigh
         clamp: [0, maxTranslation],
         deceleration: 0.7,
       }, (finished) => {
-        if (finished) {
-          // After decay, snap to closest label
-          const normalizedValue = maxTranslation > 0 ? translationX.value / maxTranslation : 0;
-          const actualValue = normalizedToValue(normalizedValue);
-          const closestValue = findClosestLabel(actualValue);
-          const closestNormalized = valueToNormalized(closestValue);
-          translationX.value = withSpring(closestNormalized * maxTranslation, {
-            damping: 40,
-            stiffness: 300,
-          });
-          runOnJS(updateValue)(closestNormalized * maxTranslation);
-        }
+        if (!finished) return;
+        // After decay, snap to closest label
+        const normalizedValue = maxTranslation > 0 ? translationX.value / maxTranslation : 0;
+        const actualValue = normalizedToValue(normalizedValue);
+        const closestValue = findClosestLabel(actualValue);
+        const closestNormalized = valueToNormalized(closestValue);
+        translationX.value = withSpring(closestNormalized * maxTranslation, {
+          damping: 40,
+          stiffness: 300,
+        });
+        runOnJS(updateValue)(closestNormalized * maxTranslation);
       });
     });
 
@@ -197,6 +196,7 @@ export const Slider = ({ value, label, labels, onValueChange, style, customHeigh
     const maxTranslation = width - KNOB_SIZE;
     const normalizedValue = valueToNormalized(value);
     translationX.value = normalizedValue * maxTranslation;
+    innerValue.current = value;
   }, [KNOB_SIZE, translationX, value, valueToNormalized, width])
 
   // Animated styles for the knob
