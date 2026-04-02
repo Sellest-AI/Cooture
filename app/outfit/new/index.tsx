@@ -12,7 +12,21 @@ import { MotiView } from "moti";
 import { Platform, StyleSheet, View } from "react-native";
 import { Colors } from "theme";
 
+import AddItemScreen from "@/modules/items/add-items/screen";
+
 export default function Screen() {
+  return (
+    <SafeAreaView
+      style={{ flex: 1 }}
+      edges={{ bottom: 'off' }}
+    >
+      <AddItemScreen />
+    </SafeAreaView>
+  )
+}
+
+/** @deprecated */
+function DeprecatedScreen() {
   const { push, replace } = useRouter();
 
   const { wallet } = useAccount.Wallet();

@@ -20,7 +20,7 @@ export default function NewOutfitScreen() {
   const [init, setInit] = useState(false);
   const { reset, setItems, name, setName, items: itemIds, saveOutfit } = useOutfit.New();
   const { push, redirect } = useRouter("/new-outfit");
-  useRoute("/new-outfit", {
+  const { redirectTo } = useRoute("/new-outfit", {
     onInit: ({ itemIds }) => { setItems(itemIds ?? []); setInit(true); },
     resetFnc: reset,
   });
@@ -119,6 +119,17 @@ export default function NewOutfitScreen() {
             disabled={itemIds.length < 2}
             onPress={async () => {
               const outfit = await saveOutfit();
+
+              if (redirectTo === ROUTES.OUTFIT.PATH) {
+                redirect({
+                  pathParams: { id: outfit },
+                  fallbackTo: ['back', ROUTES.OUTFIT.ID(outfit)],
+                  resetNextRoute: true
+                })
+
+                return;
+              }
+
               redirect({
                 params: { outfitId: outfit },
                 fallbackTo: ['back', ROUTES.OUTFIT.ID(outfit)],

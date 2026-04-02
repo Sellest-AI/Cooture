@@ -29,14 +29,14 @@ export const ItemsValidator = ({ onPress, items, onItemRemoved, disabled, onOpen
       animate={{
         transform: [{
           translateY:
-            items.length > 0 ? 0 : ITEM_HEIGHT + 58
+            items.length > 0 ? 0 : ITEM_HEIGHT + 58 + 24
         }],
       }}
       transition={{ delay: items.length > 0 ? 100 : 200 }}
     >
       <Block
         variant="blur"
-        blurIntensity={48}
+        blurIntensity={64}
         style={{
           paddingBottom: 12,
           borderRadius: isOpen ? 28 : 24,
@@ -94,8 +94,8 @@ export const ItemsValidator = ({ onPress, items, onItemRemoved, disabled, onOpen
                 flexDirection: 'row',
                 alignItems: 'center',
                 paddingVertical: 8,
-                paddingRight: 24,
                 marginLeft: 8,
+                flex: 1,
               }}>
               <Text.Base color={Colors.neutral[400]} weight={500}>{items.length} selected</Text.Base>
               <MotiView animate={{

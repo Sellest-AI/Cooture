@@ -5,13 +5,15 @@ import { Block } from "@ui/block";
 import { EmptyBlock } from "@ui/block.empty";
 import { CardItem } from "@ui/cards/card-item";
 import { FlashList, FlashListRef } from "@ui/flat-list";
+import { Col, Grid } from "@ui/grid";
 import { Camera, Globe, TShirt } from "@ui/icons";
 import { ModalHeader } from "@ui/modal";
 import { Pressable } from "@ui/pressable";
 import { SafeAreaView } from "@ui/safe-area-view";
+import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
 import { normalizeArray, notEmpty } from "@utils/convex-allowed";
-import { router } from "expo-router";
+import { Route, router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { Colors } from "theme";
@@ -37,7 +39,9 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
   // UI
   const listRef = useRef<FlashListRef<typeof results[number] | string>>(null);
   const [validatorOpen, setValidatorOpen] = useState(innerItems.length > 0);
-  const { redirect, dismissTo } = useRouter("/add-item");
+
+  const { pathname } = useRoute.Path();
+  const { redirect, push } = useRouter(pathname as Route);
 
   return (
     <SafeAreaView
@@ -52,19 +56,34 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
             onBack={router.canGoBack() ? () => { router.back() } : undefined}
             style={{ marginBottom: 0, marginTop: 16 }}
           />
-          <View style={{ flexDirection: 'row', gap: 8, marginTop: 12, marginBottom: 4, display: 'none' }}>
+          <View style={{ flexDirection: 'row', gap: 8, marginTop: 12, marginBottom: 4, }}>
             <HeaderButton
               icon={Camera}
               label="Import item"
-              onPress={() => { }}
+              onPress={() => push(ROUTES.SCAN, { forwardRedirect: true })}
             />
             <HeaderButton
               icon={Globe}
               label="Search online"
-              onPress={() => { }}
+              onPress={() => push(ROUTES.OUTFIT.BROWSER, { forwardRedirect: true })}
             />
           </View>
         </View>}
+        ListFooterComponent={(isLoading && results.length === 0) ? <Grid style={{
+          height: 0,
+          flex: 1,
+          paddingHorizontal: PADDING_HORIZONTAL,
+          gap: 24
+        }}>
+          <Col>
+            <Skeleton style={{ marginBottom: 28, height: 300 }} />
+            <Skeleton style={{ marginBottom: 28, height: 300 }} />
+          </Col>
+          <Col>
+            <Skeleton style={{ marginBottom: 28, height: 200 }} />
+            <Skeleton style={{ marginBottom: 28, height: 400 }} />
+          </Col>
+        </Grid> : undefined}
         stickyHeaderIndices={[0]}
         stickyHeaderHiddenOnScroll={true}
         stickyHeaderConfig={{
@@ -155,9 +174,9 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
       />
       <View style={{
         position: 'absolute',
-        left: 0,
-        right: 0,
-        bottom: 0,
+        left: 8,
+        right: 8,
+        bottom: 8
       }}>
         <ItemsValidator
           open={validatorOpen}
@@ -170,7 +189,7 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
           })}
           onPress={async (items) => {
             if (mode === 'new') {
-              dismissTo(ROUTES.MODALS.NEW_OUTFIT, {
+              push(ROUTES.MODALS.NEW_OUTFIT, {
                 forwardRedirect: true,
                 params: { itemIds: items }
               });

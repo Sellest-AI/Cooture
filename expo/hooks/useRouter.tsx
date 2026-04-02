@@ -316,3 +316,5 @@ useRouter.Path = usePathnameExtended;
 export const Router = () => { }
 Router.Redirect = Redirect;
 
+export type { Route } from "expo-router";
+

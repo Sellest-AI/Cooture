@@ -49,7 +49,7 @@ const Actions = () => {
           backgroundColor: Colors.secondary[500],
         }}
         onPress={() => {
-          push(ROUTES.OUTFIT.NEW);
+          push(ROUTES.OUTFIT.NEW, { redirectTo: ROUTES.OUTFIT.PATH });
         }}
       >
         <ArrowUpRight size={40} color={Colors.primary[900]} />
