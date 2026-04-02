@@ -5,17 +5,20 @@ import { Colors } from 'theme';
 import { BLUR_PROPS, BlurView } from './blur-view';
 import { LinearGradient } from './linear-gradient';
 
-type Props = {
+type Variant = 'primary' | 'secondary' | 'blur' | 'destructive' | 'ghost';
+
+type Props<T extends Variant> = {
   className?: string;
-  variant: 'primary' | 'secondary' | 'blur' | 'destructive' | 'ghost';
+  variant: T;
   style?: ViewStyle;
   children?: React.ReactNode;
   disabled?: boolean;
   blurComponent?: typeof BlurView;
   blurKey?: ComponentProps<typeof BlurView>['blurKey'];
-}
+  ref?: React.Ref<View>;
+} & (T extends 'blur' ? { blurIntensity?: number } : never)
 
-export const getBlockColors = (variant: Props['variant'], disabled?: boolean) => {
+export const getBlockColors = (variant: Variant, disabled?: boolean) => {
   switch (variant) {
     case 'primary':
       if (disabled) {
@@ -53,7 +56,7 @@ export const getBlockColors = (variant: Props['variant'], disabled?: boolean) =>
   }
 }
 
-const BorderTop = ({ style, disabled, variant }: { style?: ViewStyle, disabled?: boolean, variant: Props['variant'] }) => {
+const BorderTop = ({ style, disabled, variant }: { style?: ViewStyle, disabled?: boolean, variant: Variant }) => {
   const colors = useMemo(() => getBlockColors(variant, disabled), [disabled, variant]);
   const borderColor = colors.borderColor ?? 'transparent';
   const backgroundColor = variant === "blur" ? 'transparent' : (colors.backgroundColor ?? 'transparent');
@@ -78,7 +81,7 @@ const BorderTop = ({ style, disabled, variant }: { style?: ViewStyle, disabled?:
   )
 }
 
-export const Block = ({ className = "", children, variant, style, disabled, blurComponent, blurKey }: Props) => {
+export const Block = <T extends Variant>({ className = "", children, variant, style, disabled, blurComponent, blurKey, blurIntensity }: Props<T>) => {
   const VariantColors = useMemo(() => getBlockColors(variant, disabled), [disabled, variant]);
 
   const Component = variant === 'blur' ? (blurComponent ?? BlurView) : View;
@@ -90,6 +93,7 @@ export const Block = ({ className = "", children, variant, style, disabled, blur
     <Component
       {...BLUR_PROPS}
       blurKey={blurKey}
+      intensity={blurIntensity ?? BLUR_PROPS.intensity}
       style={{
         overflow: 'hidden',
         position: 'relative',

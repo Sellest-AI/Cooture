@@ -17,17 +17,18 @@ import { View } from "react-native";
 import { ROUTES } from "routes";
 
 export default function NewOutfitScreen() {
+  const [init, setInit] = useState(false);
   const { reset, setItems, name, setName, items: itemIds, saveOutfit } = useOutfit.New();
   const { push, redirect } = useRouter("/new-outfit");
   useRoute("/new-outfit", {
-    onInit: ({ itemIds }) => { setItems(itemIds ?? []) },
+    onInit: ({ itemIds }) => { setItems(itemIds ?? []); setInit(true); },
     resetFnc: reset,
   });
 
   const [selectedItem, setSelectedItem] = useState<Id<'items'> | null>(null);
   const { data: items } = useQueryCached(api.router.items.getMany.anon, { itemIds });
 
-  if (itemIds.length === 0) {
+  if (itemIds.length === 0 && init) {
     return <Router.Redirect
       href={ROUTES.MODALS.OUTFIT_ADD_ITEM}
       currentRoute="/new-outfit"

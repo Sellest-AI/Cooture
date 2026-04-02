@@ -206,10 +206,15 @@ export default function Screen() {
             borderRadius: 99
           }} />}
         </View> : undefined}
-        renderItem={({ item }) => {
+        renderItem={({ item, index }) => {
           if (item.type === "item") {
             return (
-              <View style={{ flexDirection: 'row', marginBottom: 24, paddingHorizontal: 12 }}>
+              <View style={{
+                flexDirection: 'row',
+                marginBottom: 32,
+                paddingLeft: index % 2 === 0 ? 12 : 24,
+                paddingRight: index % 2 === 0 ? 24 : 12,
+              }}>
                 <Item
                   id={item.data._id}
                 />
@@ -219,7 +224,12 @@ export default function Screen() {
 
           if (item.type === "outfit") {
             return (
-              <View style={{ flexDirection: 'row', paddingHorizontal: 20, marginBottom: 24 }}>
+              <View style={{
+                flexDirection: 'row',
+                marginBottom: 32,
+                paddingLeft: index % 2 === 0 ? 12 : 24,
+                paddingRight: index % 2 === 0 ? 24 : 12,
+              }}>
                 <Outfit
                   id={item.data._id}
                 />

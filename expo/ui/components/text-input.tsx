@@ -1,7 +1,8 @@
-import { ComponentProps, useRef } from 'react';
+import { ComponentProps, useRef, useState } from 'react';
 import { TextInput as NativeTextInput, View, ViewStyle } from 'react-native';
 import { SvgProps } from 'react-native-svg';
 import { Colors } from 'theme';
+import { BlurView } from './blur-view';
 import { X } from './icons';
 import { Pressable } from './pressable';
 
@@ -11,7 +12,7 @@ type Props = {
   autoFocus?: boolean;
   startIcon?: React.ComponentType<{ size?: number, color?: string, style?: SvgProps['style'] }>;
   canClear?: boolean;
-} & ComponentProps<typeof NativeTextInput>;
+} & Omit<ComponentProps<typeof NativeTextInput>, 'style'>;
 
 export const TextInput = ({ className = "", style, startIcon, canClear, autoFocus, ...props }: Props) => {
   const hasIcon = !!startIcon;
@@ -21,26 +22,30 @@ export const TextInput = ({ className = "", style, startIcon, canClear, autoFocu
 
   const ref = useRef<View>(null);
 
-  const refWidth = ref.current?.clientWidth ?? 0;
+  // Force re-render on mount to get the correct width of the component
+  const [, setInit] = useState(false);
+
+  const refWidth = (ref.current as unknown as View)?.clientWidth ?? 0;
   const textWidth = refWidth - (hasIcon ? 52 : 24) - (canClear && hasText ? 52 : 0);
 
   return (
-    <View
+    <BlurView
       ref={ref}
-      style={[{
+      onLayout={() => setInit(true)}
+      style={{
         borderRadius: 16,
         backgroundColor: Colors.blur.dark,
         borderTopColor: Colors.blur.medium,
-        color: Colors.foreground,
         borderTopWidth: 1,
         overflow: 'hidden',
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: canClear && hasText ? 'space-between' : 'flex-start',
+        justifyContent: (canClear && hasText) ? 'space-between' : 'flex-start',
         paddingLeft: hasIcon ? 20 : 0,
-        paddingRight: canClear && hasText ? 20 : 0,
+        paddingRight: (canClear && hasText) ? 12 : 0,
         height: 52,
-      }, style]}
+        ...style,
+      }}
     >
       {Icon && <View style={{ marginRight: 12 }}>
         <Icon
@@ -66,13 +71,13 @@ export const TextInput = ({ className = "", style, startIcon, canClear, autoFocu
       />
       {canClear && <Pressable
         onPress={() => { props.onChangeText?.(''); }}
-        style={{ marginLeft: 12 }}
+        style={{ marginLeft: 4, paddingLeft: 8, paddingVertical: 8, paddingRight: 8 }}
       >
         <X
           size={20}
           color={Colors.neutral[200]}
         />
       </Pressable>}
-    </View>
+    </BlurView>
   )
 }

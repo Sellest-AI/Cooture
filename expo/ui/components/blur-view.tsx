@@ -19,9 +19,10 @@ export const BLUR_PROPS: BlurViewProps = {
 type BlurPropsExtended = Omit<BlurViewProps, 'tint' | 'blurMethod' | 'style'> & {
   blurKey?: BlurKeys;
   style?: ViewStyle;
+  ref?: RefObject<View | null>;
 };
 
-export const BlurView = ({ style, blurKey, children, className, ...props }: BlurPropsExtended) => {
+export const BlurView = ({ style, blurKey, children, className, ref, ...props }: BlurPropsExtended) => {
   const { blurTargets } = useContext(BlurProviderContext) ?? {};
 
   const { padding, paddingLeft, paddingRight, paddingHorizontal, paddingVertical,
@@ -54,6 +55,7 @@ export const BlurView = ({ style, blurKey, children, className, ...props }: Blur
     }}
   >
     <View
+      ref={ref}
       style={{
         flex: style?.flex,
         flexDirection,

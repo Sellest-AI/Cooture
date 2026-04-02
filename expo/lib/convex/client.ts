@@ -82,9 +82,9 @@ export const useQueryCachedData = <T extends ActionPath>(path: T, params: Params
   }, [execute, actionParams, cacheKey, setCached]);
 
   useEffect(() => {
-    if (!!data) return;
+    // if (!!data) return;
     reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [cacheKey])
   return { data, isLoading, isSuccess, isError, reload };
 }

@@ -7,9 +7,10 @@ import { publicQuery } from '../../procedures';
 export const anon = publicQuery({
   args: {
     query: v.string(),
+    filter: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const items = await searchItems(ctx, args.query, { amount: 20 });
+    const items = await searchItems(ctx, args.query, { amount: 20, filter: args.filter });
     return (await Promise.all(items.map(async (item) => getItem(ctx, item)))).filter(notEmpty);
   }
 });

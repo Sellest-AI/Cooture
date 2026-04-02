@@ -32,6 +32,11 @@ export const CardItem = ({ title, subtitle, selected, disabled, badge, style, so
   useEffect(() => {
     if (!source) return;
 
+    if (image) {
+      setIntrinsicSize({ width: image.width, height: image.height });
+      return;
+    }
+
     // Handle local required images (numbers) and remote URIs
     if (typeof source === 'number') {
       const res = RNImage.resolveAssetSource(source as any);
@@ -42,9 +47,6 @@ export const CardItem = ({ title, subtitle, selected, disabled, badge, style, so
     if (typeof source === 'string') {
       RNImage.getSize(source, (w, h) => setIntrinsicSize({ width: w, height: h }), () => { });
     }
-    if (image) {
-      setIntrinsicSize({ width: image.width, height: image.height });
-    }
   }, [image, source]);
 
   // Compute height that preserves aspect ratio given the measured layout width
@@ -52,6 +54,8 @@ export const CardItem = ({ title, subtitle, selected, disabled, badge, style, so
 
   // If caller provides a height via `style`, use it; otherwise prefer computedHeight, then fallback
   const containerHeight = style && (style as any).height ? (style as any).height : (computedHeight ?? DEFAULT_HEIGHT);
+
+  const aspectRatio = image ? (image.width / image.height) : (intrinsicSize ? (intrinsicSize.width / intrinsicSize.height) : undefined);
 
   const handlePressIn = () => {
     if (disabled || !animate) return;
@@ -91,7 +95,8 @@ export const CardItem = ({ title, subtitle, selected, disabled, badge, style, so
         style={{
           transform: [{ scale: scaleAnim }],
           overflow: 'hidden',
-          height: containerHeight,
+          aspectRatio: style?.height ? undefined : aspectRatio,
+          height: style?.height ?? (aspectRatio ? undefined : containerHeight),
         }}
       >
         {source && <Image

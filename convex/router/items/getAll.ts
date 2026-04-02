@@ -15,9 +15,12 @@ const cache = new ActionCache(components.actionCache, {
 
 type ReturnType = (Doc<'items'> & { image: NonNullable<GetImageDoc>, ownedByUser?: boolean })[]
 
+const sharedArgs = { filter: v.optional(v.string()) }
+
 export const _internal_cache = internalAction({
+  args: sharedArgs,
   handler: async (ctx, args): Promise<ReturnType> =>
-    ctx.runQuery(internal.router.items.getAll._internal_query_1)
+    ctx.runQuery(internal.router.items.getAll._internal_query_1, { filter: args.filter })
 })
 
 /** 
@@ -25,28 +28,41 @@ export const _internal_cache = internalAction({
  * Be careful when using it, your queries will refresh ON EVERY LIKES.
  */
 export const _internal_query_1 = internalQuery({
-  handler: async (ctx): Promise<ReturnType> => {
-    const publicItems = await ctx.db.query("items")
-      .order('desc')
-      .take(50);
+  args: sharedArgs,
+  handler: async (ctx, args): Promise<ReturnType> => {
+    const publicItems = ctx.db.query("items").order('desc');
 
-    const detailedItems = await Promise.all(publicItems.map(async (item) => {
+    const detailedItems: ReturnType = [];
+    let i = 0;
+    for await (const item of publicItems) {
+      if (i >= 50) break;
+
+      let matches = args.filter ? false : true;
+      if (args.filter) {
+        if (item.category === args.filter) matches = true;
+        if (item.description?.includes(args.filter)) matches = true;
+        if (item.brand?.includes(args.filter)) matches = true;
+      }
+
+      if (!matches) continue;
+
       const image = await getImage(ctx, item.imageId);
-      if (!image) return null;
-      return {
+      if (!image) continue;
+
+      detailedItems.push({
         ...item,
         image
-      }
-    }));
+      });
+    }
 
-    return detailedItems.filter(notEmpty);
+    return detailedItems;
   }
 })
 
 export const _internal_query_2 = internalQuery({
-  args: { userId: v.optional(v.id('users')) },
+  args: { ...sharedArgs, userId: v.optional(v.id('users')) },
   handler: async (ctx, args): Promise<ReturnType> => {
-    const { userId } = args;
+    const { userId, filter } = args;
 
     if (!userId) return [];
 
@@ -65,13 +81,23 @@ export const _internal_query_2 = internalQuery({
       }
     }));
 
-    return detailedItems.filter(notEmpty);
+    return detailedItems
+      .filter((item) => {
+        if (!item) return false;
+        if (!filter) return true;
+
+        const matchesCategory = item.category === filter;
+        const matchesDescription = item.description?.includes(filter);
+        const matchesBrand = item.brand?.includes(filter);
+        return matchesCategory || matchesDescription || matchesBrand;
+      })
+      .filter(notEmpty);
   }
 });
 
-const getItems = async (ctx: ActionCtx, userId?: Id<'users'>): Promise<ReturnType> => {
-  const userItems = await ctx.runQuery(internal.router.items.getAll._internal_query_2, { userId });
-  const publicItems = await cache.fetch(ctx, {});
+const getItems = async (ctx: ActionCtx, args: { userId?: Id<'users'>, filter?: string }): Promise<ReturnType> => {
+  const userItems = await ctx.runQuery(internal.router.items.getAll._internal_query_2, { userId: args.userId, filter: args.filter });
+  const publicItems = await cache.fetch(ctx, { filter: args.filter });
 
   const items = [
     ...userItems.slice(0, 12),
@@ -87,11 +113,11 @@ const getItems = async (ctx: ActionCtx, userId?: Id<'users'>): Promise<ReturnTyp
 }
 
 export const authed = authAction({
-  args: {},
-  handler: async (ctx) => getItems(ctx, ctx.userId)
+  args: sharedArgs,
+  handler: async (ctx, args) => getItems(ctx, { ...args, userId: ctx.userId })
 })
 
 export const anon = publicAction({
-  args: { userId: v.optional(v.id('users')) },
-  handler: async (ctx, args) => getItems(ctx, args.userId)
+  args: { userId: v.optional(v.id('users')), ...sharedArgs },
+  handler: async (ctx, args) => getItems(ctx, args)
 })

@@ -4,6 +4,7 @@ import { QueryCtx } from "../../procedures";
 type Args = {
   amount?: number;
   userId?: Id<"users">;
+  filter?: string;
 }
 
 const DEFAULT_ARGS: Args = {
@@ -41,5 +42,11 @@ export const searchItems = async (ctx: QueryCtx, query: string, args?: Args) => 
     return [...acc, item];
   }, [] as Doc<'items'>[]);
 
-  return results;
+  return results.filter((item) => {
+    if (!args?.filter) return true;
+    const matchesCategory = item.category === args.filter;
+    const matchesDescription = item.description?.includes(args.filter);
+    const matchesBrand = item.brand?.includes(args.filter);
+    return matchesCategory || matchesDescription || matchesBrand;
+  });
 }
