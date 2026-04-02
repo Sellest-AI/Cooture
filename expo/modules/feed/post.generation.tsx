@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryCached, useQueryCachedData } from "@/lib
 import { downloadImageCrossPlatform } from "@/lib/image/client";
 import { Post } from "@ui/cards";
 import { notEmpty } from "@utils/convex-allowed";
+import { env } from "env";
 import { WEBSITE } from "global";
 import { Share, ViewStyle } from "react-native";
 
@@ -74,7 +75,7 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
     onDownload={async (url) => {
       await downloadImageCrossPlatform(url).catch(() => null)
     }}
-    onTurnToVideo={ownedByCurrentUser ? (_id: string) => {
+    onTurnToVideo={(ownedByCurrentUser && env.PUBLIC_NODE_ENV !== 'production') ? (_id: string) => {
       const prediction = post.predictions.find(p => p._id === _id);
       if (!prediction) return;
       push(ROUTES.MODALS.TURN_TO_VIDEO, { params: { predictionId: prediction._id } })
