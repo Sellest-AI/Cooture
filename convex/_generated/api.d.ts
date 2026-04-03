@@ -120,6 +120,7 @@ import type * as migrations from "../migrations.js";
 import type * as procedures from "../procedures.js";
 import type * as router_admin_bots_createIdentity from "../router/admin/bots/createIdentity.js";
 import type * as router_admin_bots_createOne from "../router/admin/bots/createOne.js";
+import type * as router_admin_bots_createTestAccount from "../router/admin/bots/createTestAccount.js";
 import type * as router_admin_bots_crons from "../router/admin/bots/crons.js";
 import type * as router_admin_bots_getAll from "../router/admin/bots/getAll.js";
 import type * as router_admin_bots_getWaiting from "../router/admin/bots/getWaiting.js";
@@ -384,6 +385,7 @@ declare const fullApi: ApiFromModules<{
   procedures: typeof procedures;
   "router/admin/bots/createIdentity": typeof router_admin_bots_createIdentity;
   "router/admin/bots/createOne": typeof router_admin_bots_createOne;
+  "router/admin/bots/createTestAccount": typeof router_admin_bots_createTestAccount;
   "router/admin/bots/crons": typeof router_admin_bots_crons;
   "router/admin/bots/getAll": typeof router_admin_bots_getAll;
   "router/admin/bots/getWaiting": typeof router_admin_bots_getWaiting;
