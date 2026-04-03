@@ -1,5 +1,5 @@
 import { ROUTES, useRoute, useRouter, useStateEffect } from "@/hooks";
-import { Id } from "@/lib/convex/client";
+import { api, Id, useQuery } from "@/lib/convex/client";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { Block } from "@ui/block";
 import { EmptyBlock } from "@ui/block.empty";
@@ -43,6 +43,10 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
   const { pathname } = useRoute.Path();
   const { redirect, push } = useRouter(pathname as Route);
 
+  // Cost
+  const { data: costData } = useQuery(api.router.credits.getCost.anon, { type: 'ITEM_CREATION_COST', amount: items.length + 1 });
+  const { data: canPay } = useQuery(api.router.credits.canPay.authed, costData ? { amount: costData } : 'skip');
+
   return (
     <SafeAreaView
       edges={{ top: 'off', bottom: 'android' }}
@@ -60,12 +64,18 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
             <HeaderButton
               icon={Camera}
               label="Import item"
-              onPress={() => push(ROUTES.SCAN, { forwardRedirect: true })}
+              onPress={() => {
+                if (!canPay) push(ROUTES.MODALS.UPGRADE);
+                else push(ROUTES.SCAN, { forwardRedirect: true })
+              }}
             />
             <HeaderButton
               icon={Globe}
               label="Search online"
-              onPress={() => push(ROUTES.OUTFIT.BROWSER, { forwardRedirect: true })}
+              onPress={() => {
+                if (!canPay) push(ROUTES.MODALS.UPGRADE);
+                else push(ROUTES.OUTFIT.BROWSER, { forwardRedirect: true })
+              }}
             />
           </View>
         </View>}
@@ -188,6 +198,9 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
             return prev.filter((p) => p !== item);
           })}
           onPress={async (items) => {
+            // Outfit creation is free
+            // if (!canPay) { return push(ROUTES.MODALS.UPGRADE); }
+
             if (mode === 'new') {
               push(ROUTES.MODALS.NEW_OUTFIT, {
                 forwardRedirect: true,
