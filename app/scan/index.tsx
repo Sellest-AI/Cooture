@@ -20,6 +20,8 @@ import { Dimensions, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
+const COLUMNS = 3;
+
 const MediaList = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
 
@@ -45,7 +47,8 @@ const MediaList = () => {
       .filter((a, i, arr) => arr.findIndex((asset) => asset.uri === a.uri) === i)
       .sort((a, b) => b.creationTime - a.creationTime)
 
-    const sliceIndex = Math.max(6, imagesFlat.length - (imagesFlat.length % 3));
+    const sliceIndex = Math.min(12 * COLUMNS, Math.max(COLUMNS * 2,
+      imagesFlat.length - (imagesFlat.length % COLUMNS)));
 
     setAssets(imagesFlat.slice(0, sliceIndex));
   }
@@ -56,7 +59,7 @@ const MediaList = () => {
     <FlashList
       data={assets}
       ListEmptyComponent={<Grid style={{
-        height: Dimensions.get('screen').width / (3 / 2),
+        height: Dimensions.get('screen').width / (COLUMNS / 2),
         gap: 4
       }}>
         <Col style={{ gap: 4 }}>
@@ -69,15 +72,14 @@ const MediaList = () => {
         </Col>
         <Col style={{ gap: 4 }}>
           <Skeleton style={{ width: '100%', aspectRatio: 1 }} />
-          <Skeleton style={{ width: '100%', aspectRatio: 1 }} />
         </Col>
       </Grid>}
-      numColumns={3}
+      numColumns={COLUMNS}
       style={{ marginHorizontal: 6 }}
       renderItem={({ item, index }) => {
-        const remainingSlots = assets.length % 3 === 0 ? 0 : (3 - (assets.length % 3));
+        const remainingSlots = assets.length % COLUMNS === 0 ? 0 : (COLUMNS - (assets.length % COLUMNS));
         console.log(remainingSlots);
-        const hasBorderBottomLeftRadius = index === assets.length - (3 - remainingSlots);
+        const hasBorderBottomLeftRadius = index === assets.length - (COLUMNS - remainingSlots);
 
         return (
           <View style={{
@@ -91,7 +93,7 @@ const MediaList = () => {
                 flex: 1,
                 backgroundColor: Colors.blur.dark,
                 borderTopLeftRadius: index === 0 ? 20 : 0,
-                borderTopRightRadius: index === 2 ? 20 : 0,
+                borderTopRightRadius: index === COLUMNS - 1 ? 20 : 0,
                 borderBottomRightRadius: index === assets.length - 1 ? 20 : 0,
                 borderBottomLeftRadius: hasBorderBottomLeftRadius ? 20 : 0,
               }}
@@ -156,7 +158,7 @@ export default function ScanScreen() {
       }}
       headerBackground={
         <View style={{
-          height: Dimensions.get('window').height - 356,
+          height: Dimensions.get('window').height - 282,
         }}>
           <LinearGradient
             colors={['rgba(0, 0, 0, 0.8)', 'transparent']}
@@ -171,11 +173,12 @@ export default function ScanScreen() {
           <CameraView ref={cameraRef} style={{ flex: 1 }} facing="back" />
         </View>
       }
+      contentNegativeSpace={64}
       headerContent={< View style={{
-        height: Dimensions.get('window').height - 356,
+        height: Dimensions.get('window').height - 282,
       }}>
         <LinearGradient
-          colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
+          colors={['transparent', 'rgba(0, 0, 0, 1)']}
           style={{
             position: 'absolute',
             bottom: 0,
@@ -213,9 +216,9 @@ export default function ScanScreen() {
           gap: 16,
           flexDirection: 'row',
           justifyContent: 'space-around',
-          padding: 16,
+          paddingHorizontal: 16,
           alignSelf: 'center',
-          marginBottom: 24,
+          marginBottom: 28,
         }}
       >
         <Button
@@ -244,7 +247,7 @@ export default function ScanScreen() {
           startIcon={ImageUp}
           variant="blur"
           onPress={handlePickImage}
-          style={{ marginTop: 8, marginHorizontal: 12 }}
+          style={{ marginTop: 12, marginHorizontal: 12 }}
         >
           Open Camera Roll
         </Button>

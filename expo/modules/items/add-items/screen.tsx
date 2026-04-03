@@ -1,5 +1,5 @@
 import { ROUTES, useRoute, useRouter, useStateEffect } from "@/hooks";
-import { api, Id, useQuery } from "@/lib/convex/client";
+import { api, Id, useQuery, useQueryCached } from "@/lib/convex/client";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { Block } from "@ui/block";
 import { EmptyBlock } from "@ui/block.empty";
@@ -44,7 +44,7 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
   const { redirect, push } = useRouter(pathname as Route);
 
   // Cost
-  const { data: costData } = useQuery(api.router.credits.getCost.anon, { type: 'ITEM_CREATION_COST', amount: items.length + 1 });
+  const { data: costData } = useQueryCached(api.router.credits.getCost.anon, { type: 'ITEM_CREATION_COST' });
   const { data: canPay } = useQuery(api.router.credits.canPay.authed, costData ? { amount: costData } : 'skip');
 
   return (
