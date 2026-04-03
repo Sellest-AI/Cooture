@@ -2,17 +2,106 @@ import { CameraPermission } from "@/modules/camera/camera-permission";
 import { useScan } from "@/modules/scan";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
+import { FlashList } from "@ui/flat-list";
+import { Col, Grid } from "@ui/grid";
 import { Check, ImageUp, X } from "@ui/icons";
+import { Image } from "@ui/image";
 import { LinearGradient } from "@ui/linear-gradient";
+import { ParallaxScrollView } from "@ui/parallax-scroll-view";
 import { SafeAreaView } from "@ui/safe-area-view";
+import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
 import { CameraView } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
+import { Asset, getAlbumsAsync, getAssetsAsync, requestPermissionsAsync } from "expo-media-library";
 import { router } from "expo-router";
-import { useRef, useState } from "react";
-import { View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Dimensions, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
+
+const MediaList = () => {
+  const [assets, setAssets] = useState<Asset[]>([]);
+
+  async function getAlbums() {
+    const { status } = await requestPermissionsAsync();
+    if (status !== 'granted') return;
+
+    const fetchedAlbums = await getAlbumsAsync({
+      includeSmartAlbums: true,
+    });
+
+    const images = await Promise.all(fetchedAlbums.map((album) => {
+      return getAssetsAsync({
+        album: album.id,
+        mediaType: ['photo'],
+        sortBy: 'creationTime',
+        first: 20,
+      });
+    }))
+
+    const imagesFlat = images.map((res) => res.assets).flat()
+      // remove duplicates from multiple albums
+      .filter((a, i, arr) => arr.findIndex((asset) => asset.uri === a.uri) === i)
+      .sort((a, b) => b.creationTime - a.creationTime)
+
+    const sliceIndex = Math.max(6, imagesFlat.length - (imagesFlat.length % 3));
+
+    setAssets(imagesFlat.slice(0, sliceIndex));
+  }
+
+  useEffect(() => { getAlbums() }, [])
+
+  return (
+    <FlashList
+      data={assets}
+      ListEmptyComponent={<Grid style={{
+        height: Dimensions.get('screen').width / (3 / 2),
+        gap: 4
+      }}>
+        <Col style={{ gap: 4 }}>
+          <Skeleton style={{ width: '100%', aspectRatio: 1 }} />
+          <Skeleton style={{ width: '100%', aspectRatio: 1 }} />
+        </Col>
+        <Col style={{ gap: 4 }}>
+          <Skeleton style={{ width: '100%', aspectRatio: 1 }} />
+          <Skeleton style={{ width: '100%', aspectRatio: 1 }} />
+        </Col>
+        <Col style={{ gap: 4 }}>
+          <Skeleton style={{ width: '100%', aspectRatio: 1 }} />
+          <Skeleton style={{ width: '100%', aspectRatio: 1 }} />
+        </Col>
+      </Grid>}
+      numColumns={3}
+      style={{ marginHorizontal: 6 }}
+      renderItem={({ item, index }) => {
+        const remainingSlots = assets.length % 3 === 0 ? 0 : (3 - (assets.length % 3));
+        console.log(remainingSlots);
+        const hasBorderBottomLeftRadius = index === assets.length - (3 - remainingSlots);
+
+        return (
+          <View style={{
+            width: '100%',
+            aspectRatio: 1,
+            padding: 2,
+          }}>
+            <Image
+              source={{ uri: item.uri }}
+              style={{
+                flex: 1,
+                backgroundColor: Colors.blur.dark,
+                borderTopLeftRadius: index === 0 ? 20 : 0,
+                borderTopRightRadius: index === 2 ? 20 : 0,
+                borderBottomRightRadius: index === assets.length - 1 ? 20 : 0,
+                borderBottomLeftRadius: hasBorderBottomLeftRadius ? 20 : 0,
+              }}
+            />
+          </View>
+        )
+      }}
+    />
+  )
+}
 
 export default function ScanScreen() {
   const { setImageScanned } = useScan();
@@ -36,6 +125,7 @@ export default function ScanScreen() {
 
   const handlePickImage = async () => {
     try {
+      await requestPermissionsAsync();
       const result = await ImagePicker.launchImageLibraryAsync({
         allowsMultipleSelection: false,
         mediaTypes: ['images'],
@@ -58,60 +148,74 @@ export default function ScanScreen() {
     )
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.background }}>
-      <CameraView ref={cameraRef} style={{ flex: 1 }} facing="back" />
-      <LinearGradient
-        colors={['rgba(0, 0, 0, 0.8)', 'transparent']}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 300
-        }}
-      />
-      <LinearGradient
-        colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 150
-        }}
-      />
-      <SafeAreaView
-        edges={{ bottom: 'off' }}
-        style={{
-          position: 'absolute',
-          top: 24,
-          alignSelf: 'center',
+    <ParallaxScrollView
+      // ref={ }
+      style={{
+        flex: 1,
+        backgroundColor: 'rgb(0,0,0)',
+      }}
+      headerBackground={
+        <View style={{
+          height: Dimensions.get('window').height - 356,
         }}>
-        <Block variant="blur" style={{ alignSelf: 'center', borderRadius: 999 }}>
-          <Text.Base color={Colors.neutral[50]}
-            style={{ textAlign: 'center', paddingHorizontal: 24, paddingVertical: 12 }}
-            weight={600}
-          >
-            Scan your item
-          </Text.Base>
-        </Block>
-        <Block variant="blur" style={{ maxWidth: 220, borderRadius: 999, marginTop: 12 }}>
-          <Text.Sm color={Colors.neutral[200]}
-            style={{ textAlign: 'center', paddingHorizontal: 8, paddingVertical: 12 }}
-          >
-            The background will be removed automatically in the next step
-          </Text.Sm>
-        </Block>
-      </SafeAreaView>
-      <SafeAreaView
+          <LinearGradient
+            colors={['rgba(0, 0, 0, 0.8)', 'transparent']}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 300
+            }}
+          />
+          <CameraView ref={cameraRef} style={{ flex: 1 }} facing="back" />
+        </View>
+      }
+      headerContent={< View style={{
+        height: Dimensions.get('window').height - 356,
+      }}>
+        <LinearGradient
+          colors={['transparent', 'rgba(0, 0, 0, 0.8)']}
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 150
+          }}
+        />
+        <View
+          style={{
+            position: 'absolute',
+            top: 24,
+            alignSelf: 'center',
+          }}>
+          <Block variant="blur" style={{ alignSelf: 'center', borderRadius: 999 }}>
+            <Text.Base color={Colors.neutral[50]}
+              style={{ textAlign: 'center', paddingHorizontal: 24, paddingVertical: 12 }}
+              weight={600}
+            >
+              Scan your item
+            </Text.Base>
+          </Block>
+          <Block variant="blur" style={{ maxWidth: 220, borderRadius: 999, marginTop: 12 }}>
+            <Text.Sm color={Colors.neutral[200]}
+              style={{ textAlign: 'center', paddingHorizontal: 8, paddingVertical: 12 }}
+            >
+              The background will be removed automatically in the next step
+            </Text.Sm>
+          </Block>
+        </View>
+      </View>}
+    >
+      <View
         style={{
-          position: 'absolute',
-          bottom: 24,
           gap: 16,
           flexDirection: 'row',
           justifyContent: 'space-around',
           padding: 16,
           alignSelf: 'center',
+          marginBottom: 24,
         }}
       >
         <Button
@@ -127,20 +231,23 @@ export default function ScanScreen() {
         </Button>
         <Button
           size="rounded"
-          variant="blur"
-          style={{ padding: 4 }}
-          onPress={handlePickImage}
-        >
-          <ImageUp color={Colors.foreground} size={24} />
-        </Button>
-        <Button
-          size="rounded"
           variant="primary"
           style={{ padding: 4 }}
           onPress={handleCapture}
         >
           <Check size={24} color={Colors.primary[900]} />
         </Button>
+      </View>
+      <SafeAreaView edges={{ top: 'off' }}>
+        <MediaList />
+        <Button
+          startIcon={ImageUp}
+          variant="blur"
+          onPress={handlePickImage}
+          style={{ marginTop: 8, marginHorizontal: 12 }}
+        >
+          Open Camera Roll
+        </Button>
       </SafeAreaView>
-    </View>);
+    </ParallaxScrollView>);
 }
