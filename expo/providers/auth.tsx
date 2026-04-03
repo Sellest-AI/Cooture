@@ -1,25 +1,30 @@
 import { useAccount } from '@/lib/convex/auth';
 import { LogoLoading } from '@ui/icons';
+import { AnimatePresence, MotiView } from '@ui/motion';
 import { Authenticated, AuthLoading, Unauthenticated } from 'convex/react';
 import { Redirect, usePathname } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { View } from 'react-native';
 import { ROUTES } from 'routes';
 import { Colors } from 'theme';
 
-const LoadingView = () => {
+const LoadingView = ({ animateState = false }: { animateState?: boolean }) => {
   const [init, setInit] = useState(false);
   useEffect(() => { setTimeout(() => setInit(true), 300) }, [])
-  return (<View style={{
-    backgroundColor: Colors.background,
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
-    inset: 0,
-    flex: 1,
-  }}>
+  return (<MotiView
+    from={animateState ? { opacity: 0 } : undefined}
+    animate={animateState ? { opacity: 1 } : undefined}
+    exit={{ opacity: 0 }}
+    exitTransition={{ duration: 400 }}
+    style={{
+      backgroundColor: Colors.background,
+      position: 'absolute',
+      justifyContent: 'center',
+      alignItems: 'center',
+      inset: 0,
+      flex: 1,
+    }}>
     {init && <LogoLoading size={120} />}
-  </View>)
+  </MotiView>)
 }
 
 type Props = {
@@ -73,6 +78,8 @@ export const AuthProvider = ({ children }: Props) => {
     <Unauthenticated>
       <UnauthenticatedGate />
     </Unauthenticated>
-    {isAuthenticating && <LoadingView />}
+    <AnimatePresence>
+      {isAuthenticating && <LoadingView animateState={true} />}
+    </AnimatePresence>
   </>;
 }

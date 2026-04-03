@@ -33,13 +33,19 @@ export const useAuthActions = () => {
       const code = new URL(url).searchParams.get("code")!;
       await convex.signIn(provider, { code });
 
-      if (route) setTimeout(() => router.dismissTo(route), 500);
+      if (route) setTimeout(() => router.dismissTo(route), 1000);
 
       // Don't auto redirect, the router will do it on its own
       // router.replace(route || ROUTES.TABS.DISCOVER);
+
+      setTimeout(() => { setAuthenticating(false); setIsLoading(false); }, 2000);
+      return true;
     }
+
+    setAuthenticating(false);
     setIsLoading(false);
-    return result.type === "success";
+
+    return false;
   }, [convex, setAuthenticating]);
 
   const signInGoogle = useCallback(async (route?: Href) => signIn("google", route), [signIn]);
@@ -124,10 +130,7 @@ const useWallet = () => {
 const authenticatingAtom = atom(false);
 const useAuthenticated = () => {
   const [isAuthenticating, _setAuthenticating] = useAtom(authenticatingAtom);
-  const setAuthenticating = (value: boolean) => {
-    if (value) { setTimeout(() => _setAuthenticating(false), 5000); }
-    _setAuthenticating(value);
-  }
+  const setAuthenticating = (value: boolean) => { _setAuthenticating(value); }
   return {
     isAuthenticating,
     setAuthenticating
