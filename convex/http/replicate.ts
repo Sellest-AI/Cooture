@@ -6,15 +6,19 @@ export const replicateHandler = httpAction(async (ctx, request) => {
   // Handle the Replicate webhook request here
   const json = await request.json();
   const body = parseReplicateWebhook(json);
-  const output = parseReplicateWebhookOutput(body.output);
 
-  const userId = await ctx.runQuery(internal.router.generations.getUser._internal, { predictionId: body.id });
-
-  if (body.status === 'failed' || body.status === 'canceled')
+  if (body.status === 'failed' || body.status === 'canceled') {
     await ctx.runMutation(internal.router.generations.updatePrediction._internal, {
       predictionId: body.id,
       status: 'FAILED'
     });
+
+    return Response.json({ received: true }, { status: 200 });
+  }
+
+  const output = parseReplicateWebhookOutput(body.output);
+
+  const userId = await ctx.runQuery(internal.router.generations.getUser._internal, { predictionId: body.id });
 
   if (body.status !== 'succeeded') return Response.json({ received: true }, { status: 200 });
 
