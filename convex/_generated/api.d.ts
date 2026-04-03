@@ -51,7 +51,7 @@ import type * as functions_subscriptions_getUserSubscription from "../functions/
 import type * as functions_subscriptions_index from "../functions/subscriptions/index.js";
 import type * as functions_subscriptions_isSubscriptionActive from "../functions/subscriptions/isSubscriptionActive.js";
 import type * as functions_users_getAccount from "../functions/users/getAccount.js";
-import type * as functions_users_getPortraits from "../functions/users/getPortraits.js";
+import type * as functions_users_getAppearance from "../functions/users/getAppearance.js";
 import type * as functions_users_index from "../functions/users/index.js";
 import type * as functions_users_isAuthorized from "../functions/users/isAuthorized.js";
 import type * as functions_users_isPremium from "../functions/users/isPremium.js";
@@ -315,7 +315,7 @@ declare const fullApi: ApiFromModules<{
   "functions/subscriptions/index": typeof functions_subscriptions_index;
   "functions/subscriptions/isSubscriptionActive": typeof functions_subscriptions_isSubscriptionActive;
   "functions/users/getAccount": typeof functions_users_getAccount;
-  "functions/users/getPortraits": typeof functions_users_getPortraits;
+  "functions/users/getAppearance": typeof functions_users_getAppearance;
   "functions/users/index": typeof functions_users_index;
   "functions/users/isAuthorized": typeof functions_users_isAuthorized;
   "functions/users/isPremium": typeof functions_users_isPremium;

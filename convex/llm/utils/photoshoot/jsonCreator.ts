@@ -175,6 +175,8 @@ const updateSubjects = async (ctx: ActionCtx, schema: Schema, subjects: SubjectE
     let image = prompt.head.direction === "side" ? appearance.sideImage : appearance.frontImage;
     if (!image) image = appearance.frontImage;
 
+    if (!image) continue;
+
     images = [...images, { url: image.url, hasAlpha: image.hasAlpha }];
 
     finalPrompt = {

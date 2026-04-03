@@ -1,5 +1,5 @@
 export * from './getAccount';
-export * from './getPortraits';
+export * from './getAppearance';
 export * from './isAuthorized';
 export * from './isPremium';
 

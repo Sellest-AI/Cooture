@@ -1,15 +1,21 @@
-import { Id } from "../../_generated/dataModel";
+import { Doc, Id } from "../../_generated/dataModel";
 import { QueryCtx } from "../../procedures";
-import { getImage } from "../images";
+import { getImage, GetImageDoc } from "../images";
 
-export const getPortraits = async (ctx: QueryCtx, userId: Id<'users'>) => {
+type Appearance = Doc<'usersAppearance'> & {
+  frontImage?: GetImageDoc,
+  sideImage?: GetImageDoc,
+  smileImage?: GetImageDoc,
+}
+
+export const getAppearance = async (ctx: QueryCtx, userId: Id<'users'>): Promise<Appearance | null> => {
   const appearance = await ctx.db.query("usersAppearance").withIndex("by_user_id", (q) =>
     q.eq("userId", userId)).first();
 
   if (!appearance) { return null; }
 
   if (!appearance.frontImageId || !appearance.sideImageId || !appearance.smileImageId) {
-    return null;
+    return { ...appearance };
   }
 
   const [frontImage, sideImage, smileImage] = await Promise.all([
@@ -18,7 +24,9 @@ export const getPortraits = async (ctx: QueryCtx, userId: Id<'users'>) => {
     getImage(ctx, appearance.smileImageId),
   ])
 
-  if (!frontImage || !sideImage || !smileImage) { return null; }
+  if (!frontImage || !sideImage || !smileImage) {
+    return { ...appearance };
+  }
 
   return {
     ...appearance,
