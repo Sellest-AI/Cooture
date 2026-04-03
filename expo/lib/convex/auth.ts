@@ -19,33 +19,40 @@ export const useAuthActions = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const signIn = useCallback(async (provider: "apple" | "google", route?: Href) => {
-    setIsLoading(true);
-    const redirectTo = makeRedirectUri();
-    const { redirect } = await convex.signIn(provider, { redirectTo });
+    try {
+      setIsLoading(true);
+      const redirectTo = makeRedirectUri();
+      const { redirect } = await convex.signIn(provider, { redirectTo });
 
-    if (Platform.OS === "web") { return; }
+      if (Platform.OS === "web") { return; }
 
-    setAuthenticating(true);
+      setAuthenticating(true);
 
-    const result = await openAuthSessionAsync(redirect!.toString(), redirectTo);
-    if (result.type === "success") {
-      const { url } = result;
-      const code = new URL(url).searchParams.get("code")!;
-      await convex.signIn(provider, { code });
+      const result = await openAuthSessionAsync(redirect!.toString(), redirectTo);
+      if (result.type === "success") {
+        const { url } = result;
+        const code = new URL(url).searchParams.get("code")!;
+        await convex.signIn(provider, { code });
 
-      if (route) setTimeout(() => router.dismissTo(route), 1000);
+        if (route) setTimeout(() => router.dismissTo(route), 1000);
 
-      // Don't auto redirect, the router will do it on its own
-      // router.replace(route || ROUTES.TABS.DISCOVER);
+        // Don't auto redirect, the router will do it on its own
+        // router.replace(route || ROUTES.TABS.DISCOVER);
 
-      setTimeout(() => { setAuthenticating(false); setIsLoading(false); }, 2000);
-      return true;
+        setTimeout(() => { setAuthenticating(false); setIsLoading(false); }, 2000);
+        return true;
+      }
+
+      setAuthenticating(false);
+      setIsLoading(false);
+
+      return false;
     }
-
-    setAuthenticating(false);
-    setIsLoading(false);
-
-    return false;
+    catch {
+      setAuthenticating(false);
+      setIsLoading(false);
+      return false;
+    }
   }, [convex, setAuthenticating]);
 
   const signInGoogle = useCallback(async (route?: Href) => signIn("google", route), [signIn]);
