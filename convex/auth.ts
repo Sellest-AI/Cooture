@@ -7,7 +7,17 @@ import { MutationCtx } from "./_generated/server";
 
 export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   providers: [
-    Apple,
+    Apple({
+      profile: ({ user, ...info }) => {
+        const name = user ? `${user.name.firstName} ${user.name.lastName}` : null;
+        return {
+          id: info.sub,
+          email: info.email ?? user?.email ?? undefined,
+          name: name ?? undefined,
+          image: undefined,
+        }
+      }
+    }),
     Google,
     Password
   ],
