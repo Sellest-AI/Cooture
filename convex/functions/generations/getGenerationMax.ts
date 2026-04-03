@@ -75,6 +75,8 @@ export const getGenerationMax = async (ctx: QueryCtx, generationId: Id<'generati
     coverId,
     preset: preset ? {
       ...preset,
+      // Sanitize sensitive data
+      prompts: undefined,
       cover: presetCover || null,
     } : null,
     outfit,

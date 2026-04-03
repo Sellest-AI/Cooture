@@ -18,7 +18,12 @@ export const anon = publicQuery({
     const following = await Promise.all(
       follows.page.map(async (follow) => {
         const user = await ctx.db.get(follow.followingId);
-        return user;
+        if (!user) return null;
+        return {
+          _id: user._id,
+          name: user.name,
+          image: user.image
+        };
       })
     );
 
