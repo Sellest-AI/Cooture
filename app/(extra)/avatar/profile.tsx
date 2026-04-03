@@ -146,7 +146,7 @@ export default function Screen() {
           <CircleAvatar
             size={112}
             style={{ ...styles.circleAvatar, top: 56, left: '32%' }}
-            source={image ?? user?.imageUrl}
+            source={image ?? user?.image}
             label="Import Image"
             onPress={async () => {
               try {

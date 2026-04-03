@@ -13,9 +13,16 @@ export const getAccount = async (ctx: QueryCtx, userId: Id<'users'>) => {
 
   const premium = await isPremium({ ...ctx, user: userExtended }, { throwOnReject: false });
 
+  const { imageUrl, ...userExtendedWithoutImage } = userExtended;
+  const image = imageUrl ?? user.image;
+
+  const name = userExtended.name ?? user.name;
+
   return {
-    ...userExtended,
+    ...userExtendedWithoutImage,
     ...user,
+    image,
+    name,
     _idExtended: userExtended._id,
     isPremium: premium
   };

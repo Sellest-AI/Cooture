@@ -191,7 +191,7 @@ export default function Screen() {
             <User
               key={u._id}
               style={{ marginBottom: 24 }}
-              src={u.imageUrl}
+              src={u.image}
               username={u.username}
               name={u.name}
               id={u._id}

@@ -20,7 +20,7 @@ type Context = Parameters<Parameters<typeof customCtx>[0]>[0] & {
   auth: Auth;
 };
 
-type UserExtended = Omit<Doc<'usersExtended'>, '_id' | '_table'>
+type UserExtended = Omit<Doc<'usersExtended'>, '_id' | '_table' | 'imageUrl'>
   & Doc<'users'> & { _idExtended: Id<'usersExtended'> };
 
 type UserCheckResult = Promise<{
@@ -50,12 +50,15 @@ export const userCheck = async (ctx: Context): UserCheckResult => {
   // which validate data access at access / write time.
   // const db = wrapDatabaseReader({ user, userExtended }, ctx.db, {});
 
+  const { imageUrl, ...userExtendedWithoutImage } = userExtended;
+  const image = imageUrl ?? user.image;
+
   const finalUser = {
-    ...userExtended,
-    _idExtended: userExtended._id,
+    ...userExtendedWithoutImage,
     ...user,
+    _idExtended: userExtended._id,
     name: userExtended.name || user.name,
-    image: userExtended.imageUrl || user.image,
+    image,
   }
 
   // This new ctx will be applied to the function's.

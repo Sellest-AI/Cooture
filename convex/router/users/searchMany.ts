@@ -22,7 +22,7 @@ const searchUser = async (ctx: QueryCtx, query: string) => {
     _id: u.userId,
     name: u.name,
     username: u.username,
-    imageUrl: u.imageUrl,
+    image: u.imageUrl,
   }));
 }
 

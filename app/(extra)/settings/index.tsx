@@ -39,7 +39,7 @@ export default function Screen() {
         headerBackground={
           <View style={{ position: 'absolute', width: '100%', left: 0, top: 0, height: 212 }}>
             <Image
-              source={user.imageUrl}
+              source={user.image}
               style={{ width: '100%', height: '100%', opacity: 0.3 }}
               blurRadius={3}
             />
@@ -73,7 +73,7 @@ export default function Screen() {
             }}>
               <Image
                 style={{ width: 72, height: 72, borderRadius: 99, marginBottom: 12 }}
-                source={user.imageUrl}
+                source={user.image}
               />
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <Text.Lg weight={500} color={Colors.neutral[50]}>{user.name}</Text.Lg>
