@@ -32,6 +32,7 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: SubjectExt
   const top = outfit.items.find(i => i.position === 'TOP');
   const innerLayer = outfit.items.find(i => i.position === 'INNERLAYER');
   const bottom = outfit.items.find(i => i.position === 'BOTTOM');
+  const legwear = outfit.items.find(i => i.position === 'LEGWEAR');
   const outerwear = outfit.items.find(i => i.position === 'OUTERWEAR');
   const accessories = outfit.items.filter(i => i.position === 'ACCESSORY');
   const shoes = outfit.items.find(i => i.position === 'SHOES');
@@ -44,26 +45,27 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: SubjectExt
   const references = [
     top ? { ...top, url: top.image.sizes.medium.url, hasAlpha: top.image.hasAlpha } : undefined,
     bottom ? { ...bottom, url: bottom.image.sizes.medium.url, hasAlpha: bottom.image.hasAlpha } : undefined,
+    legwear ? { ...legwear, url: legwear.image.sizes.medium.url, hasAlpha: legwear.image.hasAlpha } : undefined,
     outerwear ? { ...outerwear, url: outerwear.image.sizes.medium.url, hasAlpha: outerwear.image.hasAlpha } : undefined,
     innerLayer ? { ...innerLayer, url: innerLayer.image.sizes.medium.url, hasAlpha: innerLayer.image.hasAlpha } : undefined,
     ...(accessories.map((acc) => ({ ...acc, url: acc.image.sizes.medium.url, hasAlpha: acc.image.hasAlpha }))),
     shoes ? { ...shoes, url: shoes.image.sizes.medium.url, hasAlpha: shoes.image.hasAlpha } : undefined,
-  ]
+  ].filter(notEmpty)
+    .filter((i) => {
+      // If the prompt doesn't explicitly mention an item, we won't include it in the references, 
+      // to avoid confusion for the LLM
+      if (i.position === 'BOTTOM') if (!subject.prompt.outfit.bottom) return null;
+      if (i.position === 'LEGWEAR') if (!subject.prompt.outfit.bottom) return null;
+      if (i.position === 'SHOES') if (!subject.prompt.outfit.shoes) return null;
+      return i;
+    })
     .filter(notEmpty)
     .map((item, i) => ({
       type: item.position,
       url: item.url,
       hasAlpha: item.hasAlpha,
       text: `Image ${baseImageIndex + i} for ${item.position.toLowerCase()}.`
-    }))
-    .filter((i) => {
-      // If the prompt doesn't explicitly mention an item, we won't include it in the references, 
-      // to avoid confusion for the LLM
-      if (i.type === 'BOTTOM') if (!subject.prompt.outfit.bottom) return null;
-      if (i.type === 'SHOES') if (!subject.prompt.outfit.shoes) return null;
-      return i;
-    })
-    .filter(notEmpty);
+    }));
 
   const images = [...schema.images, ...references]
 
@@ -74,7 +76,7 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: SubjectExt
   const outfitSize = _outfitSize ? `IMPORTANT: ${_outfitSize.replaceAll('_', ' ')} FIT` : undefined;
 
   // Helper function to build details string
-  const buildDetails = (item: typeof top | typeof bottom | typeof outerwear | typeof innerLayer) => {
+  const buildDetails = (item: typeof top) => {
     if (!item) return '';
     const parts = [
       sliceText(item.name, 20),
@@ -98,6 +100,15 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: SubjectExt
     }
   })()
 
+  const legwearObject = (() => {
+    if (!subject.prompt.outfit.bottom) return undefined;
+    if (legwear) return {
+      type: legwear.name,
+      details: buildDetails(legwear),
+      reference: references.find((r) => r.type === 'LEGWEAR')?.text,
+    };
+  })()
+
   const shoesObject = (() => {
     if (!subject.prompt.outfit.shoes) return undefined;
     if (shoes) return `${shoes.name} ${shoes.materials.map(m => m.toLowerCase()).slice(0, 2).join(' ')}`;
@@ -118,6 +129,7 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: SubjectExt
       details: 'A cotton t-shirt',
     },
     bottom: bottomObject,
+    legwear: legwearObject,
     innerLayer: innerLayer ? buildDetails(innerLayer) : undefined,
     outerwear: outerwear ? {
       type: outerwear.name,
@@ -276,6 +288,7 @@ export type PromptExtended = Omit<Prompt, 'subjects' | 'style' | 'composition' |
       references?: string[];
       top?: Outfit['top'] & { reference?: string };
       bottom?: Outfit['bottom'] & { reference?: string };
+      legwear?: Outfit['bottom'] & { reference?: string };
       outerwear?: Outfit['outerwear'] & { reference?: string };
     };
   })[];

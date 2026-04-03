@@ -17,6 +17,15 @@ const extractDefaultRating = (items: Doc<'items'>[]): ContentRating => {
   return contentRating;
 }
 
+const compareRatings = (r1: ContentRating, operation: '>' | '>=', r2: ContentRating): ContentRating => {
+  const ratings = ['SAFE', 'SUGGESTIVE', 'EXPLICIT', 'NSFW'];
+  const r1Index = ratings.indexOf(r1);
+  const r2Index = ratings.indexOf(r2);
+  if (operation === '>')
+    return r1Index > r2Index ? r1 : r2;
+  return r1Index >= r2Index ? r1 : r2;
+}
+
 export const isOutfitNFSW = async (ctx: QueryCtx, itemIds: Id<'items'>[]) => {
   const items = (await Promise.all(itemIds.map(id => ctx.db.get('items', id))))
     .filter(notEmpty);
@@ -31,6 +40,13 @@ export const isOutfitNFSW = async (ctx: QueryCtx, itemIds: Id<'items'>[]) => {
   if (top?.contentRating === 'NSFW') contentRating = 'NSFW';
   // If the inner layer is NSFW, but there is no top or outerwear, then the outfit is NSFW
   if (innerLayer?.contentRating === 'NSFW' && !top && !outerwear) contentRating = 'NSFW';
+
+  const bottom = items.find((i) => extractPosition(i.category) === 'BOTTOM');
+  const legwear = items.find((i) => extractPosition(i.category) === 'LEGWEAR');
+
+  // If no bottom is present, but there is legwear that is EXPLICIT or worse, then the outfit is NSFW
+  if (!bottom && legwear && compareRatings(legwear?.contentRating, '>=', 'EXPLICIT'))
+    contentRating = 'NSFW';
 
   return contentRating;
 }

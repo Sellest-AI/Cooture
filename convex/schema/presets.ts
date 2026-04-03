@@ -72,6 +72,10 @@ export const PRESET_PROMPT = v.object({
         type: v.string(),
         details: v.string(),
       })),
+      legwear: v.optional(v.object({
+        type: v.string(),
+        details: v.string(),
+      })),
       innerLayer: v.optional(v.string()),
       outerwear: v.optional(v.object({
         type: v.string(),

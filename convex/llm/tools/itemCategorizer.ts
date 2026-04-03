@@ -12,6 +12,7 @@ Return ONLY valid data that matches the exact categories provided. Be specific a
 CRITICAL: You MUST use ONLY the categories listed in the schema. If the exact item type isn't available, choose the CLOSEST match:
 - For specific tops not listed (e.g., blouse, tank top) → use "TOP"
 - For specific bottoms not listed (e.g., shorts, leggings) → use "BOTTOM"  
+- For legwear (e.g., tights, stockings) → use "LEGWEAR"
 - For specific shoes not listed (e.g., sneakers, boots) → use "SHOES"
 - For accessories not listed (e.g., scarf, belt, jewelry) → use "ACCESSORY"
 - For outerwear not listed (e.g., coat, vest) → use "OUTERWEAR"
@@ -48,7 +49,7 @@ export const itemCategorizer = createTool({
       category: z.enum([
         "TOP", "BOTTOM", "DRESS", "OUTERWEAR", "SHOES", "ACCESSORY",
         "HOODIE", "SWEATER", "TSHIRT", "JEANS", "SKIRT", "HAT",
-        "CAP", "GLASSES", "BAG", "JACKET"
+        "CAP", "GLASSES", "BAG", "JACKET", "LEGWEAR"
       ]).describe("The most specific category. E.g., use 'TSHIRT' instead of 'TOP' for t-shirts, 'JEANS' instead of 'BOTTOM' for jeans"),
 
       weatherTags: z.array(z.enum([

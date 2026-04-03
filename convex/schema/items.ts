@@ -23,6 +23,7 @@ export const ITEM_CATEGORIES = v.union(
   v.literal("BOTTOM"),
   v.literal("DRESS"),
   v.literal("OUTERWEAR"),
+  v.literal("LEGWEAR"),
   v.literal("JACKET"),
   v.literal("SHOES"),
   v.literal("ACCESSORY"),

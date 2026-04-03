@@ -54,6 +54,7 @@ export const schemaToMarkdown = (schema: PromptExtended): string => {
         { "Top": [isCustomOutfit ? outfit.top?.type : outfit.top?.details, outfit.top?.reference] },
         { "Inner Layer": outfit.innerLayer },
         { "Bottom": [isCustomOutfit ? outfit.bottom?.type : outfit.bottom?.details, outfit.bottom?.reference] },
+        { "Legwear": [isCustomOutfit ? outfit.legwear?.type : outfit.legwear?.details, outfit.legwear?.reference] },
         { "Shoes": outfit.shoes },
         ...outfit.accessories.map((accessory, i) => ({ [`Accessory ${i + 1}`]: [Object.keys(accessory)[0], Object.values(accessory)[0]] }))
       ]))

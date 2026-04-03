@@ -143,6 +143,12 @@ export const ImagePresetSchema = z.object({
           .optional(),
       }).optional().describe("If not visible, return undefined."),
 
+      legwear: z.object({
+        type: z.string().describe("Category: e.g., 'Tights', 'Stockings', 'Socks'.").optional(),
+        details: z.string().describe("Specifics: e.g., 'Black sheer patterned tights'.")
+          .optional(),
+      }).optional().describe("If not visible, return undefined."),
+
       // Useful for managing 'tucked in' styles or visible branding on waistbands
       innerLayer: z.string().optional().describe("Visible layers underneath: e.g., 'White elastic boxer waistband showing'."),
 
@@ -250,6 +256,10 @@ export const presetCreator = createTool({
         top: subject.outfit.top?.details && subject.outfit.top.type ? {
           type: subject.outfit.top.type,
           details: subject.outfit.top.details,
+        } : undefined,
+        legwear: subject.outfit.legwear?.details && subject.outfit.legwear.type ? {
+          type: subject.outfit.legwear.type,
+          details: subject.outfit.legwear.details,
         } : undefined,
         bottom: subject.outfit.bottom?.details && subject.outfit.bottom.type ? {
           type: subject.outfit.bottom.type,

@@ -23,6 +23,7 @@ const categories = [
   "SKIRT",
   "HAT",
   "CAP",
+  "LEGWEAR",
   "GLASSES",
   "BAG",
 ]

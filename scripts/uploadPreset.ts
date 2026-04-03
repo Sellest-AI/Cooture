@@ -44,6 +44,10 @@ const PresetSchema = z.object({
         type: z.string(),
         details: z.string(),
       }).strip()),
+      legwear: z.optional(z.object({
+        type: z.string(),
+        details: z.string(),
+      }).strip()),
       innerLayer: z.optional(z.string()),
       outerwear: z.optional(z.object({
         type: z.string(),

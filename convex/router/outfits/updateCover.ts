@@ -42,7 +42,8 @@ export const _internal = internalAction({
     const top2 = items.find((i) => i.position === 'TOP' && i._id !== top1?._id) ??
       items.find((i) => i.position === 'INNERLAYER' && i._id !== top1?._id);
     const shoes = items.find((i) => i.position === 'SHOES');
-    const bottom = items.find((i) => i.position === 'BOTTOM');
+    const bottom = items.find((i) => i.position === 'BOTTOM') ??
+      items.find((i) => i.category === 'DRESS') ?? items.find((i) => i.position === 'LEGWEAR');
     const bag = items.find((i) => i.category === 'BAG');
     const mainAccessory = items.find((i) => i.category === 'CAP' || i.category === 'HAT') ??
       items.find((i) => i.category === 'GLASSES');
