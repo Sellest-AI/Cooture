@@ -16,6 +16,7 @@ export const _internal = internalMutation({
     // Waitlist
     const waitlist = await ctx.db.query("waitlist").collect();
     if (waitlist.length === 0) {
+      console.log("Initializing waitlist with default values");
       await ctx.db.insert("waitlist", {
         numberOfCodes: 0,
         numberOfUsedCodes: 0,
@@ -27,6 +28,7 @@ export const _internal = internalMutation({
     // Config
     const config = await ctx.db.query("config").collect();
     if (config.length === 0) {
+      console.log("Initializing config with default values");
       await ctx.db.insert("config", {
         appVersion: "0.9.0",
         minAppVersion: "0.9.0",
@@ -44,6 +46,7 @@ export const _internal = internalMutation({
       { createTestAccount: shouldCreateTestAccount })
 
     // Quests
+    console.log("Initializing quests");
     await ctx.runMutation(internal.router.quests.initAll._internal);
   }
 })
@@ -56,6 +59,7 @@ export const _internal_step_1 = internalAction({
     const { createTestAccount } = args;
 
     if (createTestAccount) {
+      console.log("Creating test account");
       const TEST_ACCOUNT = await ctx.runMutation(api.router.auth.getTestAccount.anon);
       await createAccount(ctx, {
         provider: "password",
