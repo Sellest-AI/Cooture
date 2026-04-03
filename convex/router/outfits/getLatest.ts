@@ -40,3 +40,7 @@ export const anon = publicAction({
   handler: async (ctx, args): Promise<Returned> =>
     cache.fetch(ctx, args)
 })
+
+export const _internal_clearCache = internalAction({
+  handler: async (ctx) => { await cache.removeAll(ctx); }
+});
