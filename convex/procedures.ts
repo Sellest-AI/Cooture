@@ -21,7 +21,7 @@ type Context = Parameters<Parameters<typeof customCtx>[0]>[0] & {
 };
 
 type UserExtended = Omit<Doc<'usersExtended'>, '_id' | '_table'>
-  & Doc<'users'> & { _idExtended?: Id<'usersExtended'> };
+  & Doc<'users'> & { _idExtended: Id<'usersExtended'> };
 
 type UserCheckResult = Promise<{
   user: UserExtended,

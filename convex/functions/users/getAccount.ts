@@ -13,7 +13,12 @@ export const getAccount = async (ctx: QueryCtx, userId: Id<'users'>) => {
 
   const premium = await isPremium({ ...ctx, user: userExtended }, { throwOnReject: false });
 
-  return { ...userExtended, ...user, isPremium: premium };
+  return {
+    ...userExtended,
+    ...user,
+    _idExtended: userExtended._id,
+    isPremium: premium
+  };
 }
 
 export const getUserPublic = async (ctx: QueryCtx, userId: Id<'users'>) => {

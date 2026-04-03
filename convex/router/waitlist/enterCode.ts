@@ -11,7 +11,6 @@ export const authed = authMutation({
 
     const codeUpper = code.toUpperCase();
 
-    if (!user._idExtended) return false;
     if (user.accountStatus !== 'WAITLIST') return true;
 
     const codeData = await ctx.db.query('waitlistCodes')

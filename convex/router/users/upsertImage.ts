@@ -8,8 +8,6 @@ export const authed = authAction({
     base64: v.string(),
   },
   handler: async (ctx, args) => {
-    if (!ctx.user._idExtended) throw new Error("User extended not found");
-
     const images = await ctx.runAction(internal.router.storage.images.uploadMany._internal, {
       images: [{ base64: args.base64 }],
       userId: ctx.userId

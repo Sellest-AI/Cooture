@@ -28,8 +28,6 @@ export const authed = authMutation({
     const firstName = capitalize(sanitizedDisplayName.split(' ')[0]).trim();
     const lastName = capitalize(sanitizedDisplayName.split(' ').slice(1).join(' ')).trim();
 
-    if (!ctx.user._idExtended) throw new Error("User extended not found");
-
     await ctx.db.patch(ctx.user._idExtended, {
       username: sanitizedUsername,
       name: sanitizedDisplayName,
