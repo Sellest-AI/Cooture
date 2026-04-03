@@ -93,14 +93,7 @@ const anonymizeUser = async (ctx: MutationCtx, userId: Id<'users'>) => {
     ].filter(notEmpty).map(imageId =>
       ctx.scheduler.runAfter(0, internal.router.storage.images.deleteOne._internal, { imageId })))
 
-    await ctx.db.patch(userAppearance._id, {
-      frontImageId: undefined,
-      sideImageId: undefined,
-      smileImageId: undefined,
-      heightCm: undefined,
-      gender: undefined,
-      size: undefined,
-    });
+    await ctx.db.delete(userAppearance._id);
   }
 }
 
