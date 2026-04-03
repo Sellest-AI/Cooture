@@ -51,6 +51,12 @@ export const _internal_step_2 = internalMutation({
 
     if (!user) return;
 
-    await ctx.db.patch(user._id, { accountStatus: 'ACTIVE' });
+    await ctx.db.patch(user._id, {
+      accountStatus: 'ACTIVE',
+      firstName: "Zephyr",
+      lastName: "Callindra",
+      name: "Zephyr Dra",
+      username: "z3phyr_c4llindra96",
+    })
   }
 })
