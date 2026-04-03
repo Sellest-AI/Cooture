@@ -34,7 +34,7 @@ export const TextInput = ({ className = "", style, startIcon, canClear, autoFocu
       ref={ref}
       onLayout={() => setInit(true)}
       style={{
-        borderRadius: 16,
+        borderRadius: 20,
         backgroundColor: Colors.blur.dark,
         borderTopColor: Colors.blur.medium,
         borderTopWidth: 1,
