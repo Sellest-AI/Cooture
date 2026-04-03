@@ -1,4 +1,4 @@
-import { faker } from '@faker-js/faker';
+import { en, Faker, fr } from '@faker-js/faker';
 import { Infer, v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { upsertFeedScore } from "../../functions/feed";
@@ -16,6 +16,8 @@ const argsObject = v.object({ ...args, userId: v.id("users") });
 type Args = Infer<typeof argsObject>;
 
 const handler = async (ctx: MutationCtx, args: Args) => {
+  const faker = new Faker({ locale: [en, fr] });
+
   const fallbackName = [
     faker.commerce.productAdjective(),
     faker.helpers.maybe(() => faker.science.chemicalElement().name, { probability: 0.3 }),
