@@ -6,25 +6,32 @@ import { authMutation, internalMutation, MutationCtx } from "../../procedures";
 import { BOOKMARK_TYPE } from "../../schema/collection";
 import { LIKEABLE_TYPE } from "../../schema/likes";
 
+const handler = async (ctx: MutationCtx, userId: Id<'users'>, options: { delayDays: number }) => {
+  const userExtended = await ctx.db.query('usersExtended')
+    .withIndex("by_user_id", q => q.eq("userId", userId))
+    .first();
+
+  if (!userExtended) return false;
+
+  if (userExtended.deleteFunctionId)
+    await ctx.scheduler.cancel(userExtended.deleteFunctionId);
+
+  // Run after 30 days
+  const functionId = await ctx.scheduler.runAfter(options.delayDays * 24 * 60 * 60 * 1000,
+    internal.router.users.deleteAccount._internal_delay, { userId })
+
+  await ctx.db.patch(userExtended._id, { deleteFunctionId: functionId })
+
+  return true;
+}
+
+export const _internal = internalMutation({
+  args: { userId: v.id('users') },
+  handler: async (ctx, { userId }) => handler(ctx, userId, { delayDays: 1 })
+})
+
 export const authed = authMutation({
-  handler: async (ctx) => {
-    const userExtended = await ctx.db.query('usersExtended')
-      .withIndex("by_user_id", q => q.eq("userId", ctx.userId))
-      .first();
-
-    if (!userExtended) return false;
-
-    if (userExtended.deleteFunctionId)
-      await ctx.scheduler.cancel(userExtended.deleteFunctionId);
-
-    // Run after 30 days
-    const functionId = await ctx.scheduler.runAfter(30 * 24 * 60 * 60 * 1000,
-      internal.router.users.deleteAccount._internal_delay, { userId: ctx.userId })
-
-    await ctx.db.patch(userExtended._id, { deleteFunctionId: functionId })
-
-    return true;
-  }
+  handler: async (ctx) => handler(ctx, ctx.userId, { delayDays: 30 })
 })
 
 const deleteGenerations = async (ctx: MutationCtx, userId: Id<'users'>) => {
