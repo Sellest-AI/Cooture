@@ -14,7 +14,8 @@ export const _internal = internalAction({
     body: v.string(),
     data: v.optional(v.any()),
     image: v.optional(v.string()), // URL to image
-    redirectUrl: v.optional(v.string()) // Deep link or screen to navigate to
+    redirectUrl: v.optional(v.string()), // Deep link or screen to navigate to
+    icon: v.optional(v.string()) // URL to icon
   },
   handler: async (ctx, args) => {
     const tokens = await ctx.runQuery(internal.router.notifications.sendPushNotificationSteps._internal_step_1, { userId: args.userId });
@@ -30,7 +31,8 @@ export const _internal = internalAction({
         data: args.redirectUrl ? { ...args.data, url: args.redirectUrl } : args.data,
         sound: "default" as const,
         channelId: args.channelId,
-        ...(args.image && { image: args.image }) // Add image if provided
+        ...(args.image && { richContent: { image: args.image } }), // Add image if provided
+        ...(args.icon && { icon: args.icon }) // Add icon if provided
       }));
 
     const chunks = expo.chunkPushNotifications(messages);

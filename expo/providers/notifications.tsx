@@ -75,15 +75,19 @@ function useNotificationObserver() {
 
     function redirect(notification: Notifications.Notification) {
       const url = notification.request.content.data?.url;
+      console.log(url);
       if (typeof url === 'string') {
-        // ⚠️ Make sure to validate/sanitize the URL in a real app to avoid open redirect vulnerabilities
-        router.push(url as Href);
+        // Wait a tick to ensure router is fully mounted before pushing
+        setTimeout(() => { router.push(url as Href); }, 200);
       }
     }
 
+    // Handle notifications when app is launched from interacting with a notification
     const response = Notifications.getLastNotificationResponse();
+    console.log(response);
     if (response?.notification) redirect(response.notification);
 
+    // Handle notifications received when the app is already open
     const subscription = Notifications.addNotificationResponseReceivedListener(response =>
       redirect(response.notification));
 

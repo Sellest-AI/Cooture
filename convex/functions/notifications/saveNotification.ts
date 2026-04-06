@@ -57,13 +57,17 @@ type Args<T extends Type> = {
     never
   )
 
+type GenerationExtended = Doc<'generations'> & { coverUrl?: string }
+type OutfitExtended = Doc<'outfits'> & { coverUrl?: string }
+type PresetExtended = Doc<'presets'> & { coverUrl?: string }
+
 type ArgsExtended<T extends Type> = Args<T> & (
-  T extends "generation_ready" ? { generation: Nullable<Doc<'generations'>>, type: "generation_ready" } :
+  T extends "generation_ready" ? { generation: Nullable<GenerationExtended>, type: "generation_ready" } :
   T extends "tagged_in_generation" ? { generation: Nullable<Doc<'generations'>>, type: "tagged_in_generation" } :
-  T extends "new_like" ? { generation?: Nullable<Doc<'generations'>>, outfit?: Nullable<Doc<'outfits'>>, actor?: Nullable<Doc<'usersExtended'>>, type: "new_like" } :
+  T extends "new_like" ? { generation?: Nullable<GenerationExtended>, outfit?: Nullable<OutfitExtended>, actor?: Nullable<Doc<'usersExtended'>>, type: "new_like" } :
   T extends "new_follower" ? { follower: Nullable<Doc<'usersExtended'>>, type: "new_follower" } :
-  T extends "outfit_used" ? { outfit: Nullable<Doc<'outfits'>>, type: "outfit_used", actor?: Nullable<Doc<'usersExtended'>> } :
-  T extends "preset_used" ? { preset: Nullable<Doc<'presets'>>, type: "preset_used", actor?: Nullable<Doc<'usersExtended'>> } :
+  T extends "outfit_used" ? { outfit: Nullable<OutfitExtended>, type: "outfit_used", actor?: Nullable<Doc<'usersExtended'>> } :
+  T extends "preset_used" ? { preset: Nullable<PresetExtended>, type: "preset_used", actor?: Nullable<Doc<'usersExtended'>> } :
   never
 )
 
@@ -71,6 +75,7 @@ type PushNotification = {
   title: string,
   body: string,
   image?: string;
+  icon?: string;
   redirectUrl?: string;
 }
 
@@ -84,11 +89,12 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
       return {
         title: "Your generation is ready",
         body: "Tap to view",
+        image: args.generation?.coverUrl,
         redirectUrl: ROUTES.GENERATIONS.PHOTOSHOOT.ID(args.generationId)
       }
     case "tagged_in_generation":
       return {
-        title: "You were tagged in a generation",
+        title: "📷 You were tagged in a generation",
         body: "Tap to view",
         redirectUrl: FALLBACK_ROUTE
       }
@@ -96,7 +102,7 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
       return {
         title: "You have a new follower",
         body: "Tap to view",
-        image: args.follower?.imageUrl,
+        icon: args.follower?.imageUrl,
         redirectUrl: args.follower ? ROUTES.USER.ID(args.follower._id) : FALLBACK_ROUTE
       }
     case "new_like":
@@ -104,31 +110,35 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
         return {
           title: `+${aggregationCount} people liked your post`,
           body: "Tap to view",
-          image: args.actor?.imageUrl,
+          icon: args.actor?.imageUrl,
+          image: args.generation?.coverUrl,
           redirectUrl: FALLBACK_ROUTE
         }
       return {
         title: "You have a new like",
         body: "Tap to view",
-        image: args.actor?.imageUrl,
+        icon: args.actor?.imageUrl,
+        image: args.generation?.coverUrl,
         redirectUrl: FALLBACK_ROUTE
       }
     case "preset_used":
       return {
         title:
-          aggregationCount > 1 ? `+${aggregationCount} people used your preset` :
-            `${args.actor?.name ?? "Someone"} used your preset`,
+          aggregationCount > 1 ? `📷 +${aggregationCount} people used your preset` :
+            `📷 ${args.actor?.name ?? "Someone"} used your preset`,
         body: "Tap to view",
-        image: args.actor?.imageUrl,
+        icon: args.actor?.imageUrl,
+        image: args.preset?.coverUrl,
         redirectUrl: FALLBACK_ROUTE
       }
     case "outfit_used":
       return {
         title:
-          aggregationCount > 1 ? `+${aggregationCount} people used your outfit` :
-            `${args.actor?.name ?? "Someone"} used your outfit`,
+          aggregationCount > 1 ? `👕 +${aggregationCount} people used your outfit` :
+            `👕 ${args.actor?.name ?? "Someone"} used your outfit`,
         body: "Tap to view",
-        image: args.actor?.imageUrl,
+        icon: args.actor?.imageUrl,
+        image: args.outfit?.coverUrl,
         redirectUrl: ROUTES.SHARE.USER(args.actorId)
       }
   }
@@ -170,8 +180,13 @@ const getUserId = (args: ArgsExtended<Type>) => {
 
 async function getObjects(ctx: QueryCtx, args: Args<Type>): Promise<ArgsExtended<Type>> {
   if (args.type === "generation_ready") {
-    const generation = await ctx.db.query("generations").withIndex("by_id", q => q.eq("_id", args.generationId)).first();
-    return { ...args, generation };
+    const [generation, predictions] = await Promise.all([
+      ctx.db.query("generations").withIndex("by_id", q => q.eq("_id", args.generationId)).first(),
+      ctx.db.query("predictions").withIndex("by_generation_id", q => q.eq("generationId", args.generationId)).collect()
+    ]);
+    const coverId = predictions.find((p) => p.status === 'ACCEPTED')?.imageId ?? predictions[0]?.imageId;
+    const cover = coverId ? await ctx.db.get(coverId) : undefined;
+    return { ...args, generation: generation ? { ...generation, coverUrl: cover?.url } : undefined };
   }
 
   if (args.type === "tagged_in_generation") {
@@ -187,25 +202,33 @@ async function getObjects(ctx: QueryCtx, args: Args<Type>): Promise<ArgsExtended
   if (args.type === "new_like") {
     const actor = await ctx.db.query("usersExtended").withIndex("by_user_id", q => q.eq("userId", args.actorId)).first();
     if (args.generationId) {
-      const generation = await ctx.db.query("generations").withIndex("by_id", q => q.eq("_id", args.generationId)).first();
-      return { ...args, generation, actor };
+      const [generation, predictions] = await Promise.all([
+        ctx.db.query("generations").withIndex("by_id", q => q.eq("_id", args.generationId)).first(),
+        ctx.db.query("predictions").withIndex("by_generation_id", q => q.eq("generationId", args.generationId)).collect()
+      ]);
+      const coverId = predictions.find((p) => p.status === 'ACCEPTED')?.imageId ?? predictions[0]?.imageId;
+      const cover = coverId ? await ctx.db.get(coverId) : undefined;
+      return { ...args, generation: generation ? { ...generation, coverUrl: cover?.url } : undefined };
     }
     else if (args.outfitId) {
       const outfit = await ctx.db.query("outfits").withIndex("by_id", q => q.eq("_id", args.outfitId)).first();
-      return { ...args, outfit, actor };
+      const cover = outfit?.coverId ? await ctx.db.get(outfit.coverId) : undefined;
+      return { ...args, outfit: outfit ? { ...outfit, coverUrl: cover?.url } : undefined, actor };
     }
   }
 
   if (args.type === "outfit_used") {
     const outfit = await ctx.db.query("outfits").withIndex("by_id", q => q.eq("_id", args.outfitId)).first();
     const actor = await ctx.db.query("usersExtended").withIndex("by_user_id", q => q.eq("userId", args.actorId)).first();
-    return { ...args, outfit, actor };
+    const cover = outfit?.coverId ? await ctx.db.get(outfit.coverId) : undefined;
+    return { ...args, outfit: outfit ? { ...outfit, coverUrl: cover?.url } : undefined, actor };
   }
 
   if (args.type === "preset_used") {
     const preset = await ctx.db.query("presets").withIndex("by_id", q => q.eq("_id", args.presetId)).first();
     const actor = await ctx.db.query("usersExtended").withIndex("by_user_id", q => q.eq("userId", args.actorId)).first();
-    return { ...args, preset, actor };
+    const cover = preset?.imageIds?.[0] ? await ctx.db.get(preset.imageIds[0]) : undefined;
+    return { ...args, preset: preset ? { ...preset, coverUrl: cover?.url } : undefined, actor };
   }
 
   return args;
