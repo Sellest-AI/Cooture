@@ -3,40 +3,27 @@ import * as Notifications from 'expo-notifications';
 import { router, usePathname } from "expo-router";
 import { atom, useAtomValue } from "jotai";
 import { useEffect, useRef } from "react";
-import { Platform } from "react-native";
 import { ROUTES } from "routes";
 
 export const claimedAtom = atom(false);
 
-function useStreakNotification() {
-  const claimed = useAtomValue(claimedAtom);
-  const { wallet } = useAccount.Wallet();
-  const { isInWaitlist } = useAccount();
+export const scheduleStreakNotification = (nextClaimAt: number) => {
+  const secondsUntilNextClaim = Math.floor((nextClaimAt - Date.now()) / 1000);
+  if (secondsUntilNextClaim <= 0) return;
 
-  useEffect(() => {
-    if (Platform.OS === 'web') return;
-    if (isInWaitlist) return;
-    if (!wallet?.nextClaimAt) return;
-    if (!wallet.canClaimNow) return;
-    if (claimed) return;
-
-    const secondsUntilNextClaim = Math.floor((wallet.nextClaimAt - Date.now()) / 1000);
-    if (secondsUntilNextClaim <= 0) return;
-
-    Notifications.scheduleNotificationAsync({
-      identifier: "streak-reminder",
-      content: {
-        title: "Don't break your streak 🔥",
-        body: "Open the app and get your daily credits!",
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-        seconds: secondsUntilNextClaim,
-        repeats: false,
-        channelId: "streak",
-      },
-    });
-  }, [claimed, isInWaitlist, wallet]);
+  Notifications.scheduleNotificationAsync({
+    identifier: "streak-reminder",
+    content: {
+      title: "Don't break your streak 🔥",
+      body: "Open the app and get your daily credits!",
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds: secondsUntilNextClaim,
+      repeats: false,
+      channelId: "streak",
+    },
+  });
 }
 
 export const StreakProvider = ({ children }: { children: React.ReactNode }) => {
@@ -47,9 +34,6 @@ export const StreakProvider = ({ children }: { children: React.ReactNode }) => {
 
   // If the user just created their account, consider them as having claimed the streak for today to avoid showing the modal immediately
   const isFirstDay = (Date.now() - (wallet?._creationTime ?? 0) < 24 * 60 * 60 * 1000);
-
-  // Show the daily streak notification if the user hasn't claimed their streak yet
-  useStreakNotification();
 
   const pushed = useRef(false);
 

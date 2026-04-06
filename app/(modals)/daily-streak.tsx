@@ -1,6 +1,6 @@
 import { useAccount } from "@/lib/convex/auth";
 import { api, useMutation } from "@/lib/convex/client";
-import { claimedAtom } from "@/modules/credits/streak-provider";
+import { claimedAtom, scheduleStreakNotification } from "@/modules/credits/streak-provider";
 import { Block } from "@ui/block";
 import { ButtonSlider } from "@ui/button.slider";
 import { useNumberIncrement } from "@ui/hooks/use-number-increment";
@@ -408,7 +408,14 @@ export default function Screen() {
         <ButtonSlider
           startIcon={Gift}
           onComplete={async () => {
+            if (!wallet) return false;
+
             setClaimed(true);
+
+            // The backend requires 20 hours between claims (MIN_HOURS_BETWEEN_CLAIMS)
+            // So the next claim will be available exactly 20 hours from now
+            scheduleStreakNotification(Date.now() + 20 * 60 * 60 * 1000);
+
             // Await delay 500ms;
             await new Promise(resolve => setTimeout(resolve, 500));
 
