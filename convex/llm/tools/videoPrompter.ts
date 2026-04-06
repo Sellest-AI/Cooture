@@ -43,7 +43,8 @@ Style: realistic - cinematic - The woman glances at her watch and smiles warmly.
 export const videoPrompter = createTool({
   description: "Take an image and generate a concise, action-focused prompt for video generation based on the image.",
   args: z.object({
-    imageUrl: z.url()
+    imageUrl: z.url(),
+    durationS: z.number(),
   }),
   handler: async (ctx, args) => {
     const response = await fetch(args.imageUrl);
@@ -59,6 +60,7 @@ export const videoPrompter = createTool({
           role: 'user',
           content: [
             { type: 'image' as const, image: arrayBuffer },
+            { type: 'text' as const, text: `Generate a video prompt based on the above image that is ${args.durationS} seconds long.` }
           ]
         }
       ],

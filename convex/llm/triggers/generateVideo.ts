@@ -43,12 +43,18 @@ export const handler = async (ctx: ActionCtx, { generation, predictionId, newGen
   const image = await ctx.runQuery(internal.router.storage.images.getOne._internal, { id: imageId });
   if (!image) throw new Error("Image not found");
 
-  const prompt = await videoPrompter.handler({ ...ctx }, { imageUrl: image.sizes.large.url });
+  // For now we hardcode to 4 seconds, but we could allow the user to specify this in the future
+  const durationS = 4;
+
+  const prompt = await videoPrompter.handler({ ...ctx }, {
+    imageUrl: image.sizes.large.url,
+    durationS,
+  });
 
   const run = await generateVideo({
     imageUrl: image.url,
     imageId: image._id,
-    durationMs: 4 * 1000,
+    durationMs: durationS * 1000,
     prompt,
     callback: {
       userId: userId,
