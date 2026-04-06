@@ -1,6 +1,5 @@
 import { api, Id } from "@/lib/convex/api";
 import { useAction, useMutation, usePaginatedQuery, useQueryCached } from "@/lib/convex/client";
-import { useUpload } from "@/lib/convex/upload";
 import { compressImage } from "@/lib/image/client/editing";
 import { atom, useAtom } from "jotai";
 import { useEffect, useMemo } from "react";
@@ -43,9 +42,7 @@ type PendingItem = {
 const pendingItemsAtom = atom<PendingItem[]>([]);
 
 export const useCreateItem = () => {
-  const { uploadImage } = useUpload();
   const { action: removeBackground } = useAction(api.llm.triggers.removeBackground.authed);
-  const { action: createItem } = useAction(api.router.items.createOne.authed);
 
   const [pendingItems, setPendingItems] = useAtom(pendingItemsAtom);
 
@@ -64,7 +61,7 @@ export const useCreateItem = () => {
 
     const compressed = await compressImage(item.image.url, { maxResolution: 2048, keepMimeType: false });
     const base64 = await compressed.toBase64();
-    const { hasAlpha } = await removeBackground({
+    await removeBackground({
       base64: base64,
       nextStep: 'CREATE_ITEM',
       nextArgs: {
@@ -76,18 +73,6 @@ export const useCreateItem = () => {
         }
       }
     });
-
-    if (hasAlpha) {
-      const image = await uploadImage(compressed.uri);
-      createItem({
-        imageId: image._id,
-        metadata: {
-          name: item.name,
-          description: item.description,
-          itemUrl: item.url,
-        }
-      })
-    }
 
     setPendingItems((prev) => [...prev, {
       key: item.key,

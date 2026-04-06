@@ -22,6 +22,7 @@ export const createItem = async (ctx: ActionCtx, data: Args): Promise<Id<"items"
       brand: data.metadata.brand,
       name: data.metadata.name,
       description: data.metadata.description,
+      url: data.metadata.itemUrl,
     } : undefined,
   })
 

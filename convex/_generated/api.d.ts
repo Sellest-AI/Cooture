@@ -164,6 +164,7 @@ import type * as router_items_getFromUser from "../router/items/getFromUser.js";
 import type * as router_items_getMany from "../router/items/getMany.js";
 import type * as router_items_getOne from "../router/items/getOne.js";
 import type * as router_items_getPaginated from "../router/items/getPaginated.js";
+import type * as router_items_replaceImage from "../router/items/replaceImage.js";
 import type * as router_items_searchMany from "../router/items/searchMany.js";
 import type * as router_likes_getLiked from "../router/likes/getLiked.js";
 import type * as router_likes_getLikes from "../router/likes/getLikes.js";
@@ -429,6 +430,7 @@ declare const fullApi: ApiFromModules<{
   "router/items/getMany": typeof router_items_getMany;
   "router/items/getOne": typeof router_items_getOne;
   "router/items/getPaginated": typeof router_items_getPaginated;
+  "router/items/replaceImage": typeof router_items_replaceImage;
   "router/items/searchMany": typeof router_items_searchMany;
   "router/likes/getLiked": typeof router_likes_getLiked;
   "router/likes/getLikes": typeof router_likes_getLikes;

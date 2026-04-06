@@ -28,7 +28,6 @@ export default function RemoveBackgroundScreen() {
     'compressing' | 'removing' | 'uploading' | 'analyzing'>
     ('removing');
 
-  const { action: createItem } = useAction(api.router.items.createOne.authed);
   const { action: removeBackground } = useAction(api.llm.triggers.removeBackground.authed);
 
   const { data: image } = useQuery(api.router.storage.images.getLatest.authed);
@@ -94,16 +93,9 @@ export default function RemoveBackgroundScreen() {
       setDisplayImage(compressed.uri);
 
       setStep('removing');
-      const { hasAlpha } = await removeBackground({ base64: base64, nextStep: 'CREATE_ITEM' });
-
-      // If the image has an alpha channel, we can skip the background removal step and directly upload it
-      if (hasAlpha) {
-        setStep('uploading');
-        const image = await uploadImage(compressed.uri);
-        await createItem({ imageId: image._id });
-      }
+      await removeBackground({ base64: base64, nextStep: 'CREATE_ITEM' });
     })();
-  }, [createItem, imageScanned, removeBackground, uploadImage])
+  }, [imageScanned, removeBackground, uploadImage])
 
   if (!imageScanned) {
     return <Redirect href={ROUTES.SCAN} />;

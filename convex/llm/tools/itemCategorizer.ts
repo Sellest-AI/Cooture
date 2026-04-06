@@ -30,6 +30,8 @@ When in doubt about content rating, default to the most conservative option.
 
 The order of the fields in the arrays ARE VERY IMPORTANT and should reflect the prominence of each attribute in the item.
 
+If a URL is included, do not mix the website's domain name with the clothing brand (for example, zalando = website, adidas = brand).
+
 RETURN THE DATA IN JSON FORMAT ONLY.
 `
 
@@ -42,6 +44,7 @@ export const itemCategorizer = createTool({
       brand: z.optional(z.string()),
       name: z.optional(z.string()),
       description: z.optional(z.string()),
+      url: z.optional(z.string()),
     })),
   }),
   handler: async (ctx, args) => {

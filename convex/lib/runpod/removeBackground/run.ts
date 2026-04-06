@@ -3,7 +3,7 @@ import { runAsync } from "../run";
 import { TaskInput } from "../types";
 
 type TaskInputExtended = Omit<TaskInput, 'callback'> & { callback: Callback }
-type Callback = TaskInput['callback'] & { nextStep: 'SAVE_IMAGE' | 'CREATE_ITEM', nextArgs?: object };
+type Callback = TaskInput['callback'] & { nextStep: string, nextArgs?: object };
 
 export type RemoveBackgroundOutput = TaskInputExtended &
 { url: string, position: { left: number, top: number }, format: 'webp' }

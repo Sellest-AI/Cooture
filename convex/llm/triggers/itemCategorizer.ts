@@ -13,6 +13,7 @@ export const _internal = internalAction({
       brand: v.optional(v.string()),
       name: v.optional(v.string()),
       description: v.optional(v.string()),
+      url: v.optional(v.string()),
     })),
   },
   handler: async (ctx, { imageId, extractText, metadata }) => {

@@ -7,6 +7,7 @@ import { ITEMS_SCHEMA } from "../../schema/items";
 const sharedArgs = {
   imageId: v.id("images"),
   metadata: v.optional(v.object({
+    brand: v.optional(v.string()),
     name: v.optional(v.string()),
     description: v.optional(v.string()),
     itemUrl: v.optional(v.string()),
