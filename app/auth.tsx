@@ -1,5 +1,6 @@
 import { ROUTES } from '@/hooks';
 import { useAuthActions } from '@/lib/convex/auth';
+import { useConfig } from '@/modules/config/_hooks';
 import { Button } from '@ui/button';
 import { Image } from '@ui/image';
 import { LinearGradient } from '@ui/linear-gradient';
@@ -10,7 +11,6 @@ import { VideoView } from '@ui/video-view';
 import { removeUndefinedKeys } from '@utils/convex-allowed';
 import { env } from 'env';
 import { AppleAuthenticationButton, AppleAuthenticationButtonStyle, AppleAuthenticationButtonType } from "expo-apple-authentication";
-import { isTestFlight } from 'expo-testflight';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, Platform, View } from 'react-native';
 import { Colors } from 'theme';
@@ -89,6 +89,8 @@ const LoginButtons = () => {
   const [init, setInit] = useState(false);
   useEffect(() => { setTimeout(() => setInit(true), 500) }, [])
 
+  const { isUpcomingVersion } = useConfig();
+
   const { isLoading, signInGoogle, signInApple, signInTester } = useAuthActions();
   const [innerLoading, setInnerLoading] = useState<"google" | "apple" | null>(null);
 
@@ -97,7 +99,7 @@ const LoginButtons = () => {
   const list: ("google" | "apple")[]
     = Platform.OS === "ios" ? ["apple", "google"] : ["google"];
 
-  const showTestAccount = (env.PUBLIC_NODE_ENV !== 'production' || isTestFlight);
+  const showTestAccount = (env.PUBLIC_NODE_ENV !== 'production' || isUpcomingVersion);
 
   return (
     <>
