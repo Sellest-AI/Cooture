@@ -23,7 +23,7 @@ import { TextInput } from "@ui/text-input";
 import { router } from "expo-router";
 import { WEBSITE } from "global";
 import { useMemo, useState } from "react";
-import { Keyboard, Share, View } from "react-native";
+import { Keyboard, Platform, Share, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -354,10 +354,13 @@ export default function ItemScreen() {
                     style={{ marginBottom: 12 }}
                     startIcon={ShareIcon}
                     onPress={() => {
-                      Share.share({
-                        title: WEBSITE.URL + ROUTES.SHARE.OUTFIT(id),
-                        url: WEBSITE.URL + ROUTES.SHARE.OUTFIT(id),
-                        message: WEBSITE.URL + ROUTES.SHARE.OUTFIT(id),
+                      const url = WEBSITE.URL + ROUTES.SHARE.OUTFIT(id);
+                      Share.share(Platform.OS === 'ios' ? {
+                        url,
+                        message: `Check out this outfit on Cooture! ${url}`,
+                      } : {
+                        title: `Check out this outfit on Cooture!`,
+                        message: url,
                       })
                     }}
                   >

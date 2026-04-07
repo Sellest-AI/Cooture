@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryCachedData } from "@/lib/convex/client";
 import { Post } from "@ui/cards";
 import { notEmpty } from "@utils/convex-allowed";
 import { WEBSITE } from "global";
-import { Share, ViewStyle } from "react-native";
+import { Platform, Share, ViewStyle } from "react-native";
 
 export const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle }) => {
   const { push } = useRouter('/feed');
@@ -38,11 +38,14 @@ export const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle
     onToggleLike={(v) => toggleLike({ outfitId: id, value: v })}
     likedAccounts={likes?.latestLikers.map(l => l.image).filter(notEmpty)}
     isLiked={liked}
-    onShare={async (id) => {
-      Share.share({
-        title: WEBSITE.URL + ROUTES.SHARE.OUTFIT(id),
-        url: WEBSITE.URL + ROUTES.SHARE.OUTFIT(id),
-        message: WEBSITE.URL + ROUTES.SHARE.OUTFIT(id),
+    onShare={(_id) => {
+      const url = WEBSITE.URL + ROUTES.SHARE.OUTFIT(_id);
+      Share.share(Platform.OS === 'ios' ? {
+        url,
+        message: `Check out this outfit on Cooture! ${url}`,
+      } : {
+        title: `Check out this outfit on Cooture!`,
+        message: url,
       })
     }}
     users={user ? [{

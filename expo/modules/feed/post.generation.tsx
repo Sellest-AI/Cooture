@@ -6,7 +6,7 @@ import { Post } from "@ui/cards";
 import { notEmpty } from "@utils/convex-allowed";
 import { env } from "env";
 import { WEBSITE } from "global";
-import { Share, ViewStyle } from "react-native";
+import { Platform, Share, ViewStyle } from "react-native";
 
 type Props = {
   id: Id<'generations'>;
@@ -47,11 +47,14 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
     onToggleLike={(v) => toggleLike({ generationId: id, value: v })}
     likedAccounts={likes?.latestLikers.map(l => l.image).filter(notEmpty)}
     isLiked={liked}
-    onShare={async (_id) => {
-      Share.share({
-        title: WEBSITE.URL + ROUTES.SHARE.POST(_id),
-        url: WEBSITE.URL + ROUTES.SHARE.POST(_id),
-        message: WEBSITE.URL + ROUTES.POST.ID(_id),
+    onShare={(_id) => {
+      const url = WEBSITE.URL + ROUTES.SHARE.POST(_id);
+      Share.share(Platform.OS === 'ios' ? {
+        url,
+        message: `Check out this post on Cooture! ${url}`,
+      } : {
+        title: `Check out this post on Cooture!`,
+        message: url,
       })
     }}
     images={images?.map((img) => ({
