@@ -6,7 +6,6 @@ import { AuthProvider } from './auth'
 import { ConvexClientProvider } from "./convex-client"
 import { I18nProvider } from "./i18n"
 import { MotionProvider } from "./motion"
-import { NotificationsProvider } from './notifications'
 import { RevenueCatProvider } from './revenue-cat'
 import { ThemeProvider } from "./theme"
 
@@ -26,9 +25,7 @@ export const Providers = ({ children }: Props) => {
                   <AsyncProviders>
                     <AuthProvider>
                       <RevenueCatProvider>
-                        <NotificationsProvider>
-                          {children}
-                        </NotificationsProvider>
+                        {children}
                       </RevenueCatProvider>
                     </AuthProvider>
                   </AsyncProviders>

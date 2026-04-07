@@ -2,8 +2,10 @@
 
 import { SplashScreen } from "expo-router";
 import { useEffect, useState } from "react";
+import { DeepLinkProvider } from "./deep-link";
 import { FontsProvider } from "./fonts";
 import { NativeUpdateProvider } from "./native-update";
+import { NotificationsProvider } from "./notifications";
 import { OTAUpdateProvider } from "./ota-update";
 
 SplashScreen.preventAutoHideAsync();
@@ -26,6 +28,8 @@ export const AsyncProviders = ({ children }: Props) => {
       <FontsProvider onComplete={() => setLoadedLeft((p) => p - 1)} />
       <OTAUpdateProvider />
       <NativeUpdateProvider />
+      <NotificationsProvider />
+      <DeepLinkProvider />
       {/* <ThemeProvider /> */}
     </>
   )

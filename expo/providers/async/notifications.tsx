@@ -20,7 +20,6 @@ Notifications.setNotificationHandler({
   }),
 });
 
-
 async function registerForPushNotificationsAsync() {
   let token;
 
@@ -93,7 +92,7 @@ function useNotificationObserver() {
   }, []);
 }
 
-export const NotificationsProvider = ({ children }: { children: React.ReactNode }) => {
+export const NotificationsProvider = () => {
   const [triggered, setTriggered] = useAtom(triggeredAtom);
   const { user } = useAccount();
 
@@ -121,5 +120,5 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     setTriggered(true);
   }, [user, register, setTriggered, triggered])
 
-  return children;
+  return null;
 }
