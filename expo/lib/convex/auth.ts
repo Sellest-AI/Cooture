@@ -1,5 +1,4 @@
 import { useAuthToken, useAuthActions as useConvexAuthActions } from "@convex-dev/auth/react";
-import { env } from "env";
 import { makeRedirectUri } from "expo-auth-session";
 import { Href, router } from "expo-router";
 import { reloadAsync } from "expo-updates";
@@ -59,7 +58,6 @@ export const useAuthActions = () => {
   const signInApple = useCallback(async (route?: Href) => signIn("apple", route), [signIn]);
 
   const signInTester = useCallback(async () => {
-    if (env.PUBLIC_NODE_ENV === 'production') return;
     const account = await getTestAccount();
     convex.signIn("password", { email: account.email, password: account.password, flow: "signIn" })
   }, [convex, getTestAccount])
