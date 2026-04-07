@@ -61,7 +61,7 @@ export const WaitlistBlock = ({ style }: Props) => {
               style={{ flex: 1, overflow: 'visible' }}
               textBreakStrategy="balanced"
             >
-              Share your invite code and get early access for your friends when they sign up.
+              Share your code with friends and unlock their spot in Cooture.
             </Text.Sm>
             <ArrowUpRight
               color={Colors.primary[200]}

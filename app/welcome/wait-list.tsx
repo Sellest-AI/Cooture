@@ -75,7 +75,7 @@ export default function Screen() {
             borderRadius: 99
           }}
         >
-          <Text.Sm color={Colors.neutral[400]} weight={600}>Closed Beta</Text.Sm>
+          <Text.Sm color={Colors.neutral[400]} weight={600}>Founding Members</Text.Sm>
         </Block>
         <View
           style={{
