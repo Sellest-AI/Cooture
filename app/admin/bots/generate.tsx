@@ -124,7 +124,8 @@ const Duo = ({ onSelect, userId }: { onSelect: (userId: Id<'users'>) => void, us
 }
 
 const Outfits = ({ onSelect, outfitId }: { onSelect: (outfitId: Id<'outfits'> | null) => void, outfitId: Id<'outfits'> | null }) => {
-  const { data: outfits } = useQueryCachedData(api.router.outfits.getLatest.anon, { key: 'latestOutfits' });
+  const { userId } = useRoute('/admin/bots/generate');
+  const { data: outfits } = useQueryCachedData(api.router.outfits.getAll.anon, { key: 'latestOutfits', userId: userId ?? undefined });
 
   useEffect(() => {
     if (!outfits) return;
