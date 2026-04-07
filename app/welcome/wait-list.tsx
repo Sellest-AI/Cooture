@@ -81,7 +81,8 @@ export default function Screen() {
           style={{
             marginTop: 12,
             marginHorizontal: 'auto',
-            width: '95%'
+            width: '95%',
+            maxWidth: 290,
           }}
         >
           <Text.H1
