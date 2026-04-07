@@ -78,7 +78,6 @@ const MediaList = () => {
       style={{ marginHorizontal: 6 }}
       renderItem={({ item, index }) => {
         const remainingSlots = assets.length % COLUMNS === 0 ? 0 : (COLUMNS - (assets.length % COLUMNS));
-        console.log(remainingSlots);
         const hasBorderBottomLeftRadius = index === assets.length - (COLUMNS - remainingSlots);
 
         return (

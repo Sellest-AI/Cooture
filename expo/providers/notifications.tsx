@@ -75,7 +75,6 @@ function useNotificationObserver() {
 
     function redirect(notification: Notifications.Notification) {
       const url = notification.request.content.data?.url;
-      console.log(url);
       if (typeof url === 'string') {
         // Wait a tick to ensure router is fully mounted before pushing
         setTimeout(() => { router.push(url as Href); }, 200);
@@ -84,7 +83,6 @@ function useNotificationObserver() {
 
     // Handle notifications when app is launched from interacting with a notification
     const response = Notifications.getLastNotificationResponse();
-    console.log(response);
     if (response?.notification) redirect(response.notification);
 
     // Handle notifications received when the app is already open
