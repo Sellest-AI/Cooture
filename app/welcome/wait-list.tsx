@@ -1,6 +1,7 @@
 import { ROUTES, useRouter } from "@/hooks";
 import { useAccount } from "@/lib/convex/auth";
 import { api, useMutation, useQueryCachedData } from "@/lib/convex/client";
+import { KeyboardAvoiderView } from "@good-react-native/keyboard-avoider";
 import { Block } from "@ui/block";
 import { BlurKeys, BlurTargetView } from "@ui/blur-view";
 import { Button } from "@ui/button";
@@ -97,25 +98,26 @@ export default function Screen() {
             If you have a code to access the app, enter it bellow
           </Text.H4>
         </View>
-        <TextInput
-          style={{ marginTop: 24 }}
-          startIcon={QrCode}
-          placeholder="Code"
-          value={code}
-          onChangeText={setCode}
-        />
-        <Button
-          style={{ marginTop: 8 }}
-          variant="blur"
-          disabled={code.length < 7}
-          onPress={async () => {
-            // Fake 1000ms
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            await enterCode({ code });
-          }}
-        >
-          Discover the future
-        </Button>
+        <KeyboardAvoiderView style={{ marginTop: 24 }}>
+          <TextInput
+            startIcon={QrCode}
+            placeholder="Code"
+            value={code}
+            onChangeText={setCode}
+          />
+          <Button
+            style={{ marginTop: 8 }}
+            variant={code.length >= 7 ? "primary" : "blur"}
+            disabled={code.length < 7}
+            onPress={async () => {
+              // Fake 1000ms
+              await new Promise(resolve => setTimeout(resolve, 1000));
+              await enterCode({ code });
+            }}
+          >
+            Discover the future
+          </Button>
+        </KeyboardAvoiderView>
         {stats ?
           <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 8, alignItems: 'center' }}>
             <Text.Base color={Colors.neutral[50]} style={{ marginRight: 3 }}>
