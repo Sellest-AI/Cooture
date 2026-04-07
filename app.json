@@ -12,7 +12,8 @@
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.cooture.app",
       "associatedDomains": [
-        "applinks:cooture.app"
+        "applinks:cooture.app",
+        "applinks:www.cooture.app"
       ],
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -50,32 +51,32 @@
           "data": [
             {
               "scheme": "https",
-              "host": "cooture.app",
+              "host": "www.cooture.app",
               "pathPrefix": "/p"
             },
             {
               "scheme": "https",
-              "host": "cooture.app",
+              "host": "www.cooture.app",
               "pathPrefix": "/u"
             },
             {
               "scheme": "https",
-              "host": "cooture.app",
+              "host": "www.cooture.app",
               "pathPrefix": "/o"
             },
             {
               "scheme": "https",
-              "host": "cooture.app",
+              "host": "www.cooture.app",
               "pathPrefix": "/i"
             },
             {
               "scheme": "https",
-              "host": "cooture.app",
+              "host": "www.cooture.app",
               "pathPrefix": "/share"
             },
             {
               "scheme": "https",
-              "host": "cooture.app",
+              "host": "www.cooture.app",
               "pathPrefix": "/link"
             }
           ]
