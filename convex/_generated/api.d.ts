@@ -234,7 +234,7 @@ import type * as router_users_follows_checkFollowing from "../router/users/follo
 import type * as router_users_follows_getFollowStats from "../router/users/follows/getFollowStats.js";
 import type * as router_users_follows_getFollowersPaginated from "../router/users/follows/getFollowersPaginated.js";
 import type * as router_users_follows_getFollowingPaginated from "../router/users/follows/getFollowingPaginated.js";
-import type * as router_users_follows_getRelatedPaginated from "../router/users/follows/getRelatedPaginated.js";
+import type * as router_users_follows_getWithAppearancePaginated from "../router/users/follows/getWithAppearancePaginated.js";
 import type * as router_users_follows_toggleFollow from "../router/users/follows/toggleFollow.js";
 import type * as router_users_getAccount from "../router/users/getAccount.js";
 import type * as router_users_getAppearance from "../router/users/getAppearance.js";
@@ -501,7 +501,7 @@ declare const fullApi: ApiFromModules<{
   "router/users/follows/getFollowStats": typeof router_users_follows_getFollowStats;
   "router/users/follows/getFollowersPaginated": typeof router_users_follows_getFollowersPaginated;
   "router/users/follows/getFollowingPaginated": typeof router_users_follows_getFollowingPaginated;
-  "router/users/follows/getRelatedPaginated": typeof router_users_follows_getRelatedPaginated;
+  "router/users/follows/getWithAppearancePaginated": typeof router_users_follows_getWithAppearancePaginated;
   "router/users/follows/toggleFollow": typeof router_users_follows_toggleFollow;
   "router/users/getAccount": typeof router_users_getAccount;
   "router/users/getAppearance": typeof router_users_getAppearance;

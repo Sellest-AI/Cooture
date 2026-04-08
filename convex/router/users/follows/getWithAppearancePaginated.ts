@@ -13,20 +13,25 @@ export const authed = authQuery({
       .order("desc")
       .paginate(args.paginationOpts);
 
-    const loadMore = followers.isDone && followers.page.length < 21;
-    const result = loadMore ? await ctx.db.query("users").order("desc")
-      .take(21) : [];
+    const userIds = followers.page.map(follow => follow.followingId);
+    const users = await Promise.all(userIds.map(async (userId) => {
+      const appearance = await ctx.db.query("usersAppearance")
+        .withIndex("by_user_id", q => q.eq("userId", userId))
+        .first();
 
-    const users = await Promise.all(Array.from(new Set([
-      ...followers.page.map(follow => follow.followingId),
-      ...result.map(user => user._id),
-    ]))
+      if (!appearance) return null;
+      if (!appearance.frontImageId) return null;
+
+      return userId;
+    }));
+
+    const results = await Promise.all(users.filter(notEmpty)
       .filter((user) => user !== ctx.userId)
-      .map((user) => getUserPublic(ctx, user)))
+      .map((user) => getUserPublic(ctx, user)));
 
     return {
       ...followers,
-      page: users.filter(notEmpty)
+      page: results.filter(notEmpty)
     }
   }
 })

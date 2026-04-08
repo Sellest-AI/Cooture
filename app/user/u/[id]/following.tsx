@@ -23,7 +23,7 @@ export default function Screen() {
         ListHeaderComponent={
           <ModalHeader
             title="Following"
-            style={{ marginBottom: 28, paddingTop: 12 }}
+            style={{ marginBottom: 28, paddingTop: 12, paddingHorizontal: 4 }}
             onBack={router.canGoBack() ? () => router.back() : undefined}
           />
         }
@@ -42,14 +42,14 @@ export default function Screen() {
         onEndReached={() => loadMore(20)}
         data={results}
         keyExtractor={item => item._id}
-        numColumns={2}
-        contentContainerStyle={{ paddingHorizontal: 12 }}
+        numColumns={3}
+        contentContainerStyle={{ paddingHorizontal: 8 }}
         renderItem={({ item }) => (
           <Pressable
             onPress={() => replace(ROUTES.USER.PATH, { pathParams: { id: item._id } })}
             style={{
               marginHorizontal: 12,
-              marginBottom: 32,
+              marginBottom: 40,
               justifyContent: 'center',
               alignItems: 'center',
               flex: 1,
@@ -57,14 +57,24 @@ export default function Screen() {
           >
             <Badge
               source={item.image ?? require('assets/backgrounds/dark-gradient.png')}
-              style={{ width: 96, height: 96, marginBottom: 16 }}
+              style={{ width: 82, height: 82, marginBottom: 16 }}
             />
-            <Text.Lg
+            <Text.Sm
+              color={Colors.neutral[400]}
+              style={{ textAlign: 'center', maxWidth: '90%' }}
+              numberOfLines={1}
+              weight={600}
+            >
+              @{item.username}
+            </Text.Sm>
+            <Text.Sm
               color={Colors.foreground}
-              style={{ textAlign: 'center' }}
+              style={{ textAlign: 'center', maxWidth: '90%', marginTop: 2 }}
+              numberOfLines={1}
+              weight={600}
             >
               {item.name}
-            </Text.Lg>
+            </Text.Sm>
           </Pressable>
         )}
       />
