@@ -47,7 +47,14 @@ export const PostHogProvider = ({ children }: { children: ReactNode }) => {
       apiKey={env.PUBLIC_POSTHOG_KEY}
       options={{
         host: env.PUBLIC_POSTHOG_HOST,
-        enableSessionReplay: true
+        enableSessionReplay: true,
+        errorTracking: {
+          autocapture: {
+            uncaughtExceptions: true,
+            unhandledRejections: true,
+            console: ['error', 'warn'],
+          },
+        },
       }}
     >
       {children}
