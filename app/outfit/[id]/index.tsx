@@ -314,10 +314,11 @@ export default function ItemScreen() {
                         marginRight: 20,
                       }}
                       size={112}
-                      onPress={() => {
-                        updateItems(items.map((i) => i._id));
-                        push(ROUTES.MODALS.OUTFIT_ADD_ITEM, {
-                          params: { outfitId: id }
+                      onPress={async () => {
+                        await updateItems(items.map((i) => i._id));
+                        push(ROUTES.OUTFIT.NEW, {
+                          params: { outfitId: id },
+                          redirectHere: true,
                         })
                       }}
                     />)

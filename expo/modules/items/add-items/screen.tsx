@@ -246,7 +246,7 @@ const HeaderButton = ({ label, icon, onPress }: { onPress: () => void, label: st
 }
 
 export default function Screen() {
-  const { itemIds, outfitId } = useRoute("/add-item");
+  const { itemIds, outfitId } = useRoute(ROUTES.OUTFIT.NEW);
 
   const mode = outfitId ? 'edit' : 'new';
 

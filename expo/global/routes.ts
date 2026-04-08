@@ -15,7 +15,6 @@ export const ROUTES = {
   MODALS: {
     PICK_OUTFIT: '/pick-outfit',
     NEW_OUTFIT: '/new-outfit',
-    OUTFIT_ADD_ITEM: '/add-item',
     PICK_USER: '/pick-user',
     UPGRADE: '/upgrade',
     DAILY_STREAK: '/daily-streak',

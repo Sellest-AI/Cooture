@@ -9,7 +9,7 @@ import { CardItem } from "@ui/cards/card-item";
 import { FlashList } from "@ui/flat-list";
 import { Pencil, SquirishPlus } from "@ui/icons";
 import { ModalHeader } from "@ui/modal";
-import { SafeScrollView } from "@ui/safe-scroll-view";
+import { SafeAreaView } from "@ui/safe-area-view";
 import { TextInput } from "@ui/text-input";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -19,7 +19,7 @@ import { ROUTES } from "routes";
 export default function NewOutfitScreen() {
   const [init, setInit] = useState(false);
   const { reset, setItems, name, setName, items: itemIds, saveOutfit } = useOutfit.New();
-  const { push, redirect } = useRouter("/new-outfit");
+  const { dismissTo, redirect } = useRouter("/new-outfit");
   const { redirectTo } = useRoute("/new-outfit", {
     onInit: ({ itemIds }) => { setItems(itemIds ?? []); setInit(true); },
     resetFnc: reset,
@@ -30,7 +30,7 @@ export default function NewOutfitScreen() {
 
   if (itemIds.length === 0 && init) {
     return <Router.Redirect
-      href={ROUTES.MODALS.OUTFIT_ADD_ITEM}
+      href={ROUTES.OUTFIT.NEW}
       currentRoute="/new-outfit"
       forwardRedirect={true}
     />
@@ -38,82 +38,80 @@ export default function NewOutfitScreen() {
 
   return (
     <>
-      <View style={{ flex: 1 }}>
-        <SafeScrollView
-          style={{
-            padding: 12,
-            // borderTopWidth: 2,
-            // borderTopColor: Colors.blur.dark,
-          }}
+      <SafeAreaView style={{ flex: 1 }}>
+        <FlashList
+          data={[...(items ?? []), undefined]}
+          contentContainerStyle={{ paddingTop: 16, paddingHorizontal: 12 }}
           showsVerticalScrollIndicator={false}
-          stickyHeaderIndices={[0]}
-        >
-          <ModalHeader
-            title="Create an outfit"
-            onBack={router.canGoBack() ? () => { router.back() } : undefined}
-          />
-          {items ?
-            <FlashList
-              data={[...items, undefined]}
-              style={{
-                marginTop: 16,
-                paddingHorizontal: 8
-              }}
-              renderItem={({ item, index }) => {
-                const marginLeft = 20;
-                const marginRight = 20;
-
-                if (!item) {
-                  return (<SquirishPlus
-                    style={{
-                      marginBottom: 24,
-                      paddingTop: 3,
-                      marginLeft,
-                      marginRight,
-                    }}
-                    size={112}
-                    onPress={() => {
-                      push(ROUTES.MODALS.OUTFIT_ADD_ITEM, {
-                        redirectHere: true
-                      })
-                    }}
-                  />)
-                }
-
-                return (
-                  <View style={{ marginBottom: 24, paddingTop: 3, marginLeft, marginRight }}>
-                    <CardItem
-                      image={item.image}
-                      source={item.image.sizes.small.url}
-                      title={item.name}
-                      subtitle={item.category}
-                      onLongPress={() => setSelectedItem(item._id)}
-                    />
-                  </View>
-                )
-              }}
-              numColumns={2}
-              masonry
+          ListEmptyComponent={<LoadingBlock style={{ height: 500 }} />}
+          ListHeaderComponent={
+            <ModalHeader
+              title="Create an outfit"
+              onBack={router.canGoBack() ? () => { router.back() } : undefined}
             />
-            : <LoadingBlock style={{ height: 500 }} />
           }
-        </SafeScrollView>
-        <KeyboardAvoiderView
-          avoidMode="focused-input"
+          renderItem={({ item, index }) => {
+            const marginLeft = 20;
+            const marginRight = 20;
+
+            if (!item) {
+              return (<SquirishPlus
+                style={{
+                  marginBottom: 24,
+                  paddingTop: 3,
+                  marginLeft,
+                  marginRight,
+                }}
+                size={112}
+                onPress={() => {
+                  dismissTo(ROUTES.OUTFIT.NEW, {
+                    forwardRedirect: true,
+                    resetNextRoute: false,
+                    params: { itemIds }
+                  })
+                }}
+              />)
+            }
+
+            return (
+              <View style={{ marginBottom: 24, paddingTop: 3, marginLeft, marginRight }}>
+                <CardItem
+                  image={item.image}
+                  source={item.image.sizes.small.url}
+                  title={item.name}
+                  subtitle={item.category}
+                  onLongPress={() => setSelectedItem(item._id)}
+                />
+              </View>
+            )
+          }}
+          numColumns={2}
+          masonry
+          ListFooterComponent={<>
+            <View style={{ height: 132 }} />
+          </>}
+        />
+        <View
           style={{
-            position: 'relative',
-            paddingHorizontal: 12,
+            position: 'absolute',
+            left: 0,
+            bottom: 0,
             paddingBottom: 12,
+            paddingHorizontal: 4,
+            width: '100%',
           }}>
-          <TextInput
-            startIcon={Pencil}
-            placeholder="Name your outfit (optional)"
-            onChangeText={setName}
-            value={name}
-            style={{
-              marginBottom: 12,
-            }}
-          />
+          <KeyboardAvoiderView
+            avoidMode="whole-view"
+            style={{ marginBottom: 12 }}
+            extraSpace={112}
+          >
+            <TextInput
+              startIcon={Pencil}
+              placeholder="Name your outfit (optional)"
+              onChangeText={setName}
+              value={name}
+            />
+          </KeyboardAvoiderView>
           <Button
             variant="primary"
             disabled={itemIds.length < 2}
@@ -139,8 +137,8 @@ export default function NewOutfitScreen() {
           >
             Save Outfit
           </Button>
-        </KeyboardAvoiderView>
-      </View>
+        </View>
+      </SafeAreaView>
       <SelectedItemModal
         onRemove={() => {
           setSelectedItem(null);

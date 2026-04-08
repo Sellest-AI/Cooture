@@ -13,7 +13,7 @@ type ParamsDefault<T extends Route> =
   T extends "/photoshoot/create/recap" ? { outfitId?: Id<'outfits'> | null, presetId?: Id<'presets'> | null, userId?: Id<'users'> | null } :
   T extends "/pick-outfit" ? { canSkip?: boolean, itemIds?: Id<'items'>[] } :
   T extends "/new-outfit" ? { itemIds?: Id<'items'>[] } :
-  T extends "/add-item" ? { outfitId?: Id<'outfits'>, itemIds?: Id<'items'>[] } :
+  T extends "/outfit/new" ? { outfitId?: Id<'outfits'>, itemIds?: Id<'items'>[] } :
   T extends "/admin/bots/generate" ? { userId?: Id<'users'> | null } :
   T extends "/admin/bots/outfits/extractor" ? { userId?: Id<'users'> | null } :
   T extends "/preset/create/thumbnail" ? { presetId: Id<'presets'> } :
