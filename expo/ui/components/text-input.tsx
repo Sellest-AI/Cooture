@@ -56,7 +56,8 @@ export const TextInput = ({ className = "", style, startIcon, canClear, autoFocu
       </View>}
       <NativeTextInput
         {...props}
-        onBlur={() => props.onBlur?.(props.value?.toString() ?? '')}
+        onBlur={(e) =>
+          props.onBlur?.((e.nativeEvent as unknown as { text: string }).text)}
         autoFocus={autoFocus}
         onLayout={autoFocus ? (e) => e.currentTarget.focus() : undefined}
         placeholderTextColor={Colors.neutral[400]}
