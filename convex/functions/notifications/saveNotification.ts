@@ -108,14 +108,14 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
     case "new_like":
       if (aggregationCount > 1)
         return {
-          title: `+${aggregationCount} people liked your post`,
+          title: `${args.actor?.name ?? "Someone"} and ${aggregationCount} others liked your post`,
           body: "Tap to view",
           icon: args.actor?.imageUrl,
           image: args.generation?.coverUrl,
           redirectUrl: FALLBACK_ROUTE
         }
       return {
-        title: "You have a new like",
+        title: `${args.actor?.name ?? "Someone"} liked your post`,
         body: "Tap to view",
         icon: args.actor?.imageUrl,
         image: args.generation?.coverUrl,
