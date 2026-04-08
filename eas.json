@@ -12,7 +12,9 @@
         "EXPO_PUBLIC_CUSTOM_NODE_ENV": "development",
         "EXPO_PUBLIC_CONVEX_URL": "https://flippant-ocelot-772.convex.cloud",
         "EXPO_PUBLIC_APP_URL": "cooture://",
-        "EXPO_PUBLIC_AUTH_URL": "cooture://"
+        "EXPO_PUBLIC_AUTH_URL": "cooture://",
+        "EXPO_PUBLIC_POSTHOG_KEY": "phc_wDRFL8aWCCQEMjaQYypiMxb4gYvkQmHkNvdgDPwB6jWC",
+        "EXPO_PUBLIC_POSTHOG_HOST": "https://eu.i.posthog.com"
       },
       "android": {
         "buildType": "apk"
@@ -37,7 +39,9 @@
         "EXPO_PUBLIC_CUSTOM_NODE_ENV": "preview",
         "EXPO_PUBLIC_CONVEX_URL": "https://flippant-ocelot-772.convex.cloud",
         "EXPO_PUBLIC_APP_URL": "cooture://",
-        "EXPO_PUBLIC_AUTH_URL": "cooture://"
+        "EXPO_PUBLIC_AUTH_URL": "cooture://",
+        "EXPO_PUBLIC_POSTHOG_KEY": "phc_wDRFL8aWCCQEMjaQYypiMxb4gYvkQmHkNvdgDPwB6jWC",
+        "EXPO_PUBLIC_POSTHOG_HOST": "https://eu.i.posthog.com"
       },
       "channel": "preview"
     },
@@ -55,7 +59,9 @@
         "EXPO_PUBLIC_CUSTOM_NODE_ENV": "production",
         "EXPO_PUBLIC_CONVEX_URL": "https://mild-newt-461.convex.cloud",
         "EXPO_PUBLIC_APP_URL": "cooture://",
-        "EXPO_PUBLIC_AUTH_URL": "cooture://"
+        "EXPO_PUBLIC_AUTH_URL": "cooture://",
+        "EXPO_PUBLIC_POSTHOG_KEY": "phc_wDRFL8aWCCQEMjaQYypiMxb4gYvkQmHkNvdgDPwB6jWC",
+        "EXPO_PUBLIC_POSTHOG_HOST": "https://eu.i.posthog.com"
       },
       "channel": "production"
     }
