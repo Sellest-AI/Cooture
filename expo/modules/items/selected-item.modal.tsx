@@ -7,6 +7,7 @@ import { MenuGroup, MenuItem } from '@ui/menu';
 import { Modal, ModalProps } from '@ui/modal';
 import * as Linking from 'expo-linking';
 import { router } from 'expo-router';
+import { usePostHog } from 'posthog-react-native';
 import { View } from 'react-native';
 import { ROUTES } from 'routes';
 
@@ -16,6 +17,7 @@ type SelectedItemModalProps = {
 } & ModalProps;
 
 export const SelectedItemModal = ({ itemId, onRemove, ...props }: SelectedItemModalProps) => {
+  const posthog = usePostHog();
   const { data: item } = useQuery(api.router.items.getOne.anon, itemId ? { itemId } : 'skip');
   const open = !!item && props.open;
 
@@ -46,18 +48,30 @@ export const SelectedItemModal = ({ itemId, onRemove, ...props }: SelectedItemMo
             <MenuItem
               icon={User}
               text="User profile"
-              onPress={!item ? undefined : () => { router.push(ROUTES.USER.ID(item.userId)); close(); }}
+              onPress={!item ? undefined : () => {
+                router.push(ROUTES.USER.ID(item.userId));
+                posthog.capture('item_user_profile_button_pressed', { userId: item.userId });
+                close();
+              }}
             />
             {item?.link && <MenuItem
               icon={Globe}
               text="View on website"
-              onPress={!item?.link ? undefined : () => { Linking.openURL(item.link!); close(); }}
+              onPress={!item?.link ? undefined : () => {
+                Linking.openURL(item.link!);
+                posthog.capture('item_link_opened', { itemId: item._id });
+                close();
+              }}
             />}
             <MenuItem
               variant="primary"
               icon={Search}
               text="View details"
-              onPress={!item ? undefined : () => { router.push(ROUTES.ITEM.ID(item._id)); close(); }}
+              onPress={!item ? undefined : () => {
+                router.push(ROUTES.ITEM.ID(item._id));
+                posthog.capture('item_details_button_opened', { itemId: item._id });
+                close();
+              }}
             />
           </MenuGroup>
           <Button

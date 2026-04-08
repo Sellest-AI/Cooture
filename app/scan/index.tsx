@@ -8,6 +8,7 @@ import { Check, ImageUp, X } from "@ui/icons";
 import { Image } from "@ui/image";
 import { LinearGradient } from "@ui/linear-gradient";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
+import { Pressable } from "@ui/pressable";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
@@ -15,6 +16,7 @@ import { CameraView } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import { Asset, getAlbumsAsync, getAssetsAsync, requestPermissionsAsync } from "expo-media-library";
 import { router } from "expo-router";
+import { usePostHog } from "posthog-react-native";
 import { useEffect, useRef, useState } from "react";
 import { Dimensions, View } from "react-native";
 import { ROUTES } from "routes";
@@ -22,7 +24,8 @@ import { Colors } from "theme";
 
 const COLUMNS = 3;
 
-const MediaList = () => {
+type MediaListProps = { onAssetSelect?: (asset: Asset) => void }
+const MediaList = ({ onAssetSelect }: MediaListProps) => {
   const [assets, setAssets] = useState<Asset[]>([]);
 
   async function getAlbums() {
@@ -81,11 +84,13 @@ const MediaList = () => {
         const hasBorderBottomLeftRadius = index === assets.length - (COLUMNS - remainingSlots);
 
         return (
-          <View style={{
-            width: '100%',
-            aspectRatio: 1,
-            padding: 2,
-          }}>
+          <Pressable
+            onPress={() => onAssetSelect?.(item)}
+            style={{
+              width: '100%',
+              aspectRatio: 1,
+              padding: 2,
+            }}>
             <Image
               source={{ uri: item.uri }}
               style={{
@@ -97,7 +102,7 @@ const MediaList = () => {
                 borderBottomLeftRadius: hasBorderBottomLeftRadius ? 20 : 0,
               }}
             />
-          </View>
+          </Pressable>
         )
       }}
     />
@@ -105,6 +110,7 @@ const MediaList = () => {
 }
 
 export default function ScanScreen() {
+  const posthog = usePostHog();
   const { setImageScanned } = useScan();
   const cameraRef = useRef<CameraView>(null);
 
@@ -118,6 +124,7 @@ export default function ScanScreen() {
       if (photo) {
         setImageScanned(photo.uri);
         router.push('/scan/remove-background')
+        posthog.capture('scan_image_captured_with_camera');
       }
     } catch (error) {
       console.error('Failed to capture image:', error);
@@ -137,6 +144,7 @@ export default function ScanScreen() {
       if (!result.canceled && result.assets[0]) {
         setImageScanned(result.assets[0].uri);
         router.push('/scan/remove-background');
+        posthog.capture('scan_image_picked_from_library');
       }
     } catch (error) {
       console.error('Failed to pick image:', error);
@@ -241,7 +249,11 @@ export default function ScanScreen() {
         </Button>
       </View>
       <SafeAreaView edges={{ top: 'off' }}>
-        <MediaList />
+        <MediaList onAssetSelect={(asset) => {
+          setImageScanned(asset.uri);
+          router.push('/scan/remove-background');
+          posthog.capture('scan_image_picked_from_library_preview');
+        }} />
         <Button
           startIcon={ImageUp}
           variant="blur"

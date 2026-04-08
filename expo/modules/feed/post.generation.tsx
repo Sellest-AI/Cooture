@@ -6,6 +6,7 @@ import { Post } from "@ui/cards";
 import { notEmpty } from "@utils/convex-allowed";
 import { env } from "env";
 import { WEBSITE } from "global";
+import { usePostHog } from "posthog-react-native";
 import { Platform, Share, ViewStyle } from "react-native";
 
 type Props = {
@@ -18,6 +19,7 @@ type Props = {
 }
 
 export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableLongPress, ownedByCurrentUser }: Props) => {
+  const posthog = usePostHog();
   const { push } = useRouter('/feed');
   const { data: post } = useQuery(api.router.generations.getOne.anon, { id });
 
@@ -48,6 +50,7 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
     likedAccounts={likes?.latestLikers.map(l => l.image).filter(notEmpty)}
     isLiked={liked}
     onShare={(_id) => {
+      posthog.capture('post_share_button_pressed', { generationId: id });
       const url = WEBSITE.URL + ROUTES.SHARE.POST(_id);
       Share.share(Platform.OS === 'ios' ? {
         url,

@@ -18,6 +18,7 @@ import { ParallaxScrollView } from "@ui/parallax-scroll-view";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import * as Linking from 'expo-linking';
+import { usePostHog } from "posthog-react-native";
 import { useEffect, useState } from "react";
 import { Platform, View } from "react-native";
 import { ROUTES } from "routes";
@@ -86,6 +87,7 @@ const DeleteItemButton = () => {
 }
 
 const LinkBlock = () => {
+  const posthog = usePostHog();
   const { id } = useRoute.Params<{ id: Id<'items'> }>();
   const { item } = useItem(id);
   const { user } = useAccount();
@@ -101,7 +103,7 @@ const LinkBlock = () => {
     })();
   }, [item?.link])
 
-  if (isOwner) return (
+  if (isOwner && canOpen) return (
     <Block
       variant="blur"
       style={{
@@ -120,7 +122,10 @@ const LinkBlock = () => {
       {canOpen && <Button
         variant="blur"
         startIcon={ExternalLink}
-        onPress={() => { if (item?.link) Linking.openURL(item.link); }}
+        onPress={() => {
+          if (!item?.link) return;
+          Linking.openURL(item.link);
+        }}
       >
         Open website
       </Button>}
@@ -137,7 +142,11 @@ const LinkBlock = () => {
     <Button
       variant="blur"
       startIcon={ExternalLink}
-      onPress={() => { if (item?.link) Linking.openURL(item.link); }}
+      onPress={() => {
+        if (!item?.link) return;
+        Linking.openURL(item.link);
+        posthog.capture('item_link_opened', { itemId: item._id });
+      }}
     >
       Open website
     </Button>

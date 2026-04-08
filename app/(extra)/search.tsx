@@ -1,5 +1,6 @@
 import { ROUTES, useDebounce } from "@/hooks";
 import { api, Id, useQuery, useQueryCached } from "@/lib/convex/client";
+import { useTrackValues } from "@/lib/posthog/useTrackValues";
 import { Badge } from "@ui/badge";
 import { Block } from "@ui/block";
 import { CardItem, Collection } from "@ui/cards";
@@ -131,6 +132,11 @@ export default function Screen() {
 
   const isSuccess = isUsersSuccess && isItemsSuccess && isOutfitsSuccess;
   const showLoading = search && !isSuccess;
+
+  useTrackValues('search_screen_query_submitted', {
+    query,
+    enabled: hasQuery && isSuccess
+  });
 
   const data = useMemo(() => shuffleArray([
     ...(items ?? []).map((chunk) => ({ type: 'item' as const, data: chunk })).slice(0, 20),

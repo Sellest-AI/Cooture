@@ -1,4 +1,5 @@
 import { api, Api, Id, useQuery, useQueryCached } from "@/lib/convex/client";
+import { useTrackValues } from "@/lib/posthog/useTrackValues";
 import { notEmpty, shuffleWithSeed } from "@utils/convex-allowed";
 import { useState } from "react";
 
@@ -39,6 +40,13 @@ export const useSearchPresets = ({ category, userId, query = '' }: Args) => {
     .filter((preset, i, self) => i === self.findIndex((p) => p._id === preset._id));
 
   const mergedOrSearchPresets = (searchedPresets ?? []).length > 0 ? (searchedPresets ?? []) : (mergedUserPresets ?? []);
+
+  useTrackValues('preset_search_query_submitted', {
+    query,
+    category,
+    enabled: query.length > 0 && !isLoading
+  });
+
   const finalPresets = (category ? (categoryPresets) : mergedOrSearchPresets);
 
   return {

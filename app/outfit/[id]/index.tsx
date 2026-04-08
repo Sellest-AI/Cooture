@@ -22,6 +22,7 @@ import { Text } from "@ui/text";
 import { TextInput } from "@ui/text-input";
 import { router } from "expo-router";
 import { WEBSITE } from "global";
+import { usePostHog } from "posthog-react-native";
 import { useMemo, useState } from "react";
 import { Keyboard, Platform, Share, View } from "react-native";
 import { ROUTES } from "routes";
@@ -160,7 +161,8 @@ const Generations = ({ customText }: { customText?: string }) => {
   )
 }
 
-export default function ItemScreen() {
+export default function Screen() {
+  const posthog = usePostHog();
   const { user: me } = useAccount();
   const { bottom } = useSafeAreaInsets();
 
@@ -355,6 +357,7 @@ export default function ItemScreen() {
                     style={{ marginBottom: 12 }}
                     startIcon={ShareIcon}
                     onPress={() => {
+                      posthog.capture('outfit_share_button_pressed', { generationId: id });
                       const url = WEBSITE.URL + ROUTES.SHARE.OUTFIT(id);
                       Share.share(Platform.OS === 'ios' ? {
                         url,
@@ -388,7 +391,7 @@ export default function ItemScreen() {
                 else router.replace(ROUTES.PROFILE.OUTFITS);
               }}
             >
-              Delete Outfit
+              Long press to delete outfit
             </Button>}
           </SafeAreaView>
         </ParallaxScrollView>

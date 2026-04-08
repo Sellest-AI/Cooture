@@ -1,4 +1,5 @@
 import { api, useQuery, useQueryCachedData } from "@/lib/convex/client";
+import { useTrackValues } from "@/lib/posthog/useTrackValues";
 
 type Parameters = {
   query: string;
@@ -15,6 +16,13 @@ export const useSearchItems = ({ query, category, channel = 'public' }: Paramete
 
   const _results = (hasQuery ? searchResults : _items) as typeof _items;
   const results = _results ?? [];
+
+  useTrackValues('item_search_query_submitted', {
+    query,
+    category,
+    channel,
+    enabled: query.length > 0 && !isLoading
+  });
 
   const isEmpty = results && results.length === 0 && !isLoading;
 
