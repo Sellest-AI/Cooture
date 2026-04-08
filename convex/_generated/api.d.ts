@@ -127,6 +127,7 @@ import type * as router_admin_bots_getWaiting from "../router/admin/bots/getWait
 import type * as router_admin_config_getConfig from "../router/admin/config/getConfig.js";
 import type * as router_admin_config_initConfig from "../router/admin/config/initConfig.js";
 import type * as router_admin_outfits_regenerateCovers from "../router/admin/outfits/regenerateCovers.js";
+import type * as router_admin_presets_findByName from "../router/admin/presets/findByName.js";
 import type * as router_admin_presets_repairOne from "../router/admin/presets/repairOne.js";
 import type * as router_admin_users_approveWaitlist from "../router/admin/users/approveWaitlist.js";
 import type * as router_auth_getTestAccount from "../router/auth/getTestAccount.js";
@@ -188,10 +189,10 @@ import type * as router_outfits_updateCoverInternal from "../router/outfits/upda
 import type * as router_outfits_wearCount from "../router/outfits/wearCount.js";
 import type * as router_presets_createOne from "../router/presets/createOne.js";
 import type * as router_presets_deleteOne from "../router/presets/deleteOne.js";
-import type * as router_presets_getAll from "../router/presets/getAll.js";
 import type * as router_presets_getByCategory from "../router/presets/getByCategory.js";
 import type * as router_presets_getByUser from "../router/presets/getByUser.js";
 import type * as router_presets_getCategories from "../router/presets/getCategories.js";
+import type * as router_presets_getMany from "../router/presets/getMany.js";
 import type * as router_presets_getOne from "../router/presets/getOne.js";
 import type * as router_presets_recreateCount from "../router/presets/recreateCount.js";
 import type * as router_presets_searchMany from "../router/presets/searchMany.js";
@@ -393,6 +394,7 @@ declare const fullApi: ApiFromModules<{
   "router/admin/config/getConfig": typeof router_admin_config_getConfig;
   "router/admin/config/initConfig": typeof router_admin_config_initConfig;
   "router/admin/outfits/regenerateCovers": typeof router_admin_outfits_regenerateCovers;
+  "router/admin/presets/findByName": typeof router_admin_presets_findByName;
   "router/admin/presets/repairOne": typeof router_admin_presets_repairOne;
   "router/admin/users/approveWaitlist": typeof router_admin_users_approveWaitlist;
   "router/auth/getTestAccount": typeof router_auth_getTestAccount;
@@ -454,10 +456,10 @@ declare const fullApi: ApiFromModules<{
   "router/outfits/wearCount": typeof router_outfits_wearCount;
   "router/presets/createOne": typeof router_presets_createOne;
   "router/presets/deleteOne": typeof router_presets_deleteOne;
-  "router/presets/getAll": typeof router_presets_getAll;
   "router/presets/getByCategory": typeof router_presets_getByCategory;
   "router/presets/getByUser": typeof router_presets_getByUser;
   "router/presets/getCategories": typeof router_presets_getCategories;
+  "router/presets/getMany": typeof router_presets_getMany;
   "router/presets/getOne": typeof router_presets_getOne;
   "router/presets/recreateCount": typeof router_presets_recreateCount;
   "router/presets/searchMany": typeof router_presets_searchMany;

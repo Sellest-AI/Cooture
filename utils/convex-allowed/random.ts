@@ -25,9 +25,10 @@ function mulberry32(seed: number): () => number {
  * @param seedString - The seed string to use for shuffling.
  * @returns A new array with the shuffled elements.
  */
-export function shuffleWithSeed<T>(array: T[], seedString: string): T[] {
-  const seed = stringToSeed(seedString);
-  const random = mulberry32(seed);
+export function shuffleWithSeed<T>(array: T[], seed: string | number): T[] {
+  const seedString = typeof seed === 'number' ? seed.toString() : seed;
+  const _seed = stringToSeed(seedString);
+  const random = mulberry32(_seed);
   const arr = array.slice(); // Make a copy
 
   for (let i = arr.length - 1; i > 0; i--) {

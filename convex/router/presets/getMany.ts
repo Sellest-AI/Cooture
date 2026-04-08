@@ -7,11 +7,14 @@ export const anon = publicQuery({
   args: {
     /** Number between 0 and 23 */
     seed: v.optional(v.number()),
+    limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const presets = await ctx.db.query('presets')
-      .withIndex('by_archived', (q) => q.eq("archived", false))
-      .order('desc').collect();
+      .withIndex('by_user_id', (q) => q.eq("userId", undefined))
+      .filter(q => q.eq(q.field('archived'), false))
+      .order('desc')
+      .take(args.limit ?? 100);
 
     // Sanitize presets by removing prompts
     const sanitizedPresets = await sanitizePresets(ctx, presets);

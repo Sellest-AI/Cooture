@@ -1,7 +1,8 @@
 import { useDebounce, useRouter } from "@/hooks";
 import { useAccount } from "@/lib/convex/auth";
-import { Api, api, usePaginatedQuery, useQuery, useQueryCached } from "@/lib/convex/client";
+import { Api, api, useQueryCached } from "@/lib/convex/client";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
+import { useSearchPresets } from "@/modules/presets/_hooks";
 import { Block } from "@ui/block";
 import { BlurKeys, BlurTargetView } from "@ui/blur-view";
 import { Button } from "@ui/button";
@@ -14,7 +15,6 @@ import { Pressable } from "@ui/pressable";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
 import { TextInput } from "@ui/text-input";
-import { notEmpty } from "@utils/convex-allowed";
 import React, { useRef, useState } from "react";
 import { Platform, View } from "react-native";
 import { ROUTES } from "routes";
@@ -29,29 +29,15 @@ export default function Screen() {
   const { setPresetId, presetId, outfitId, friendId } = usePhotoshoot.New();
 
   const [category, setCategory] = useState<Api['router']['presets']['getByCategory']['anon']['_args']['category'] | null>(friendId ? "DUO" : null);
-  const { results: presetsByCategory } = usePaginatedQuery(api.router.presets.getByCategory.anon, category ? { category } : 'skip', { initialNumItems: 200 });
   const { data: categories } = useQueryCached(api.router.presets.getCategories.anon);
-
-  const seed = new Date().getHours();
-  const { data: presets } = useQueryCached(api.router.presets.getAll.anon, { seed });
-
-  const [filterOwn, setFilterOwn] = useState(false);
-  const { data: userPresets } = useQueryCached(api.router.presets.getByUser.anon, userId ? { userId } : 'skip');
 
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 800);
   const query = search !== debouncedSearch ? '' : search;
 
-  const { data: searchedPresets, isPending } = useQuery(api.router.presets.searchMany.anon, query.length > 0 ? { query } : 'skip');
+  const { isLoading, presets } = useSearchPresets({ category, query, userId });
 
-  // If the user has created a preset in the last 24h, we want to showcase it at the beginning of the list
-  const showcasedPreset = (userPresets?.[0]?._creationTime ?? 0) > (Date.now() - 24 * 60 * 60 * 1000);
-  const mergedPresets = [showcasedPreset ? userPresets?.[0] : null, ...(presets ?? [])
-    .filter(p => showcasedPreset ? p._id !== userPresets?.[0]?._id : true)].filter(notEmpty);
-
-  const mergedSearchPresets = (searchedPresets ?? []).length > 0 ? (searchedPresets ?? []) : (mergedPresets ?? []);
-  const finalPresets = filterOwn ? (userPresets ?? []) : (category ? presetsByCategory : mergedSearchPresets);
-  const displayedPresets = outfitId ? finalPresets.filter((p) => !p.hasMultipleSubjects) : finalPresets;
+  const displayedPresets = outfitId ? presets.filter((p) => !p.hasMultipleSubjects) : presets;
 
   const listRef = useRef<FlashListRef<typeof displayedPresets[number] | string>>(null);
 
@@ -59,14 +45,14 @@ export default function Screen() {
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <View style={{ marginTop: 8 }}>
         <TextInput
-          startIcon={(isPending && query) ? Loader : Search}
+          startIcon={(isLoading && query) ? Loader : Search}
           placeholder="Search preset"
           style={{ marginHorizontal: 12 }}
           canClear
           value={search}
           onChangeText={(v) => {
             setSearch(v);
-            if (v.length > 0) { setCategory(null); setFilterOwn(false); }
+            if (v.length > 0) { setCategory(null); }
             listRef.current?.scrollToTop({ animated: true });
           }}
         />
@@ -146,7 +132,6 @@ export default function Screen() {
                         setCategory((c) => c === item.value ? null : item.value);
                         listRef.current?.scrollToTop({ animated: true });
                         setSearch('');
-                        setFilterOwn(false);
                       }}
                     >
                       <Block

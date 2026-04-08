@@ -75,7 +75,7 @@ const PresetSchema = z.object({
 
 export const checkIfExists = async (convex: ConvexClient, name: string) => {
   const sanitizeName = (n: string) => n.trim().toUpperCase().replaceAll(' ', '_');
-  const existingPresets = await convex.query(api.router.presets.getAll.anon, {});
+  const existingPresets = await convex.query(api.router.admin.presets.findByName.anon, { name });
   return existingPresets.some(p => sanitizeName(p.name) === sanitizeName(name));
 }
 

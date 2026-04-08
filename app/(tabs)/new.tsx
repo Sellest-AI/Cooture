@@ -1,5 +1,5 @@
 import { useRouter, useScrollToTop } from "@/hooks";
-import { Api, api, usePaginatedQuery, useQueryCached, useQueryCachedData } from "@/lib/convex/client";
+import { Api, api, useQuery, useQueryCached, useQueryCachedData } from "@/lib/convex/client";
 import { CreditsButton } from "@/modules/premium/credits.button";
 import { Notification } from "@/modules/profiles/notification";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
@@ -62,11 +62,11 @@ const Actions = () => {
 type Category = Api["router"]["presets"]["getCategories"]["anon"]["_returnType"][number];
 const SectionPresets = ({ category, style }: { category: Category, style: ViewStyle }) => {
   const { push } = useRouter(ROUTES.TABS.NEW);
-  const { results, isLoading } = usePaginatedQuery(api.router.presets.getByCategory.anon, { category: category.value }, { initialNumItems: 8 });
+  const { data: results, isPending: isLoading } = useQuery(api.router.presets.getByCategory.anon, { category: category.value });
 
   const [date] = useState(new Date());
 
-  if (!isLoading && results.length < 3) return null;
+  if (!isLoading && (results ?? []).length < 3) return null;
 
   return (
     <View style={style}>

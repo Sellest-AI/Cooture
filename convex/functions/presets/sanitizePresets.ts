@@ -3,7 +3,7 @@ import { Doc } from "../../_generated/dataModel";
 import { QueryCtx } from "../../procedures";
 import { getImage } from "../images";
 
-export const sanitizePresets = async (ctx: QueryCtx, presets: Doc<'presets'>[]) => {
+export const sanitizePresets = async <T extends Doc<'presets'>>(ctx: QueryCtx, presets: T[]) => {
   // Sanitize presets by removing prompts
   const sanitizedPresets = await Promise.all(presets.map(async ({ prompts, ...rest }) => {
     const hasMultipleSubjects = prompts.some((p) => p.subjects.length > 1);
