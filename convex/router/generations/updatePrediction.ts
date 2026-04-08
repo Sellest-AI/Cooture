@@ -73,7 +73,11 @@ const updatePrediction = async (ctx: MutationCtx, args: {
 
   const hasResult = !!imageId || !!videoId;
 
-  const status = args.status ?? (hasResult ? "REVIEW" : undefined);
+  // Force REJECTED status if trying to accept without a result
+  const newStatus = (args.status === "ACCEPTED" && !hasResult) ? "REJECTED" : args.status;
+  // If no status provided, set to REVIEW if there's a result, or keep it unchanged
+  const status = newStatus ?? (hasResult ? "REVIEW" : undefined);
+
   const readyAt = prediction.readyAt ?? (hasResult ? Date.now() : undefined);
 
   const patch = removeUndefinedKeys({
