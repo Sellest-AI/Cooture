@@ -54,7 +54,7 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
       const url = WEBSITE.URL + ROUTES.SHARE.POST(_id);
       Share.share(Platform.OS === 'ios' ? {
         url,
-        message: `Check out this post on Cooture! ${url}`,
+        message: `Check out this post on Cooture!`,
       } : {
         title: `Check out this post on Cooture!`,
         message: url,

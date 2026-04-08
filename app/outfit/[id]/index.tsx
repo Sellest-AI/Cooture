@@ -361,7 +361,7 @@ export default function Screen() {
                       const url = WEBSITE.URL + ROUTES.SHARE.OUTFIT(id);
                       Share.share(Platform.OS === 'ios' ? {
                         url,
-                        message: `Check out this outfit on Cooture! ${url}`,
+                        message: `Check out this outfit on Cooture!`,
                       } : {
                         title: `Check out this outfit on Cooture!`,
                         message: url,

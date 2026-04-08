@@ -3,7 +3,7 @@ import { Id } from "@/lib/convex/client";
 import { useScrollToTop } from "@react-navigation/native";
 import { Block } from "@ui/block";
 import { BlurKeys } from "@ui/blur-view";
-import { Camera, Credits, Settings } from "@ui/icons";
+import { Credits, Settings, ShareIcon } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
@@ -13,8 +13,10 @@ import { StickyView } from "@ui/sticky-view";
 import { Tabs } from "@ui/tabs";
 import { Text } from "@ui/text";
 import { Href, router, Slot, useSegments } from "expo-router";
+import { WEBSITE } from "global";
+import { usePostHog } from "posthog-react-native";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { LayoutRectangle, PanResponder, Platform, ScrollView, View, ViewStyle } from "react-native";
+import { LayoutRectangle, PanResponder, Platform, ScrollView, Share, View, ViewStyle } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 import { WaitlistBlock } from "../waitlist/waitlist-block";
@@ -42,6 +44,7 @@ type Props = {
 }
 
 export function Screen({ user, isSelf, recentPosts, style }: Props) {
+  const posthog = usePostHog();
   const { back, push } = useRouter(ROUTES.USER.PATH);
   const { pathname: path } = useRouter.Path();
   const slotRef = useRef<LayoutRectangle | null>(null);
@@ -133,9 +136,27 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
               size="big"
               endContent={<View style={{ flexDirection: 'row', gap: 8 }}>
                 {/* <Notification /> */}
-                <Pressable onPress={() => {
-                  if (isSelf) push(ROUTES.PROFILE.SETTINGS);
-                  if (!isSelf) push(ROUTES.PHOTOSHOOT.NEW, { params: { userId: user._id } })
+                <Pressable onPress={() => {                  // if (!isSelf) push(ROUTES.PHOTOSHOOT.NEW, { params: { userId: user._id } })
+                  posthog.capture('profile_share_button_pressed', { userId: user._id, isSelf: isSelf || false });
+                  const url = WEBSITE.URL + ROUTES.SHARE.USER(user._id);
+                  const message = isSelf ? `Check out my profile on Cooture!` :
+                    `Check out this user on Cooture!`;
+                  Share.share(Platform.OS === 'ios' ? { url, message: message } :
+                    { title: message, message: url })
+                }}>
+                  <Block
+                    variant="blur"
+                    style={{
+                      borderRadius: 99,
+                      padding: 12,
+                    }}
+                  >
+                    <ShareIcon size={22} color={Colors.foreground} />
+                  </Block>
+                </Pressable>
+                {isSelf && <Pressable onPress={() => {
+                  if (isSelf) return push(ROUTES.PROFILE.SETTINGS);
+                  // if (!isSelf) push(ROUTES.PHOTOSHOOT.NEW, { params: { userId: user._id } })
                 }}>
                   <Block
                     variant="blur"
@@ -145,9 +166,9 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
                     }}
                   >
                     {isSelf && <Settings size={24} color={Colors.foreground} />}
-                    {!isSelf && <Camera size={24} color={Colors.foreground} />}
+                    {/* {!isSelf && <Camera size={24} color={Colors.foreground} />} */}
                   </Block>
-                </Pressable>
+                </Pressable>}
               </View>}
             />
           </View>

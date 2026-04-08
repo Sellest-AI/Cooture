@@ -45,7 +45,7 @@ export const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle
       const url = WEBSITE.URL + ROUTES.SHARE.OUTFIT(_id);
       Share.share(Platform.OS === 'ios' ? {
         url,
-        message: `Check out this outfit on Cooture! ${url}`,
+        message: `Check out this outfit on Cooture!`,
       } : {
         title: `Check out this outfit on Cooture!`,
         message: url,
