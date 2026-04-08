@@ -205,7 +205,6 @@ export const Bots = (props: SharedProps) => {
               </Text.Sm>
             </Pressable>
             <Modal
-              scrollable={false}
               open={modal === item._id}
               onOpenChange={(v) => setModal(v ? item._id : null)}
               header={{

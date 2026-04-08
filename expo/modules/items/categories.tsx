@@ -27,9 +27,7 @@ export const Categories = <T extends string>({ value, categories, categoryTitle,
       />
       <Modal
         onOpenChange={setOpen}
-        scrollable={categories.length > 12 ? true : false}
         open={open}
-        style={{ maxHeight: '80%' }}
         header={{ title: categoryTitle }}
       >
         <FlatList

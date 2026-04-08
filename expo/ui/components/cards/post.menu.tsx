@@ -1,5 +1,4 @@
 import { Button } from "@ui/button"
-import { SafeAreaView } from "@ui/safe-area-view"
 import { Text } from "@ui/text"
 import { ComponentProps, useState } from "react"
 import { Platform, View } from "react-native"
@@ -76,10 +75,8 @@ export const PostMenu = ({ open, onOpenChange, ...props }: Props) => {
     <Modal
       open={open}
       onOpenChange={onOpenChange}
-      scrollable={false}
     >
-      <SafeAreaView
-        edges={{ top: 'off', bottom: 'android' }}
+      <View
         style={{ paddingTop: 20 }}
       >
         {(onToggleLike || onToggleBookmark || onShare) && (
@@ -141,7 +138,7 @@ export const PostMenu = ({ open, onOpenChange, ...props }: Props) => {
         >
           Close
         </Button>
-      </SafeAreaView>
+      </View>
     </Modal >
   )
 }

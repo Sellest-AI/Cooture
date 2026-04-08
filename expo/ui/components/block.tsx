@@ -16,6 +16,7 @@ type Props<T extends Variant> = {
   blurComponent?: typeof BlurView;
   blurKey?: ComponentProps<typeof BlurView>['blurKey'];
   ref?: React.Ref<View>;
+  onLayout?: ComponentProps<typeof BlurView>['onLayout'];
 } & (T extends 'blur' ? { blurIntensity?: number } : never)
 
 export const getBlockColors = (variant: Variant, disabled?: boolean) => {
@@ -81,7 +82,7 @@ const BorderTop = ({ style, disabled, variant }: { style?: ViewStyle, disabled?:
   )
 }
 
-export const Block = <T extends Variant>({ className = "", children, variant, style, disabled, blurComponent, blurKey, blurIntensity }: Props<T>) => {
+export const Block = <T extends Variant>({ className = "", children, variant, style, disabled, blurComponent, blurKey, blurIntensity, onLayout }: Props<T>) => {
   const VariantColors = useMemo(() => getBlockColors(variant, disabled), [disabled, variant]);
 
   const Component = variant === 'blur' ? (blurComponent ?? BlurView) : View;
@@ -104,6 +105,7 @@ export const Block = <T extends Variant>({ className = "", children, variant, st
         backgroundColor: style?.backgroundColor ?? VariantColors.backgroundColor,
       }}
       className={cn(className)}
+      onLayout={onLayout}
     >
       {showTopBorder && <BorderTop
         style={style}

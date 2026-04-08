@@ -2,7 +2,7 @@ import { api, Id } from '@/lib/convex/api';
 import { useQuery } from '@/lib/convex/client';
 import { Button } from '@ui/button';
 import { CardItem } from '@ui/cards/card-item';
-import { ExternalLink, Globe, Trash, User } from '@ui/icons';
+import { Globe, Search, Trash, User } from '@ui/icons';
 import { MenuGroup, MenuItem } from '@ui/menu';
 import { Modal, ModalProps } from '@ui/modal';
 import * as Linking from 'expo-linking';
@@ -21,20 +21,19 @@ export const SelectedItemModal = ({ itemId, onRemove, ...props }: SelectedItemMo
 
   return (
     <Modal {...props}
-      open={open}
+      open={open && !!item}
       header={{ title: item?.name ?? '' }}
-      scrollable={true}
     >
-      {({ close }) => <View style={{ paddingVertical: 12 }}>
+      {({ close }) => <View style={{ paddingTop: 20 }}>
         {item && <CardItem
           image={item.image}
           source={item.image.sizes.medium.url}
           title={item.name}
           subtitle={item.category}
           animate={false}
-          style={{ height: 256 }}
+          style={{ height: 212, paddingHorizontal: 20, flex: 0 }}
         />}
-        <View style={{ flex: 1, justifyContent: 'flex-end', marginTop: 24 }}>
+        <View style={{ justifyContent: 'flex-end', marginTop: 24 }}>
           {onRemove && <MenuGroup title="Danger">
             <MenuItem
               icon={Trash}
@@ -55,7 +54,8 @@ export const SelectedItemModal = ({ itemId, onRemove, ...props }: SelectedItemMo
               onPress={!item?.link ? undefined : () => { Linking.openURL(item.link!); close(); }}
             />}
             <MenuItem
-              icon={ExternalLink}
+              variant="primary"
+              icon={Search}
               text="View details"
               onPress={!item ? undefined : () => { router.push(ROUTES.ITEM.ID(item._id)); close(); }}
             />

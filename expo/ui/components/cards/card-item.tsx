@@ -85,7 +85,7 @@ export const CardItem = ({ title, subtitle, selected, disabled, badge, style, so
       onPressOut={handlePressOut}
       onPress={(e) => { onPress?.(e); }}
       onLongPress={(e) => { onLongPress?.(e); }}
-      style={{ flex: 1, opacity: style?.opacity }}
+      style={{ flex: style?.flex ?? 1, opacity: style?.opacity }}
     >
       <Animated.View
         onLayout={(e: LayoutChangeEvent) => {
@@ -97,6 +97,7 @@ export const CardItem = ({ title, subtitle, selected, disabled, badge, style, so
           overflow: 'hidden',
           aspectRatio: style?.height ? undefined : aspectRatio,
           height: style?.height ?? (aspectRatio ? undefined : containerHeight),
+          paddingHorizontal: style?.paddingHorizontal,
         }}
       >
         {source && <Image

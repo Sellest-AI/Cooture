@@ -1,5 +1,5 @@
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { Modal as NativeModal, Platform, Pressable, View, ViewStyle } from 'react-native';
+import { Dimensions, Modal as NativeModal, Pressable, View, ViewStyle } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView, GestureType } from 'react-native-gesture-handler';
 import type { SharedValue } from 'react-native-reanimated';
 import Animated, { useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
@@ -16,7 +16,6 @@ type Children = (actions: { next: () => void, back: () => void, close: () => voi
 type Props = {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  scrollable?: boolean;
   children: ReactNode | Children;
   style?: ViewStyle;
   header?: {
@@ -97,7 +96,7 @@ export const SlideToDismiss = ({
   );
 };
 
-export const Modal = ({ children, open, onOpenChange, style, header, scrollable = true }: Props) => {
+export const Modal = ({ children, open, onOpenChange, style, header }: Props) => {
   const [currentStep, setCurrentStep] = useState(0);
   const stepsLengthRef = useRef<number>(0);
 
@@ -136,8 +135,15 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
     setCurrentStep((s) => Math.max(0, s - 1));
   }, []);
 
-  const FinalView = scrollable ? Animated.ScrollView : View;
+  // const FinalView = scrollable ? Animated.ScrollView : View;
   const { bottom } = useSafeAreaInsets();
+
+  const [contentHeight, setContentHeight] = useState(0);
+
+  const FinalView = Animated.ScrollView;
+
+  const paddingBottom = bottom + 28;
+  const addPadding = contentHeight + paddingBottom >= (Dimensions.get('window').height * 0.95);
 
   return (
     <NativeModal
@@ -150,8 +156,8 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
         <View style={{ flex: 1, justifyContent: 'flex-end' }}>
           <SlideToDismiss
             onDismiss={() => { if (onOpenChange) closeAnimation(); }}
-            scrollY={scrollable ? scrollY : undefined}
-            simultaneousHandlers={scrollable ? nativeScroll : undefined}
+            scrollY={scrollY}
+            simultaneousHandlers={nativeScroll}
             canDismiss={canDismiss}
           >
             <Block
@@ -160,7 +166,6 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
               style={{
                 width: '100%',
                 maxWidth: 540,
-                maxHeight: '95%',
                 borderTopLeftRadius: 32,
                 borderTopRightRadius: 32,
                 borderBottomLeftRadius: 0,
@@ -171,39 +176,42 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
                 paddingHorizontal: 12,
                 pointerEvents: 'auto',
                 ...style,
+                maxHeight: "95%",
                 paddingBottom: 0,
               }}
             >
-              <GestureDetector gesture={Gesture.Tap().onBegin(() => {
-                'worklet';
-                canDismiss.value = true;
-              }).onEnd(() => {
-                'worklet';
-                canDismiss.value = scrollY ? scrollY.value <= 1 : true;
-              }).simultaneousWithExternalGesture(nativeScroll)}>
-                <Animated.View style={{ width: '100%', paddingVertical: 12, alignItems: 'center' }}>
-                  <View
-                    style={{ width: 56, height: 4, borderRadius: 2, backgroundColor: Colors.neutral[400] }}
-                  />
-                </Animated.View>
-              </GestureDetector>
-              <GestureDetector gesture={nativeScroll}>
-                <SafeAreaView
-                  edges={{
-                    top: 'off',
-                    bottom: Platform.OS === 'android' ? 'additive' : (scrollable ? 'additive' : 'off'),
-                  }}
-                >
+              <SafeAreaView
+                edges={{
+                  top: 'off',
+                  bottom: 'additive'
+                }}
+              >
+                <GestureDetector gesture={Gesture.Tap().onBegin(() => {
+                  'worklet';
+                  canDismiss.value = true;
+                }).onEnd(() => {
+                  'worklet';
+                  canDismiss.value = scrollY ? scrollY.value <= 1 : true;
+                }).simultaneousWithExternalGesture(nativeScroll)}>
+                  <Animated.View style={{ width: '100%', paddingVertical: 12, alignItems: 'center' }}>
+                    <View
+                      style={{ width: 56, height: 4, borderRadius: 2, backgroundColor: Colors.neutral[400] }}
+                    />
+                  </Animated.View>
+                </GestureDetector>
+                <GestureDetector gesture={nativeScroll}>
                   <FinalView
                     showsVerticalScrollIndicator={false}
                     // bottom + Pan handler offset
                     contentContainerStyle={{
-                      paddingBottom:
-                        bottom + (Platform.OS === 'android' ? 8 : 0)
+                      paddingBottom: addPadding ? paddingBottom : 0
                     }}
                     bounces={false}
-                    onScroll={scrollable ? scrollHandler : undefined}
+                    onScroll={scrollHandler}
                     scrollEventThrottle={16}
+                    onContentSizeChange={(_, height) => {
+                      setContentHeight(height);
+                    }}
                   >
                     {header && <ModalHeader
                       type={header.type}
@@ -239,8 +247,8 @@ export const Modal = ({ children, open, onOpenChange, style, header, scrollable 
                       return children;
                     })()}
                   </FinalView>
-                </SafeAreaView>
-              </GestureDetector>
+                </GestureDetector>
+              </SafeAreaView>
             </Block>
           </SlideToDismiss>
         </View>
