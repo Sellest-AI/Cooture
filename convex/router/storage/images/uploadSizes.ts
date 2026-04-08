@@ -25,20 +25,22 @@ const uploadSizes = async (ctx: ActionCtx, imageId: Id<'images'>) => {
   type Data = typeof api.router.storage.images.saveSizes.server._args;
   const data: Data['images'][number]['sizes'][number][] = [];
 
-  for (const size of sizes) {
+  await Promise.all(sizes.map(async (size) => {
     const { px, quality } = size;
 
     const alreadyExist = image._sizes.find((s) => Math.max(s.width, s.height) === px && s.quality === quality);
-    if (alreadyExist) continue;
+    if (alreadyExist) return;
 
     const threshold = px < 1000 ? px : px * 1.3;
     const isTooSmall = Math.max(image.width, image.height) <= threshold;
-    if (isTooSmall) continue;
+    if (isTooSmall) return;
 
     const buffer = await compressImage(image.url, { maxSideSize: px, quality: quality })
 
     const directory = StorageCloud.FOLDERS.getFromKey(image.key);
     const file = await StorageCloud.uploadFile(buffer, directory);
+
+    await StorageCloud.updateCacheControl(file.key);
 
     data.push({
       key: file.key,
@@ -48,7 +50,7 @@ const uploadSizes = async (ctx: ActionCtx, imageId: Id<'images'>) => {
       height: buffer.metadata.height ?? image.height,
       url: file.location,
     })
-  }
+  }))
 
   return data;
 }
