@@ -225,18 +225,14 @@ export default function Screen() {
                         {posts[4] ? <Post id={posts[4]._id} type={posts[4].type} size="small" style={{ flex: 1 }} /> : <Skeleton style={{ flex: 1 }} />}
                       </Row>
                     </Col>
-                    {posts.length > 5 && (
-                      <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
-                        {posts[5] ? <Row><Post id={posts[5]._id} type={posts[5].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
-                        {posts[6] ? <Row><Post id={posts[6]._id} type={posts[6].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
-                      </Col>
-                    )}
-                    {posts.length > 7 && (
-                      <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
-                        {posts[7] ? <Row><Post id={posts[7]._id} type={posts[7].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
-                        {posts[8] ? <Row><Post id={posts[8]._id} type={posts[8].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
-                      </Col>
-                    )}
+                    <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
+                      {posts[5] ? <Row><Post id={posts[5]._id} type={posts[5].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                      {posts[6] ? <Row><Post id={posts[6]._id} type={posts[6].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                    </Col>
+                    <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
+                      {posts[7] ? <Row><Post id={posts[7]._id} type={posts[7].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                      {posts[8] ? <Row><Post id={posts[8]._id} type={posts[8].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                    </Col>
                   </Grid>
                 )}
 
