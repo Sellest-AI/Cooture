@@ -143,6 +143,7 @@ export const useRoute = <K extends Record<string, any> = EmptyObject, T extends 
 
   useFocusEffect(useCallback(() => {
     if (!options?.onInit) return;
+    if (initialized) return;
     options.onInit(localData ?? {} as ParamsDefault<T>);
     setInitialized(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps

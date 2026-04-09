@@ -319,7 +319,10 @@ export default function Screen() {
                       onPress={async () => {
                         await updateItems(items.map((i) => i._id));
                         push(ROUTES.OUTFIT.NEW, {
-                          params: { outfitId: id },
+                          params: {
+                            outfitId: id,
+                            itemIds: items.map((i) => i._id)
+                          },
                           redirectHere: true,
                         })
                       }}

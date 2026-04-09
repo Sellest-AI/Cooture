@@ -4,12 +4,16 @@ import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { Stack } from "expo-router";
 
 export default function Layout() {
-  const { reset: resetOutfit } = useOutfit.New();
+  const { reset: resetOutfit, setItems } = useOutfit.New();
   const { reset: resetItem } = useItem.Create();
   useRoute(ROUTES.OUTFIT.NEW, {
     resetFnc: () => {
       resetOutfit();
       resetItem();
+    },
+    onInit: ({ itemIds }) => {
+      if (itemIds && itemIds.length > 0)
+        setItems(itemIds ?? []);
     }
   })
 
@@ -26,7 +30,6 @@ export default function Layout() {
     >
       <Stack.Screen name="browser" />
       <Stack.Screen name="index" />
-      <Stack.Screen name="recap" />
     </Stack>
   )
 }

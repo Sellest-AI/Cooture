@@ -1,4 +1,4 @@
-import { ROUTES, useRoute, useRouter, useStateEffect } from "@/hooks";
+import { ROUTES, useRoute, useRouter } from "@/hooks";
 import { api, Id, useQuery, useQueryCached } from "@/lib/convex/client";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { Block } from "@ui/block";
@@ -6,17 +6,18 @@ import { EmptyBlock } from "@ui/block.empty";
 import { CardItem } from "@ui/cards/card-item";
 import { FlashList, FlashListRef } from "@ui/flat-list";
 import { Col, Grid } from "@ui/grid";
-import { Camera, Globe, TShirt } from "@ui/icons";
+import { Camera, Globe, Loader, TShirt } from "@ui/icons";
 import { ModalHeader } from "@ui/modal";
 import { Pressable } from "@ui/pressable";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
-import { normalizeArray, notEmpty } from "@utils/convex-allowed";
+import { notEmpty } from "@utils/convex-allowed";
 import { Route, router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { Colors } from "theme";
+import { useItem } from "../_hooks/useItem";
 import { useSearchItems } from "../_hooks/useSearchItems";
 import { Categories } from "./categories";
 import { ItemsValidator } from "./items-validator";
@@ -24,21 +25,55 @@ import { SearchInput } from "./search-input";
 
 const PADDING_HORIZONTAL = 12;
 
-function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outfits'> }) {
-  const { outfit, updateItems } = useOutfit(outfitId ?? null);
-  const { items } = useOutfit.New();
-  const [innerItems, setInnerItems] = useStateEffect(mode === 'edit' ? outfit?.items.map((i) => i._id) ?? [] : items);
+function PendingItems() {
+  const { pendingItems, newItems, reset } = useItem.Create();
+  const { setItems } = useOutfit.New();
 
-  const newDelay = Date.now() - 3 * 24 * 60 * 60 * 1000 // 3 days
+  useEffect(() => {
+    if (newItems.length === 0) return;
+    setItems((prev) =>
+      Array.from(new Set([...prev, ...newItems.map((i) => i._id)])));
+  }, [newItems, setItems])
+
+  useEffect(() => {
+    if (newItems.length === 0) return;
+    if (pendingItems.length === 0) return;
+    if (newItems.length < pendingItems.length) return;
+    reset();
+  }, [newItems, newItems.length, pendingItems.length, reset, setItems])
+
+  if (pendingItems.length <= 0) return null;
+
+  return (
+    <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 32 }}>
+      <View style={{ position: 'relative', width: 20, height: 20 }}>
+        <Loader size={20} color={Colors.primary[500]} />
+      </View>
+      <Text.Base color={Colors.neutral[400]} style={{ marginLeft: 4 }}>
+        Adding {pendingItems.length} item{pendingItems.length > 1 ? 's' : ''} to your wardrobe
+      </Text.Base>
+    </View>
+  )
+}
+
+const newDelay = Date.now() - 3 * 24 * 60 * 60 * 1000 // 3 days
+
+function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
+  const { updateItems } = useOutfit(outfitId ?? null);
+  const { items, setItems } = useOutfit.New();
+  const { latestItems } = useItem.Create();
 
   // Search
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string | null>(null);
   const { results, isLoading, isEmpty } = useSearchItems({ query, category, channel: 'public' });
 
+  const itemsLibrary = [...latestItems, ...results] // unique;
+    .filter((item, i, arr) => arr.findIndex(it => it._id === item._id) === i)
+
   // UI
-  const listRef = useRef<FlashListRef<typeof results[number] | string>>(null);
-  const [validatorOpen, setValidatorOpen] = useState(innerItems.length > 0);
+  const listRef = useRef<FlashListRef<typeof itemsLibrary[number] | string>>(null);
+  const [validatorOpen, setValidatorOpen] = useState(items.length > 0);
 
   const { pathname } = useRoute.Path();
   const { redirect, push } = useRouter(pathname as Route);
@@ -79,7 +114,7 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
             />
           </View>
         </View>}
-        ListFooterComponent={(isLoading && results.length === 0) ? <Grid style={{
+        ListFooterComponent={(isLoading && itemsLibrary.length === 0) ? <Grid style={{
           height: 0,
           flex: 1,
           paddingHorizontal: PADDING_HORIZONTAL,
@@ -105,7 +140,7 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
         overrideItemLayout={(layout, item, index) => {
           if (typeof item === "string") { layout.span = 2; }
         }}
-        data={["header", isEmpty ? "empty" : undefined, ...(results ?? [])].filter(notEmpty)}
+        data={["header", "pending", isEmpty ? "empty" : undefined, ...(itemsLibrary ?? [])].filter(notEmpty)}
         contentContainerStyle={{ paddingBottom: 56 }}
         showsVerticalScrollIndicator={false}
         keyExtractor={(item) => typeof item === "string" ? item : item._id}
@@ -119,6 +154,9 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
                 description="Try adjusting your search or check back later"
                 variant="secondary"
               />
+
+            if (item === "pending")
+              return <PendingItems />
 
             if (item === "header")
               return <>
@@ -162,11 +200,11 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
                 source={item.image.sizes.small.url}
                 // title={item.name}
                 // subtitle={item.brand || item.category}
-                selected={!!innerItems.find((i) => i === item._id)}
+                selected={!!items.find((i) => i === item._id)}
                 badge={badge}
                 onPress={() => {
                   setValidatorOpen(true);
-                  setInnerItems((prev) => {
+                  setItems((prev) => {
                     if (prev.find((i) => i === item._id)) {
                       return prev.filter((i) => i !== item._id);
                     } else {
@@ -191,9 +229,9 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
         <ItemsValidator
           open={validatorOpen}
           onOpenChange={setValidatorOpen}
-          disabled={innerItems.length === 0}
-          items={innerItems.toReversed()}
-          onItemRemoved={(item) => setInnerItems((prev) => {
+          disabled={items.length === 0}
+          items={items.toReversed()}
+          onItemRemoved={(item) => setItems((prev) => {
             if (prev.length === 1) setValidatorOpen(false);
             return prev.filter((p) => p !== item);
           })}
@@ -201,7 +239,7 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
             // Outfit creation is free
             // if (!canPay) { return push(ROUTES.MODALS.UPGRADE); }
 
-            if (mode === 'new') {
+            if (outfitId) {
               push(ROUTES.MODALS.NEW_OUTFIT, {
                 forwardRedirect: true,
                 params: { itemIds: items }
@@ -246,16 +284,7 @@ const HeaderButton = ({ label, icon, onPress }: { onPress: () => void, label: st
 }
 
 export default function Screen() {
-  const { itemIds, outfitId } = useRoute(ROUTES.OUTFIT.NEW);
+  const { outfitId } = useRoute(ROUTES.OUTFIT.NEW);
 
-  const mode = outfitId ? 'edit' : 'new';
-
-  const { setItems } = useOutfit.New();
-
-  // Initialize items if itemIds are provided
-  useEffect(() => {
-    if (itemIds && itemIds.length > 0) setItems(normalizeArray(itemIds))
-  }, [itemIds, setItems])
-
-  return <Content mode={mode} outfitId={outfitId} />;
+  return <Content outfitId={outfitId} />;
 }

@@ -1,14 +1,17 @@
 import { ArrowLeft, ArrowRight, Home, X } from "@ui/icons";
 import { Image } from "@ui/image";
 import { Pressable } from "@ui/pressable";
+import { notEmpty } from "@utils/convex-allowed";
 import { router } from "expo-router";
 import { atom, useAtom } from "jotai";
 import { nanoid } from "nanoid/non-secure";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { BackHandler, Platform, View } from "react-native";
+import ViewShot from 'react-native-view-shot';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { ROUTES } from "routes";
 import { Colors } from "theme";
+import { BrowserCapture } from "./browser.capture";
 
 // Types for extracted product data
 export type BrowserProductItem = {
@@ -17,7 +20,7 @@ export type BrowserProductItem = {
   brand?: string;
   description?: string;
   url: string;
-  images: { url: string; width: number; height: number }[];
+  images: { url?: string; uri?: string, width: number; height: number }[];
 };
 
 export type BrowserProductData = {
@@ -284,7 +287,7 @@ true; // Required for iOS
 interface BrowserProps {
   onTouchStart?: () => void;
   onProductExtracted: (data: BrowserProductData) => void;
-  extractProductRef: React.RefObject<() => void>;
+  extractProductRef?: React.RefObject<() => void>;
   goBackRef?: React.RefObject<() => void>;
   goForwardRef?: React.RefObject<() => void>;
   children?: React.ReactNode;
@@ -299,6 +302,10 @@ const latestUrlAtom = atom<string>(BASE_URL);
 
 export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goForwardRef, children, onRouteChange, onTouchStart, autoExtractDelay }: BrowserProps) => {
   const webviewRef = useRef<WebView>(null);
+  const captureRef = useRef<ViewShot>(null);
+
+  const [image, setImage] = useState<BrowserProductItem['images'][number] | null>(null);
+
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoForward, setCanGoForward] = useState(false);
   const [currentUrl, setCurrentUrl] = useAtom(latestUrlAtom);
@@ -330,6 +337,7 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
         ...data,
         items: data.items?.map(item => ({
           ...item,
+          images: [image, ...item.images].filter(notEmpty),
           key: nanoid()
         })),
       }
@@ -343,7 +351,8 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
     webviewRef.current?.injectJavaScript(EXTRACT_PRODUCT_INFO);
   }
 
-  extractProductRef.current = extractProductInfo;
+  if (extractProductRef)
+    extractProductRef.current = extractProductInfo;
 
   if (goBackRef) goBackRef.current = goBack;
   if (goForwardRef) goForwardRef.current = goForward;
@@ -360,24 +369,39 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
           borderTopStartRadius: 0,
           overflow: 'hidden'
         }}>
-        <WebView
-          ref={webviewRef}
-          style={{ flex: 1 }}
-          source={{ uri: currentUrl }}
-          onMessage={handleMessage}
-          onNavigationStateChange={(navState) => {
-            const url = navState.url.trim();
-            setCanGoForward(navState.canGoForward);
-            setCanGoBack(navState.canGoBack);
-            setCurrentUrl(url);
-            onRouteChange?.(url);
+        <ViewShot
+          ref={captureRef}
+          style={{
+            flex: 1
+          }}>
+          <WebView
+            ref={webviewRef}
+            style={{ flex: 1 }}
+            source={{ uri: currentUrl }}
+            onMessage={handleMessage}
+            onNavigationStateChange={(navState) => {
+              const url = navState.url.trim();
+              setCanGoForward(navState.canGoForward);
+              setCanGoBack(navState.canGoBack);
+              setCurrentUrl(url);
+              onRouteChange?.(url);
 
-            if (autoExtractDelay) {
-              if (timer.current) clearTimeout(timer.current);
-              timer.current = setTimeout(() => { extractProductInfo() }, autoExtractDelay);
-            }
-          }}
-        />
+              if (autoExtractDelay) {
+                if (timer.current) clearTimeout(timer.current);
+                timer.current = setTimeout(() => { extractProductInfo() }, autoExtractDelay);
+              }
+            }}
+          />
+        </ViewShot>
+        <View style={{ position: 'absolute', right: 12, bottom: 12 }}>
+          <BrowserCapture
+            captureRef={captureRef}
+            onCrop={async (image) => {
+              setImage({ ...image, url: image.uri });
+              requestAnimationFrame(() => extractProductInfo());
+            }}
+          />
+        </View>
       </View>
       {children}
       <View style={{
