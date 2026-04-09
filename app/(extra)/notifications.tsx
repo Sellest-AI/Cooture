@@ -112,6 +112,9 @@ const GenericNotification = ({ id, onPress, read, data }: GenereticNotificationP
   return (
     <Notification
       read={read}
+      onProfilePress={() => {
+        if (notification.actor) router.push(ROUTES.USER.ID(notification.actor._id));
+      }}
       onPress={() => {
         onPress?.()
         requestAnimationFrame(() => {
