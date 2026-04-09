@@ -65,10 +65,12 @@ const GridSkeleton = () => {
 const Generation = ({ id, style, size = 'large' }: { id: Id<'generations'>, style?: ViewStyle, size?: 'small' | 'large' }) => {
   const { data: post } = useQuery(api.router.generations.getOne.anon, { id });
 
-  const prediction = post?.predictions.find(p => p.videoId) ?? post?.predictions[0];
+  const predictionVideo = post?.predictions.find(p => p.videoId) ?? post?.predictions[0];
+  const predictionImage = post?.predictions.find(p => p.imageId) ?? post?.predictions[0];
+  const prediction = predictionVideo || predictionImage;
 
-  const { data: image } = useQueryCached(api.router.storage.images.getOne.anon, prediction?.imageId ? { id: prediction?.imageId } : 'skip');
-  const { data: video } = useQueryCached(api.router.storage.videos.getOne.anon, prediction?.videoId ? { id: prediction?.videoId } : 'skip');
+  const { data: image } = useQueryCached(api.router.storage.images.getOne.anon, predictionImage?.imageId ? { id: predictionImage?.imageId } : 'skip');
+  const { data: video } = useQueryCached(api.router.storage.videos.getOne.anon, predictionVideo?.videoId ? { id: predictionVideo?.videoId } : 'skip');
 
   if (!post || (!image && !video)) return <Skeleton style={style} />;
 

@@ -2,6 +2,7 @@ import { ROUTES, useRouter } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
 import { useMutation, useQuery, useQueryCached, useQueryCachedData } from "@/lib/convex/client";
 import { downloadImageCrossPlatform } from "@/lib/image/client";
+import { downloadVideo } from "@/lib/video";
 import { Post } from "@ui/cards";
 import { notEmpty } from "@utils/convex-allowed";
 import { env } from "env";
@@ -79,7 +80,8 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
       })
     }))}
     onDownload={async (url) => {
-      await downloadImageCrossPlatform(url, { applyWatermark: true }).catch(() => null)
+      await downloadImageCrossPlatform(url, { applyWatermark: true })
+        .catch(async () => downloadVideo(url).catch(() => null))
     }}
     onTurnToVideo={(ownedByCurrentUser && env.PUBLIC_NODE_ENV !== 'production') ? (_id: string) => {
       const prediction = post.predictions.find(p => p._id === _id);
