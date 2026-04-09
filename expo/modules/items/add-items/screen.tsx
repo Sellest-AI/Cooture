@@ -42,7 +42,9 @@ function PendingItems() {
     reset();
   }, [newItems, newItems.length, pendingItems.length, reset, setItems])
 
-  if (pendingItems.length <= 0) return null;
+  const pendingLength = pendingItems.length - newItems.length;
+
+  if (pendingLength <= 0) return null;
 
   return (
     <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 32 }}>
@@ -50,7 +52,7 @@ function PendingItems() {
         <Loader size={20} color={Colors.primary[500]} />
       </View>
       <Text.Base color={Colors.neutral[400]} style={{ marginLeft: 4 }}>
-        Adding {pendingItems.length} item{pendingItems.length > 1 ? 's' : ''} to your wardrobe
+        Adding {pendingLength} item{pendingLength > 1 ? 's' : ''} to your wardrobe
       </Text.Base>
     </View>
   )
@@ -66,9 +68,9 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
   // Search
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string | null>(null);
-  const { results, isLoading, isEmpty } = useSearchItems({ query, category, channel: 'public' });
+  const { results, isLoading, isFiltering, isEmpty } = useSearchItems({ query, category, channel: 'public' });
 
-  const itemsLibrary = [...latestItems, ...results] // unique;
+  const itemsLibrary = [...(isFiltering ? [] : latestItems), ...results] // unique;
     .filter((item, i, arr) => arr.findIndex(it => it._id === item._id) === i)
 
   // UI
@@ -202,6 +204,11 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
                 // subtitle={item.brand || item.category}
                 selected={!!items.find((i) => i === item._id)}
                 badge={badge}
+                onLongPress={() => {
+                  push(ROUTES.ITEM.PATH, {
+                    pathParams: { id: item._id }
+                  })
+                }}
                 onPress={() => {
                   setValidatorOpen(true);
                   setItems((prev) => {
@@ -239,7 +246,7 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
             // Outfit creation is free
             // if (!canPay) { return push(ROUTES.MODALS.UPGRADE); }
 
-            if (outfitId) {
+            if (!outfitId) {
               push(ROUTES.MODALS.NEW_OUTFIT, {
                 forwardRedirect: true,
                 params: { itemIds: items }

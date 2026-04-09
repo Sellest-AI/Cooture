@@ -25,6 +25,7 @@ export const useSearchItems = ({ query, category, channel = 'public' }: Paramete
   });
 
   const isEmpty = results && results.length === 0 && !isLoading;
+  const isFiltering = !!category || hasQuery;
 
-  return { results, isLoading, isEmpty };
+  return { results, isLoading, isEmpty, isFiltering };
 }
