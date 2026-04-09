@@ -9,10 +9,10 @@ const checkIfVideosOnly = (predictions: Doc<'predictions'>[]) => {
   const completedPredictions = predictions.filter((p) => p.status === 'ACCEPTED' || p.status === 'REJECTED');
   const pendingPredictions = predictions.filter((p) => p.status === 'LOADING');
 
-  const completedAreVideos =
-    completedPredictions.length > 0 && completedPredictions.every((p) => !!p.videoId);
-  const pendingAreVideos =
-    pendingPredictions.length > 0 && pendingPredictions.every((p) => !!p.imageId);
+  const completedAreVideos = completedPredictions.length === 0 ||
+    completedPredictions.every((p) => !!p.videoId);
+  const pendingAreVideos = pendingPredictions.length === 0 ||
+    pendingPredictions.every((p) => !!p.imageId);
 
   return completedAreVideos && pendingAreVideos;
 }
