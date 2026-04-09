@@ -47,7 +47,6 @@ const UnlockMore = () => {
         <View style={{
           alignItems: 'center',
           justifyContent: 'center',
-          transform: [{ scale: 1.2 }],
           flex: 1,
         }}>
           <Text.H3 color={Colors.primary[500]} style={{ maxWidth: '65%', textAlign: 'center' }}>
@@ -189,7 +188,8 @@ export default function Screen() {
                   <ImageGeneration
                     loading={s.status === 'LOADING'}
                     source={s.imageUrl}
-                    text={s.status === 'LOADING' ? "Generating..." : "Ready in 13s."}
+                    text={s.status === 'LOADING' ? "Generating..." :
+                      s.status === 'FAILED' ? "Failed to generate." : "Ready"}
                   />
                 </AnimatedGeneration>
               )
