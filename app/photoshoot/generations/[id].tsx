@@ -230,7 +230,7 @@ export default function Screen() {
                       source={s.imageUrl}
                       text={s.status === 'LOADING' ? "Generating..." :
                         isFailed ? "Failed" : "Ready"}
-                      onDownload={s.imageUrl ? () => downloadImageCrossPlatform(s.imageUrl!) : undefined}
+                      onDownload={s.imageUrl ? () => downloadImageCrossPlatform(s.imageUrl!, { applyWatermark: true }) : undefined}
                     />
                     {isFailed && <View style={{
                       position: 'absolute',

@@ -88,7 +88,7 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
                     if (currentItem.videoUrl) {
                       await downloadVideo(currentItem.videoUrl);
                     } else if (currentItem.imageUrl) {
-                      await downloadImageCrossPlatform(currentItem.imageUrl);
+                      await downloadImageCrossPlatform(currentItem.imageUrl, { applyWatermark: true });
                     }
                   } catch { }
                   onNext(true);

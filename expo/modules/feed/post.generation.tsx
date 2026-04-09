@@ -79,7 +79,7 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
       })
     }))}
     onDownload={async (url) => {
-      await downloadImageCrossPlatform(url).catch(() => null)
+      await downloadImageCrossPlatform(url, { applyWatermark: true }).catch(() => null)
     }}
     onTurnToVideo={(ownedByCurrentUser && env.PUBLIC_NODE_ENV !== 'production') ? (_id: string) => {
       const prediction = post.predictions.find(p => p._id === _id);
