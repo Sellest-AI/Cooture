@@ -16,7 +16,7 @@ import { Platform } from "react-native";
 import { Colors } from "theme";
 
 export default function Screen() {
-  const { userId, isPremium } = useAccount();
+  const { userId } = useAccount();
   const { id } = useRoute.Params<{ id: Id<'predictions'> }>();
   const { data: post, isPending } = useQuery(api.router.generations.getFromPrediction.anon, { id });
   const { results: postsFromUser, isLoading, status, loadMore } = usePaginatedQuery(api.router.generations.getPaginated.anon, post?.user?._id ? { userId: post?.user?._id } : 'skip', { initialNumItems: 8 });
@@ -36,14 +36,14 @@ export default function Screen() {
   const renderItem = useCallback(({ item, index }: { item: typeof items[number], index: number }) => {
     if (!item.id) return null;
 
-    const showPremiumBlock = (index % 5 === 0 && index > 0) && !isPremium;
+    const showPremiumBlock = (index % 5 === 0 && index > 0);
 
     return <>
-      {showPremiumBlock && <PremiumBlock style={{ marginHorizontal: 12 }} />}
+      {showPremiumBlock && <PremiumBlock style={{ marginHorizontal: 12, marginBottom: 20 }} />}
       <GenerationPost
         id={item.id}
         style={{
-          marginTop: showPremiumBlock ? 28 : 8,
+          marginTop: 8,
           marginBottom: 28
         }}
         imageQuality={item.id === post?._id ? 'full' : 'optimized'}
@@ -51,7 +51,7 @@ export default function Screen() {
         disableLongPress={true}
       />
     </>
-  }, [post, isPremium, userId]);
+  }, [post, userId]);
 
   if (!isPending && !post)
     return <Redirect href={ROUTES.TABS.DISCOVER} />

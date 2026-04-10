@@ -1,4 +1,5 @@
 import { useRouter } from "@/hooks";
+import { useAccount } from "@/lib/convex/auth";
 import { Block } from "@ui/block";
 import { ArrowUpRight, Credits } from "@ui/icons";
 import { Pressable } from "@ui/pressable";
@@ -11,7 +12,11 @@ type Props = {
 }
 
 export const PremiumBlock = ({ style }: Props) => {
+  const { isPremium } = useAccount();
   const { push } = useRouter();
+
+  if (isPremium) return null;
+
   return (
     <Pressable onPress={() => push("/upgrade")}>
       <Block
