@@ -36,7 +36,7 @@ export const TextInput = ({ className = "", style, startIcon, canClear, autoFocu
       style={{
         borderRadius: 20,
         backgroundColor: Colors.blur.dark,
-        borderTopColor: Colors.blur.medium,
+        borderColor: Colors.blur.medium,
         borderTopWidth: 1,
         overflow: 'hidden',
         flexDirection: 'row',

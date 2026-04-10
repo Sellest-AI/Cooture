@@ -342,6 +342,7 @@ export default function Screen() {
                       source={item.image.sizes.small.url}
                       title={item.name}
                       subtitle={item.category}
+                      onLongPress={() => push(ROUTES.ITEM.PATH, { pathParams: { id: item._id } })}
                       onPress={() => setSelectedItem(item._id)}
                     />
                   </View>
