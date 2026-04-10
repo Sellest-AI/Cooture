@@ -5,9 +5,11 @@ import { saveNotification } from "../../functions/notifications";
 import { updateQuest } from "../../functions/quests";
 import { internalMutation, MutationCtx } from "../../procedures";
 
-const questHandler = async (ctx: MutationCtx, { userId, presetId }: { userId: Id<'users'>, presetId: Id<'presets'> }) => {
+const questHandler = async (ctx: MutationCtx, { userId, presetId, currentGenerationId }: { userId: Id<'users'>, presetId: Id<'presets'>, currentGenerationId: Id<'generations'> }) => {
   const generations = await ctx.db.query("generations").withIndex("by_user_id", (q) => q.eq("userId", userId)).collect();
-  const presets = await Promise.all(generations.map((generation) => ctx.db.query("presetGenerations").withIndex("by_generation_id", (q) => q.eq("generationId", generation._id)).first()));
+  const pastGenerations = generations.filter((g) => g._id !== currentGenerationId);
+
+  const presets = await Promise.all(pastGenerations.map((generation) => ctx.db.query("presetGenerations").withIndex("by_generation_id", (q) => q.eq("generationId", generation._id)).first()));
   const isNewPreset = !presets.some((preset) => preset?.presetId === presetId);
   if (isNewPreset) await updateQuest(ctx, { userId, questType: "presets_used", increment: 1 });
 }
@@ -84,7 +86,7 @@ export const _internal = internalMutation({
       });
 
       // Update quests
-      await questHandler(ctx, { userId, presetId: preset.presetId });
+      await questHandler(ctx, { userId, presetId: preset.presetId, currentGenerationId: generationId });
     }
 
     return generationId;

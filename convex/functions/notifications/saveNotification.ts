@@ -208,7 +208,7 @@ async function getObjects(ctx: QueryCtx, args: Args<Type>): Promise<ArgsExtended
       ]);
       const coverId = predictions.find((p) => p.status === 'ACCEPTED')?.imageId ?? predictions[0]?.imageId;
       const cover = coverId ? await ctx.db.get(coverId) : undefined;
-      return { ...args, generation: generation ? { ...generation, coverUrl: cover?.url } : undefined };
+      return { ...args, generation: generation ? { ...generation, coverUrl: cover?.url } : undefined, actor };
     }
     else if (args.outfitId) {
       const outfit = await ctx.db.query("outfits").withIndex("by_id", q => q.eq("_id", args.outfitId)).first();
