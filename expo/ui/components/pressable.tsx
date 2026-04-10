@@ -1,6 +1,6 @@
+import * as Haptics from 'expo-haptics';
 import { ComponentProps, useRef, useState } from "react";
 import { Animated, GestureResponderEvent, Pressable as NativePressable, ViewStyle } from "react-native";
-
 
 type PressableProps = {
   disabled?: boolean;
@@ -62,6 +62,16 @@ export const Pressable = ({ disabled, onPress, children, animated = true, intens
       }}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
+      delayLongPress={props.delayLongPress ?? 320}
+      onLongPress={(e) => {
+        if (disabled) return;
+        if (innerDisabled) return;
+        setInnerDisabled(true);
+        setTimeout(() => { setInnerDisabled(false) }, 300);
+
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+        props.onLongPress?.(e);
+      }}
       onPress={(e) => {
         if (disabled) return;
 
