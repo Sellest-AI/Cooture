@@ -75,7 +75,7 @@ const BorderTop = ({ style, disabled, variant }: { style?: ViewStyle, disabled?:
         left: 0,
         right: 0,
         top: 0,
-        height: 1.5,
+        height: 1,
         opacity: style?.opacity
       }}
     />
@@ -87,8 +87,14 @@ export const Block = <T extends Variant>({ className = "", children, variant, st
 
   const Component = variant === 'blur' ? (blurComponent ?? BlurView) : View;
 
-  const showTopBorder = (Number(style?.width) || Infinity) > 24 &&
-    (Number(style?.borderRadius) || 0) < 99;
+  const borderRadius = style?.borderRadius ?? 18;
+
+  const showExtraBorder = (Number(style?.width) || Infinity) > 24 &&
+    (Number(borderRadius) || 0) < 99;
+
+  const { padding, paddingLeft, paddingRight, paddingTop, paddingBottom, paddingHorizontal, paddingVertical,
+    width, height, aspectRatio,
+    flexDirection, justifyContent, alignItems, alignContent, gap, borderColor, ...restStyle } = style || {};
 
   return (
     <Component
@@ -99,20 +105,22 @@ export const Block = <T extends Variant>({ className = "", children, variant, st
         overflow: 'hidden',
         position: 'relative',
         ...VariantColors,
-        borderLeftWidth: disabled ? 0 : 2,
-        borderRadius: 18,
-        ...style,
+        borderWidth: 0,
+        ...restStyle,
+        borderRadius,
         backgroundColor: style?.backgroundColor ?? VariantColors.backgroundColor,
+        width: !Number(width) ? width : undefined,
+        height: !Number(height) ? height : undefined,
       }}
       className={cn(className)}
       onLayout={onLayout}
     >
-      {showTopBorder && <BorderTop
+      {showExtraBorder && <BorderTop
         style={style}
         disabled={disabled}
         variant={variant}
       />}
-      <LinearGradient
+      {showExtraBorder && <LinearGradient
         colors={['transparent', 'rgba(0, 0, 0, 0.3)', 'transparent']}
         start={{ x: 0, y: 0.5 }} // Left center
         end={{ x: 1, y: 0.5 }}   // Right center
@@ -124,14 +132,45 @@ export const Block = <T extends Variant>({ className = "", children, variant, st
           height: 3,
           opacity: style?.opacity
         }}
-      />
+      />}
       {disabled && <View style={{
         position: 'absolute',
         inset: 0,
         backgroundColor: VariantColors.textColor,
         opacity: 0.2
       }} />}
-      {children}
+      <View style={[
+        {
+          padding,
+          paddingLeft,
+          paddingRight,
+          paddingTop,
+          paddingBottom,
+          paddingHorizontal,
+          paddingVertical,
+        },
+        {
+          flexDirection,
+          justifyContent,
+          alignItems,
+          alignContent,
+          gap,
+        },
+        {
+          width: width ? (Number(width) ? width : '100%') : undefined,
+          height: height ? (Number(height) ? height : '100%') : undefined,
+          aspectRatio,
+        },
+        {
+          overflow: 'hidden',
+          borderRadius,
+          ...VariantColors,
+          backgroundColor: 'transparent',
+          borderLeftWidth: style?.borderLeftWidth ?? (disabled ? 0 : 1),
+          borderTopWidth: showExtraBorder ? 1 : 0,
+        }]}>
+        {children}
+      </View>
     </Component>
   )
 }
