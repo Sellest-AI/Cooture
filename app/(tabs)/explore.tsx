@@ -8,7 +8,7 @@ import { BlurKeys, BlurTargetView } from "@ui/blur-view";
 import { FlashList } from "@ui/flat-list";
 import { Col, Grid, Row } from "@ui/grid";
 import { Loader, Search } from "@ui/icons";
-import { Image } from "@ui/image";
+import { Image, prefetch } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { Pressable as AnimatedPressable } from "@ui/pressable";
 import { SafeAreaView, useSafeAreaInsets } from "@ui/safe-area-view";
@@ -80,7 +80,10 @@ const Generation = ({ id, style, size = 'large' }: { id: Id<'generations'>, styl
 
   return (
     <Pressable style={{ borderRadius: 16, overflow: 'hidden', flex: 1, ...style }}
-      onPress={prediction ? () => router.push(ROUTES.POST.ID(prediction._id)) : undefined}
+      onPress={prediction ? () => {
+        router.push(ROUTES.POST.ID(prediction._id));
+        if (image) prefetch(image.url)
+      } : undefined}
     >
       {showVideo && <VideoView
         style={{ flex: 1 }}

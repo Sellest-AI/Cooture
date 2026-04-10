@@ -16,7 +16,7 @@ import { Platform } from "react-native";
 import { Colors } from "theme";
 
 export default function Screen() {
-  const { userId } = useAccount();
+  const { userId, isPremium } = useAccount();
   const { id } = useRoute.Params<{ id: Id<'predictions'> }>();
   const { data: post, isPending } = useQuery(api.router.generations.getFromPrediction.anon, { id });
   const { results: postsFromUser, isLoading, status, loadMore } = usePaginatedQuery(api.router.generations.getPaginated.anon, post?.user?._id ? { userId: post?.user?._id } : 'skip', { initialNumItems: 8 });
@@ -35,27 +35,23 @@ export default function Screen() {
 
   const renderItem = useCallback(({ item, index }: { item: typeof items[number], index: number }) => {
     if (!item.id) return null;
-    if (index % 6 === 0 && index > 0) {
-      return (<>
-        <PremiumBlock style={{ marginHorizontal: 12 }} />
-        <GenerationPost
-          id={item.id}
-          style={{ marginTop: 28, marginBottom: 28 }}
-          imageQuality={item.id === post?._id ? 'full' : 'optimized'}
-          disableLongPress={true}
-          ownedByCurrentUser={post?._id === item.id && post?.user?._id === userId}
-        />
-      </>
-      )
-    }
-    return <GenerationPost
-      id={item.id}
-      style={{ marginTop: 8, marginBottom: 28 }}
-      imageQuality={item.id === post?._id ? 'full' : 'optimized'}
-      ownedByCurrentUser={post?._id === item.id && post?.user?._id === userId}
-      disableLongPress={true}
-    />
-  }, [post, userId]);
+
+    const showPremiumBlock = (index % 5 === 0 && index > 0) && !isPremium;
+
+    return <>
+      {showPremiumBlock && <PremiumBlock style={{ marginHorizontal: 12 }} />}
+      <GenerationPost
+        id={item.id}
+        style={{
+          marginTop: showPremiumBlock ? 28 : 8,
+          marginBottom: 28
+        }}
+        imageQuality={item.id === post?._id ? 'full' : 'optimized'}
+        ownedByCurrentUser={post?._id === item.id && post?.user?._id === userId}
+        disableLongPress={true}
+      />
+    </>
+  }, [post, isPremium, userId]);
 
   if (!isPending && !post)
     return <Redirect href={ROUTES.TABS.DISCOVER} />
