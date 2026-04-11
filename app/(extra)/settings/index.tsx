@@ -2,7 +2,7 @@ import { useRouter } from "@/hooks";
 import { useAccount, useAuthActions } from "@/lib/convex/auth";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
-import { ArrowLeft, Bell, Camera, ChevronRight, Credits, Gem, Lock, Package, Settings, TriangleAlert, TShirt } from "@ui/icons";
+import { ArrowLeft, Bell, Camera, ChevronRight, Credits, Gem, Lock, Package, Settings, TriangleAlert, TShirt, UserRoundX } from "@ui/icons";
 import { Image } from "@ui/image";
 import { LinearGradient } from "@ui/linear-gradient";
 import { MenuGroup, MenuItem } from "@ui/menu";
@@ -113,6 +113,11 @@ export default function Screen() {
             icon={Camera}
             text="Saved Posts"
             onPress={() => push(ROUTES.COLLECTION.SAVED_POSTS)}
+          />
+          <MenuItem
+            icon={UserRoundX}
+            text="Blocked Users"
+            onPress={async () => push('/settings/blocked-users')}
           />
           <MenuItem
             icon={Bell}

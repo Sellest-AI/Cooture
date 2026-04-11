@@ -2,9 +2,11 @@ import { useScrollToTop } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
 import { useQuery, useQueryCached } from "@/lib/convex/client";
 import { useFeed } from "@/modules/feed/_hooks";
+import { useSafety } from "@/modules/safety";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Block } from "@ui/block";
 import { BlurKeys, BlurTargetView } from "@ui/blur-view";
+import { Post as PostComponent } from "@ui/cards";
 import { FlashList } from "@ui/flat-list";
 import { Col, Grid, Row } from "@ui/grid";
 import { Loader, Search } from "@ui/icons";
@@ -63,6 +65,7 @@ const GridSkeleton = () => {
 }
 
 const Generation = ({ id, style, size = 'large' }: { id: Id<'generations'>, style?: ViewStyle, size?: 'small' | 'large' }) => {
+  const { isHidden } = useSafety();
   const { data: post } = useQuery(api.router.generations.getOne.anon, { id });
 
   const predictionVideo = post?.predictions.find(p => p.videoId) ?? post?.predictions[0];
@@ -73,6 +76,8 @@ const Generation = ({ id, style, size = 'large' }: { id: Id<'generations'>, styl
   const { data: video } = useQueryCached(api.router.storage.videos.getOne.anon, predictionVideo?.videoId ? { id: predictionVideo?.videoId } : 'skip');
 
   if (!post || (!image && !video)) return <Skeleton style={style} />;
+  if (isHidden({ generationId: id, userId: post?.userId, itemIds: post?.outfit?.items.map(i => i._id), outfitId: post?.outfitId }))
+    return (<PostComponent.Hidden style={{ ...style, borderRadius: 16 }} src={image?.sizes.thumbnail?.url} />);
 
   const finalSize = size === 'large' ? 'medium' : 'small';
 
@@ -100,10 +105,16 @@ const Generation = ({ id, style, size = 'large' }: { id: Id<'generations'>, styl
 }
 
 const Outfit = ({ id, style, size = 'large' }: { id: Id<'outfits'>, style?: ViewStyle, size: 'small' | 'large' }) => {
+  const { isHidden } = useSafety();
+
   const { data: outfit } = useQuery(api.router.outfits.getOne.anon, { outfitId: id });
   if (!outfit) return <Skeleton style={style} />;
 
   const image = outfit.cover ?? outfit.items[0].image;
+
+  if (isHidden({ outfitId: id, userId: outfit?.userId, itemIds: outfit?.items.map(i => i._id) }))
+    return (<PostComponent.Hidden style={{ ...style, borderRadius: 16 }} src={image?.sizes.thumbnail?.url} />);
+
 
   const finalSize = size === 'large' ? 'medium' : 'small';
 

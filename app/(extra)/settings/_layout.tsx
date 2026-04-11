@@ -18,6 +18,9 @@ export default function Layout() {
         name="index"
       />
       <Stack.Screen
+        name="blockers-users"
+      />
+      <Stack.Screen
         name="delete-account"
         options={{
           presentation: 'formSheet',
