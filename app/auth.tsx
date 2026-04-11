@@ -11,9 +11,10 @@ import { VideoView } from '@ui/video-view';
 import { removeUndefinedKeys } from '@utils/convex-allowed';
 import { env } from 'env';
 import { AppleAuthenticationButton, AppleAuthenticationButtonStyle, AppleAuthenticationButtonType } from "expo-apple-authentication";
+import * as WebBrowser from 'expo-web-browser';
 import { WEBSITE } from 'global';
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Linking, Platform, View } from 'react-native';
+import { Animated, Platform, View } from 'react-native';
 import { Colors } from 'theme';
 
 const BackgroundImage = () => {
@@ -236,18 +237,16 @@ export default function Screen() {
         <LoginButtons />
         <View style={{ marginHorizontal: 24, marginTop: 20 }}>
           <Text.Sm style={{ textAlign: 'center', color: Colors.neutral[400] }}>
-            By continuing, you fully agree to {WEBSITE.NAME}&apos;s Terms of Use and acknowledge that you have read the Privacy Policy.
-          </Text.Sm>
-          <Text.Sm style={{ textAlign: 'center', color: Colors.neutral[400] }}>
+            By continuing, you fully agree to our Terms of Use and Privacy Policy.
             We have zero tolerance for objectionable content, any kind of abuse, or harassment.
           </Text.Sm>
           <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8, marginTop: 12 }}>
-            <Pressable onPress={() => Linking.openURL(WEBSITE.TERMS_OF_USE)}>
+            <Pressable onPress={() => WebBrowser.openBrowserAsync(WEBSITE.TERMS_OF_USE)}>
               <Text.Sm color={Colors.neutral[400]} style={{ textDecorationLine: 'underline' }}>
                 Terms of use
               </Text.Sm>
             </Pressable>
-            <Pressable onPress={() => Linking.openURL(WEBSITE.PRIVACY_POLICY)}>
+            <Pressable onPress={() => WebBrowser.openBrowserAsync(WEBSITE.PRIVACY_POLICY)}>
               <Text.Sm color={Colors.neutral[400]} style={{ textDecorationLine: 'underline' }}>
                 Privacy Policy
               </Text.Sm>
