@@ -157,7 +157,7 @@
         "expo-image-picker",
         {
           "photosPermission": "Allow $(PRODUCT_NAME) access to your photo library to choose pictures for editing or uploading to your virtual closet.",
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera so you can take and edit pictures or add your clothing items."
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera so you can scan clothing items, take selfies for virtual photoshoots, and capture pictures to edit."
         }
       ],
       [
