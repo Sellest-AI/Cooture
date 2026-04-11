@@ -9,7 +9,7 @@ type Props = {
 }
 
 export const RevenueCatProvider = ({ children }: Props) => {
-  const { user } = useAccount();
+  const { userId, isAuthenticated, isAuthLoading } = useAccount();
 
   // 1. Initialize RevenueCat Once
   useEffect(() => {
@@ -29,14 +29,20 @@ export const RevenueCatProvider = ({ children }: Props) => {
   // 2. Sync RevenueCat with Convex Authentication
   useEffect(() => {
     const syncRevenueCat = async () => {
+      // Wait until Convex auth has finished initializing on the device
+      if (isAuthLoading) return;
+
+      // If authenticated but the user document is still fetching, wait
+      if (isAuthenticated && !userId) return;
+
       try {
         const isAnonymous = await Purchases.isAnonymous();
 
-        if (user?.userId) {
+        if (userId) {
           // Identify user in RevenueCat with their Convex userId if not already set
           const currentRcUserId = await Purchases.getAppUserID();
-          if (currentRcUserId !== user.userId) {
-            await Purchases.logIn(user.userId);
+          if (currentRcUserId !== userId) {
+            await Purchases.logIn(userId);
           }
         } else {
           // If logged out and not already anonymous, log out of RevenueCat
@@ -50,7 +56,7 @@ export const RevenueCatProvider = ({ children }: Props) => {
     };
 
     syncRevenueCat();
-  }, [user?.userId]);
+  }, [userId, isAuthLoading, isAuthenticated]);
 
   return (
     children

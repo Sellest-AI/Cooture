@@ -1,4 +1,5 @@
 import { useAuthToken, useAuthActions as useConvexAuthActions } from "@convex-dev/auth/react";
+import { useConvexAuth } from "convex/react";
 import { makeRedirectUri } from "expo-auth-session";
 import { Href, router } from "expo-router";
 import { reloadAsync } from "expo-updates";
@@ -95,9 +96,11 @@ export const useAuthActions = () => {
 
 export const useAccount = () => {
   const token = useAuthToken();
+  const { isLoading: isAuthLoading, isAuthenticated: _isAuthenticated } = useConvexAuth();
+
   const { data: user } = useQueryCached(api.router.users.getAccount.authed, !!token ? undefined : 'skip');
 
-  const isAuthenticated = !!token;
+  const isAuthenticated = !!token || _isAuthenticated;
 
   const isPremium = !!user?.plan;
   const userId = user?._id;
@@ -112,6 +115,7 @@ export const useAccount = () => {
   return {
     user,
     userId,
+    isAuthLoading,
     isAuthenticated,
     isPremium,
     isSuspended,
