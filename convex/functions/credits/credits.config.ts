@@ -14,7 +14,7 @@ export const CREDITS_CONFIG = {
   MAX_HOURS_TO_MAINTAIN_STREAK: 48, // Missing 2 days breaks the streak
 
   // Initial credits for new users
-  STARTING_CREDITS: 200, // Enough for 2 generations to try the app
+  STARTING_CREDITS: 140, // Enough for 1 generation to try the app
   COOTURE_PLUS_CREDITS: 100 * 15,
 } as const;
 
