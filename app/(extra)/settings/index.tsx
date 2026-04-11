@@ -2,7 +2,7 @@ import { useRouter } from "@/hooks";
 import { useAccount, useAuthActions } from "@/lib/convex/auth";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
-import { ArrowLeft, Bell, Camera, ChevronRight, Credits, Gem, Lock, Package, Settings, TriangleAlert, TShirt, UserRoundX } from "@ui/icons";
+import { ArrowLeft, Bell, Camera, ChevronRight, Credits, Gem, Info, Lock, Package, Settings, TriangleAlert, TShirt, UserRoundX } from "@ui/icons";
 import { Image } from "@ui/image";
 import { LinearGradient } from "@ui/linear-gradient";
 import { MenuGroup, MenuItem } from "@ui/menu";
@@ -11,6 +11,8 @@ import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
 import { fetchUpdateAsync, reloadAsync, useUpdates } from 'expo-updates';
+import * as WebBrowser from 'expo-web-browser';
+import { WEBSITE } from "global";
 import { Linking, Platform, Pressable, View } from "react-native";
 import Purchases from "react-native-purchases";
 import { ROUTES } from "routes";
@@ -150,6 +152,18 @@ export default function Screen() {
             text="Delete account"
             // onPress={async () => Linking.openURL(WEBSITE.HELP.DELETE_ACCOUNT)}
             onPress={async () => push('/settings/delete-account')}
+          />
+        </MenuGroup>
+        <MenuGroup title="About">
+          <MenuItem
+            icon={Info}
+            text={"Terms of use"}
+            onPress={() => { WebBrowser.openBrowserAsync(WEBSITE.TERMS_OF_USE); }}
+          />
+          <MenuItem
+            icon={Info}
+            text={"Privacy policy"}
+            onPress={() => { WebBrowser.openBrowserAsync(WEBSITE.PRIVACY_POLICY); }}
           />
         </MenuGroup>
 
