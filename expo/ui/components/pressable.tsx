@@ -66,6 +66,7 @@ export const Pressable = ({ disabled, onPress, children, animated = true, intens
       onLongPress={(e) => {
         if (disabled) return;
         if (innerDisabled) return;
+        if (!props.onLongPress) return;
         setInnerDisabled(true);
         setTimeout(() => { setInnerDisabled(false) }, 300);
 

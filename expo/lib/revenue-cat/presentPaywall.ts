@@ -9,7 +9,7 @@ export async function presentPaywall(): Promise<boolean> {
 
   const offerings = await Purchases.getOfferings();
 
-  const offering = offerings.all['default_discount'] ?? offerings.current;
+  const offering = offerings.all['default'] ?? offerings.current;
 
   // Present paywall for current offering:
   const paywallResult: PAYWALL_RESULT = await RevenueCatUI.presentPaywallIfNeeded({

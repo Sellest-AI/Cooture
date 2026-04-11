@@ -136,10 +136,7 @@ export const Modal = ({ children, open, onOpenChange, style, header }: Props) =>
     setCurrentStep((s) => Math.max(0, s - 1));
   }, []);
 
-  // const FinalView = scrollable ? Animated.ScrollView : View;
   const { bottom } = useSafeAreaInsets();
-
-  const FinalView = Animated.ScrollView;
 
   const paddingBottom = bottom;
 
@@ -192,7 +189,7 @@ export const Modal = ({ children, open, onOpenChange, style, header }: Props) =>
                 </Animated.View>
               </GestureDetector>
               <GestureDetector gesture={nativeScroll}>
-                <FinalView
+                <Animated.ScrollView
                   showsVerticalScrollIndicator={false}
                   // 95% - Pan handler offset
                   style={{
@@ -237,7 +234,7 @@ export const Modal = ({ children, open, onOpenChange, style, header }: Props) =>
                     stepsLengthRef.current = 0;
                     return children;
                   })()}
-                </FinalView>
+                </Animated.ScrollView>
               </GestureDetector>
             </Block>
           </SlideToDismiss>

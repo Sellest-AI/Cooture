@@ -3,6 +3,7 @@ import { Camera, ImageIcon, Info, TShirt } from "@ui/icons";
 import { MenuGroup, MenuItem, MenuItemCheck } from "@ui/menu";
 import { Modal, ModalHeader } from "@ui/modal";
 import { useMemo, useState } from "react";
+import { View } from "react-native";
 
 export type ReportConfig = {
   generationId?: string;
@@ -77,61 +78,64 @@ export const ReportModal = ({ open, onComplete, onCancel, report }: Props) => {
   const isStep1 = step === 1 && availableOptions.length > 1;
 
   return (
-    <Modal open={open} onOpenChange={(v) => { if (!v) onCancel?.(); }}>
-      <ModalHeader
-        onBack={() => {
-          if (!isStep1) setStep(1)
-          else onCancel?.()
-        }}
-        title={
-          isStep1 ?
-            "What do you want to report?" : "Why are you reporting this?"
-        }
-      />
-      {isStep1 && (
-        <>
+    <Modal
+      open={open}
+      onOpenChange={(v) => { if (!v) onCancel?.(); }}
+    >
+      <View>
+        <ModalHeader
+          onBack={() => {
+            if (!isStep1) setStep(1)
+            else onCancel?.()
+          }}
+          title={isStep1 ?
+            "What do you want to report?" : "Why are you reporting this?"}
+        />
+        {isStep1 && (
+          <>
+            <MenuGroup>
+              {availableOptions.map(option => (
+                <MenuItemCheck
+                  key={option.id}
+                  icon={option.icon as any}
+                  text={option.label}
+                  selected={selectedIds.includes(option.id)}
+                  onPress={() => toggleSelection(option.id)}
+                  variant="destructive"
+                />
+              ))}
+            </MenuGroup>
+            <Button
+              variant="destructive"
+              disabled={selectedIds.length === 0}
+              style={{ marginBottom: 12 }}
+              onPress={() => setStep(2)}
+            >
+              Continue
+            </Button>
+          </>
+        )}
+        {!isStep1 && (
           <MenuGroup>
-            {availableOptions.map(option => (
-              <MenuItemCheck
-                key={option.id}
-                icon={option.icon as any}
-                text={option.label}
-                selected={selectedIds.includes(option.id)}
-                onPress={() => toggleSelection(option.id)}
-                variant="destructive"
+            {REASONS.map(reason => (
+              <MenuItem
+                icon={Info}
+                key={reason}
+                text={reason}
+                onPress={() => {
+                  if (availableOptions.length <= 1 && availableOptions[0]) {
+                    // Auto-select the only option if skipping step 1
+                    if (!selectedIds.includes(availableOptions[0].id)) {
+                      selectedIds.push(availableOptions[0].id);
+                    }
+                  }
+                  handleReport(reason);
+                }}
               />
             ))}
           </MenuGroup>
-          <Button
-            variant="destructive"
-            disabled={selectedIds.length === 0}
-            style={{ marginBottom: 12 }}
-            onPress={() => setStep(2)}
-          >
-            Continue
-          </Button>
-        </>
-      )}
-      {!isStep1 && (
-        <MenuGroup>
-          {REASONS.map(reason => (
-            <MenuItem
-              icon={Info}
-              key={reason}
-              text={reason}
-              onPress={() => {
-                if (availableOptions.length <= 1 && availableOptions[0]) {
-                  // Auto-select the only option if skipping step 1
-                  if (!selectedIds.includes(availableOptions[0].id)) {
-                    selectedIds.push(availableOptions[0].id);
-                  }
-                }
-                handleReport(reason);
-              }}
-            />
-          ))}
-        </MenuGroup>
-      )}
+        )}
+      </View>
     </Modal>
   );
 };
