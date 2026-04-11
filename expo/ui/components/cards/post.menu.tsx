@@ -128,13 +128,13 @@ export const PostMenu = ({ open, onOpenChange, ...props }: Props) => {
               onPress={() => { setReportModalOpen(true); onOpenChange?.(false); }}
             >
               <TriangleAlert size={16} color={Colors.destructive[500]} />
-              <Text.Base color={Colors.destructive[500]} weight={500}>Report content</Text.Base>
+              <Text.Base color={Colors.neutral[400]} weight={500}>Report content</Text.Base>
             </Pressable>
             <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
               onPress={() => { report?.onBlock?.(); onOpenChange?.(false); }}
             >
-              <UserRoundX size={16} color={Colors.destructive[500]} />
-              <Text.Base color={Colors.destructive[500]} weight={500}>Block user</Text.Base>
+              <UserRoundX size={16} color={Colors.neutral[400]} />
+              <Text.Base color={Colors.neutral[400]} weight={500}>Block user</Text.Base>
             </Pressable>
           </View>}
         </View>

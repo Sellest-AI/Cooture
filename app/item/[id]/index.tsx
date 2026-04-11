@@ -175,7 +175,7 @@ const ReportContentButton = () => {
       }}
         onPress={() => setShowModal(true)}
       >
-        <TriangleAlert size={16} color={Colors.neutral[400]} />
+        <TriangleAlert size={16} color={Colors.destructive[500]} />
         <Text.Base color={Colors.neutral[400]} weight={500}>Report item</Text.Base>
       </Pressable>
       <ReportModal
