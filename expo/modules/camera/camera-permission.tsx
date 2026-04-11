@@ -55,7 +55,7 @@ export const CameraPermission = ({ style, onSuccess }: Props) => {
             Camera Permission Required
           </Text.H4>
           <Text.Base style={{ textAlign: 'center', marginBottom: 20 }} color={Colors.neutral[400]}>
-            We need your permission to show the camera
+            Cooture uses the camera so you can scan items to create your outfits, take selfies for virtual photoshoots, and capture pictures to edit.
           </Text.Base>
           <Button
             onPress={async () => {

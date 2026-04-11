@@ -290,8 +290,7 @@ const HeaderButton = ({ label, icon, onPress }: { onPress: () => void, label: st
   )
 }
 
-export default function Screen() {
-  const { outfitId } = useRoute(ROUTES.OUTFIT.NEW);
-
+type Props = { outfitId?: Id<'outfits'> };
+export default function Screen({ outfitId }: Props) {
   return <Content outfitId={outfitId} />;
 }

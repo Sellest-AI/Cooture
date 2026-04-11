@@ -11,8 +11,9 @@ import { VideoView } from '@ui/video-view';
 import { removeUndefinedKeys } from '@utils/convex-allowed';
 import { env } from 'env';
 import { AppleAuthenticationButton, AppleAuthenticationButtonStyle, AppleAuthenticationButtonType } from "expo-apple-authentication";
+import { WEBSITE } from 'global';
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Platform, View } from 'react-native';
+import { Animated, Linking, Platform, View } from 'react-native';
 import { Colors } from 'theme';
 
 const BackgroundImage = () => {
@@ -68,7 +69,7 @@ const BackgroundImage = () => {
           left: 0,
           right: 0,
           top: 0,
-          height: '50%'
+          height: '30%'
         }}
       />
       <LinearGradient
@@ -78,7 +79,7 @@ const BackgroundImage = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          height: '50%'
+          height: '65%'
         }}
       />
     </Animated.View>
@@ -163,10 +164,10 @@ const LoginButtons = () => {
         )
       }))}
       {showTestAccount && (
-        <Pressable style={{ marginTop: 12 }} onPress={() => signInTester()}>
-          <Text.Base color={Colors.neutral[400]}>
+        <Pressable style={{ marginTop: 24 }} onPress={() => signInTester()}>
+          <Text.Lg color={Colors.neutral[400]}>
             Sign in with test account
-          </Text.Base>
+          </Text.Lg>
         </Pressable>
       )}
     </>
@@ -233,6 +234,26 @@ export default function Screen() {
           Try infinite looks and see what feels like you.
         </Text.H4>
         <LoginButtons />
+        <View style={{ marginHorizontal: 24, marginTop: 20 }}>
+          <Text.Sm style={{ textAlign: 'center', color: Colors.neutral[400] }}>
+            By continuing, you fully agree to {WEBSITE.NAME}&apos;s Terms of Use and acknowledge that you have read the Privacy Policy.
+          </Text.Sm>
+          <Text.Sm style={{ textAlign: 'center', color: Colors.neutral[400] }}>
+            We have zero tolerance for objectionable content, any kind of abuse, or harassment.
+          </Text.Sm>
+          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8, marginTop: 12 }}>
+            <Pressable onPress={() => Linking.openURL(WEBSITE.TERMS_OF_USE)}>
+              <Text.Sm color={Colors.neutral[400]} style={{ textDecorationLine: 'underline' }}>
+                Terms of use
+              </Text.Sm>
+            </Pressable>
+            <Pressable onPress={() => Linking.openURL(WEBSITE.PRIVACY_POLICY)}>
+              <Text.Sm color={Colors.neutral[400]} style={{ textDecorationLine: 'underline' }}>
+                Privacy Policy
+              </Text.Sm>
+            </Pressable>
+          </View>
+        </View>
       </SafeAreaView>
     </View>
   );
