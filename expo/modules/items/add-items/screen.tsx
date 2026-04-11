@@ -1,6 +1,7 @@
 import { ROUTES, useRoute, useRouter } from "@/hooks";
 import { api, Id, useQuery, useQueryCached } from "@/lib/convex/client";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
+import { useSafety } from "@/modules/safety";
 import { Block } from "@ui/block";
 import { EmptyBlock } from "@ui/block.empty";
 import { CardItem } from "@ui/cards/card-item";
@@ -70,8 +71,10 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
   const [category, setCategory] = useState<string | null>(null);
   const { results, isLoading, isFiltering, isEmpty } = useSearchItems({ query, category, channel: 'public' });
 
+  const { isHidden } = useSafety();
   const itemsLibrary = [...(isFiltering ? [] : latestItems), ...results] // unique;
     .filter((item, i, arr) => arr.findIndex(it => it._id === item._id) === i)
+    .filter((item) => !isHidden({ itemId: item._id, userId: item.userId }));
 
   // UI
   const listRef = useRef<FlashListRef<typeof itemsLibrary[number] | string>>(null);

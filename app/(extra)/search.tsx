@@ -1,6 +1,7 @@
 import { ROUTES, useDebounce } from "@/hooks";
 import { api, Id, useQuery, useQueryCached } from "@/lib/convex/client";
 import { useTrackValues } from "@/lib/posthog/useTrackValues";
+import { useSafety } from "@/modules/safety";
 import { Badge } from "@ui/badge";
 import { Block } from "@ui/block";
 import { CardItem, Collection } from "@ui/cards";
@@ -138,10 +139,14 @@ export default function Screen() {
     enabled: hasQuery && isSuccess
   });
 
+  const { isHidden } = useSafety();
+
   const data = useMemo(() => shuffleArray([
-    ...(items ?? []).map((chunk) => ({ type: 'item' as const, data: chunk })).slice(0, 20),
+    ...(items ?? []).map((chunk) => ({ type: 'item' as const, data: chunk })).slice(0, 20)
+      .filter((x) => !isHidden({ itemId: x?.data?._id, userId: x?.data?.userId })),
     ...((outfits ?? []).map((chunk) => ({ type: 'outfit' as const, data: chunk }))).slice(0, 10)
-  ], query), [items, outfits, query]);
+      .filter((x) => !isHidden({ outfitId: x?.data?._id, userId: x?.data?.userId, itemIds: x?.data?.items.map(i => i.itemId) })),
+  ], query), [items, outfits, query, isHidden]);
 
   return (
     <SafeAreaView
