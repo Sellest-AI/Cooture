@@ -18,7 +18,7 @@ export default function Layout() {
         name="index"
       />
       <Stack.Screen
-        name="blockers-users"
+        name="blocked-users"
       />
       <Stack.Screen
         name="delete-account"
