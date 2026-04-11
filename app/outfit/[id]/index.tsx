@@ -5,14 +5,16 @@ import { useMutation, useQuery, useQueryCached } from "@/lib/convex/client";
 import { SelectedItemModal } from "@/modules/items/selected-item.modal";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { PremiumBlock } from "@/modules/premium/premium-block";
+import { useSafety } from "@/modules/safety";
 import { Block } from "@ui/block";
 import { LoadingBlock } from "@ui/block.loading";
 import { Button } from "@ui/button";
 import { ImageGeneration } from "@ui/cards";
 import { CardItem } from "@ui/cards/card-item";
+import { ReportModal } from "@ui/cards/report.modal";
 import { FlashList } from "@ui/flat-list";
 import { GhostIconWrapper } from "@ui/ghost-animation";
-import { ArrowUpRight, BookmarkIcon, CircleFadingArrowUp, Credits, Pencil, ShareIcon, SquirishPlus, Trash } from "@ui/icons";
+import { ArrowUpRight, BookmarkIcon, CircleFadingArrowUp, Credits, Pencil, ShareIcon, SquirishPlus, Trash, TriangleAlert } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
@@ -160,6 +162,46 @@ const Generations = ({ customText }: { customText?: string }) => {
     </>
   )
 }
+
+
+const ReportContentButton = () => {
+  const { reportContent } = useSafety();
+  const { id } = useRoute.Params<{ id: Id<'outfits'> }>();
+  const [showModal, setShowModal] = useState(false);
+
+  return (
+    <>
+      <Pressable style={{
+        alignSelf: 'center',
+        marginTop: 4,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+      }}
+        onPress={() => setShowModal(true)}
+      >
+        <TriangleAlert size={16} color={Colors.neutral[400]} />
+        <Text.Base color={Colors.neutral[400]} weight={500}>Report outfit</Text.Base>
+      </Pressable>
+      <ReportModal
+        open={showModal}
+        onCancel={() => setShowModal(false)}
+        onComplete={() => {
+          setShowModal(false);
+          if (router.canGoBack()) router.back();
+          else router.dismissTo(ROUTES.HOME);
+        }}
+        report={{
+          outfitId: id,
+          onReport: ({ reason }) => reportContent({ outfitId: id, reason })
+        }}
+      />
+    </>
+  )
+}
+
 
 export default function Screen() {
   const posthog = usePostHog();
@@ -397,6 +439,7 @@ export default function Screen() {
             >
               Long press to delete outfit
             </Button>}
+            {!ownOutfit && <ReportContentButton />}
           </SafeAreaView>
         </ParallaxScrollView>
         {(editable && hasChanges) && <View style={{

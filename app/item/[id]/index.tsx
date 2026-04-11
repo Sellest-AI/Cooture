@@ -8,16 +8,20 @@ import { FeelCategory } from "@/modules/items/category.feel";
 import { GenderCategory } from "@/modules/items/category.gender";
 import { ItemCategory } from "@/modules/items/category.item";
 import { WeatherCategory } from "@/modules/items/category.weather";
+import { useSafety } from "@/modules/safety";
 import { Block } from "@ui/block";
 import { LoadingBlock } from "@ui/block.loading";
 import { Button, BUTTON_HEIGHT } from "@ui/button";
-import { ExternalLink, LinkIcon } from "@ui/icons";
+import { ReportModal } from "@ui/cards/report.modal";
+import { ExternalLink, LinkIcon, TriangleAlert } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
+import { Pressable } from "@ui/pressable";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import * as Linking from 'expo-linking';
+import { router } from "expo-router";
 import { usePostHog } from "posthog-react-native";
 import { useEffect, useState } from "react";
 import { Platform, View } from "react-native";
@@ -153,6 +157,44 @@ const LinkBlock = () => {
   )
 }
 
+const ReportContentButton = () => {
+  const { reportContent } = useSafety();
+  const { id } = useRoute.Params<{ id: Id<'items'> }>();
+  const [showModal, setShowModal] = useState(false);
+
+  return (
+    <>
+      <Pressable style={{
+        alignSelf: 'center',
+        marginTop: 4,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+      }}
+        onPress={() => setShowModal(true)}
+      >
+        <TriangleAlert size={16} color={Colors.neutral[400]} />
+        <Text.Base color={Colors.neutral[400]} weight={500}>Report item</Text.Base>
+      </Pressable>
+      <ReportModal
+        open={showModal}
+        onCancel={() => setShowModal(false)}
+        onComplete={() => {
+          setShowModal(false);
+          if (router.canGoBack()) router.back();
+          else router.dismissTo(ROUTES.HOME);
+        }}
+        report={{
+          itemId: id,
+          onReport: ({ reason }) => reportContent({ itemId: id, reason })
+        }}
+      />
+    </>
+  )
+}
+
 export default function ItemScreen() {
   const { id } = useRoute.Params<{ id: Id<'items'> }>();
   const { push, redirect } = useRouter('/item/[id]');
@@ -160,6 +202,8 @@ export default function ItemScreen() {
 
   const { user } = useAccount();
   const disabled = (id: Id<'users'>) => user?._id !== id;
+
+  const isOwner = item?.userId === user?._id;
 
   if (isLoading || !item) {
     return <LoadingBlock style={{ height: 'auto' }} type="logo" />
@@ -226,6 +270,7 @@ export default function ItemScreen() {
             <GenderCategory title={item.gender} onPress={(gender) => update({ gender })} disabled={disabled(item.userId)} />
           </View>
           <DeleteItemButton />
+          {!isOwner && <ReportContentButton />}
         </SafeAreaView>
       </ParallaxScrollView>
       <SafeAreaView
