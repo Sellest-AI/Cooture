@@ -69,9 +69,10 @@ export const useAuthActions = () => {
 
   const signOut = useCallback(() => {
     setAuthenticating(true);
-    router.push(ROUTES.AUTH);
     setTimeout(() => {
-      convex.signOut();
+      router.dismissAll();
+      router.dismissTo(ROUTES.AUTH);
+      setTimeout(async () => { convex.signOut(); }, 500);
       // posthog.reset();
       setTimeout(async () => {
         convexAuthStorage.clear();
@@ -80,7 +81,7 @@ export const useAuthActions = () => {
         } catch { }
         // window.localStorage.clear();
         // window.location.reload();
-      }, 500);
+      }, 1000);
     }, 300)
   }, [convex, setAuthenticating]);
 
