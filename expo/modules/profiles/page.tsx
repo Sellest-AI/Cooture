@@ -31,6 +31,7 @@ type Props = {
     _id: Id<'users'>;
     _creationTime: number;
     isPremium?: boolean;
+    image?: string;
   }
   isSelf?: boolean;
   recentPosts?: {
@@ -115,7 +116,9 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
         ref={scrollRef}
         contentNegativeSpace={56}
         headerBackgroundImagePosition="top center"
-        headerBackgroundImage={recentPosts?.[0]?.image?.sizes.large.url ?? require('assets/backgrounds/dark-gradient.png')}
+        headerBackgroundImageStyle={{ blurRadius: 2, opacity: 0.8 }}
+        headerBackgroundImage={recentPosts?.[0]?.image?.sizes.large.url ??
+          user.image ?? require('assets/backgrounds/dark-gradient.png')}
         contentContainerStyle={style}
         headerContent={
           <View

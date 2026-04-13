@@ -41,7 +41,7 @@ export default function Screen() {
         headerBackground={
           <View style={{ position: 'absolute', width: '100%', left: 0, top: 0, height: 212 }}>
             <Image
-              source={user.image}
+              source={user.image ?? require("assets/backgrounds/dark-gradient.png")}
               style={{ width: '100%', height: '100%', opacity: 0.3 }}
               blurRadius={3}
             />
@@ -74,8 +74,16 @@ export default function Screen() {
               alignItems: 'center',
             }}>
               <Image
-                style={{ width: 72, height: 72, borderRadius: 99, marginBottom: 12 }}
-                source={user.image}
+                style={{
+                  width: 72,
+                  height: 72,
+                  borderRadius: 99,
+                  marginBottom: 12,
+                  borderWidth: user.image ? 0 : 1,
+                  borderColor: Colors.blur.dark
+                }}
+                source={user.image ?? require("assets/backgrounds/dark-gradient.png")}
+                blurRadius={user.image ? 0 : 172}
               />
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <Text.Lg weight={500} color={Colors.neutral[50]}>{user.name}</Text.Lg>

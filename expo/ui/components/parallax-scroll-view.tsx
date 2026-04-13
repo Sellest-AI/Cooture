@@ -15,7 +15,7 @@ type Props = {
   headerContent: ReactNode;
   headerContentEdges?: ComponentProps<typeof SafeAreaView>['edges'];
   headerBackgroundImage?: ComponentProps<typeof Image>['source'];
-  headerBackgroundImageStyle?: ComponentProps<typeof Image>['style'];
+  headerBackgroundImageStyle?: ComponentProps<typeof Image>['style'] & { blurRadius?: number };
   headerBackgroundImagePosition?: ComponentProps<typeof Image>['contentPosition'];
   headerBackground?: ReactNode;
   children: ReactNode;
@@ -135,6 +135,7 @@ export const ParallaxScrollView = ({
                 height: '100%',
                 paddingTop: layoutToggle,
               }, headerBackgroundImageStyle]}
+              blurRadius={headerBackgroundImageStyle?.blurRadius ?? 0}
               contentPosition={headerBackgroundImagePosition}
               contentFit="cover"
             />
