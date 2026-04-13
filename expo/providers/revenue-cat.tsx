@@ -39,8 +39,6 @@ export const RevenueCatProvider = ({ children }: Props) => {
       if (isAuthenticated && !userId) return;
 
       try {
-        const isAnonymous = await Purchases.isAnonymous();
-
         if (userId) {
           // Identify user in RevenueCat with their Convex userId if not already set
           const currentRcUserId = await Purchases.getAppUserID();
@@ -60,6 +58,7 @@ export const RevenueCatProvider = ({ children }: Props) => {
 
         } else {
           // If logged out and not already anonymous, log out of RevenueCat
+          const isAnonymous = await Purchases.isAnonymous();
           if (!isAnonymous) {
             await Purchases.logOut();
           }
