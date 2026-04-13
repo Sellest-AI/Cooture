@@ -5,11 +5,11 @@ export const FEED_CONFIG = {
   FREEZE_DECAY_PERCENT: 90, // At freeze time, base score is reduced by this % (0-100)
 
   // Weight for extra score based on likes (e.g. 100 points per like)
-  LIKES_WEIGHT: 200,
-  SAVES_WEIGHT: 700,
+  LIKES_WEIGHT: 300,
+  SAVES_WEIGHT: 1000,
 
   // Weight for extra score based on post type
-  VIDEO_WEIGHT: 4000,
-  PRESET_WEIGHT: 1000,
-  OUTFIT_WEIGHT: 2000,
+  VIDEO_WEIGHT: 1200,
+  PRESET_WEIGHT: 200,
+  OUTFIT_WEIGHT: 1000,
 }
