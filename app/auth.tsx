@@ -165,7 +165,11 @@ const LoginButtons = () => {
         )
       }))}
       {showTestAccount && (
-        <Pressable style={{ marginTop: 24 }} onPress={() => signInTester()}>
+        <Pressable
+          style={{ marginTop: 24 }}
+          onLongPress={() => signInTester()}
+          delayLongPress={5000}
+        >
           <Text.Lg color={Colors.neutral[400]}>
             Sign in with test account
           </Text.Lg>
