@@ -1,4 +1,5 @@
 import { useAccount } from "@/lib/convex/auth";
+import { removeUndefinedKeys } from "@utils/convex-allowed";
 import { env } from "env";
 import { ReactNode, useEffect } from "react";
 import { Platform } from "react-native";
@@ -9,7 +10,7 @@ type Props = {
 }
 
 export const RevenueCatProvider = ({ children }: Props) => {
-  const { userId, isAuthenticated, isAuthLoading } = useAccount();
+  const { user, isAuthenticated, isAuthLoading } = useAccount();
 
   // 1. Initialize RevenueCat Once
   useEffect(() => {
@@ -29,6 +30,8 @@ export const RevenueCatProvider = ({ children }: Props) => {
   // 2. Sync RevenueCat with Convex Authentication
   useEffect(() => {
     const syncRevenueCat = async () => {
+      const userId = user?._id;
+
       // Wait until Convex auth has finished initializing on the device
       if (isAuthLoading) return;
 
@@ -41,9 +44,20 @@ export const RevenueCatProvider = ({ children }: Props) => {
         if (userId) {
           // Identify user in RevenueCat with their Convex userId if not already set
           const currentRcUserId = await Purchases.getAppUserID();
-          if (currentRcUserId !== userId) {
-            await Purchases.logIn(userId);
-          }
+
+          // Only log in if the current RevenueCat user ID doesn't match the Convex user ID to avoid unnecessary logins
+          if (currentRcUserId === userId) return;
+
+          await Purchases.logIn(userId);
+          if (user.name) await Purchases.setDisplayName(user.name);
+          if (user.email) await Purchases.setEmail(user.email);
+          if (user.phone) await Purchases.setPhoneNumber(user.phone);
+          await Purchases.setAttributes(removeUndefinedKeys({
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+          }))
+
         } else {
           // If logged out and not already anonymous, log out of RevenueCat
           if (!isAnonymous) {
@@ -56,7 +70,7 @@ export const RevenueCatProvider = ({ children }: Props) => {
     };
 
     syncRevenueCat();
-  }, [userId, isAuthLoading, isAuthenticated]);
+  }, [user, isAuthLoading, isAuthenticated]);
 
   return (
     children
