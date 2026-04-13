@@ -143,9 +143,9 @@ export default function Screen() {
 
   const data = useMemo(() => shuffleArray([
     ...(items ?? []).map((chunk) => ({ type: 'item' as const, data: chunk })).slice(0, 20)
-      .filter((x) => !isHidden({ itemId: x?.data?._id, userId: x?.data?.userId })),
+      .filter((x) => !isHidden({ itemId: x?.data?._id, userId: x?.data?.userId, item: x?.data })),
     ...((outfits ?? []).map((chunk) => ({ type: 'outfit' as const, data: chunk }))).slice(0, 10)
-      .filter((x) => !isHidden({ outfitId: x?.data?._id, userId: x?.data?.userId, itemIds: x?.data?.items.map(i => i.itemId) })),
+      .filter((x) => !isHidden({ outfitId: x?.data?._id, userId: x?.data?.userId, itemIds: x?.data?.items.map(i => i.itemId), outfit: x?.data })),
   ], query), [items, outfits, query, isHidden]);
 
   return (

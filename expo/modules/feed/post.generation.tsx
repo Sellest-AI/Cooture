@@ -45,7 +45,7 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized' }: Props)
 
   if (!post || !images) return <Post.Skeleton style={{ ...style, paddingHorizontal: 12 }} />;
 
-  if (isHidden({ generationId: id, userId: post?.userId, itemIds: post?.outfit?.items.map(i => i._id), outfitId: post?.outfitId }))
+  if (isHidden({ generationId: id, userId: post?.userId, itemIds: post?.outfit?.items.map(i => i._id), outfitId: post?.outfitId, preset: post?.preset }))
     return <Post.Hidden
       src={images?.[0].sizes.thumbnail.url}
       style={{ ...style, marginHorizontal: 12, aspectRatio: 3 / 4, borderRadius: 28 }}

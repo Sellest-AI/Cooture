@@ -1,5 +1,7 @@
-import { api, Id } from "@/lib/convex/client";
+import { api, Doc, Id } from "@/lib/convex/client";
 import { useMutation, useQuery } from "convex/react";
+
+type ContentRating = Doc<'items'>['contentRating'];
 
 export const useSafety = () => {
   const getBlockedContents = useQuery(api.router.safety.getBlockedContents.authed, {});
@@ -8,6 +10,19 @@ export const useSafety = () => {
   const unblockUserMutation = useMutation(api.router.safety.unblockUser.authed);
   const reportContentMutation = useMutation(api.router.safety.reportContent.authed);
 
+  type ContentRatingParams = {
+    contentRating?: ContentRating,
+    item?: { contentRating: ContentRating },
+    outfit?: { contentRating: ContentRating },
+    preset?: { contentRating: ContentRating },
+  }
+  const isNsfw = (params: ContentRatingParams) => {
+    const contentRating = params.contentRating ?? params.item?.contentRating
+      ?? params.outfit?.contentRating
+      ?? params.preset?.contentRating;
+    return contentRating === 'NSFW';
+  }
+
   type IsHiddenParams = {
     userId?: Id<'users'>,
     outfitId?: Id<'outfits'>,
@@ -15,8 +30,10 @@ export const useSafety = () => {
     presetId?: Id<'presets'>,
     itemId?: Id<'items'>,
     itemIds?: Id<'items'>[],
-  }
+  } & ContentRatingParams;
   const isHidden = (params: IsHiddenParams) => {
+    if (isNsfw(params)) return true;
+
     if (!getBlockedContents) return false; // Default to not hidden until loaded
 
     if (params.userId && getBlockedContents.blockedUsers.includes(params.userId)) return true;
@@ -53,15 +70,18 @@ export const useSafety = () => {
     });
   };
 
+  const blockedContents = getBlockedContents || {
+    blockedUsers: [],
+    reportedUsers: [],
+    reportedOutfits: [],
+    reportedGenerations: [],
+    reportedItems: [],
+    reportedPresets: [],
+  }
+
   return {
-    blockedContents: getBlockedContents || {
-      blockedUsers: [],
-      reportedUsers: [],
-      reportedOutfits: [],
-      reportedGenerations: [],
-      reportedItems: [],
-      reportedPresets: [],
-    },
+    blockedContents,
+    isNsfw,
     isHidden,
     blockUser,
     unblockUser,

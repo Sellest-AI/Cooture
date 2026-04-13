@@ -76,7 +76,7 @@ const Generation = ({ id, style, size = 'large' }: { id: Id<'generations'>, styl
   const { data: video } = useQueryCached(api.router.storage.videos.getOne.anon, predictionVideo?.videoId ? { id: predictionVideo?.videoId } : 'skip');
 
   if (!post || (!image && !video)) return <Skeleton style={style} />;
-  if (isHidden({ generationId: id, userId: post?.userId, itemIds: post?.outfit?.items.map(i => i._id), outfitId: post?.outfitId }))
+  if (isHidden({ generationId: id, userId: post?.userId, itemIds: post?.outfit?.items.map(i => i._id), outfitId: post?.outfitId, preset: post?.preset }))
     return (<PostComponent.Hidden style={{ ...style, borderRadius: 16 }} src={image?.sizes.thumbnail?.url} />);
 
   const finalSize = size === 'large' ? 'medium' : 'small';

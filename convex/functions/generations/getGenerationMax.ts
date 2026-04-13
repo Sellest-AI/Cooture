@@ -80,7 +80,7 @@ export const getGenerationMax = async (ctx: QueryCtx, generationId: Id<'generati
       // Sanitize sensitive data
       prompts: undefined,
       cover: presetCover || null,
-    } : null,
+    } : undefined,
     outfit,
     isVideosOnly
   }

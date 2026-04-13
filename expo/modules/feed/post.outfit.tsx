@@ -30,7 +30,7 @@ export const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle
 
   if (!outfit) return <Post.Skeleton style={{ ...style, paddingHorizontal: 12 }} />;
 
-  if (isHidden({ outfitId: id, userId: outfit?.userId, itemIds: outfit?.items.map(i => i._id) }))
+  if (isHidden({ outfitId: id, userId: outfit?.userId, itemIds: outfit?.items.map(i => i._id), outfit }))
     return <Post.Hidden
       src={outfit?.cover?.sizes.thumbnail.url}
       style={{ ...style, marginHorizontal: 12, aspectRatio: 3 / 4, borderRadius: 28 }}
