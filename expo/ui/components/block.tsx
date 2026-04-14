@@ -167,6 +167,8 @@ export const Block = <T extends Variant>({ className = "", children, variant, st
           ...VariantColors,
           backgroundColor: 'transparent',
           borderLeftWidth: style?.borderLeftWidth ?? (disabled ? 0 : 1),
+          borderRightColor: showExtraBorder ? undefined : 'rgba(0, 0, 0, 0.15)',
+          borderRightWidth: showExtraBorder ? 0 : 1,
           borderTopWidth: showExtraBorder ? 1 : 0,
         }]}>
         {children}
