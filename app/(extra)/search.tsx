@@ -92,10 +92,14 @@ const Item = ({ id }: { id: Id<'items'> }) => {
   useEffect(() => { if (item) setAspectRatio(item.image.width / item.image.height) }, [item])
   if (!item) return <Skeleton style={{ flex: 1, aspectRatio }} />;
 
+  // For items with a very vertical aspect ratio, we want to use the medium size
+  const isTall = Number(item.image.aspectRatio.actual) < 4 / 6;
+  const imageUrl = isTall ? item.image.sizes.medium.url : item.image.sizes.small.url;
+
   return (
     <CardItem
       image={item.image}
-      source={item.image.sizes.small.url}
+      source={imageUrl}
       title={item.name}
       subtitle={item.category.toLowerCase()}
       onPress={() => router.push(ROUTES.ITEM.ID(item._id))}

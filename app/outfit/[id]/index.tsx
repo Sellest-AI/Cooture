@@ -371,6 +371,10 @@ export default function Screen() {
                     />)
                 }
 
+                // For items with a very vertical aspect ratio, we want to use the medium size
+                const isTall = Number(item.image.aspectRatio.actual) < 4 / 6;
+                const imageUrl = isTall ? item.image.sizes.medium.url : item.image.sizes.small.url;
+
                 return (
                   <View style={{
                     marginBottom: 40,
@@ -381,7 +385,7 @@ export default function Screen() {
                   >
                     <CardItem
                       image={item.image}
-                      source={item.image.sizes.small.url}
+                      source={imageUrl}
                       title={item.name}
                       subtitle={item.category}
                       onLongPress={() => push(ROUTES.ITEM.PATH, { pathParams: { id: item._id } })}
