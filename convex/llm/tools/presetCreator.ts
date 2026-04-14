@@ -62,6 +62,9 @@ CONTENT RATING FOR THE SCENE:
 - NSFW = When the image contains highly revealing, fetish wear, or explicit content. Use this rating only for images that are clearly adult in nature.
 When in doubt about content rating, default to the most conservative option.
 
+NOTES:
+- Unless the image IS black & white, do not EVERY mention "black and white" in the "composition" or "style" fields.
+
 OUTPUT FORMAT (VERY IMPORTANT):
 - Return a JSON object that exactly matches the schema structure.
 - Use plain strings for textual fields, arrays for lists, nested objects only when visible and describable.
