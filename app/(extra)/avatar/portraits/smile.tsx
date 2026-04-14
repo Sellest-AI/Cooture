@@ -16,6 +16,7 @@ export default function Screen() {
         setSmileImage(photoUri);
         setTimeout(() => { push('/avatar/portraits/side', { forwardRedirect: true }) }, 1300);
       }}
+      guideline="smile"
       examples={{
         hint: "Make sure to be in a bright enough room. Try to keep a plain white background.",
         good: require('assets/placeholders/portraits/smile-good.jpg'),

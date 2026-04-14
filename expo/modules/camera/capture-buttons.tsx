@@ -84,14 +84,14 @@ export const CaptureButtons = ({ style, cameraRef, onCapture, onDelete, backButt
         <Button
           size="rounded"
           variant="blur"
-          style={{ padding: 12 }}
+          style={{ padding: 8 }}
           onPress={handlePickImage}
           startContent={<ImageIcon color={Colors.foreground} size={24} />}
         />
         <Button
           size="rounded"
           variant="primary"
-          style={{ padding: 20 }}
+          style={{ padding: 16 }}
           isLoading={innerLoading}
           onPress={handleCapture}
           startContent={<Camera color={Colors.primary[900]} size={28} />}
@@ -101,7 +101,7 @@ export const CaptureButtons = ({ style, cameraRef, onCapture, onDelete, backButt
         <Button
           size="rounded"
           variant="blur"
-          style={{ padding: 12 }}
+          style={{ padding: 8 }}
           isLoading={innerLoading}
           onPress={onDelete}
           startContent={<X color={Colors.foreground} size={24} />}

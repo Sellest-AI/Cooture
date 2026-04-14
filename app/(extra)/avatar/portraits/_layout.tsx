@@ -1,9 +1,7 @@
 import { ModalHeader } from "@ui/modal";
 import { SafeAreaView } from "@ui/safe-area-view";
-import { Stepper } from "@ui/stepper";
-import { LinearGradient } from "expo-linear-gradient";
-import { Stack, usePathname } from "expo-router";
-import { View } from "react-native";
+import { router, Stack, usePathname } from "expo-router";
+import { Platform } from "react-native";
 import { Colors } from "theme";
 
 export const unstable_settings = {
@@ -25,42 +23,21 @@ export default function ProfileLayout() {
       currentStep === 3 ? 'Take a picture of your side face.' : undefined;
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.background }}>
-      <SafeAreaView
-        edges={{ bottom: 'off' }}
-        style={{
-          zIndex: 10,
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-        }}>
-        <LinearGradient
-          colors={['black', 'transparent']}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 156
-          }}
-        />
-        <ModalHeader
-          style={{ marginTop: 20 }}
-          title={title}
-          subtitle={subtitle}
-          type="alt"
-        />
-        <Stepper
-          value={currentStep}
-          style={{
-            width: 280,
-            alignSelf: 'center',
-            marginTop: 12,
-            marginBottom: 32
-          }}
-        />
-      </SafeAreaView>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        paddingHorizontal: 12,
+        paddingTop: Platform.OS === 'ios' ? 0 : 12,
+        backgroundColor: Colors.background
+      }}
+      edges={{ bottom: Platform.OS === 'ios' ? 'off' : 'additive' }}
+    >
+      <ModalHeader
+        title={title}
+        subtitle={subtitle}
+        onBack={router.canGoBack() ? router.back : undefined}
+        type="alt"
+      />
       <Stack
         screenOptions={{
           headerShown: false,
@@ -74,6 +51,6 @@ export default function ProfileLayout() {
         <Stack.Screen name="side" />
         <Stack.Screen name="smile" />
       </Stack>
-    </View>
+    </SafeAreaView>
   );
 }

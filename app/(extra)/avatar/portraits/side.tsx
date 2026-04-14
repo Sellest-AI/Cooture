@@ -34,6 +34,7 @@ export default function Screen() {
 
         push('/avatar/appearance', { forwardRedirect: true });
       }}
+      guideline="side"
       examples={{
         hint: "Make sure to be in a bright enough room. Try to keep a plain white background.",
         good: require('assets/placeholders/portraits/side-good.png'),

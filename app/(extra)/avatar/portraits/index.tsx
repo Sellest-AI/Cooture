@@ -16,6 +16,7 @@ export default function Screen() {
         setFrontImage(photoUri);
         setTimeout(() => { push('/avatar/portraits/smile', { forwardRedirect: true }) }, 1300);
       }}
+      guideline="default"
       examples={{
         hint: "Make sure to be in a bright enough room. Try to keep a plain white background.",
         good: require('assets/placeholders/portraits/front-good.webp'),
