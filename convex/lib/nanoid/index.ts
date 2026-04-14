@@ -5,8 +5,13 @@ type Options = {
 export const nanoid = (length: number = 21, options?: Options): string => {
   const alphabet = options?.alphabet || '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
   let id = '';
+
+  const randomValues = new Uint8Array(length);
+  crypto.getRandomValues(randomValues);
+
   for (let i = 0; i < length; i++) {
-    id += alphabet[Math.floor(Math.random() * alphabet.length)];
+    id += alphabet[randomValues[i] % alphabet.length];
   }
+
   return id;
 }

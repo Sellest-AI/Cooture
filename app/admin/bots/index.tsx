@@ -1,10 +1,11 @@
 import { ROUTES, useRouter } from "@/hooks";
+import { useAuthActions } from "@/lib/convex/auth";
 import { api, useQuery } from "@/lib/convex/client";
 import { Badge } from "@ui/badge";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
 import { FlashList } from "@ui/flat-list";
-import { ArrowUpRight, Camera, Loader, TShirt, User } from "@ui/icons";
+import { ArrowUpRight, AtSign, Camera, Loader, TShirt, User } from "@ui/icons";
 import { Image } from "@ui/image";
 import { Modal, ModalHeader } from "@ui/modal";
 import { Pressable } from "@ui/pressable";
@@ -163,6 +164,7 @@ export const WaitingBots = (props: SharedProps) => {
 
 export const Bots = (props: SharedProps) => {
   const { push } = useRouter();
+  const { signInBot, isLoading } = useAuthActions();
   const { data: bots } = useQuery(api.router.admin.bots.getAll.admin);
 
   const [modal, setModal] = useState<string | null>(null);
@@ -214,8 +216,17 @@ export const Bots = (props: SharedProps) => {
               <View style={{ paddingBottom: 12, gap: 8 }}>
                 <Button
                   variant="blur"
+                  onPress={() => signInBot(item._id)}
+                  isLoading={isLoading}
+                  startIcon={AtSign}
+                >
+                  Connect to account
+                </Button>
+                <Button
+                  variant="blur"
                   onPress={() => { push(ROUTES.USER.PATH, { pathParams: { id: item._id } }); setModal(null); }}
                   startIcon={User}
+                  style={{ marginBottom: 20 }}
                 >
                   View profile
                 </Button>

@@ -8,12 +8,13 @@ import { atom, useAtom } from "jotai";
 import { useCallback, useState } from "react";
 import { Platform } from "react-native";
 import { ROUTES } from "routes";
-import { api, useMutation, useQueryCached } from "./client";
+import { api, Id, useMutation, useQueryCached } from "./client";
 import { convexAuthStorage } from "./storage";
 
 export const useAuthActions = () => {
   const convex = useConvexAuthActions();
   const { mutate: getTestAccount } = useMutation(api.router.auth.getTestAccount.anon);
+  const { mutate: getBotAccount } = useMutation(api.router.admin.bots.getAccount.admin);
 
   const { setAuthenticating } = useAuthenticated();
   const [isLoading, setIsLoading] = useState(false);
@@ -63,25 +64,33 @@ export const useAuthActions = () => {
     convex.signIn("password", { email: account.email, password: account.password, flow: "signIn" })
   }, [convex, getTestAccount])
 
+  const signInBot = useCallback(async (userId: Id<'users'>) => {
+    setAuthenticating(true);
+    setTimeout(async () => {
+      router.dismissAll();
+      router.dismissTo(ROUTES.AUTH);
+      const account = await getBotAccount({ userId });
+      await convex.signOut();
+      await convexAuthStorage.clear();
+      await convex.signIn("password", { email: account.email, password: account.password, flow: "signIn" });
+      setTimeout(() => { setAuthenticating(false); }, 2000);
+    }, 300);
+  }, [convex, getBotAccount, setAuthenticating])
+
   const signInEmail = useCallback((data: FormData) => {
     return convex.signIn("resend-otp", data);
   }, [convex]);
 
   const signOut = useCallback(() => {
     setAuthenticating(true);
+    router.dismissAll();
+    router.dismissTo(ROUTES.AUTH);
     setTimeout(() => {
-      router.dismissAll();
-      router.dismissTo(ROUTES.AUTH);
-      setTimeout(async () => { convex.signOut(); }, 500);
-      // posthog.reset();
       setTimeout(async () => {
-        convexAuthStorage.clear();
-        try {
-          await reloadAsync();
-        } catch { }
-        // window.localStorage.clear();
-        // window.location.reload();
-      }, 1000);
+        await convex.signOut();
+        await convexAuthStorage.clear();
+        await reloadAsync();
+      }, 500);
     }, 300)
   }, [convex, setAuthenticating]);
 
@@ -91,17 +100,14 @@ export const useAuthActions = () => {
     signInGoogle,
     signInApple,
     signInEmail,
-    signInTester
+    signInTester,
+    signInBot
   }
 }
 
 export const useAccount = () => {
-  const token = useAuthToken();
-  const { isLoading: isAuthLoading, isAuthenticated: _isAuthenticated } = useConvexAuth();
-
-  const { data: user } = useQueryCached(api.router.users.getAccount.authed, !!token ? undefined : 'skip');
-
-  const isAuthenticated = !!token || _isAuthenticated;
+  const { isAuthenticated, isAuthenticating } = useAuthenticated();
+  const { data: user } = useQueryCached(api.router.users.getAccount.authed, isAuthenticated ? undefined : 'skip');
 
   const isPremium = !!user?.plan;
   const userId = user?._id;
@@ -116,7 +122,7 @@ export const useAccount = () => {
   return {
     user,
     userId,
-    isAuthLoading,
+    isAuthenticating,
     isAuthenticated,
     isPremium,
     isSuspended,
@@ -125,23 +131,28 @@ export const useAccount = () => {
 }
 
 export const useIsAdmin = () => {
-  const token = useAuthToken();
-  const { data: user } = useQueryCached(api.router.users.getAccount.authed, !!token ? undefined : 'skip');
+  const { isAuthenticated } = useAuthenticated();
+  const { data: user } = useQueryCached(api.router.users.getAccount.authed, isAuthenticated ? undefined : 'skip');
   const isAdmin = user?.role === 'ADMIN';
   return { isAdmin };
 }
 
 const useWallet = () => {
-  const token = useAuthToken();
-  const { data: wallet } = useQueryCached(api.router.credits.getUserWallet.authed, !!token ? undefined : 'skip');
+  const { isAuthenticated } = useAuthenticated();
+  const { data: wallet } = useQueryCached(api.router.credits.getUserWallet.authed, isAuthenticated ? undefined : 'skip');
   return { wallet };
 }
 
 const authenticatingAtom = atom(false);
 const useAuthenticated = () => {
-  const [isAuthenticating, _setAuthenticating] = useAtom(authenticatingAtom);
+  const token = useAuthToken();
+  const { isAuthenticated: _isConvexAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
+  const [_isAuthenticating, _setAuthenticating] = useAtom(authenticatingAtom);
   const setAuthenticating = (value: boolean) => { _setAuthenticating(value); }
+  const isAuthenticated = !!token && _isConvexAuthenticated && !_isAuthenticating && !isAuthLoading;
+  const isAuthenticating = _isAuthenticating || isAuthLoading;
   return {
+    isAuthenticated,
     isAuthenticating,
     setAuthenticating
   }

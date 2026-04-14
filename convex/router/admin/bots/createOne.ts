@@ -1,7 +1,10 @@
 import { createCustomer } from "@/lib/stripe";
+import { createAccount } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { api, internal } from "../../../_generated/api";
 import { Id } from "../../../_generated/dataModel";
+import { internalAction } from "../../../_generated/server";
+import { env } from "../../../env";
 import { createUserWallet } from "../../../functions/credits";
 import { adminAction, internalMutation } from "../../../procedures";
 
@@ -42,6 +45,9 @@ export const admin = adminAction({
 
     if (!available) throw new Error("Username is already taken");
 
+    if (!env.BOT_DEFAULT_PASSWORD)
+      throw new Error("BOT_DEFAULT_PASSWORD is not set in the environment variables");
+
     const extractImage = (url: string) => {
       if (url.startsWith('http')) return { url };
       return { base64: url }
@@ -54,15 +60,21 @@ export const admin = adminAction({
     const { images: argsImages, ...shared } = args;
 
     // User
-    const user = await ctx.runMutation(internal.router.admin.bots.createOne._internal_step_1, {
+    const userId = await ctx.runAction(internal.router.admin.bots.createOne._internal_step_1, {
       ...shared,
-      image: profileImages[0].url,
       username: sanitizedUsername,
+    });
+
+    await ctx.runMutation(internal.router.admin.bots.createOne._internal_step_2, {
+      ...shared,
+      username: sanitizedUsername,
+      image: profileImages[0].url,
+      userId,
     });
 
     // Stripe User
     const stripeCustomer = await createCustomer({
-      id: user,
+      id: userId,
       email: args.email,
       name: args.name,
     })
@@ -74,14 +86,14 @@ export const admin = adminAction({
         extractImage(argsImages.sideUrl),
         extractImage(argsImages.smileUrl),
       ],
-      userId: user,
+      userId: userId,
     });
 
     // Appearance
-    await ctx.runMutation(internal.router.admin.bots.createOne._internal_step_2, {
+    await ctx.runMutation(internal.router.admin.bots.createOne._internal_step_3, {
       ...shared,
       username: sanitizedUsername,
-      userId: user,
+      userId: userId,
       stripeCustomerId: stripeCustomer.id,
       images: {
         profileImageId: profileImages[0]._id,
@@ -92,16 +104,38 @@ export const admin = adminAction({
     })
 
     // Cron trigger after 2 minutes to start liking content
-    await ctx.scheduler.runAfter(1000 * 60 * 2, internal.router.admin.bots.crons._internal, { id: user });
+    await ctx.scheduler.runAfter(1000 * 60 * 2, internal.router.admin.bots.crons._internal, { id: userId });
 
-    return user;
+    return userId;
   }
 })
 
-export const _internal_step_1 = internalMutation({
-  args: { ...sharedArgs, image: v.string() },
+export const _internal_step_1 = internalAction({
+  args: { ...sharedArgs },
   handler: async (ctx, args) => {
-    const userId = await ctx.db.insert("users", {
+    const user = await createAccount(ctx, {
+      provider: "password",
+      account: {
+        id: args.email,
+        secret: env.BOT_DEFAULT_PASSWORD,
+      },
+      profile: {
+        email: args.email,
+      },
+      shouldLinkViaEmail: false,
+      shouldLinkViaPhone: false,
+    })
+
+    return user.user._id;
+  }
+});
+
+export const _internal_step_2 = internalMutation({
+  args: { ...sharedArgs, image: v.string(), userId: v.id('users') },
+  handler: async (ctx, args) => {
+    const { userId } = args;
+
+    await ctx.db.patch(args.userId, {
       name: args.name.trim(),
       email: args.email.trim(),
       image: args.image,
@@ -118,7 +152,7 @@ export const _internal_step_1 = internalMutation({
   }
 })
 
-export const _internal_step_2 = internalMutation({
+export const _internal_step_3 = internalMutation({
   args: {
     ...sharedArgs,
     userId: v.id('users'),

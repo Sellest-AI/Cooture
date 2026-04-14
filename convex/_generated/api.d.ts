@@ -122,6 +122,7 @@ import type * as router_admin_bots_createIdentity from "../router/admin/bots/cre
 import type * as router_admin_bots_createOne from "../router/admin/bots/createOne.js";
 import type * as router_admin_bots_createTestAccount from "../router/admin/bots/createTestAccount.js";
 import type * as router_admin_bots_crons from "../router/admin/bots/crons.js";
+import type * as router_admin_bots_getAccount from "../router/admin/bots/getAccount.js";
 import type * as router_admin_bots_getAll from "../router/admin/bots/getAll.js";
 import type * as router_admin_bots_getWaiting from "../router/admin/bots/getWaiting.js";
 import type * as router_admin_config_getConfig from "../router/admin/config/getConfig.js";
@@ -394,6 +395,7 @@ declare const fullApi: ApiFromModules<{
   "router/admin/bots/createOne": typeof router_admin_bots_createOne;
   "router/admin/bots/createTestAccount": typeof router_admin_bots_createTestAccount;
   "router/admin/bots/crons": typeof router_admin_bots_crons;
+  "router/admin/bots/getAccount": typeof router_admin_bots_getAccount;
   "router/admin/bots/getAll": typeof router_admin_bots_getAll;
   "router/admin/bots/getWaiting": typeof router_admin_bots_getWaiting;
   "router/admin/config/getConfig": typeof router_admin_config_getConfig;

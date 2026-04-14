@@ -2,7 +2,9 @@ export const env = {
   NODE_ENV: process.env.NODE_ENV ?? '',
   FRONTEND_SITE_URL: process.env.FRONTEND_SITE_URL ?? '',
   CONVEX_SITE_URL: process.env.CONVEX_SITE_URL ?? '',
+  // Convex Configuration
   SERVER_PRIVATE_KEY: process.env.SERVER_PRIVATE_KEY ?? '',
+  BOT_DEFAULT_PASSWORD: process.env.BOT_DEFAULT_PASSWORD ?? '',
   // Optional Services
   REPLICATE_API_KEY: process.env.REPLICATE_API_KEY ?? '',
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ?? '',
