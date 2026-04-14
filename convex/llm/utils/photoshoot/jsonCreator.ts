@@ -164,12 +164,18 @@ const updateSubjects = async (ctx: ActionCtx, schema: Schema, subjects: SubjectE
     const appearance = await ctx.runQuery(internal.router.users.getAppearance._internal, { userId: subject.userId });
     if (!appearance) continue;
 
+    const heightAdjective = appearance.heightCm ? (appearance.heightCm > 180 ? 'tall' :
+      appearance.heightCm > 167 ? 'medium' : 'short') : undefined;
+
+    const buildCleaned = appearance.size ? (appearance.size === 'heavy' ? 'heavyset' :
+      appearance.size === 'heavyset' ? 'extremely heavyset' : appearance.size) : undefined;
+
     const prompt = {
       ...subject.prompt,
       reference: `Image ${images.length + 1}. Use facial expression from prompt.`,
       gender: appearance.gender,
-      height: appearance.heightCm ? `${appearance.heightCm}cm tall` : undefined,
-      size: appearance.size,
+      height: appearance.heightCm ? `${appearance.heightCm}cm ${heightAdjective} height` : undefined,
+      size: buildCleaned ? `${buildCleaned} build` : undefined,
     }
 
     let image = prompt.head.direction === "side" ? appearance.sideImage : appearance.frontImage;

@@ -48,13 +48,13 @@ export const schemaToMarkdown = (schema: PromptExtended): string => {
     // as there is no risk of confusing the model with multiple outfits.
     if (schema.subjects.length === 1) {
       prompt.push(sectionCreator(`SUBJECT ${index + 1} OUTFIT (VERY IMPORTANT)`, [
-        { "Description": sliceText(outfit?.description, 125) },
+        { "Description": outfit?.description },
         { "References": outfit.references },
-        { "Outerwear": [isCustomOutfit ? outfit.outerwear?.type : outfit.outerwear?.details, outfit.outerwear?.reference] },
-        { "Top": [isCustomOutfit ? outfit.top?.type : outfit.top?.details, outfit.top?.reference] },
+        { "Outerwear": [isCustomOutfit ? outfit.outerwear?.type : outfit.outerwear?.details] },
+        { "Top": [isCustomOutfit ? outfit.top?.type : outfit.top?.details] },
         { "Inner Layer": outfit.innerLayer },
-        { "Bottom": [isCustomOutfit ? outfit.bottom?.type : outfit.bottom?.details, outfit.bottom?.reference] },
-        { "Legwear": [isCustomOutfit ? outfit.legwear?.type : outfit.legwear?.details, outfit.legwear?.reference] },
+        { "Bottom": [isCustomOutfit ? outfit.bottom?.type : outfit.bottom?.details] },
+        { "Legwear": [isCustomOutfit ? outfit.legwear?.type : outfit.legwear?.details] },
         { "Shoes": outfit.shoes },
         ...outfit.accessories.map((accessory, i) => ({ [`Accessory ${i + 1}`]: [Object.keys(accessory)[0], Object.values(accessory)[0]] }))
       ]))
