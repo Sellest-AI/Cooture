@@ -161,6 +161,7 @@ export const Block = <T extends Variant>({ className = "", children, variant, st
           height: height ? (Number(height) ? height : '100%') : undefined,
           aspectRatio,
         },
+        style?.alignSelf === 'stretch' ? { flex: 1 } : {},
         {
           overflow: 'hidden',
           borderRadius,
