@@ -90,9 +90,7 @@ export default function Screen() {
       </View>
       <SafeAreaView
         edges={{ top: 'off', bottom: 'maximum' }}
-        style={{
-          marginTop: 16,
-        }}>
+      >
         <Button
           variant="primary"
           onPress={() => router.push('/preset/create/new')}

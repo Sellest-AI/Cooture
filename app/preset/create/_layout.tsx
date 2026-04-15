@@ -15,9 +15,9 @@ export default function Layout() {
       style={{
         flex: 1,
         backgroundColor: Colors.background,
-        paddingBottom: Platform.OS !== 'ios' ? 8 : 0
+        paddingBottom: (Platform.OS !== 'ios' && step > 1) ? 8 : 0
       }}
-      edges={{ bottom: 'android' }}
+      edges={{ bottom: step > 1 ? 'android' : 'off' }}
     >
       <View style={{ paddingHorizontal: 12, paddingTop: 8 }}>
         <ModalHeader
