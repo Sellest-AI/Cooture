@@ -40,6 +40,14 @@ type PresetUsed = {
   actorId: Id<'users'>,
 }
 
+type QuestProgress = {
+  type: "quest_progress",
+  /** The user whose quest progress is updated */
+  actorId: Id<'users'>,
+  questTitle: string,
+  rewardCredits?: number,
+}
+
 type Args<T extends Type> = {
   type: T,
   /** The user to notify */
@@ -54,6 +62,7 @@ type Args<T extends Type> = {
     T extends "tagged_in_generation" ? TaggedInGeneration :
     T extends "outfit_used" ? OutfitUsed :
     T extends "preset_used" ? PresetUsed :
+    T extends "quest_progress" ? QuestProgress :
     never
   )
 
@@ -68,6 +77,7 @@ type ArgsExtended<T extends Type> = Args<T> & (
   T extends "new_follower" ? { follower: Nullable<Doc<'usersExtended'>>, type: "new_follower" } :
   T extends "outfit_used" ? { outfit: Nullable<OutfitExtended>, type: "outfit_used", actor?: Nullable<Doc<'usersExtended'>> } :
   T extends "preset_used" ? { preset: Nullable<PresetExtended>, type: "preset_used", actor?: Nullable<Doc<'usersExtended'>> } :
+  T extends "quest_progress" ? { questTitle: string, rewardCredits?: number, type: "quest_progress" } :
   never
 )
 
@@ -85,6 +95,14 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
   const aggregationCount = notification?.aggregationCount ?? 0;
 
   switch (args.type) {
+    case "quest_progress":
+      return {
+        title: `Quest progress: ${args.questTitle}`,
+        body: Number(args.rewardCredits) > 0 ?
+          `You earned ${args.rewardCredits} credits! Tap to view your quests.` :
+          `Tap to view your quests.`,
+        redirectUrl: ROUTES.COLLECTION.PATH,
+      }
     case "generation_ready":
       return {
         title: "Your generation is ready",
@@ -146,8 +164,10 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
 
 const aggregationKey = (args: Args<Type>) => {
   switch (args.type) {
+    case "quest_progress":
+      return `quest_progress:${args.actorId}:${args.questTitle}`
     case "generation_ready":
-      return `generation_ready:${args.userId}:${args.generationId}`
+      return `generation_ready:${args.actorId}:${args.generationId}`
     case "tagged_in_generation":
       return `tagged_in_generation:${args.userId}:${args.generationId}`
     case "new_follower":
@@ -163,10 +183,12 @@ const aggregationKey = (args: Args<Type>) => {
 
 const getUserId = (args: ArgsExtended<Type>) => {
   switch (args.type) {
+    case "quest_progress":
+      return args.userId ?? args.actorId;
     case "generation_ready":
       return args.generation?.userId;
     case "tagged_in_generation":
-      return args.generation?.userId;
+      return args.userId;
     case "new_follower":
       return args.actorId;
     case "new_like":
@@ -231,6 +253,10 @@ async function getObjects(ctx: QueryCtx, args: Args<Type>): Promise<ArgsExtended
     return { ...args, preset: preset ? { ...preset, coverUrl: cover?.url } : undefined, actor };
   }
 
+  if (args.type === "quest_progress") {
+    return { ...args };
+  }
+
   return args;
 }
 
@@ -238,6 +264,7 @@ const isNotificationAllowed = (args: ArgsExtended<Type>) => {
   const userId = args.userId ?? getUserId(args);
 
   if (args.type === "generation_ready") return true;
+  if (args.type === "quest_progress") return true;
 
   // Don't allow notifications if the actor is the same as the user (e.g. liking your own generation, following yourself, etc.)
   if (userId === args.actorId) return false;

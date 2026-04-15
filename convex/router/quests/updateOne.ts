@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
+import { saveNotification } from "../../functions/notifications";
 import { internalMutation } from "../../procedures";
 import { questTypes } from "../../schema/quests";
 
@@ -65,6 +66,14 @@ export const _internal = internalMutation({
           metadata: {
             reason: `Quest completed: ${quest.title} (${quest.type})`,
           }
+        })
+
+        await saveNotification(ctx, {
+          userId: userId,
+          actorId: userId,
+          type: 'quest_progress',
+          questTitle: quest.title,
+          rewardCredits: quest.rewardCredits,
         })
       }
     }
