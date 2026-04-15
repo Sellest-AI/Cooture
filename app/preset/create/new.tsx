@@ -104,7 +104,7 @@ const Cost = ({ cost }: { cost?: number | null }) => {
       alignItems: 'center',
       marginTop: 12,
     }}>
-      {cost && <Text.Sm
+      <Text.Sm
         style={{
           textAlign: 'center',
           maxWidth: 172,
@@ -112,14 +112,14 @@ const Cost = ({ cost }: { cost?: number | null }) => {
         color={Colors.neutral[400]}
       >
         Your preset will cost
-      </Text.Sm>}
+      </Text.Sm>
       <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
         <Credits size={12} />
         <Text.Base
           color={Colors.primary[200]} weight={600}
           style={{ marginLeft: 2 }}
         >
-          {cost}
+          {cost ?? '??'}
         </Text.Base>
       </View>
     </View>
