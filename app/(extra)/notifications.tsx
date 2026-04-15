@@ -2,8 +2,9 @@ import { Api, api, Id } from "@/lib/convex/api";
 import { useMutation, usePaginatedQueryCached, useQueryCached } from "@/lib/convex/client";
 import { EmptyBlock } from "@ui/block.empty";
 import { Notification } from "@ui/cards";
-import { Bell } from "@ui/icons";
+import { Bell, Check, Credits, Loader } from "@ui/icons";
 import { ModalHeader } from "@ui/modal";
+import { Pressable } from "@ui/pressable";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { SafeScrollView } from "@ui/safe-scroll-view";
 import { Text } from "@ui/text";
@@ -76,6 +77,12 @@ const GenericNotification = ({ id, onPress, read, data }: GenereticNotificationP
         {aggregationCount > 1 ? `and ${aggregationCount} people liked your post.` : "liked your post."}
       </>
 
+    if (notification.type === "quest_progress")
+      return <>
+        You&apos;ve completed the <Text.Base color={Colors.foreground} weight={600}>{`"${notification.quest?.title}" `}</Text.Base>
+        quest and earned <Text.Base color={Colors.foreground} weight={600}>{`${notification.quest?.rewardCredits}`} <Credits size={12} /> !</Text.Base>
+      </>
+
     if (notification.type === "new_follower")
       return <>
         <Text.Base color={Colors.foreground} weight={600}>{notification.actor?.name} </Text.Base>
@@ -109,6 +116,9 @@ const GenericNotification = ({ id, onPress, read, data }: GenereticNotificationP
 
   if (!notification) return null;
 
+  const leftImage = notification.actorId === notification.userId ?
+    require('assets/images/icon.png') : notification.actor?.image;
+
   return (
     <Notification
       read={read}
@@ -135,9 +145,12 @@ const GenericNotification = ({ id, onPress, read, data }: GenereticNotificationP
           if (notification.type === "preset_used") {
             if (notification.presetId) router.push(ROUTES.PRESETS.ID.toString(notification.presetId));
           }
+          if (notification.type === "quest_progress") {
+            router.dismissTo(ROUTES.COLLECTION.PATH);
+          }
         });
       }}
-      leftImage={notification.actor?.image}
+      leftImage={leftImage}
       rightImage={rightImageId ? {
         url: rightImage?.sizes.thumbnail.url,
         backgroundColor: notification.outfit?.backgroundColor
@@ -153,7 +166,7 @@ const GenericNotification = ({ id, onPress, read, data }: GenereticNotificationP
 }
 
 export default function Screen() {
-  const { mutate: readNotifications } = useMutation(api.router.notifications.readNotifications.authed);
+  const { mutate: readNotifications, isLoading: isReadingNotifications } = useMutation(api.router.notifications.readNotifications.authed);
 
   const _generations = usePaginatedQueryCached(api.router.generations.getPaginated.authed, {}, { initialNumItems: 12 });
   const generations = (_generations.results ?? []);
@@ -197,6 +210,17 @@ export default function Screen() {
         onBack={() => router.canGoBack() ? router.back() : router.dismissTo(ROUTES.TABS.FEED)}
         title="Notifications"
         type="alt"
+        endContent={unread.length > 5 && <Pressable
+          disabled={isReadingNotifications}
+          onPress={() =>
+            readNotifications({ notificationIds: unread.map((n) => n._id).slice(0, 10) })}
+          style={{
+            top: 12,
+            padding: 4,
+          }}>
+          {isReadingNotifications ? <Loader size={20} color={Colors.neutral[400]} />
+            : <Check size={20} color={Colors.neutral[400]} />}
+        </Pressable>}
       />
       {isEmpty && <EmptyBlock
         style={{ marginTop: -52 }}

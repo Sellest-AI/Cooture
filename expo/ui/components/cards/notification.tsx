@@ -79,6 +79,7 @@ export const Notification = ({ read, onPress, onProfilePress, leftImage, rightIm
             minWidth: 0,
             flexDirection: 'row',
             flexWrap: 'wrap',
+            paddingRight: rightImage ? 0 : 8,
           }}>
             {typeof children === 'string' ? (
               <Text.Base color={Colors.neutral[50]} weight={500}>
