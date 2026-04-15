@@ -38,6 +38,16 @@ const updateGenerationStatus = async (ctx: MutationCtx, generationId: Id<'genera
       completedAt: completedAt,
       publication: allRejected ? "ARCHIVED" : "PUBLISHED"
     });
+
+    // Only increment quests if the generation is moving to DRAFT (waiting for review) 
+    // or PUBLISHED (approved) status, not when it's archived
+    if (generation.publication === "DRAFT" && someAccepted)
+      await updateQuest(ctx, {
+        questType: "posts_published",
+        userId: generation.userId,
+        increment: 1,
+      })
+
     return;
   }
 
