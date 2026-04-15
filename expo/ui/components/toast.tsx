@@ -31,6 +31,7 @@ export const useToasts = () => {
   const addToast = (toast: Omit<Toast, 'key'>) => {
     const key = `${Date.now()}`;
     setState((prev) => [...prev, { ...toast, key, durationS: toast.durationS ?? 10 }]);
+    return key;
   };
   const removeToast = (key: string) => {
     setState((prev) => prev.filter((t) => t.key !== key));
@@ -116,6 +117,8 @@ const ToastComponent = ({ toast, onRemove, list, onPress }: ToastComponentProps)
       }}
       from={{ translateY: -200 }}
       animate={{ translateY: 0 }}
+      exit={{ translateY: -200 }}
+      exitTransition={{ delay: 300, duration: 200 }}
     >
       <Animated.View style={[animatedStyle]}>
         <Pressable
@@ -132,20 +135,21 @@ const ToastComponent = ({ toast, onRemove, list, onPress }: ToastComponentProps)
             borderRadius: 36,
             borderWidth: 1,
           }}>
-          <BlurView style={{
-            alignSelf: 'center',
-            maxWidth: 332,
-            backgroundColor: Platform.OS === 'android' ?
-              Colors.blur.darkest : Colors.blur.dark,
-            overflow: 'hidden',
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 16,
-            padding: 12,
-            paddingLeft: Icon ? 12 : 28,
-            paddingRight: 28,
-          }}
+          <BlurView
             intensity={40}
+            style={{
+              alignSelf: 'center',
+              maxWidth: 332,
+              backgroundColor: Platform.OS === 'android' ?
+                Colors.blur.darkest : Colors.blur.dark,
+              overflow: 'hidden',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: toast.description ? 16 : 12,
+              padding: 12,
+              paddingLeft: Icon ? 12 : 28,
+              paddingRight: 28,
+            }}
           >
 
             {toast.type !== 'default' && <LinearGradient
@@ -164,20 +168,20 @@ const ToastComponent = ({ toast, onRemove, list, onPress }: ToastComponentProps)
               }}
             />}
             {Icon && <View style={{
-              padding: 14,
+              padding: toast.description ? 14 : 2,
               borderRadius: 999,
               borderWidth: 1,
-              borderColor: 'rgba(255,255,255,0.1)',
+              borderColor: toast.description ? 'rgba(255,255,255,0.1)' : 'transparent',
               overflow: 'hidden',
             }}>
-              <View style={{ position: 'absolute', inset: 0 }}>
+              {toast.description && <View style={{ position: 'absolute', inset: 0 }}>
                 <LinearGradient
                   colors={['rgb(0,0,0,0.2)', 'transparent']}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={{ width: '100%', height: '100%' }}
                 />
-              </View>
+              </View>}
               <Icon
                 size={20}
                 color={toast.type === 'error' ? Colors.destructive[500] :
@@ -192,14 +196,14 @@ const ToastComponent = ({ toast, onRemove, list, onPress }: ToastComponentProps)
                 weight={500}>
                 {toast.title}
               </Text.Base>
-              <Text.Sm
+              {toast.description && <Text.Sm
                 color={toast.type === 'default' ? Colors.neutral[400] : Colors.neutral[200]}
                 weight={500}
                 style={{ marginTop: 6 }}
                 numberOfLines={2}
               >
                 {toast.description}
-              </Text.Sm>
+              </Text.Sm>}
             </View>
           </BlurView>
         </Pressable>
@@ -217,8 +221,8 @@ export const ToastsProvider = ({ children }: { children: React.ReactNode }) => {
       <AnimatePresence>
         {toasts.map((toast, i, arr) => (
           <ToastComponent
-            key={toast.key}
             toast={toast}
+            key={toast.key}
             onRemove={removeToast}
             list={{
               currentIndex: i,
