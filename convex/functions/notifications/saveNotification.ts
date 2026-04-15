@@ -38,6 +38,7 @@ type PresetUsed = {
   presetId: Id<'presets'>,
   /** The actor who used the preset */
   actorId: Id<'users'>,
+  transactionId?: Id<'creditTransactions'>,
 }
 
 type QuestProgress = {
@@ -76,7 +77,7 @@ type ArgsExtended<T extends Type> = Args<T> & (
   T extends "new_like" ? { generation?: Nullable<GenerationExtended>, outfit?: Nullable<OutfitExtended>, actor?: Nullable<Doc<'usersExtended'>>, type: "new_like" } :
   T extends "new_follower" ? { follower: Nullable<Doc<'usersExtended'>>, type: "new_follower" } :
   T extends "outfit_used" ? { outfit: Nullable<OutfitExtended>, type: "outfit_used", actor?: Nullable<Doc<'usersExtended'>> } :
-  T extends "preset_used" ? { preset: Nullable<PresetExtended>, type: "preset_used", actor?: Nullable<Doc<'usersExtended'>> } :
+  T extends "preset_used" ? { preset: Nullable<PresetExtended>, transaction: Nullable<Doc<'creditTransactions'>>, type: "preset_used", actor?: Nullable<Doc<'usersExtended'>> } :
   T extends "quest_progress" ? { type: "quest_progress", quest: Nullable<Doc<'quests'>>, transaction: Nullable<Doc<'creditTransactions'>> } :
   never
 )
@@ -97,12 +98,12 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
 
   switch (args.type) {
     case "quest_progress":
-      const rewardCredits = args.transaction?.amount ?? args.quest?.rewardCredits ?? 0;
+      const questRewardCredits = args.transaction?.amount ?? args.quest?.rewardCredits ?? 0;
       return {
         title: `Quest progress: ${args.quest?.title}`,
-        body: Number(rewardCredits) > 0 ?
-          `You earned ${rewardCredits} credits! Tap to view your quests.` :
-          `Tap to view your quests.`,
+        body: Number(questRewardCredits) > 0 ?
+          `You earned ${questRewardCredits} credits! Tap to view your quests` :
+          `Tap to view your quests`,
         redirectUrl: ROUTES.COLLECTION.PATH,
       }
     case "generation_ready":
@@ -142,11 +143,14 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
         redirectUrl: FALLBACK_ROUTE
       }
     case "preset_used":
+      const presetRewardCredits = args.transaction?.amount ?? 0;
       return {
         title:
           aggregationCount > 1 ? `📷 ${aggregationText} used your preset` :
             `📷 ${args.actor?.name ?? "Someone"} used your preset`,
-        body: "Tap to view",
+        body: `${Number(presetRewardCredits) > 0 ?
+          `You earned ${presetRewardCredits} credits! Tap to view` :
+          "Tap to view"}`,
         icon: args.actor?.imageUrl,
         image: args.preset?.coverUrl,
         redirectUrl: FALLBACK_ROUTE
@@ -251,8 +255,9 @@ async function getObjects(ctx: QueryCtx, args: Args<Type>): Promise<ArgsExtended
   if (args.type === "preset_used") {
     const preset = await ctx.db.query("presets").withIndex("by_id", q => q.eq("_id", args.presetId)).first();
     const actor = await ctx.db.query("usersExtended").withIndex("by_user_id", q => q.eq("userId", args.actorId)).first();
+    const transaction = args.transactionId ? await ctx.db.get(args.transactionId) : null;
     const cover = preset?.imageIds?.[0] ? await ctx.db.get(preset.imageIds[0]) : undefined;
-    return { ...args, preset: preset ? { ...preset, coverUrl: cover?.url } : undefined, actor };
+    return { ...args, preset: preset ? { ...preset, coverUrl: cover?.url } : undefined, actor, transaction };
   }
 
   if (args.type === "quest_progress") {
@@ -357,6 +362,7 @@ export const saveNotification = async <T extends Type>(ctx: MutationCtx, args: A
     type: args.type,
     read: false,
     actorId: args.actorId,
+    transactionId: "transactionId" in args ? args.transactionId : undefined,
     generationId: "generationId" in args ? args.generationId : undefined,
     outfitId: "outfitId" in args ? args.outfitId : undefined,
     presetId: "presetId" in args ? args.presetId : undefined,

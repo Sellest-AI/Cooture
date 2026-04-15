@@ -16,6 +16,7 @@ export const CREDITS_CONFIG = {
   // Initial credits for new users
   STARTING_CREDITS: 140, // Enough for 1 generation to try the app
   COOTURE_PLUS_CREDITS: 100 * 15,
+  PRESET_USAGE_REWARD: 5, // Credits awarded to the creator of a preset
 } as const;
 
 /**

@@ -1,14 +1,23 @@
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
-import { TriangleAlert, User } from "@ui/icons";
+import { Credits, TriangleAlert, User } from "@ui/icons";
+import { LinearGradient } from "@ui/linear-gradient";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
 import { ReactNode } from "react";
-import { ScrollView, View, ViewStyle } from "react-native";
+import { Platform, ScrollView, View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 
-const Information = ({ icon, title, subtitle, style }: { icon: ReactNode, title: string, subtitle: string, style?: ViewStyle }) => {
+type InformationProps = {
+  icon: ReactNode;
+  title: string;
+  subtitle: string;
+  style?: ViewStyle;
+  showGradient?: boolean;
+  variant?: "primary" | "destructive";
+}
+const Information = ({ icon, title, subtitle, style, showGradient, variant = 'primary' }: InformationProps) => {
   return (
     <Block
       variant="blur"
@@ -26,12 +35,25 @@ const Information = ({ icon, title, subtitle, style }: { icon: ReactNode, title:
         ...style,
       }}
     >
+      {showGradient && <LinearGradient
+        colors={[variant === 'primary' ? Colors.primary[500] : Colors.destructive[500], 'transparent']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: Platform.OS === 'android' ? 200 : 400,
+          opacity: Platform.OS === 'android' ? 0.1 : 0.15
+        }}
+      />}
       <Block
-        variant="blur"
+        variant={showGradient ? variant : "blur"}
         style={{
           maxWidth: 64,
-          width: '100%',
-          height: '100%',
+          flexGrow: 1,
+          alignSelf: "stretch",
           alignItems: "center",
           justifyContent: "center",
           borderRadius: 22,
@@ -41,8 +63,12 @@ const Information = ({ icon, title, subtitle, style }: { icon: ReactNode, title:
         {icon}
       </Block>
       <View style={{ flex: 1, gap: 8, flexShrink: 1 }}>
-        <Text.Base color={Colors.primary[500]} weight={600}>{title}</Text.Base>
-        <Text.Base color={Colors.neutral[200]}>{subtitle}</Text.Base>
+        <Text.Base color={variant === 'primary' ? Colors.primary[500] : Colors.destructive[500]} weight={600}>
+          {title}
+        </Text.Base>
+        <Text.Base color={Colors.neutral[200]}>
+          {subtitle}
+        </Text.Base>
       </View>
     </Block>
   )
@@ -56,6 +82,13 @@ export default function Screen() {
       contentContainerStyle={{ paddingBottom: 12 }}
       showsVerticalScrollIndicator={false}
     >
+      <Information
+        style={{ marginTop: 12, marginBottom: 32 }}
+        icon={<Credits size={28} />}
+        title="Win credits by sharing your style"
+        subtitle="When others use your preset, you earn credits!"
+        showGradient
+      />
       <View style={{ marginBottom: 32 }}>
         <Text.H4 color={Colors.neutral[50]} style={{ marginHorizontal: 'auto', marginBottom: 20 }}>
           How it works
@@ -71,6 +104,13 @@ export default function Screen() {
           subtitle="Creating a preset costs credits. These are deducted upon upload and are non-refundable if you cancel."
           style={{ marginTop: 12 }}
         />
+        <Information
+          icon={<Text.H3 color={Colors.primary[900]} style={{ lineHeight: 32 }}>3</Text.H3>}
+          title="Win credits"
+          subtitle="Every time someone uses your preset, you earn credits! The more your preset is used, the more you earn."
+          style={{ marginTop: 12 }}
+          showGradient
+        />
       </View>
       <View style={{ marginBottom: 32 }}>
         <Text.H4 color={Colors.neutral[50]} style={{ marginHorizontal: 'auto', marginBottom: 20 }}>
@@ -82,10 +122,12 @@ export default function Screen() {
           subtitle="Your reference image must feature exactly one person. Group photos are not supported."
         />
         <Information
-          icon={<TriangleAlert size={28} color={Colors.neutral[400]} />}
+          icon={<TriangleAlert size={28} color={Colors.destructive[50]} />}
           title="Content moderation"
           subtitle="NSFW or provocative images will be rejected automatically. Credits spent here are non-refundable."
           style={{ marginTop: 12 }}
+          variant="destructive"
+          showGradient
         />
       </View>
       <SafeAreaView

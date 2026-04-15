@@ -80,7 +80,7 @@ const GenericNotification = ({ id, onPress, read, data }: GenereticNotificationP
     if (notification.type === "quest_progress")
       return <>
         You&apos;ve completed the <Text.Base color={Colors.foreground} weight={600}>{`"${notification.quest?.title}" `}</Text.Base>
-        quest and earned <Text.Base color={Colors.foreground} weight={600}>{`${notification.quest?.rewardCredits}`} <Credits size={12} /> !</Text.Base>
+        quest and earned <Text.Base color={Colors.foreground} weight={600}>{`${notification.transaction?.amount ?? notification.quest?.rewardCredits ?? '?'}`} <Credits size={12} />.</Text.Base>
       </>
 
     if (notification.type === "new_follower")
@@ -108,7 +108,8 @@ const GenericNotification = ({ id, onPress, read, data }: GenereticNotificationP
       if (notification.preset)
         return <>
           <Text.Base color={Colors.foreground} weight={600}>{notification.actor?.name} </Text.Base>
-          {aggregationCount > 1 ? `and ${aggregationCount} people used your preset` : "used your preset"} <Text.Base color={Colors.foreground} weight={600}>{`"${notification.preset.name}"`}</Text.Base>.
+          {aggregationCount > 1 ? `and ${aggregationCount} people used your preset` : "used your preset"} <Text.Base color={Colors.foreground} weight={600}>{`"${notification.preset.name}"`}</Text.Base>
+          {Number(notification.transaction?.amount) > 0 ? <> and you earned <Text.Base color={Colors.foreground} weight={600}>{`${notification.transaction?.amount ?? '?'}`} <Credits size={12} /></Text.Base>.</> : "."}
         </>
     }
 

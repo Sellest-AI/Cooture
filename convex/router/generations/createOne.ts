@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { Id } from "../../_generated/dataModel";
+import { CREDITS_CONFIG, grantCredits } from "../../functions/credits";
 import { createPrediction } from "../../functions/generations";
 import { saveNotification } from "../../functions/notifications";
 import { updateQuest } from "../../functions/quests";
@@ -66,16 +67,6 @@ export const _internal = internalMutation({
         delayPushMs: 5 * 60 * 1000,
       })
 
-    if (preset?.presetId)
-      await saveNotification(ctx, {
-        actorId: userId,
-        presetId: preset.presetId,
-        type: "preset_used",
-        pushToDevice: true,
-        // Delay the notification by 5 minutes to wait for the generation to be completed
-        delayPushMs: 5 * 60 * 1000,
-      })
-
     if (preset) {
       await ctx.db.insert("presetGenerations", {
         presetId: preset.presetId,
@@ -84,6 +75,31 @@ export const _internal = internalMutation({
         prompts: preset.prompts,
         userIds,
       });
+
+      let transactionId: Id<'creditTransactions'> | undefined = undefined;
+      const _preset = await ctx.db.get(preset?.presetId);
+      if (_preset?.userId && _preset.userId !== userId) {
+        const result = await grantCredits(ctx, {
+          userId: _preset.userId,
+          amount: CREDITS_CONFIG.PRESET_USAGE_REWARD,
+          type: 'PRESET_USAGE_REWARD',
+          metadata: {
+            reason: `Preset used in generation`,
+            generationId,
+          }
+        })
+        transactionId = result.transactionId;
+      }
+
+      await saveNotification(ctx, {
+        actorId: userId,
+        presetId: preset.presetId,
+        type: "preset_used",
+        pushToDevice: true,
+        transactionId,
+        // Delay the notification by 5 minutes to wait for the generation to be completed
+        delayPushMs: 5 * 60 * 1000,
+      })
 
       // Update quests
       await questHandler(ctx, { userId, presetId: preset.presetId, currentGenerationId: generationId });

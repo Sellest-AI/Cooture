@@ -32,6 +32,7 @@ export const notifications = defineTable({
   actorId: v.optional(v.id("users")),
 
   // references — only populate what's relevant
+  transactionId: v.optional(v.id("creditTransactions")),
   generationId: v.optional(v.id("generations")),
   outfitId: v.optional(v.id("outfits")),
   presetId: v.optional(v.id("presets")),

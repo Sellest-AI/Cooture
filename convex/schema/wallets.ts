@@ -23,6 +23,7 @@ export const TRANSACTION_TYPE = v.union(
   v.literal("QUEST_REWARD"),
   v.literal("GENERATION_COST"),
   v.literal("PRESET_CREATION_COST"),
+  v.literal("PRESET_USAGE_REWARD"),
   v.literal("ADMIN_GRANT"),
   v.literal("SYSTEM_GRANT"),
   v.literal("SYSTEM_DEDUCT"),
