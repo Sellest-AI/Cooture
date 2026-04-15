@@ -2,10 +2,11 @@ import { downloadImageCrossPlatform } from "@/lib/image/client";
 import { downloadVideo } from "@/lib/video";
 import { Block } from "@ui/block";
 import { Button, BUTTON_HEIGHT } from "@ui/button";
-import { HeartIcon, Loader, X } from "@ui/icons";
+import { Check, HeartIcon, Loader, X } from "@ui/icons";
 import { AnimatePresence, MotiView } from "@ui/motion";
 import { useSafeAreaInsets } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
+import { useToasts } from "@ui/toast";
 import { Platform, View } from "react-native";
 import { Colors } from "theme";
 
@@ -22,6 +23,8 @@ type Props = {
   items: Generation[];
 }
 export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
+  const { addToast, removeToast } = useToasts();
+
   const isCurrentLoading = currentItem?.status === 'LOADING';
   const processed = items.filter((i) => i.status !== 'LOADING').length;
   const loading = items.filter((i) => i.status === 'LOADING').length;
@@ -86,9 +89,36 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
                   if (!currentItem || !hasMedia) return;
                   try {
                     if (currentItem.videoUrl) {
-                      await downloadVideo(currentItem.videoUrl);
+                      const key = addToast({
+                        title: 'Saving video to your gallery',
+                        type: 'default',
+                        icon: Loader
+                      });
+                      downloadVideo(currentItem.videoUrl)
+                        .then(() => {
+                          addToast({
+                            title: 'Video saved to your gallery',
+                            type: 'success',
+                            icon: Check
+                          });
+                          removeToast(key);
+                        }).catch(() => null);
                     } else if (currentItem.imageUrl) {
-                      await downloadImageCrossPlatform(currentItem.imageUrl, { applyWatermark: true });
+                      const key = addToast({
+                        title: 'Saving image to your gallery',
+                        type: 'default',
+                        icon: Loader
+                      });
+                      downloadImageCrossPlatform(currentItem.imageUrl, { applyWatermark: true })
+                        .then(() => {
+                          addToast({
+                            title: 'Image saved to your gallery',
+                            type: 'success',
+                            icon: Check
+                          })
+                          removeToast(key);
+                        })
+                        .catch(() => null);
                     }
                   } catch { }
                   onNext(true);

@@ -134,13 +134,13 @@ export default function Screen() {
   const currentItem = visibleItems[currentIndex];
 
   // Functions
-  const next = (validated: boolean) => {
+  const next = async (validated: boolean) => {
     if (!currentItem) return;
 
     if (validated) {
-      mutate({ predictionId: currentItem._id, status: 'ACCEPTED' });
+      await mutate({ predictionId: currentItem._id, status: 'ACCEPTED' });
     } else {
-      mutate({ predictionId: currentItem._id, status: 'REJECTED' });
+      await mutate({ predictionId: currentItem._id, status: 'REJECTED' });
     }
 
     setHiddenItems(prev => [...prev, currentItem._id]);
