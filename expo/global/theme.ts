@@ -59,7 +59,7 @@ export const Texts = {
   sm: {
     fontSize: 13,
     lineHeight: 14,
-    letterSpacing: -0.7,
+    letterSpacing: -0.6,
     fontWeight: 400
   }
 } as const;

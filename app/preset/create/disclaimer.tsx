@@ -14,10 +14,10 @@ type InformationProps = {
   title: string;
   subtitle: string;
   style?: ViewStyle;
-  showGradient?: boolean;
-  variant?: "primary" | "destructive";
+  variant?: "blur" | "primary" | "destructive";
 }
-const Information = ({ icon, title, subtitle, style, showGradient, variant = 'primary' }: InformationProps) => {
+const Information = ({ icon, title, subtitle, style, variant = 'blur' }: InformationProps) => {
+  const showGradient = variant !== 'blur';
   return (
     <Block
       variant="blur"
@@ -29,7 +29,7 @@ const Information = ({ icon, title, subtitle, style, showGradient, variant = 'pr
         paddingVertical: 12,
         flexDirection: "row",
         justifyContent: "center",
-        alignItems: "flex-start",
+        alignItems: "center",
         gap: 16,
         flex: 0,
         ...style,
@@ -57,18 +57,23 @@ const Information = ({ icon, title, subtitle, style, showGradient, variant = 'pr
           alignItems: "center",
           justifyContent: "center",
           borderRadius: 22,
+          minHeight: 68,
           flex: 1,
         }}
       >
         {icon}
       </Block>
       <View style={{ flex: 1, gap: 8, flexShrink: 1 }}>
-        <Text.Base color={variant === 'primary' ? Colors.primary[500] : Colors.destructive[500]} weight={600}>
+        <Text.Base color={variant === 'primary' ?
+          Colors.primary[500] : variant === "blur" ? Colors.neutral[50] :
+            Colors.destructive[500]}
+          weight={600}
+        >
           {title}
         </Text.Base>
-        <Text.Base color={Colors.neutral[200]}>
+        <Text.Sm color={variant === 'primary' ? Colors.primary[200] : Colors.neutral[200]}>
           {subtitle}
-        </Text.Base>
+        </Text.Sm>
       </View>
     </Block>
   )
@@ -85,9 +90,9 @@ export default function Screen() {
       <Information
         style={{ marginTop: 12, marginBottom: 32 }}
         icon={<Credits size={28} />}
-        title="Win credits by sharing your style"
-        subtitle="When others use your preset, you earn credits!"
-        showGradient
+        title="Win credits"
+        subtitle="When others use your preset, you earn credits! Spread the word and watch your earnings grow."
+        variant="primary"
       />
       <View style={{ marginBottom: 32 }}>
         <Text.H4 color={Colors.neutral[50]} style={{ marginHorizontal: 'auto', marginBottom: 20 }}>
@@ -96,7 +101,7 @@ export default function Screen() {
         <Information
           icon={<Text.H3 color={Colors.neutral[400]} style={{ lineHeight: 32 }}>1</Text.H3>}
           title="Upload a reference"
-          subtitle="Choose a photo from your gallery. We'll extract its core style to build your custom preset."
+          subtitle="Choose a photo from your gallery. We will extract its core style to build your custom preset."
         />
         <Information
           icon={<Text.H3 color={Colors.neutral[400]} style={{ lineHeight: 32 }}>2</Text.H3>}
@@ -106,10 +111,10 @@ export default function Screen() {
         />
         <Information
           icon={<Text.H3 color={Colors.primary[900]} style={{ lineHeight: 32 }}>3</Text.H3>}
-          title="Win credits"
+          title="Earn from your style"
           subtitle="Every time someone uses your preset, you earn credits! The more your preset is used, the more you earn."
           style={{ marginTop: 12 }}
-          showGradient
+          variant="primary"
         />
       </View>
       <View style={{ marginBottom: 32 }}>
@@ -127,7 +132,6 @@ export default function Screen() {
           subtitle="NSFW or provocative images will be rejected automatically. Credits spent here are non-refundable."
           style={{ marginTop: 12 }}
           variant="destructive"
-          showGradient
         />
       </View>
       <SafeAreaView

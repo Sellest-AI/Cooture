@@ -23,8 +23,7 @@ import { Colors } from "theme";
 const loading = false;
 
 export default function Screen() {
-  const { userId, isPremium } = useAccount();
-  const { isAdmin } = useAccount.Admin();
+  const { userId } = useAccount();
   const { push } = useRouter('/photoshoot/create');
   const { setPresetId, presetId, outfitId, friendId } = usePhotoshoot.New();
 
@@ -108,8 +107,7 @@ export default function Screen() {
                     style={{ padding: Platform.OS === 'android' ? 6 : 0 }}
                     title="New preset"
                     onPress={() => {
-                      if (isPremium || isAdmin) push(ROUTES.PRESETS.CREATE.PATH, { redirectHere: true })
-                      else push(ROUTES.MODALS.UPGRADE);
+                      push(ROUTES.PRESETS.CREATE.PATH, { redirectHere: true })
                     }}
                   />
                 </View>

@@ -1,4 +1,5 @@
 import { useRouter } from "@/hooks";
+import { useAccount } from "@/lib/convex/auth";
 import { api, useAction, useQuery, useQueryCached } from "@/lib/convex/client";
 import { compressImage } from "@/lib/image/client/editing";
 import { Block } from "@ui/block";
@@ -135,6 +136,7 @@ export default function Screen() {
   const { action: createPreset } = useAction(api.router.presets.createOne.authed);
   const { data: cost } = useQueryCached(api.router.credits.getCost.anon, { type: 'PRESET_CREATION_COST' });
   const { data: canPay } = useQuery(api.router.credits.canPay.authed, cost ? { amount: cost } : 'skip');
+  const { isPremium } = useAccount();
 
   return (
     <View style={{ flex: 1, padding: 12 }}>
@@ -154,6 +156,11 @@ export default function Screen() {
         disabled={!imageUri || name.length < 3 || !cost || !canPay}
         onComplete={async () => {
           if (!imageUri || name.length < 3 || !cost || !canPay) return false;
+
+          if (!isPremium) {
+            push(ROUTES.MODALS.UPGRADE)
+            return false;
+          }
 
           const compressedImage = await compressImage(imageUri);
           const presetId = await createPreset({
