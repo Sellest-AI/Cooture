@@ -1,7 +1,7 @@
 import { useRoute, useRouter } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
 import { useAccount } from "@/lib/convex/auth";
-import { useQuery, useQueryCached } from "@/lib/convex/client";
+import { useMutation, useQuery, useQueryCached } from "@/lib/convex/client";
 import { PremiumBlock } from "@/modules/premium/premium-block";
 import { usePreset } from "@/modules/presets/_hooks";
 import { LoadingBlock } from "@ui/block.loading";
@@ -116,8 +116,11 @@ export default function ItemScreen() {
   const { preset } = usePreset(id);
   const { data: user } = useQuery(api.router.users.getAccount.anon, preset?.userId ? { userId: preset.userId } : 'skip');
 
+  const { data: generations, isPending } = useQuery(api.router.feed.getFromPreset.anon, { presetId: id });
+  const { mutate: deletePreset } = useMutation(api.router.presets.deleteOne.authed);
+
   const ownPreset = preset?.userId === me?._id;
-  const editable = ownPreset && false;
+  const editable = ownPreset && (!isPending && (generations ?? []).length === 0);
 
   const exit = () => {
     if (router.canGoBack()) {
@@ -236,12 +239,14 @@ export default function ItemScreen() {
             variant="destructive"
             startIcon={Trash}
             onLongPress={async () => {
-              // await remove();
-              if (router.canGoBack()) router.back();
-              else router.replace(ROUTES.TABS.FEED);
+              try {
+                deletePreset({ id: preset._id });
+                if (router.canGoBack()) router.back();
+                else router.replace(ROUTES.TABS.FEED);
+              } catch { }
             }}
           >
-            Delete Preset
+            Long press to delete preset
           </Button>}
         </SafeAreaView>
       </ParallaxScrollView>
