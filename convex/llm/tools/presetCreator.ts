@@ -64,6 +64,7 @@ When in doubt about content rating, default to the most conservative option.
 
 NOTES:
 - Unless the image IS black & white, do not EVERY mention "black and white" in the "composition" or "style" fields.
+- Do not mention clothing accessories in the "hands" or "heldObjects" fields, as they will be replaced by the user's outfit. Only include true environmental props. Example bad: "Hat, cap, gloves, purse". Example good: "Bouquet of flowers, coffee cup, book, phone, skateboard".
 
 OUTPUT FORMAT (VERY IMPORTANT):
 - Return a JSON object that exactly matches the schema structure.
@@ -161,7 +162,7 @@ export const ImagePresetSchema = z.object({
           .optional(),
       }).optional().describe("If not visible, return undefined."),
 
-      accessories: z.array(z.record(z.string(), z.string())).describe("Worn items (Glasses, Necklace, Hat). If none, return []."),
+      accessories: z.array(z.record(z.string(), z.string())).describe("Worn items (Glasses, Necklace, Hat, Cap). If none, return []."),
 
       shoes: z.string().optional().describe("If feet are not visible, return undefined."),
     }),
