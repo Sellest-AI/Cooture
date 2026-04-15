@@ -10,6 +10,7 @@ import { ButtonSlider } from "@ui/button.slider";
 import { Col, Grid, Row } from "@ui/grid";
 import { Credits, Flame, Plus, Squirish } from "@ui/icons";
 import { Image } from "@ui/image";
+import { LinearGradient } from "@ui/linear-gradient";
 import { Pressable } from "@ui/pressable";
 import { Skeleton } from "@ui/skeleton";
 import { Slider } from "@ui/slider";
@@ -176,8 +177,19 @@ const FriendBlock = () => {
         alignItems: 'flex-end',
       }}
     >
-      {!friend && <>
-      </>}
+      <LinearGradient
+        colors={['transparent', Colors.primary[500]]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={{
+          position: 'absolute',
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: 300,
+          opacity: 0.1
+        }}
+      />
       <View style={{ gap: 8 }}>
         <View style={{
           paddingHorizontal: 12,
@@ -213,11 +225,11 @@ const FriendBlock = () => {
           height: 72,
           borderRadius: 99,
           backgroundColor: Colors.primary[500],
-          borderWidth: 2,
+          borderWidth: 1,
           borderTopColor: Colors.primary[200],
           borderLeftColor: Colors.primary[200],
-          borderRightColor: Colors.primary[700],
-          borderBottomColor: Colors.primary[700],
+          borderRightColor: Colors.primary[500],
+          borderBottomColor: Colors.primary[500],
           justifyContent: 'center',
           alignItems: 'center'
         }}

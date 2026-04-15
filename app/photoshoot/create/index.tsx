@@ -169,6 +169,9 @@ export default function Screen() {
                   style={{ padding: Platform.OS === 'android' ? 6 : 0 }}
                   contentFit="cover"
                   title={item.name}
+                  onLongPress={() => {
+                    push(ROUTES.PRESETS.ID.PATH, { pathParams: { id: item._id } });
+                  }}
                   onPress={() => {
                     setPresetId((p) => p === item._id ? null : item._id);
                     if (!selected) requestAnimationFrame(() => push(ROUTES.PHOTOSHOOT.RECAP, { resetNextRoute: false }));
