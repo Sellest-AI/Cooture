@@ -2,6 +2,7 @@ import { useRouter } from "@/hooks";
 import { useAccount } from "@/lib/convex/auth";
 import { Block } from "@ui/block";
 import { ArrowUpRight, Credits } from "@ui/icons";
+import { LinearGradient } from "@ui/linear-gradient";
 import { Pressable } from "@ui/pressable";
 import { Text } from "@ui/text";
 import { View, ViewStyle } from "react-native";
@@ -32,6 +33,19 @@ export const PremiumBlock = ({ style }: Props) => {
           ...style,
         }}
       >
+        <LinearGradient
+          colors={[Colors.primary[500], 'transparent']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: 300,
+            opacity: 0.2
+          }}
+        />
         <Block
           variant="primary"
           style={{
