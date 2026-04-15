@@ -1,7 +1,9 @@
 import { api, useQueryCached } from "@/lib/convex/client";
 import { useItem } from "@/modules/items/_hooks/useItem";
 import { Browser, BrowserProductData } from "@/modules/outfits/browser/browser.view";
+import { Loader } from "@ui/icons";
 import { SafeAreaView } from "@ui/safe-area-view";
+import { useToasts } from "@ui/toast";
 import { router } from "expo-router";
 import { nanoid } from "nanoid/non-secure";
 import { View } from "react-native";
@@ -10,6 +12,7 @@ import { Colors } from "theme";
 
 export default function Screen() {
   const { create } = useItem.Create();
+  const { addToast } = useToasts();
 
   const { data: cost } = useQueryCached(api.router.credits.getCost.anon, { type: 'ITEM_CREATION_COST' });
   const { data: canPay } = useQueryCached(api.router.credits.canPay.authed, cost ? { amount: cost } : 'skip');
@@ -35,6 +38,14 @@ export default function Screen() {
     const img = item.images.filter(i => i.uri ?? i.url)[0];
     const image = { url: (img.url ?? img.uri)!, width: img.width, height: img.height };
     if (!image.url) return;
+
+    addToast({
+      title: 'Extracting product information',
+      description: 'This can take up to a minute. You can now close the browser.',
+      icon: Loader,
+      type: 'success',
+      durationS: 10,
+    });
 
     await create({
       key: item.key,
