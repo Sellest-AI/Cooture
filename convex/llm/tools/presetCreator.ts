@@ -64,7 +64,7 @@ When in doubt about content rating, default to the most conservative option.
 
 NOTES:
 - Unless the image IS black & white, do not EVERY mention "black and white" in the "composition" or "style" fields.
-- Do not mention clothing accessories in the "hands" or "heldObjects" fields, as they will be replaced by the user's outfit. Only include true environmental props. Example bad: "Hat, cap, gloves, purse". Example good: "Bouquet of flowers, coffee cup, book, phone, skateboard".
+- Strict separation of wearable items vs props: Never list fashion accessories (hats, gloves, purses, bags) in "hands" or "heldObjects". These belong exclusively in "outfit.accessories". "heldObjects" is strictly for environmental props. Examples of valid heldObjects: "Bouquet of flowers, coffee cup, book, phone, skateboard".
 
 OUTPUT FORMAT (VERY IMPORTANT):
 - Return a JSON object that exactly matches the schema structure.
