@@ -1,9 +1,12 @@
-import { ArrowLeft, ArrowRight, Home, X } from "@ui/icons";
+import { KeyboardAvoiderView } from "@good-react-native/keyboard-avoider";
+import { ArrowLeft, ArrowRight, Home, Search, X } from "@ui/icons";
 import { Image } from "@ui/image";
 import { Pressable } from "@ui/pressable";
+import { TextInput } from "@ui/text-input";
 import { notEmpty } from "@utils/convex-allowed";
 import { router } from "expo-router";
 import { atom, useAtom } from "jotai";
+import { AnimatePresence, MotiView } from "moti";
 import { nanoid } from "nanoid/non-secure";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { BackHandler, Platform, View } from "react-native";
@@ -304,6 +307,7 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
   const webviewRef = useRef<WebView>(null);
   const captureRef = useRef<ViewShot>(null);
 
+  const [showInput, setShowInput] = useState(false);
   const [image, setImage] = useState<BrowserProductItem['images'][number] | null>(null);
 
   const [canGoBack, setCanGoBack] = useState(false);
@@ -393,15 +397,47 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
             }}
           />
         </ViewShot>
-        <View style={{ position: 'absolute', right: 12, bottom: 12 }}>
-          <BrowserCapture
-            captureRef={captureRef}
-            onCrop={async (image) => {
-              setImage({ ...image, url: image.uri });
-              requestAnimationFrame(() => extractProductInfo());
-            }}
-          />
-        </View>
+        <AnimatePresence>
+          <MotiView
+            key="extract"
+            style={{ position: 'absolute', right: 12, bottom: 12 }}
+            from={{ bottom: 0, opacity: 0 }}
+            animate={{ bottom: 12, opacity: 1 }}
+            transition={{ delay: 1000 }}
+          >
+            <BrowserCapture
+              captureRef={captureRef}
+              onCrop={async (image) => {
+                setImage({ ...image, url: image.uri });
+                requestAnimationFrame(() => extractProductInfo());
+              }}
+            />
+          </MotiView>
+          {showInput && <MotiView
+            key="input"
+            style={{ position: 'absolute', bottom: 12, left: 12, right: 12 }}
+            from={{ bottom: 0, opacity: 0 }}
+            animate={{ bottom: 12, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+          >
+            <KeyboardAvoiderView>
+              <TextInput
+                placeholder="Search or url"
+                autoFocus
+                onBlur={(value) => {
+                  setShowInput(false);
+
+                  if (value.length < 2) return;
+
+                  const sanitizedValue = value.startsWith('http') ? value :
+                    `${BASE_URL}/search?q=${encodeURIComponent(value)}`;
+
+                  navigateTo(sanitizedValue);
+                }}
+              />
+            </KeyboardAvoiderView>
+          </MotiView>}
+        </AnimatePresence>
       </View>
       {children}
       <View style={{
@@ -411,6 +447,11 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
         paddingHorizontal: Platform.OS === 'ios' ? 24 : 12
       }}>
         <View style={{ flexDirection: 'row', gap: 24 }}>
+          <X
+            onPress={() => router.canGoBack() ? router.back() : router.dismissTo(ROUTES.TABS.NEW)}
+            color={Colors.foreground}
+            size={24}
+          />
           <Pressable onPress={goBack} disabled={!canGoBack} style={{ opacity: canGoBack ? 1 : 0.5 }}>
             <ArrowLeft color={Colors.foreground} size={24} />
           </Pressable>
@@ -419,10 +460,13 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
           </Pressable>
         </View>
         <View style={{ flexDirection: 'row', gap: 24 }}>
+          <Pressable onPress={() => setShowInput(true)}>
+            <Search size={24} color={Colors.foreground} />
+          </Pressable>
+          <Pressable onPress={() => navigateTo(BASE_URL)}>
+            <Home color={Colors.foreground} size={24} />
+          </Pressable>
           <View style={{ flexDirection: 'row', gap: 12 }}>
-            <Pressable onPress={() => navigateTo(BASE_URL)}>
-              <Home color={Colors.foreground} size={24} />
-            </Pressable>
             <FaviconPressable
               favicon="https://www.endclothing.com/static/images/end-logo.svg"
               onPress={() => navigateTo("https://www.endclothing.com")}
@@ -433,11 +477,6 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
               onPress={() => navigateTo("https://www.zalando.com/get-the-look-femme/?style=style_all")}
             />
           </View>
-          <X
-            onPress={() => router.canGoBack() ? router.back() : router.dismissTo(ROUTES.TABS.NEW)}
-            color={Colors.foreground}
-            size={24}
-          />
         </View>
       </View>
     </View>
