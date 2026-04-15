@@ -59,7 +59,7 @@ export const _internal = internalMutation({
       }
 
       if (claimReward) {
-        await ctx.runMutation(internal.router.credits.grantCredits._internal, {
+        const { transactionId } = await ctx.runMutation(internal.router.credits.grantCredits._internal, {
           userId,
           amount: quest.rewardCredits,
           type: "QUEST_REWARD",
@@ -73,6 +73,7 @@ export const _internal = internalMutation({
           actorId: userId,
           type: 'quest_progress',
           questId: quest._id,
+          transactionId,
           pushToDevice: true,
         })
       }

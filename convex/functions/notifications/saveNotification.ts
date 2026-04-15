@@ -45,6 +45,7 @@ type QuestProgress = {
   /** The user whose quest progress is updated */
   actorId: Id<'users'>,
   questId: Id<'quests'>,
+  transactionId?: Id<'creditTransactions'>,
 }
 
 type Args<T extends Type> = {
@@ -76,7 +77,7 @@ type ArgsExtended<T extends Type> = Args<T> & (
   T extends "new_follower" ? { follower: Nullable<Doc<'usersExtended'>>, type: "new_follower" } :
   T extends "outfit_used" ? { outfit: Nullable<OutfitExtended>, type: "outfit_used", actor?: Nullable<Doc<'usersExtended'>> } :
   T extends "preset_used" ? { preset: Nullable<PresetExtended>, type: "preset_used", actor?: Nullable<Doc<'usersExtended'>> } :
-  T extends "quest_progress" ? { type: "quest_progress", quest: Nullable<Doc<'quests'>> } :
+  T extends "quest_progress" ? { type: "quest_progress", quest: Nullable<Doc<'quests'>>, transaction: Nullable<Doc<'creditTransactions'>> } :
   never
 )
 
@@ -92,13 +93,15 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
   const FALLBACK_ROUTE = ROUTES.EXTRA.NOTIFICATIONS;
 
   const aggregationCount = notification?.aggregationCount ?? 0;
+  const aggregationText = "actor" in args ? `${args.actor?.name ?? "Someone"} and ${aggregationCount} others` : "";
 
   switch (args.type) {
     case "quest_progress":
+      const rewardCredits = args.transaction?.amount ?? args.quest?.rewardCredits ?? 0;
       return {
         title: `Quest progress: ${args.quest?.title}`,
-        body: Number(args.quest?.rewardCredits) > 0 ?
-          `You earned ${args.quest?.rewardCredits} credits! Tap to view your quests.` :
+        body: Number(rewardCredits) > 0 ?
+          `You earned ${rewardCredits} credits! Tap to view your quests.` :
           `Tap to view your quests.`,
         redirectUrl: ROUTES.COLLECTION.PATH,
       }
@@ -125,7 +128,7 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
     case "new_like":
       if (aggregationCount > 1)
         return {
-          title: `${args.actor?.name ?? "Someone"} and ${aggregationCount} others liked your post`,
+          title: `${aggregationText} liked your post`,
           body: "Tap to view",
           icon: args.actor?.imageUrl,
           image: args.generation?.coverUrl,
@@ -141,7 +144,7 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
     case "preset_used":
       return {
         title:
-          aggregationCount > 1 ? `📷 +${aggregationCount} people used your preset` :
+          aggregationCount > 1 ? `📷 ${aggregationText} used your preset` :
             `📷 ${args.actor?.name ?? "Someone"} used your preset`,
         body: "Tap to view",
         icon: args.actor?.imageUrl,
@@ -151,7 +154,7 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
     case "outfit_used":
       return {
         title:
-          aggregationCount > 1 ? `👕 +${aggregationCount} people used your outfit` :
+          aggregationCount > 1 ? `👕 ${aggregationText} used your outfit` :
             `👕 ${args.actor?.name ?? "Someone"} used your outfit`,
         body: "Tap to view",
         icon: args.actor?.imageUrl,
@@ -253,8 +256,12 @@ async function getObjects(ctx: QueryCtx, args: Args<Type>): Promise<ArgsExtended
   }
 
   if (args.type === "quest_progress") {
-    const quest = await ctx.db.get(args.questId);
-    return { ...args, quest };
+    const [quest, transaction] = await Promise.all([
+      await ctx.db.get(args.questId),
+      args.transactionId ? await ctx.db.get(args.transactionId) : null,
+    ])
+
+    return { ...args, quest, transaction };
   }
 
   return args;
