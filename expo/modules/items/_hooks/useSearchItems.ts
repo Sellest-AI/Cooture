@@ -15,16 +15,16 @@ export const useSearchItems = ({ query, category, channel = 'public' }: Paramete
   const isLoading = (hasQuery && !searchResults) || isItemsLoading;
 
   const _results = (hasQuery ? searchResults : _items) as typeof _items;
-  const results = _results ?? [];
+  const results = _results || [];
 
   useTrackValues('item_search_query_submitted', {
     query,
     category,
     channel,
-    enabled: query.length > 0 && !isLoading
+    enabled: hasQuery && !isLoading
   });
 
-  const isEmpty = results && results.length === 0 && !isLoading;
+  const isEmpty = results.length === 0 && !isLoading;
   const isFiltering = !!category || hasQuery;
 
   return { results, isLoading, isEmpty, isFiltering };
