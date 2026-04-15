@@ -94,7 +94,7 @@ export const Block = <T extends Variant>({ className = "", children, variant, st
 
   const { padding, paddingLeft, paddingRight, paddingTop, paddingBottom, paddingHorizontal, paddingVertical,
     width, height, aspectRatio,
-    flexDirection, justifyContent, alignItems, alignContent, gap, borderColor, ...restStyle } = style || {};
+    flexDirection, justifyContent, alignItems, alignContent, gap, borderColor, borderWidth, ...restStyle } = style || {};
 
   return (
     <Component
@@ -166,6 +166,10 @@ export const Block = <T extends Variant>({ className = "", children, variant, st
           borderRadius,
           ...VariantColors,
           backgroundColor: 'transparent',
+        }, style?.borderColor ? {
+          borderColor: style?.borderColor,
+          borderWidth: style?.borderWidth ?? undefined,
+        } : {
           borderLeftWidth: style?.borderLeftWidth ?? (disabled ? 0 : 1),
           borderRightColor: showExtraBorder ? undefined : 'rgba(0, 0, 0, 0.15)',
           borderRightWidth: showExtraBorder ? 0 : 1,
