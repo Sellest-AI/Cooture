@@ -16,7 +16,7 @@ import { Skeleton } from "@ui/skeleton";
 import { Slider } from "@ui/slider";
 import { Text } from "@ui/text";
 import React, { useMemo, useState } from "react";
-import { View, ViewStyle } from "react-native";
+import { Platform, View, ViewStyle } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -187,7 +187,7 @@ const FriendBlock = () => {
           top: 0,
           bottom: 0,
           width: 300,
-          opacity: 0.1
+          opacity: Platform.OS === 'android' ? 0.05 : 0.1
         }}
       />
       <View style={{ gap: 8 }}>
