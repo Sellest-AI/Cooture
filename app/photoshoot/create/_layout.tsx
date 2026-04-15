@@ -17,7 +17,7 @@ export default function Layout() {
   const { setOutfitId, setPresetId, setFriendId, reset, preset } = usePhotoshoot.New();
   const { initialized } = useRoute('/photoshoot/create', {
     resetFnc: reset,
-    onInit: ({ outfitId, presetId, userId }) => {
+    onUpdate: ({ outfitId, presetId, userId }) => {
       if (outfitId === null) setOutfitId(null);
       if (presetId === null) setPresetId(null);
       if (userId === null) setFriendId(null);

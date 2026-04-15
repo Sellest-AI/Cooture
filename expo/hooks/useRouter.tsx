@@ -100,6 +100,7 @@ const retrieveData = <T extends Route>(href: T | undefined, data: Record<string,
 type Options<T extends Route> = {
   resetFnc?: Params<T> extends { reset?: boolean } ? () => void : never,
   onInit?: (params: ParamsDefault<T>) => void,
+  onUpdate?: (params: ParamsDefault<T>) => void,
 }
 
 export const useRoute = <K extends Record<string, any> = EmptyObject, T extends Route = Route>(_href?: T, options?: Options<T>) => {
@@ -146,6 +147,12 @@ export const useRoute = <K extends Record<string, any> = EmptyObject, T extends 
     if (initialized) return;
     options.onInit(localData ?? {} as ParamsDefault<T>);
     setInitialized(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localData]));
+
+  useFocusEffect(useCallback(() => {
+    if (!options?.onUpdate) return;
+    options.onUpdate(localData ?? {} as ParamsDefault<T>);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localData]));
 
