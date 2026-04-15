@@ -1,5 +1,5 @@
 import { atom, useAtom } from "jotai";
-import { AnimatePresence, SafeAreaView, View } from "moti";
+import { AnimatePresence, View } from "moti";
 import { useCallback, useEffect } from "react";
 import { Platform, ViewStyle } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -9,6 +9,7 @@ import { Colors } from "theme";
 import { BlurView } from "./blur-view";
 import { LinearGradient } from "./linear-gradient";
 import { Pressable } from "./pressable";
+import { SafeAreaView } from "./safe-area-view";
 import { Text } from "./text";
 
 type IconStyle = ViewStyle & { strokeWidth?: number }
@@ -51,15 +52,17 @@ const ToastComponent = ({ toast, onRemove, list, onPress }: ToastComponentProps)
   const revertedIndex = list ? list.length - 1 - index : 0;
   const isLast = list ? index === list.length - 1 : true;
 
+  const OFFSET_TOP = Platform.OS === 'ios' ? 0 : 12;
+
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
-  const offsetY = useSharedValue(12 - (revertedIndex ?? 0) * 10);
+  const offsetY = useSharedValue(OFFSET_TOP - (revertedIndex ?? 0) * 10);
   const scale = useSharedValue(1);
 
   useEffect(() => {
     const damping = Math.max(50, 100 - 20 * (revertedIndex ?? 0));
-    offsetY.value = withSpring(12 - (revertedIndex ?? 0) * 10, { damping, stiffness: 100 });
-  }, [revertedIndex, offsetY]);
+    offsetY.value = withSpring(OFFSET_TOP - (revertedIndex ?? 0) * 10, { damping, stiffness: 100 });
+  }, [revertedIndex, OFFSET_TOP, offsetY]);
 
   useEffect(() => {
     const damping = Math.max(30, 100 - 20 * (revertedIndex ?? 0));
@@ -109,7 +112,7 @@ const ToastComponent = ({ toast, onRemove, list, onPress }: ToastComponentProps)
   const Icon = toast.icon;
 
   return <GestureDetector gesture={pan}>
-    <SafeAreaView
+    <View
       style={{
         position: 'absolute',
         alignItems: 'center',
@@ -120,95 +123,97 @@ const ToastComponent = ({ toast, onRemove, list, onPress }: ToastComponentProps)
       exit={{ translateY: -200 }}
       exitTransition={{ delay: 300, duration: 200 }}
     >
-      <Animated.View style={[animatedStyle]}>
-        <Pressable
-          animated={!!onPress}
-          onPress={onPress ? () => {
-            onPress();
-            setTimeout(remove, 300);
-          } : undefined}
-          style={{
-            alignSelf: 'center',
-            overflow: 'hidden',
-            borderColor: Colors.blur.medium,
-            backgroundColor: 'transparent',
-            borderRadius: 36,
-            borderWidth: 1,
-          }}>
-          <BlurView
-            intensity={40}
+      <SafeAreaView edges={{ bottom: 'off' }}>
+        <Animated.View style={[animatedStyle]}>
+          <Pressable
+            animated={!!onPress}
+            onPress={onPress ? () => {
+              onPress();
+              setTimeout(remove, 300);
+            } : undefined}
             style={{
               alignSelf: 'center',
-              maxWidth: 332,
-              backgroundColor: Platform.OS === 'android' ?
-                Colors.blur.darkest : Colors.blur.dark,
               overflow: 'hidden',
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: toast.description ? 16 : 12,
-              padding: 12,
-              paddingLeft: Icon ? 12 : 28,
-              paddingRight: 28,
-            }}
-          >
-
-            {toast.type !== 'default' && <LinearGradient
-              colors={[toast.type === 'error' ? Colors.destructive[500] :
-                toast.type === 'success' ? Colors.primary[500] : 'transparent',
-                'transparent']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={{
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                bottom: 0,
-                width: 200,
-                opacity: 0.2
-              }}
-            />}
-            {Icon && <View style={{
-              padding: toast.description ? 14 : 2,
-              borderRadius: 999,
+              borderColor: Colors.blur.medium,
+              backgroundColor: 'transparent',
+              borderRadius: 36,
               borderWidth: 1,
-              borderColor: toast.description ? 'rgba(255,255,255,0.1)' : 'transparent',
-              overflow: 'hidden',
             }}>
-              {toast.description && <View style={{ position: 'absolute', inset: 0 }}>
-                <LinearGradient
-                  colors={['rgb(0,0,0,0.2)', 'transparent']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={{ width: '100%', height: '100%' }}
+            <BlurView
+              intensity={40}
+              style={{
+                alignSelf: 'center',
+                maxWidth: 332,
+                backgroundColor: Platform.OS === 'android' ?
+                  Colors.blur.darkest : Colors.blur.dark,
+                overflow: 'hidden',
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: toast.description ? 16 : 12,
+                padding: 12,
+                paddingLeft: Icon ? 12 : 28,
+                paddingRight: 28,
+              }}
+            >
+
+              {toast.type !== 'default' && <LinearGradient
+                colors={[toast.type === 'error' ? Colors.destructive[500] :
+                  toast.type === 'success' ? Colors.primary[500] : 'transparent',
+                  'transparent']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: 200,
+                  opacity: 0.2
+                }}
+              />}
+              {Icon && <View style={{
+                padding: toast.description ? 14 : 2,
+                borderRadius: 999,
+                borderWidth: 1,
+                borderColor: toast.description ? 'rgba(255,255,255,0.1)' : 'transparent',
+                overflow: 'hidden',
+              }}>
+                {toast.description && <View style={{ position: 'absolute', inset: 0 }}>
+                  <LinearGradient
+                    colors={['rgb(0,0,0,0.2)', 'transparent']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={{ width: '100%', height: '100%' }}
+                  />
+                </View>}
+                <Icon
+                  size={20}
+                  color={toast.type === 'error' ? Colors.destructive[500] :
+                    toast.type === 'success' ? Colors.primary[500] : Colors.neutral[200]}
+                  style={{ strokeWidth: 2 }}
                 />
               </View>}
-              <Icon
-                size={20}
-                color={toast.type === 'error' ? Colors.destructive[500] :
-                  toast.type === 'success' ? Colors.primary[500] : Colors.neutral[200]}
-                style={{ strokeWidth: 2 }}
-              />
-            </View>}
-            <View style={{ flexShrink: 1 }}>
-              <Text.Base
-                color={toast.type === 'error' ? Colors.destructive[500] :
-                  toast.type === 'success' ? Colors.primary[500] : Colors.neutral[50]}
-                weight={500}>
-                {toast.title}
-              </Text.Base>
-              {toast.description && <Text.Sm
-                color={toast.type === 'default' ? Colors.neutral[400] : Colors.neutral[200]}
-                weight={500}
-                style={{ marginTop: 6 }}
-                numberOfLines={2}
-              >
-                {toast.description}
-              </Text.Sm>}
-            </View>
-          </BlurView>
-        </Pressable>
-      </Animated.View>
-    </SafeAreaView>
+              <View style={{ flexShrink: 1 }}>
+                <Text.Base
+                  color={toast.type === 'error' ? Colors.destructive[500] :
+                    toast.type === 'success' ? Colors.primary[500] : Colors.neutral[50]}
+                  weight={500}>
+                  {toast.title}
+                </Text.Base>
+                {toast.description && <Text.Sm
+                  color={toast.type === 'default' ? Colors.neutral[400] : Colors.neutral[200]}
+                  weight={500}
+                  style={{ marginTop: 6 }}
+                  numberOfLines={2}
+                >
+                  {toast.description}
+                </Text.Sm>}
+              </View>
+            </BlurView>
+          </Pressable>
+        </Animated.View>
+      </SafeAreaView>
+    </View>
   </GestureDetector>;
 }
 

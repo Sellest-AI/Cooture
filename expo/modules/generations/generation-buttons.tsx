@@ -92,6 +92,7 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
                       const key = addToast({
                         title: 'Saving video to your gallery',
                         type: 'default',
+                        durationS: 10,
                         icon: Loader
                       });
                       downloadVideo(currentItem.videoUrl)
@@ -99,6 +100,7 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
                           addToast({
                             title: 'Video saved to your gallery',
                             type: 'success',
+                            durationS: 3,
                             icon: Check
                           });
                           removeToast(key);
@@ -107,6 +109,7 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
                       const key = addToast({
                         title: 'Saving image to your gallery',
                         type: 'default',
+                        durationS: 10,
                         icon: Loader
                       });
                       downloadImageCrossPlatform(currentItem.imageUrl, { applyWatermark: true })
@@ -114,7 +117,8 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
                           addToast({
                             title: 'Image saved to your gallery',
                             type: 'success',
-                            icon: Check
+                            durationS: 3,
+                            icon: Check,
                           })
                           removeToast(key);
                         })
