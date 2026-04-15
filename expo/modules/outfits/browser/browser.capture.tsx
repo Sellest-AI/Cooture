@@ -58,11 +58,12 @@ export const BrowserCapture = ({ style, captureRef, onCrop }: Props) => {
     Math.abs(endY.value - startY.value)
   );
 
-  const skiaImage = useImage(`file://${screenshotUri}`);
+  const skiaImage = useImage(screenshotUri);
 
   const handleCapture = async () => {
-    const uri = await captureRef.current?.capture?.();
-    if (uri) {
+    const _uri = await captureRef.current?.capture?.();
+    if (_uri) {
+      const uri = _uri.startsWith('file://') ? _uri : `file://${_uri}`;
       setScreenshotUri(uri);
       // Reset selection (50% of canvas size)
       startX.value = CANVAS_WIDTH * 0.10;
