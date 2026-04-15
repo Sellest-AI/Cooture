@@ -72,8 +72,8 @@ export const _internal = internalMutation({
           userId: userId,
           actorId: userId,
           type: 'quest_progress',
-          questTitle: quest.title,
-          rewardCredits: quest.rewardCredits,
+          questId: quest._id,
+          pushToDevice: true,
         })
       }
     }

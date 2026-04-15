@@ -35,6 +35,7 @@ export const notifications = defineTable({
   generationId: v.optional(v.id("generations")),
   outfitId: v.optional(v.id("outfits")),
   presetId: v.optional(v.id("presets")),
+  questId: v.optional(v.id("quests")),
 
   // aggregation
   aggregationCount: v.optional(v.number()), // starts at 1

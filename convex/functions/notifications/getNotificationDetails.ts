@@ -6,11 +6,12 @@ import { getPreset } from "../presets";
 import { getUserPublic } from "../users";
 
 export const getNotificationDetails = async (ctx: QueryCtx, notification: Doc<'notifications'>) => {
-  const [actor, generation, outfit, preset] = await Promise.all([
+  const [actor, generation, outfit, preset, quest] = await Promise.all([
     notification.actorId ? getUserPublic(ctx, notification.actorId) : null,
     notification.generationId ? getGenerationMax(ctx, notification.generationId) : null,
     notification.outfitId ? getOutfit(ctx, notification.outfitId) : null,
     notification.presetId ? getPreset(ctx, notification.presetId) : null,
+    notification.questId ? ctx.db.get(notification.questId) : null,
   ])
 
   const aggregationCount = notification.aggregationCount ?? 1;
@@ -22,5 +23,6 @@ export const getNotificationDetails = async (ctx: QueryCtx, notification: Doc<'n
     generation,
     actor,
     preset,
+    quest
   }
 }
