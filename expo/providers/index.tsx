@@ -1,6 +1,7 @@
 import { KeyboardAvoiderProvider } from '@good-react-native/keyboard-avoider'
 import { BlurProvider } from '@ui/blur-view'
 import { SafeAreaProvider } from '@ui/safe-area-view'
+import { ToastsProvider } from '@ui/toast'
 import { AsyncProviders } from "./async"
 import { AuthProvider } from './auth'
 import { ConvexClientProvider } from "./convex-client"
@@ -25,11 +26,13 @@ export const Providers = ({ children }: Props) => {
                 <KeyboardAvoiderProvider>
                   <AsyncProviders>
                     <AuthProvider>
-                      <PostHogProvider>
-                        <RevenueCatProvider>
-                          {children}
-                        </RevenueCatProvider>
-                      </PostHogProvider>
+                      <ToastsProvider>
+                        <PostHogProvider>
+                          <RevenueCatProvider>
+                            {children}
+                          </RevenueCatProvider>
+                        </PostHogProvider>
+                      </ToastsProvider>
                     </AuthProvider>
                   </AsyncProviders>
                 </KeyboardAvoiderProvider>
