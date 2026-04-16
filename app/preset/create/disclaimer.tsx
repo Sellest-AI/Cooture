@@ -96,7 +96,7 @@ export default function Screen() {
       />
       <View style={{ marginBottom: 32 }}>
         <Text.H4 color={Colors.neutral[50]} style={{ marginHorizontal: 'auto', marginBottom: 20 }}>
-          How it works
+          How it works 🤔
         </Text.H4>
         <Information
           icon={<Text.H3 color={Colors.neutral[400]} style={{ lineHeight: 32 }}>1</Text.H3>}
@@ -119,7 +119,7 @@ export default function Screen() {
       </View>
       <View style={{ marginBottom: 32 }}>
         <Text.H4 color={Colors.neutral[50]} style={{ marginHorizontal: 'auto', marginBottom: 20 }}>
-          Important guidelines
+          Important guidelines 📍
         </Text.H4>
         <Information
           icon={<User size={28} color={Colors.neutral[400]} />}
