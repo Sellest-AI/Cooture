@@ -1,15 +1,11 @@
-import { api, Id } from '@/lib/convex/api';
-import { useQuery } from '@/lib/convex/client';
+import { Id } from '@/lib/convex/api';
 import { Button } from '@ui/button';
-import { CardItem } from '@ui/cards/card-item';
-import { Globe, Search, Trash, User } from '@ui/icons';
-import { MenuGroup, MenuItem } from '@ui/menu';
+import { Trash } from '@ui/icons';
 import { Modal, ModalProps } from '@ui/modal';
-import * as Linking from 'expo-linking';
-import { router } from 'expo-router';
-import { usePostHog } from 'posthog-react-native';
 import { View } from 'react-native';
 import { ROUTES } from 'routes';
+import { useItem } from './_hooks/useItem';
+import { ItemScreen } from './screen';
 
 type SelectedItemModalProps = {
   itemId: Id<'items'> | null;
@@ -17,72 +13,30 @@ type SelectedItemModalProps = {
 } & ModalProps;
 
 export const SelectedItemModal = ({ itemId, onRemove, ...props }: SelectedItemModalProps) => {
-  const posthog = usePostHog();
-  const { data: item } = useQuery(api.router.items.getOne.anon, itemId ? { itemId } : 'skip');
+  const { item } = useItem(itemId);
   const open = !!item && props.open;
 
   return (
     <Modal {...props}
       open={open && !!item}
-      header={{ title: item?.name ?? '' }}
+      header={{
+        showBackButton: true,
+        title: item?.name ?? '',
+        endContent: onRemove && <Button
+          startIcon={Trash}
+          onPress={onRemove}
+          variant="destructive"
+          size="rounded"
+        />
+      }}
     >
-      {({ close }) => <View style={{ paddingTop: 20 }}>
-        {item && <CardItem
-          image={item.image}
-          source={item.image.sizes.medium.url}
-          title={item.name}
-          subtitle={item.category}
-          animate={false}
-          style={{ height: 212, paddingHorizontal: 20, flex: 0 }}
+      <View>
+        {item && <ItemScreen
+          showHeader={false}
+          path={ROUTES.ITEM.PATH}
+          id={item._id}
         />}
-        <View style={{ justifyContent: 'flex-end', marginTop: 24 }}>
-          {onRemove && <MenuGroup title="Danger">
-            <MenuItem
-              icon={Trash}
-              text="Remove"
-              onPress={onRemove}
-              variant="destructive"
-            />
-          </MenuGroup>}
-          <MenuGroup title="More actions">
-            <MenuItem
-              icon={User}
-              text="User profile"
-              onPress={!item ? undefined : () => {
-                router.push(ROUTES.USER.ID(item.userId));
-                posthog.capture('item_user_profile_button_pressed', { userId: item.userId });
-                close();
-              }}
-            />
-            {item?.link && <MenuItem
-              icon={Globe}
-              text="View on website"
-              onPress={!item?.link ? undefined : () => {
-                Linking.openURL(item.link!);
-                posthog.capture('item_link_opened', { itemId: item._id });
-                close();
-              }}
-            />}
-            <MenuItem
-              variant="primary"
-              icon={Search}
-              text="View details"
-              onPress={!item ? undefined : () => {
-                router.push(ROUTES.ITEM.ID(item._id));
-                posthog.capture('item_details_button_opened', { itemId: item._id });
-                close();
-              }}
-            />
-          </MenuGroup>
-          <Button
-            style={{ marginTop: 8 }}
-            variant="blur"
-            onPress={() => close()}
-          >
-            Close
-          </Button>
-        </View>
-      </View>}
+      </View>
     </Modal>
   )
 }

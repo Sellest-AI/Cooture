@@ -1,17 +1,17 @@
 import { Route, useRouter } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
 import { useAccount } from "@/lib/convex/auth";
-import { useMutation } from "@/lib/convex/client";
+import { useMutation, useQuery } from "@/lib/convex/client";
 import { useItem } from "@/modules/items/_hooks/useItem";
 import { ColorCategory } from "@/modules/items/category.color";
 import { FeelCategory } from "@/modules/items/category.feel";
 import { GenderCategory } from "@/modules/items/category.gender";
 import { ItemCategory } from "@/modules/items/category.item";
 import { WeatherCategory } from "@/modules/items/category.weather";
-import { Block } from "@ui/block";
 import { LoadingBlock } from "@ui/block.loading";
-import { Button, BUTTON_HEIGHT } from "@ui/button";
-import { ExternalLink, LinkIcon } from "@ui/icons";
+import { Button } from "@ui/button";
+import { GhostIconWrapper } from "@ui/ghost-animation";
+import { BookmarkIcon, ExternalLink, Plus, User } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
@@ -19,43 +19,40 @@ import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import * as Linking from 'expo-linking';
 import { useEffect, useState } from "react";
-import { Platform, View } from "react-native";
+import { Platform, View, ViewStyle } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
-const ColorsBlock = () => {
+const ColorsBlock = ({ style }: { style?: ViewStyle }) => {
   const { item } = useItem();
 
   if (!item) return null;
 
   return (
-    <Block
-      variant="blur"
-      style={{
-        borderRadius: 32,
-        paddingHorizontal: 16,
-        paddingVertical: 20,
-        gap: 12
-      }}
-    >
-      <Text.H4 color={Colors.neutral[50]}>
-        Colors
-      </Text.H4>
-      <View style={{ height: 72, flexDirection: 'row', gap: 4 }}>
-        {item.mainColors.slice(0, 4).map((color, i) => (
-          <View
-            key={color + i}
-            style={{
-              flex: 1,
-              borderRadius: 24,
-              backgroundColor: color,
-              borderTopColor: Colors.blur.light,
-              borderTopWidth: 2,
-            }}
-          />
-        ))}
-      </View>
-    </Block>
+    <View style={[{
+      gap: 8,
+      height: 24,
+      maxWidth: 164,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      marginHorizontal: 'auto'
+    }, style]}>
+      {item.mainColors.slice(0, 4).map((color, i) => (
+        <View
+          key={color + i}
+          style={{
+            flex: 1,
+            borderRadius: 999,
+            overflow: 'hidden',
+            backgroundColor: 'transparent',
+            borderColor: Colors.blur.medium,
+            borderWidth: 1,
+          }}
+        >
+          <View style={{ flex: 1, backgroundColor: color, borderRadius: 999 }} />
+        </View>
+      ))}
+    </View>
   )
 }
 
@@ -87,9 +84,8 @@ const DeleteItemButton = ({ path }: { path: Route }) => {
 
 const LinkBlock = () => {
   const { item } = useItem();
-  const { user } = useAccount();
-
-  const isOwner = item?.userId === user?._id;
+  // const { user } = useAccount();
+  // const isOwner = item?.userId === user?._id;
 
   const [canOpen, setCanOpen] = useState(true);
   useEffect(() => {
@@ -100,38 +96,6 @@ const LinkBlock = () => {
     })();
   }, [item?.link])
 
-  if (isOwner) return (
-    <Block
-      variant="blur"
-      style={{
-        borderRadius: 32,
-        paddingHorizontal: 16,
-        paddingVertical: 20,
-        gap: 12
-      }}
-    >
-      <Text.H4 color={Colors.neutral[50]}>
-        Website link
-      </Text.H4>
-      <Text.Base color={Colors.neutral[200]}>
-        Extract more information such as materials, price, sizes, higher quality images, etc…
-      </Text.Base>
-      {canOpen && <Button
-        variant="blur"
-        startIcon={ExternalLink}
-        onPress={() => { if (item?.link) Linking.openURL(item.link); }}
-      >
-        Open website
-      </Button>}
-      <Button
-        variant="blur"
-        startIcon={LinkIcon}
-      >
-        Add link
-      </Button>
-    </Block>
-  )
-
   if (canOpen) return (
     <Button
       variant="blur"
@@ -141,9 +105,41 @@ const LinkBlock = () => {
       Open website
     </Button>
   )
+
+  return null;
 }
 
-export const ItemScreen = ({ id, path }: { path: Route, id: Id<'items'> }) => {
+const ToggleBookmarkButton = ({ style }: { style?: ViewStyle }) => {
+  const { item } = useItem();
+  const { data: isBookmarked } = useQuery(api.router.collection.getBookmarked.authed, item ? { itemId: item._id } : 'skip');
+  const { mutate: toggleBookmark } = useMutation(api.router.collection.toggleBookmark.authed);
+
+  return (
+    <Button
+      variant="blur"
+      size="rounded"
+      style={style}
+    >
+      <GhostIconWrapper
+        style={{ padding: 4 }}
+        icon={BookmarkIcon}
+        selected={isBookmarked}
+        color={Colors.primary[500]}
+        onPress={() => { if (item) toggleBookmark?.({ itemId: item._id }); }}
+        size={24}
+      />
+    </Button>
+  )
+}
+
+type Props = {
+  QuickAccessBar?: React.ReactNode;
+  id: Id<'items'>;
+  path: Route;
+  showHeader?: boolean;
+}
+
+export const ItemScreen = ({ id, path, QuickAccessBar, showHeader = true }: Props) => {
   const { push, redirect } = useRouter(path);
   const { item, isLoading, update } = useItem(id);
 
@@ -159,7 +155,6 @@ export const ItemScreen = ({ id, path }: { path: Route, id: Id<'items'> }) => {
       <ParallaxScrollView
         headerBackground={
           <Image
-            allowDownscaling={false}
             contentFit="cover"
             blurRadius={100}
             source={item.image?.sizes.thumbnail.url}
@@ -168,11 +163,11 @@ export const ItemScreen = ({ id, path }: { path: Route, id: Id<'items'> }) => {
         }
         headerContent={
           <View>
-            <ModalHeader
+            {showHeader && <ModalHeader
               style={{ paddingTop: 12, paddingHorizontal: 12 }}
               title={item.name}
               onBack={() => redirect({ fallbackTo: ['back', ROUTES.PROFILE.ITEMS] })}
-            />
+            />}
             <View style={{
               padding: 32,
               paddingBottom: Platform.OS === 'web' ? 32 : 16,
@@ -180,18 +175,18 @@ export const ItemScreen = ({ id, path }: { path: Route, id: Id<'items'> }) => {
             }}>
               <Image
                 priority="high"
-                allowDownscaling={false}
                 contentFit="contain"
                 source={item.image?.sizes.medium.url}
                 placeholder={item.image?.sizes.thumbnail.url}
                 placeholderContentFit="contain"
                 style={{
                   width: '100%',
-                  height: 320,
+                  height: Number(item.image.aspectRatio.actual) > 1 ? 220 : 320,
                 }}
               />
             </View>
-            {item.description && <View style={{ paddingHorizontal: 32, marginTop: 16, marginBottom: 12 }}>
+            <ColorsBlock style={{ marginTop: 24 }} />
+            {item.description && <View style={{ paddingHorizontal: 32, marginTop: 28, marginBottom: 24 }}>
               <Text.Base color={Colors.neutral[200]} numberOfLines={4} style={{ textAlign: 'center' }}>
                 {item.description}
               </Text.Base>
@@ -201,10 +196,36 @@ export const ItemScreen = ({ id, path }: { path: Route, id: Id<'items'> }) => {
       >
         <SafeAreaView
           edges={{ top: 'off' }}
-          style={{ padding: 8, gap: 8, marginBottom: BUTTON_HEIGHT + 8 }}
+          style={{ padding: 8, gap: 8 }}
         >
-          <LinkBlock />
-          <ColorsBlock />
+          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8, alignItems: 'stretch' }}>
+            <ToggleBookmarkButton style={{ marginRight: 4 }} />
+            <Button
+              startIcon={User}
+              onPress={() => {
+                push(ROUTES.USER.PATH, {
+                  pathParams: { id: item.userId }
+                })
+              }}
+              variant="blur"
+              size="rounded"
+              style={{ padding: 6 }}
+            />
+            {QuickAccessBar}
+            <Button
+              startIcon={Plus}
+              onPress={() => {
+                push(ROUTES.MODALS.PICK_OUTFIT, {
+                  redirectTo: ROUTES.PROFILE.OUTFITS,
+                  params: { itemIds: [item._id] }
+                })
+              }}
+              style={{ flex: 1 }}
+              variant="primary"
+            >
+              Add to outfit
+            </Button>
+          </View>
           <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
             <ItemCategory title={item.category} onPress={(category) => update({ category })} disabled={disabled(item.userId)} />
             <WeatherCategory title={item.weatherTags[0]} onPress={(weather) => update({ weatherTags: [weather, ...item.weatherTags.slice(1)] })} disabled={disabled(item.userId)} />
@@ -214,29 +235,10 @@ export const ItemScreen = ({ id, path }: { path: Route, id: Id<'items'> }) => {
             <FeelCategory title={item.materialFeel} onPress={(materialFeel) => update({ materialFeel })} disabled={disabled(item.userId)} />
             <GenderCategory title={item.gender} onPress={(gender) => update({ gender })} disabled={disabled(item.userId)} />
           </View>
+          <LinkBlock />
           <DeleteItemButton path={path} />
         </SafeAreaView>
       </ParallaxScrollView>
-      <SafeAreaView
-        edges={{ bottom: 'android' }}
-        style={{
-          position: 'absolute',
-          bottom: Platform.OS === 'ios' ? 20 : 0,
-          left: 8,
-          right: 8,
-        }}>
-        <Button
-          variant="primary"
-          onPress={() => {
-            push(ROUTES.MODALS.PICK_OUTFIT, {
-              redirectTo: ROUTES.PROFILE.OUTFITS,
-              params: { itemIds: [item._id] }
-            })
-          }}
-        >
-          Add to outfit
-        </Button>
-      </SafeAreaView>
     </>
   )
 }
