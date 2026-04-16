@@ -134,7 +134,6 @@ const LoginButtons = () => {
             isLoading={innerLoading === item}
             disabled={disableRuntime || !init}
             style={{
-              alignSelf: 'stretch',
               backgroundColor: isGoogle ? undefined : "white",
               marginTop: i > 0 ? 8 : 0
             }}

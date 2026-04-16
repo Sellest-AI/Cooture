@@ -137,9 +137,10 @@ type Props = {
   id: Id<'items'>;
   path: Route;
   showHeader?: boolean;
+  isFullScreen?: boolean;
 }
 
-export const ItemScreen = ({ id, path, QuickAccessBar, showHeader = true }: Props) => {
+export const ItemScreen = ({ id, path, QuickAccessBar, showHeader = true, isFullScreen = false }: Props) => {
   const { push, redirect } = useRouter(path);
   const { item, isLoading, update } = useItem(id);
 
@@ -153,7 +154,8 @@ export const ItemScreen = ({ id, path, QuickAccessBar, showHeader = true }: Prop
   return (
     <>
       <ParallaxScrollView
-        headerBackground={
+        headerBackgroundGradient={isFullScreen}
+        headerBackground={isFullScreen &&
           <Image
             contentFit="cover"
             blurRadius={100}

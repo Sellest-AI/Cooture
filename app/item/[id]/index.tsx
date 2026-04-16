@@ -8,6 +8,7 @@ export default function Screen() {
 
   return (
     <ItemScreen
+      isFullScreen={true}
       path={ROUTES.ITEM.PATH}
       id={id}
     />

@@ -32,6 +32,7 @@ export const SelectedItemModal = ({ itemId, onRemove, ...props }: SelectedItemMo
     >
       <View>
         {item && <ItemScreen
+          isFullScreen={false}
           showHeader={false}
           path={ROUTES.ITEM.PATH}
           id={item._id}

@@ -18,6 +18,7 @@ type Props = {
   headerBackgroundImageStyle?: ComponentProps<typeof Image>['style'] & { blurRadius?: number };
   headerBackgroundImagePosition?: ComponentProps<typeof Image>['contentPosition'];
   headerBackground?: ReactNode;
+  headerBackgroundGradient?: boolean;
   children: ReactNode;
   contentContainerStyle?: ViewStyle;
   showsVerticalScrollIndicator?: boolean;
@@ -35,6 +36,7 @@ export const ParallaxScrollView = ({
   headerContentEdges,
   headerBackgroundImageStyle,
   headerBackgroundImagePosition,
+  headerBackgroundGradient = true,
   headerBackgroundImage,
   headerBackground,
   children,
@@ -141,7 +143,7 @@ export const ParallaxScrollView = ({
             />
           )}
         </Animated.View>
-        <Animated.View style={{
+        {headerBackgroundGradient && <Animated.View style={{
           position: 'absolute',
           left: 0,
           right: 0,
@@ -155,8 +157,8 @@ export const ParallaxScrollView = ({
               height: '100%'
             }}
           />
-        </Animated.View>
-        <LinearGradient
+        </Animated.View>}
+        {headerBackgroundGradient && <LinearGradient
           colors={[Colors.background, 'transparent']}
           style={{
             position: 'absolute',
@@ -166,7 +168,7 @@ export const ParallaxScrollView = ({
             height: '30%',
             opacity: 0.8
           }}
-        />
+        />}
       </Animated.View>
 
       {/* Scrollable Content */}
