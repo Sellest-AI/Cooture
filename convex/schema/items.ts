@@ -90,7 +90,7 @@ export const ITEMS_SCHEMA = {
   category: ITEM_CATEGORIES,
   weatherTags: v.array(ITEM_WEATHERS),
   mainColors: v.array(v.string()),
-  colorTags: v.optional(v.string()),
+  colorTags: v.string(),
   colorTones: v.array(ITEM_COLOR_TONES),
   materialFeel: ITEM_MATERIAL_FEEL,
   materials: v.array(ITEM_MATERIALS),
