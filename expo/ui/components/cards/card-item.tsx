@@ -79,6 +79,7 @@ export const CardItem = ({ title, subtitle, selected, disabled, badge, style, so
         }}
       >
         {source && <Image
+          key={source.toString()}
           source={source}
           // Let the image scale to fit vertically while preserving aspect ratio
           contentFit="contain"

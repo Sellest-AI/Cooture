@@ -4,7 +4,7 @@ import { FlashList } from "@ui/flat-list";
 import { Pressable } from "@ui/pressable";
 import { Text } from "@ui/text";
 import { ReactNode, useEffect, useState } from "react";
-import { ViewStyle } from "react-native";
+import { View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 
 const categories = [
@@ -60,7 +60,7 @@ export const Categories = ({ style, category: _category, extraCategories, onCate
 
         if (extraCategories && extraCategoriesKeys.includes(item)) {
           return (
-            <Pressable style={{ height: '100%', justifyContent: 'center' }}>
+            <View style={{ height: '100%', justifyContent: 'center', alignItems: 'center' }}>
               {typeof extraCategories[item] === 'string' ? (
                 <Text.Base weight={500} color={Colors.neutral[200]}>
                   {extraCategories[item]}
@@ -68,7 +68,7 @@ export const Categories = ({ style, category: _category, extraCategories, onCate
               ) : (
                 extraCategories[item]
               )}
-            </Pressable>
+            </View>
           )
         }
 

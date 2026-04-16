@@ -28,6 +28,7 @@ export default function Screen() {
 }
 
 /** @deprecated */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function DeprecatedScreen() {
   const { push, replace } = useRouter();
 
