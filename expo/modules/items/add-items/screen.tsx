@@ -25,6 +25,7 @@ import { ItemsValidator } from "./items-validator";
 import { SearchInput } from "./search-input";
 
 const PADDING_HORIZONTAL = 12;
+const MAX_ITEMS = 6;
 
 function PendingItems() {
   const { pendingItems, newItems, reset } = useItem.Create();
@@ -243,7 +244,7 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
         <ItemsValidator
           open={validatorOpen}
           onOpenChange={setValidatorOpen}
-          disabled={items.length === 0}
+          maxItems={MAX_ITEMS}
           items={items.toReversed()}
           onItemRemoved={(item) => setItems((prev) => {
             if (prev.length === 1) setValidatorOpen(false);
