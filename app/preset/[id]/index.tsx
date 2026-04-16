@@ -108,7 +108,7 @@ const Generations = ({ customText }: { customText?: string }) => {
   )
 }
 
-export default function ItemScreen() {
+export default function Screen() {
   const { user: me } = useAccount();
 
   const { push } = useRouter(ROUTES.PRESETS.ID.PATH);
