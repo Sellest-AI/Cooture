@@ -22,6 +22,7 @@ type Props = {
   header?: {
     title: string;
     showBackButton?: boolean;
+    endContent?: ReactNode;
     type?: 'default' | 'alt';
   }
 }
@@ -205,6 +206,7 @@ export const Modal = ({ children, open, onOpenChange, style, header }: Props) =>
                     type={header.type}
                     style={{ marginTop: 10 }}
                     title={header.title}
+                    endContent={header.endContent}
                     onBack={(header.showBackButton || currentStep > 0) ? () => {
                       back?.();
                       if (currentStep === 0 && onOpenChange) closeAnimation();

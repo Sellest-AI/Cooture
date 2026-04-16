@@ -264,7 +264,8 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
 
             await updateItems(items);
             redirect({
-              params: { itemIds: items },
+              params: { itemIds: items, outfitId },
+              pathParams: { id: outfitId },
               fallbackTo: ['back', '/'],
               resetNextRoute: false
             });

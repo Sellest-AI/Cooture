@@ -24,6 +24,7 @@ export const Categories = <T extends string>({ value, categories, categoryTitle,
         icon={Icon}
         title={value}
         onPress={disabled ? undefined : () => setOpen(true)}
+        category={categoryTitle}
       />
       <Modal
         onOpenChange={setOpen}

@@ -6,7 +6,6 @@ import { SelectedItemModal } from "@/modules/items/selected-item.modal";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { PremiumBlock } from "@/modules/premium/premium-block";
 import { useSafety } from "@/modules/safety";
-import { Block } from "@ui/block";
 import { LoadingBlock } from "@ui/block.loading";
 import { Button } from "@ui/button";
 import { ImageGeneration } from "@ui/cards";
@@ -14,7 +13,7 @@ import { CardItem } from "@ui/cards/card-item";
 import { ReportModal } from "@ui/cards/report.modal";
 import { FlashList } from "@ui/flat-list";
 import { GhostIconWrapper } from "@ui/ghost-animation";
-import { ArrowUpRight, BookmarkIcon, CircleFadingArrowUp, Credits, Pencil, ShareIcon, SquirishPlus, Trash, TriangleAlert } from "@ui/icons";
+import { BookmarkIcon, CircleFadingArrowUp, Credits, Pencil, ShareIcon, SquirishPlus, Trash, TriangleAlert } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
@@ -29,65 +28,6 @@ import { useMemo, useState } from "react";
 import { Keyboard, Platform, Share, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
-
-const UserBlock = () => {
-  const { push } = useRouter(ROUTES.OUTFIT.PATH);
-  const { id } = useRoute.Params<{ id: Id<'outfits'> }>();
-  const { outfit } = useOutfit(id);
-
-  const { data: user } = useQuery(api.router.users.getAccount.anon, outfit ? { userId: outfit.userId } : 'skip');
-
-  if (!user) return null;
-
-  return (
-    <Pressable
-      onPress={() => push(ROUTES.USER.PATH, { pathParams: { id: user._id } })}
-    >
-      <Block
-        variant="blur"
-        style={{
-          borderRadius: 28,
-          paddingHorizontal: 16,
-          paddingVertical: 20,
-          width: '100%',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-          gap: 10
-        }}
-      >
-        <View style={{
-          width: 32, height: 32,
-          borderRadius: 99,
-          borderColor: Colors.blur.medium,
-          borderWidth: 1,
-          backgroundColor: Colors.blur.dark,
-          overflow: 'hidden'
-        }}>
-          <Image
-            source={user.image}
-            style={{ flex: 1 }}
-          />
-        </View>
-        <View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <Text.Sm color={Colors.neutral[50]} weight={600}>{user.name}</Text.Sm>
-            {user.isPremium && <Credits size={12} />}
-          </View>
-          <Text.Sm color={Colors.neutral[400]} style={{ marginTop: 2 }}>@{user.username}</Text.Sm>
-        </View>
-        <ArrowUpRight
-          style={{
-            position: 'absolute',
-            right: 20,
-            bottom: 20,
-          }}
-          color={Colors.neutral[200]}
-        />
-      </Block>
-    </Pressable>
-  )
-}
 
 const Generation = ({ imageId, predictionId }: { imageId: Id<'images'>, predictionId: Id<'predictions'> }) => {
   const { push } = useRouter(ROUTES.OUTFIT.PATH);
@@ -398,7 +338,7 @@ export default function Screen() {
               masonry
             />
             <FlashList
-              data={['share', 'user', 'premium', 'generations', 'cant-edit']}
+              data={['share', 'premium', 'generations', 'cant-edit']}
               keyExtractor={(i) => i}
               renderItem={({ item }) => {
                 if (item === 'share') return (
@@ -421,8 +361,7 @@ export default function Screen() {
                     Share outfit
                   </Button>
                 )
-                if (item === 'user') return <UserBlock />
-                if (item === 'premium') return <PremiumBlock style={{ marginTop: 12 }} />
+                if (item === 'premium') return <PremiumBlock />
                 if (item === 'generations') return <Generations
                   customText={(!editable && ownOutfit) ? "This outfit has been used and is now locked to preserve your generated looks." : undefined}
                 />
