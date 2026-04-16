@@ -6,13 +6,13 @@ import { imageBufferFromUrl } from './image.buffer';
  * - Resizes the image to a small size for performance
  * - Quantizes colors to 5 bits per channel and builds a frequency map
  * - Uses an adaptive strategy to ensure diverse colors are extracted
- * - Returns the top `count` colors as hex strings (e.g. `#aabbcc`)
+ * - Returns an array of colors with their hex code and percentage in the image
  */
 export async function extractMainColors(
   image: Buffer | string,
   count = 5,
   opts?: { resize?: number; diversityWeight?: number }
-): Promise<string[]> {
+): Promise<{ hex: string; percentage: number }[]> {
   const resize = opts?.resize ?? 512;
   const diversityWeight = opts?.diversityWeight ?? 0.3; // Balance between frequency and diversity
 
@@ -44,8 +44,11 @@ export async function extractMainColors(
 
   if (bins.size === 0) return [];
 
+  let totalPixels = 0;
+
   // Convert bins to color objects
   const colors = Array.from(bins.entries()).map(([key, cnt]) => {
+    totalPixels += cnt;
     const r5 = (key >> 10) & 31;
     const g5 = (key >> 5) & 31;
     const b5 = key & 31;
@@ -93,7 +96,7 @@ export async function extractMainColors(
 
   // If we have fewer clusters than needed, return them all
   if (initialClusters.length <= count) {
-    return clustersToHex(initialClusters);
+    return formatColors(initialClusters, totalPixels);
   }
 
   // Step 2: Use diversity-aware selection
@@ -143,13 +146,17 @@ export async function extractMainColors(
     }
   }
 
-  return clustersToHex(selected);
+  return formatColors(selected, totalPixels);
 }
 
-function clustersToHex(clusters: { r: number; g: number; b: number; count: number }[]): string[] {
+function formatColors(
+  clusters: { r: number; g: number; b: number; count: number }[],
+  totalPixels: number
+): { hex: string; percentage: number }[] {
   return clusters.map((c) => {
     const hex = '#' + [c.r, c.g, c.b].map((v) => v.toString(16).padStart(2, '0')).join('');
-    return hex;
+    const percentage = Number(((c.count / totalPixels) * 100).toFixed(2));
+    return { hex, percentage };
   });
 }
 

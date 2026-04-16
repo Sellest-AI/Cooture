@@ -90,6 +90,7 @@ export const ITEMS_SCHEMA = {
   category: ITEM_CATEGORIES,
   weatherTags: v.array(ITEM_WEATHERS),
   mainColors: v.array(v.string()),
+  colorTags: v.optional(v.string()),
   colorTones: v.array(ITEM_COLOR_TONES),
   materialFeel: ITEM_MATERIAL_FEEL,
   materials: v.array(ITEM_MATERIALS),
@@ -106,4 +107,5 @@ export const items = defineTable({
   .index("by_user_id", ["userId"])
   .searchIndex("search_name", { searchField: "name", filterFields: ["userId"] })
   .searchIndex("search_brand", { searchField: "brand", filterFields: ["userId"] })
-  .searchIndex("search_description", { searchField: "description", filterFields: ["userId"] });
+  .searchIndex("search_description", { searchField: "description", filterFields: ["userId"] })
+  .searchIndex("search_colors", { searchField: "colorTags", filterFields: ["userId"] });

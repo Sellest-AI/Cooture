@@ -7,16 +7,19 @@ import { EmptyBlock } from "@ui/block.empty";
 import { CardItem } from "@ui/cards/card-item";
 import { FlashList, FlashListRef } from "@ui/flat-list";
 import { Col, Grid } from "@ui/grid";
-import { BookmarkIcon, Camera, Globe, Loader, TShirt } from "@ui/icons";
+import { BookmarkIcon, Camera, Globe, Loader, TShirt, X } from "@ui/icons";
+import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
+import { AnimatePresence, MotiView } from "@ui/motion";
 import { Pressable } from "@ui/pressable";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
-import { notEmpty } from "@utils/convex-allowed";
+import { hslToHex, notEmpty, parseColorToHsl } from "@utils/convex-allowed";
+import { COLOR_TAGS } from "@utils/convex-allowed/lib/color";
 import { Route, router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
-import { View } from "react-native";
+import { View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 import { useItem } from "../_hooks/useItem";
 import { useSearchItems } from "../_hooks/useSearchItems";
@@ -60,6 +63,87 @@ function PendingItems() {
   )
 }
 
+const ColorPicker = ({ style, hexColor, onPress }: { style?: ViewStyle, hexColor?: string, onPress: (hexColor: null | string) => void }) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <View style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      ...style
+    }}>
+      <Pressable onPress={() => { setOpen((v) => !v); }}
+        intensity={0.9}
+        style={{
+          width: 24,
+          height: 24,
+          borderRadius: 99,
+          backgroundColor: open ? undefined : hexColor || Colors.blur.dark,
+          overflow: 'hidden',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        {(!open && !hexColor) && <Image
+          source={require('assets/images/palette-gradient.jpg')}
+          style={{ width: '100%', height: '100%', opacity: 0.8 }}
+        />}
+        {open && <X size={24} color={Colors.neutral[400]} />}
+      </Pressable>
+      <AnimatePresence>
+        {open && <MotiView
+          from={{ width: 0 }}
+          animate={{ width: COLOR_TAGS.length * (28 + 8) + 24 }}
+          exit={{ width: 0, opacity: 0, paddingHorizontal: 0, marginLeft: 0 }}
+          style={{
+            overflow: 'hidden',
+            flexDirection: 'row',
+            gap: 8,
+            padding: 6,
+            paddingHorizontal: 12,
+            borderRadius: 999,
+            backgroundColor: Colors.blur.dark,
+            borderLeftWidth: 1,
+            borderColor: Colors.blur.medium,
+            marginLeft: 8,
+          }}>
+          {COLOR_TAGS.map((color, i) => {
+            const rgb = `rgb(${color.r}, ${color.g}, ${color.b})`;
+            const hsl = parseColorToHsl(rgb);
+
+            if (!hsl) return null;
+
+            const hex = hslToHex(...hsl);
+
+            const selected = hexColor === hex;
+
+            return (
+              <Pressable
+                style={{ width: selected ? 22 : 28 }}
+                key={color.tag}
+                intensity={0.9}
+                onPress={() => {
+                  if (selected) setOpen(false);
+                  onPress(selected ? null : hex);
+                }}
+              >
+                <MotiView
+                  style={{
+                    width: selected ? 22 : 28,
+                    height: 22,
+                    borderRadius: 99,
+                    backgroundColor: `rgb(${color.r}, ${color.g}, ${color.b})`
+                  }}
+                />
+              </Pressable>
+            )
+          })}
+        </MotiView>}
+      </AnimatePresence>
+    </View>
+  )
+}
+
 const newDelay = Date.now() - 3 * 24 * 60 * 60 * 1000 // 3 days
 
 function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
@@ -70,8 +154,9 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
   // Search
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string | null>(null);
+  const [hexColor, setColor] = useState<string | null>(null);
   const [bookmarked, setBookmarked] = useState(false);
-  const { results, isLoading, isFiltering, isEmpty, onLoadMore } = useSearchItems({ query, category, bookmarked, channel: 'public' });
+  const { results, isLoading, isFiltering, isEmpty, onLoadMore } = useSearchItems({ query, category, hexColor, bookmarked, channel: 'public' });
 
   const { isHidden } = useSafety();
   const itemsLibrary = [...(isFiltering ? [] : latestItems), ...results] // unique;
@@ -184,19 +269,31 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
                         listRef.current?.scrollToTop({ animated: true });
                         setBookmarked((b) => !b);
                         setCategory(null);
+                        setColor(null);
                       }}>
                       <BookmarkIcon
                         color={bookmarked ? Colors.primary[500] : Colors.neutral[400]}
                         weight={bookmarked ? 'fill' : 'regular'}
-                        size={22}
+                        size={24}
                       />
-                    </Pressable>
+                    </Pressable>,
+                    colors: <ColorPicker
+                      hexColor={hexColor ?? undefined}
+                      onPress={(hex) => {
+                        listRef.current?.scrollToTop({ animated: true });
+                        setBookmarked(false);
+                        setCategory(null);
+                        setColor(hex);
+                      }}
+                      style={{ marginRight: 12 }}
+                    />
                   }}
                   category={category}
                   onCategoryChange={(category) => {
                     listRef.current?.scrollToTop({ animated: true });
                     setBookmarked(false);
                     setCategory(category);
+                    setColor(null);
                   }}
                   style={{
                     marginTop: 8,

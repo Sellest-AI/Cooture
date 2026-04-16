@@ -1,4 +1,5 @@
 "use node"
+import { getTagsFromHexColors } from "@/lib/color";
 import { extractMainColors } from "@/lib/image/node";
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
@@ -32,11 +33,14 @@ export const _internal = internalAction({
     }
 
     const object = await itemCategorizer.handler(toolCtx, { imageUrl: image.url, extractText, metadata });
-    const colors = await extractMainColors(image.url)
+    const extractedColors = await extractMainColors(image.url);
+    const colors = extractedColors.sort((a, b) => b.percentage - a.percentage);
+    const tags = getTagsFromHexColors(colors.filter((c) => c.percentage > 20).slice(0, 2).map((c) => c.hex));
 
     return {
       ...object,
       mainColors: colors,
+      colorTags: tags,
     };
   }
 })
