@@ -1,5 +1,6 @@
 import { useScrollToTop } from "@/hooks";
 import { api, Doc, Id, useQuery, useQueryCached } from "@/lib/convex/client";
+import { SavedItems } from "@/modules/collection/saved-items";
 import { SavedOutfits } from "@/modules/collection/saved-outfits";
 import { SavedPosts } from "@/modules/collection/saved-posts";
 import { CreditsButton } from "@/modules/premium/credits.button";
@@ -148,6 +149,12 @@ export default function SavedScreen() {
         }}
       />
       <PremiumBlock style={{ marginTop: 0, marginHorizontal: 12, marginBottom: 28 }} />
+      <SavedItems
+        itemWidth={132}
+        style={{ marginBottom: 24 }}
+        direction="horizontal"
+        header={true}
+      />
       <SavedOutfits
         itemWidth={132}
         style={{ marginBottom: 40 }}
@@ -156,7 +163,7 @@ export default function SavedScreen() {
       />
       <SavedPosts
         itemWidth={132}
-        style={{ marginBottom: 24 }}
+        style={{ marginBottom: 40 }}
         direction="horizontal"
         header={true}
       />

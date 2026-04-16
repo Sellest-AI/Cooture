@@ -39,6 +39,7 @@ export const ROUTES = {
     PATH: '/collection',
     SAVED_POSTS: '/collection/saved-posts',
     SAVED_OUTFITS: '/collection/saved-outfits',
+    SAVED_ITEMS: '/collection/saved-items',
   },
   SHARE: {
     POST: (postId: string) => `/p/${postId}` as const,
