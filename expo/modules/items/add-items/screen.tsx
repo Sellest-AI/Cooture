@@ -7,7 +7,7 @@ import { EmptyBlock } from "@ui/block.empty";
 import { CardItem } from "@ui/cards/card-item";
 import { FlashList, FlashListRef } from "@ui/flat-list";
 import { Col, Grid } from "@ui/grid";
-import { Camera, Globe, Loader, TShirt } from "@ui/icons";
+import { BookmarkIcon, Camera, Globe, Loader, TShirt } from "@ui/icons";
 import { ModalHeader } from "@ui/modal";
 import { Pressable } from "@ui/pressable";
 import { SafeAreaView } from "@ui/safe-area-view";
@@ -70,7 +70,8 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
   // Search
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string | null>(null);
-  const { results, isLoading, isFiltering, isEmpty } = useSearchItems({ query, category, channel: 'public' });
+  const [bookmarked, setBookmarked] = useState(false);
+  const { results, isLoading, isFiltering, isEmpty, onLoadMore } = useSearchItems({ query, category, bookmarked, channel: 'public' });
 
   const { isHidden } = useSafety();
   const itemsLibrary = [...(isFiltering ? [] : latestItems), ...results] // unique;
@@ -95,6 +96,7 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
     >
       <FlashList
         ref={listRef}
+        onEndReached={onLoadMore}
         ListHeaderComponent={<View style={{ marginHorizontal: PADDING_HORIZONTAL }}>
           <ModalHeader
             title="Select items"
@@ -175,9 +177,25 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
                   }}
                 />
                 <Categories
+                  extraCategories={{
+                    bookmarks: <Pressable
+                      style={{ paddingRight: 10, paddingVertical: 4 }}
+                      onPress={() => {
+                        listRef.current?.scrollToTop({ animated: true });
+                        setBookmarked((b) => !b);
+                        setCategory(null);
+                      }}>
+                      <BookmarkIcon
+                        color={bookmarked ? Colors.primary[500] : Colors.neutral[400]}
+                        weight={bookmarked ? 'fill' : 'regular'}
+                        size={22}
+                      />
+                    </Pressable>
+                  }}
                   category={category}
                   onCategoryChange={(category) => {
                     listRef.current?.scrollToTop({ animated: true });
+                    setBookmarked(false);
                     setCategory(category);
                   }}
                   style={{
