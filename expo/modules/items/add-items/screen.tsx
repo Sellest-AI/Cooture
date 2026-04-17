@@ -72,7 +72,9 @@ const ColorPicker = ({ style, hexColor, onPress }: { style?: ViewStyle, hexColor
       alignItems: 'center',
       ...style
     }}>
-      <Pressable onPress={() => { setOpen((v) => !v); }}
+      <Pressable
+        onLongPress={() => { onPress(null); setOpen(false); }}
+        onPress={() => { setOpen((v) => !v); }}
         intensity={0.9}
         style={{
           width: 24,
@@ -207,7 +209,7 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
             />
           </View>
         </View>}
-        ListFooterComponent={(isLoading && itemsLibrary.length === 0) ? <Grid style={{
+        ListFooterComponent={isLoading ? <Grid style={{
           height: 0,
           flex: 1,
           paddingHorizontal: PADDING_HORIZONTAL,
@@ -282,7 +284,6 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
                       onPress={(hex) => {
                         listRef.current?.scrollToTop({ animated: true });
                         setBookmarked(false);
-                        setCategory(null);
                         setColor(hex);
                       }}
                       style={{ marginRight: 12 }}
@@ -293,7 +294,6 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
                     listRef.current?.scrollToTop({ animated: true });
                     setBookmarked(false);
                     setCategory(category);
-                    setColor(null);
                   }}
                   style={{
                     marginTop: 8,

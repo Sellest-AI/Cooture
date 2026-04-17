@@ -17,7 +17,7 @@ export const useSearchItems = ({ query, category, bookmarked, channel = 'public'
   const { results: bookmarkedItemIds, loadMore: loadMoreBookmarked } = usePaginatedQuery(api.router.collection.getBookmarks.authed, bookmarked ? { type: 'item' } : 'skip', { initialNumItems: 24 });
   const { data: _bookmarkedItems, isPending: isBookmarkedItemsLoading } = useQuery(api.router.items.getMany.anon, bookmarked ? { itemIds: bookmarkedItemIds.map((b) => b.itemId).filter(notEmpty) } : 'skip');
 
-  const { results: colorResults, isLoading: isLoadingColorResults, loadMore: loadMoreColor } = usePaginatedQuery(api.router.items.searchByColor.anon, hexColor ? { hexColor } : 'skip', { initialNumItems: 24 });
+  const { results: colorResults, isLoading: isLoadingColorResults, loadMore: loadMoreColor } = usePaginatedQuery(api.router.items.searchByColor.anon, hexColor ? { hexColor, category: category ?? undefined } : 'skip', { initialNumItems: 24 });
 
   const hasQuery = query.length > 0;
   const isLoading = (hasQuery && !searchResults) || isItemsLoading

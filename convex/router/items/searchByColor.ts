@@ -8,6 +8,7 @@ import { publicQuery } from "../../procedures";
 export const anon = publicQuery({
   args: {
     hexColor: v.string(),
+    category: v.optional(v.string()),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
@@ -18,7 +19,13 @@ export const anon = publicQuery({
       .withSearchIndex("search_colors", (q) => q.search('colorTags', cleanedColor))
       .paginate(args.paginationOpts);
 
-    const items = await Promise.all(results.page.map((item) => getItem(ctx, item)));
+    const items = await Promise.all(results.page
+      .filter((item) => {
+        if (!args.category) return true;
+        const sanitizeCategory = (value: string) => value.toLowerCase().trim().replaceAll(' ', '_');
+        return sanitizeCategory(item.category) === sanitizeCategory(args.category);
+      })
+      .map((item) => getItem(ctx, item._id)));
 
     return {
       ...results,
