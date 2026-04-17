@@ -105,6 +105,7 @@ export default function RemoveBackgroundScreen() {
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <Image
         blurRadius={24}
+        cachePolicy="none"
         source={{ uri: displayImage ?? imageScanned }}
         style={{
           opacity: 0.1,
@@ -146,6 +147,7 @@ export default function RemoveBackgroundScreen() {
             }}
           >
             <Image
+              cachePolicy="none"
               source={{ uri: displayImage ?? imageScanned }}
               contentFit={displayImage ? 'contain' : 'cover'}
               style={{

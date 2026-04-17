@@ -47,26 +47,28 @@ export const CameraPermission = ({ style, onSuccess }: Props) => {
           }}
           source={require('assets/backgrounds/dark-gradient.png')}
         />
-        <Block
-          variant="blur"
-          style={{ borderRadius: 28, padding: 16, paddingTop: 20 }}
-        >
-          <Text.H4 style={{ textAlign: 'center', marginBottom: 8 }} color={Colors.neutral[50]}>
-            Camera Permission Required
-          </Text.H4>
-          <Text.Base style={{ textAlign: 'center', marginBottom: 20 }} color={Colors.neutral[400]}>
-            Cooture uses the camera so you can scan items to create your outfits, take selfies for virtual photoshoots, and capture pictures to edit.
-          </Text.Base>
-          <Button
-            onPress={async () => {
-              if (!permission.canAskAgain) Linking.openSettings();
-              else await requestPermission();
-            }}
-            variant="primary"
+        <View style={{ padding: 12 }}>
+          <Block
+            variant="blur"
+            style={{ borderRadius: 28, padding: 16, paddingTop: 20 }}
           >
-            Grant Permission
-          </Button>
-        </Block>
+            <Text.H4 style={{ textAlign: 'center', marginBottom: 8 }} color={Colors.neutral[50]}>
+              Camera Permission Required
+            </Text.H4>
+            <Text.Base style={{ textAlign: 'center', marginBottom: 20 }} color={Colors.neutral[400]}>
+              Cooture uses the camera so you can scan items to create your outfits, take selfies for virtual photoshoots, and capture pictures to edit.
+            </Text.Base>
+            <Button
+              onPress={async () => {
+                if (!permission.canAskAgain) Linking.openSettings();
+                else await requestPermission();
+              }}
+              variant="primary"
+            >
+              Grant Permission
+            </Button>
+          </Block>
+        </View>
       </View>
     );
   }

@@ -30,7 +30,7 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples, guideline = 'de
     // Only update internal state if not currently processing
     if (!isProcessingRef.current) {
       setInternalImageUri(imageUri);
-      if (imageUri) { setShowCamera(false); }
+      setShowCamera(!imageUri);
     }
   }, [imageUri])
 
@@ -91,7 +91,8 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples, guideline = 'de
                 flash="off"
               />}
               {(internalImageUri && !showCamera) && <Image
-                source={internalImageUri}
+                cachePolicy="none"
+                source={{ uri: internalImageUri }}
                 style={{ flex: 1, position: 'absolute', inset: 0 }}
               />}
             </View>
@@ -166,10 +167,10 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples, guideline = 'de
 
                 const { ImageManipulator, SaveFormat } = await import('expo-image-manipulator');
 
-                const cropWidth = photo.width / scale;
-                const cropHeight = photo.height / scale;
-                const originX = (photo.width - cropWidth) / 2;
-                const originY = (photo.height - cropHeight) / 2;
+                const cropWidth = Math.round(photo.width / scale);
+                const cropHeight = Math.round(photo.height / scale);
+                const originX = Math.round((photo.width - cropWidth) / 2);
+                const originY = Math.round((photo.height - cropHeight) / 2);
 
                 const manipulatedPhoto = await (await ImageManipulator.manipulate(photo.uri)
                   .crop({

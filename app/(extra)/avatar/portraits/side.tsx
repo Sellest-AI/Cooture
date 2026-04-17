@@ -2,15 +2,12 @@ import { useRouter } from "@/hooks";
 import { useUpload } from "@/lib/convex/upload";
 import { usePortraitsLocal } from "@/modules/profiles/_hooks/useAppearance";
 import { UpdatePortraits } from "@/modules/profiles/update-portraits";
-import { useFocusEffect } from "expo-router";
-import { useCallback } from "react";
 
 export default function Screen() {
   const { push } = useRouter('/avatar/portraits/side');
 
   const { uploadImage } = useUpload();
-  const { frontImage, smileImage, setSideImage, sideImage, pushImagesToServer } = usePortraitsLocal();
-  useFocusEffect(useCallback(() => { setSideImage(null) }, [setSideImage]))
+  const { frontImage, smileImage, setSideImage, sideImage, pushImagesToServer, resetImages } = usePortraitsLocal();
 
   return (
     <UpdatePortraits
@@ -33,6 +30,8 @@ export default function Screen() {
         });
 
         push('/avatar/appearance', { forwardRedirect: true });
+
+        resetImages();
       }}
       guideline="side"
       examples={{

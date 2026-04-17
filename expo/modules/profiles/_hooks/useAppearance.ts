@@ -42,6 +42,12 @@ export const usePortraitsLocal = () => {
 
   const { mutate: pushImagesToServer } = useMutation(api.router.users.upsertAppearance.authed);
 
+  const resetImages = () => {
+    setFrontImage(null);
+    setSideImage(null);
+    setSmileImage(null);
+  }
+
   return {
     frontImage,
     setFrontImage,
@@ -49,7 +55,8 @@ export const usePortraitsLocal = () => {
     setSideImage,
     smileImage,
     setSmileImage,
-    pushImagesToServer
+    pushImagesToServer,
+    resetImages
   }
 }
 
