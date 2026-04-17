@@ -79,7 +79,7 @@ export default function NewOutfitScreen() {
                   source={item.image.sizes.small.url}
                   title={item.name}
                   subtitle={item.category}
-                  onLongPress={() => {
+                  onPress={() => {
                     push(ROUTES.MODALS.PREVIEW_ITEM, {
                       forwardRedirect: false,
                       params: {

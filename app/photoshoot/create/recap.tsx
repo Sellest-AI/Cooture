@@ -144,7 +144,10 @@ const OutfitComponent = () => {
         variant="blur"
         onPress={() => {
           push(ROUTES.MODALS.PICK_OUTFIT, {
-            params: { canSkip: true },
+            params: {
+              canSkip: true,
+              itemIds: outfit?.items.map(i => i._id)
+            },
             redirectHere: true,
           });
         }}
