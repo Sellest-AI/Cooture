@@ -1,6 +1,5 @@
 import { Router, useRoute, useRouter } from "@/hooks";
-import { api, Id, useQueryCached } from "@/lib/convex/client";
-import { SelectedItemModal } from "@/modules/items/selected-item.modal";
+import { api, useQueryCached } from "@/lib/convex/client";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { KeyboardAvoiderView } from "@good-react-native/keyboard-avoider";
 import { LoadingBlock } from "@ui/block.loading";
@@ -25,7 +24,7 @@ export default function NewOutfitScreen() {
     resetFnc: reset,
   });
 
-  const [selectedItem, setSelectedItem] = useState<Id<'items'> | null>(null);
+  const { push } = useRouter();
   const { data: items } = useQueryCached(api.router.items.getMany.anon, { itemIds });
 
   if (itemIds.length === 0 && init) {
@@ -80,7 +79,18 @@ export default function NewOutfitScreen() {
                   source={item.image.sizes.small.url}
                   title={item.name}
                   subtitle={item.category}
-                  onLongPress={() => setSelectedItem(item._id)}
+                  onLongPress={() => {
+                    push(ROUTES.MODALS.PREVIEW_ITEM, {
+                      forwardRedirect: false,
+                      params: {
+                        itemId: item._id,
+                        onRemove: () => {
+                          setItems((p) => p.filter(x => x !== item._id));
+                          router.back();
+                        }
+                      }
+                    })
+                  }}
                 />
               </View>
             )
@@ -139,15 +149,6 @@ export default function NewOutfitScreen() {
           </Button>
         </View>
       </SafeAreaView>
-      <SelectedItemModal
-        onRemove={() => {
-          setSelectedItem(null);
-          setItems((p) => p.filter(id => id !== selectedItem))
-        }}
-        itemId={selectedItem}
-        open={!!selectedItem}
-        onOpenChange={() => setSelectedItem(null)}
-      />
     </>
   )
 }

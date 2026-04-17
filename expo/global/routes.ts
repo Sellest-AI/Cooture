@@ -19,6 +19,7 @@ export const ROUTES = {
     UPGRADE: '/upgrade',
     DAILY_STREAK: '/daily-streak',
     TURN_TO_VIDEO: '/turn-to-video',
+    PREVIEW_ITEM: '/preview-item',
   },
   POST: {
     PATH: '/post/[id]',

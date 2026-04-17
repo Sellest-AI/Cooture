@@ -2,7 +2,6 @@ import { useRoute, useRouter, useStateEffect } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
 import { useAccount } from "@/lib/convex/auth";
 import { useMutation, useQuery, useQueryCached } from "@/lib/convex/client";
-import { SelectedItemModal } from "@/modules/items/selected-item.modal";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { PremiumBlock } from "@/modules/premium/premium-block";
 import { useSafety } from "@/modules/safety";
@@ -154,7 +153,6 @@ export default function Screen() {
   const { data: isBookmarked } = useQuery(api.router.collection.getBookmarked.authed, { outfitId: id });
   const { mutate: toggleBookmark } = useMutation(api.router.collection.toggleBookmark.authed);
 
-  const [selectedItem, setSelectedItem] = useState<Id<'items'> | null>(null);
   const [items, setItems] = useStateEffect(outfit?.items ?? []);
   const [name, setName] = useStateEffect('');
 
@@ -327,7 +325,18 @@ export default function Screen() {
                       title={item.name}
                       subtitle={item.category}
                       onLongPress={() => push(ROUTES.ITEM.PATH, { pathParams: { id: item._id } })}
-                      onPress={() => setSelectedItem(item._id)}
+                      onPress={() => {
+                        push(ROUTES.MODALS.PREVIEW_ITEM, {
+                          forwardRedirect: false,
+                          params: {
+                            itemId: item._id,
+                            onRemove: (editable && items.length > 1) ? () => {
+                              router.back();
+                              setItems((p) => p.filter(x => x._id !== item._id));
+                            } : undefined
+                          }
+                        })
+                      }}
                     />
                   </View>
                 )
@@ -402,15 +411,6 @@ export default function Screen() {
           </Button>
         </View>}
       </View>
-      <SelectedItemModal
-        onRemove={(editable && items.length > 1) ? () => {
-          setSelectedItem(null);
-          setItems((p) => p.filter(x => x._id !== selectedItem))
-        } : undefined}
-        itemId={selectedItem}
-        open={!!selectedItem}
-        onOpenChange={() => setSelectedItem(null)}
-      />
     </>
   )
 }

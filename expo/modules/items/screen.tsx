@@ -203,11 +203,11 @@ type Props = {
   QuickAccessBar?: React.ReactNode;
   id: Id<'items'>;
   path: Route;
-  showHeader?: boolean;
   isFullScreen?: boolean;
+  headerEndContent?: React.ReactNode;
 }
 
-export const ItemScreen = ({ id, path, QuickAccessBar, showHeader = true, isFullScreen = false }: Props) => {
+export const ItemScreen = ({ id, path, QuickAccessBar, isFullScreen = false, headerEndContent }: Props) => {
   const { push, redirect } = useRouter(path);
   const { item, isLoading, update } = useItem(id);
 
@@ -219,104 +219,104 @@ export const ItemScreen = ({ id, path, QuickAccessBar, showHeader = true, isFull
   }
 
   return (
-    <>
-      <ParallaxScrollView
-        headerBackgroundGradient={isFullScreen}
-        headerBackground={isFullScreen &&
-          <Image
-            contentFit="cover"
-            blurRadius={100}
-            source={item.image?.sizes.thumbnail.url}
-            style={{ width: '100%', height: '100%', opacity: 0.2 }}
-          />
-        }
-        headerContent={
-          <View>
-            {showHeader && <ModalHeader
-              style={{ paddingTop: 12, paddingHorizontal: 12 }}
-              title={item.name}
-              onBack={() => redirect({ fallbackTo: ['back', ROUTES.PROFILE.ITEMS] })}
-            />}
-            <View style={{
-              padding: 32,
-              paddingBottom: Platform.OS === 'web' ? 32 : 16,
-              flex: 1,
-            }}>
-              <Image
-                priority="high"
-                contentFit="contain"
-                source={item.image?.sizes.medium.url}
-                placeholder={item.image?.sizes.thumbnail.url}
-                placeholderContentFit="contain"
-                style={{
-                  width: '100%',
-                  height: Number(item.image.aspectRatio.actual) > 1 ? 220 : 320,
-                }}
-              />
-            </View>
-            <ColorsBlock style={{ marginTop: 24 }} />
-            {item.description && <View style={{ paddingHorizontal: 32, marginTop: 28, marginBottom: 24 }}>
-              <Text.Base color={Colors.neutral[200]} numberOfLines={4} style={{ textAlign: 'center' }}>
-                {item.description}
-              </Text.Base>
-            </View>}
-          </View>
-        }
-      >
-        <View style={{ paddingHorizontal: 8, gap: 8 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8, alignItems: 'stretch' }}>
-            <ToggleBookmarkButton style={{ marginRight: 4 }} />
-            <Button
-              startIcon={User}
-              onPress={() => {
-                push(ROUTES.USER.PATH, {
-                  pathParams: { id: item.userId }
-                })
-              }}
-              variant="blur"
-              size="rounded"
-              style={{ padding: 6 }}
-            />
-            {QuickAccessBar}
-            <Button
-              startIcon={Plus}
-              onPress={() => {
-                push(ROUTES.MODALS.PICK_OUTFIT, {
-                  redirectTo: ROUTES.PROFILE.OUTFITS,
-                  params: { itemIds: [item._id] }
-                })
-              }}
-              style={{ flex: 1 }}
-              variant="primary"
-            >
-              Add to outfit
-            </Button>
-          </View>
-          <LinkBlock />
-        </View>
-        <SimilarItems
-          path={path}
-          style={{ marginTop: 20, paddingHorizontal: 8 }}
+    <ParallaxScrollView
+      headerBackgroundGradient={isFullScreen}
+      headerBackground={isFullScreen &&
+        <Image
+          contentFit="cover"
+          blurRadius={100}
+          source={item.image?.sizes.thumbnail.url}
+          style={{ width: '100%', height: '100%', opacity: 0.2 }}
         />
-        <View style={{ paddingHorizontal: 8, gap: 8 }}>
-          <Text.Lg color={Colors.neutral[400]} weight={500}
-            style={{ marginBottom: 8, marginLeft: 4, marginTop: 12 }}
-          >
-            Information
-          </Text.Lg>
-          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
-            <ItemCategory title={item.category} onPress={(category) => update({ category })} disabled={disabled(item.userId)} />
-            <WeatherCategory title={item.weatherTags[0]} onPress={(weather) => update({ weatherTags: [weather, ...item.weatherTags.slice(1)] })} disabled={disabled(item.userId)} />
+      }
+      headerContent={
+        <View>
+          <ModalHeader
+            style={{ paddingTop: 12, paddingHorizontal: 12 }}
+            title={item.name}
+            onBack={() => redirect({ fallbackTo: ['back', ROUTES.PROFILE.ITEMS] })}
+            endContent={headerEndContent}
+          />
+          <View style={{
+            padding: 32,
+            paddingBottom: Platform.OS === 'web' ? 32 : 16,
+            flex: 1,
+          }}>
+            <Image
+              priority="high"
+              contentFit="contain"
+              source={item.image?.sizes.medium.url}
+              placeholder={item.image?.sizes.thumbnail.url}
+              placeholderContentFit="contain"
+              style={{
+                width: '100%',
+                height: Number(item.image.aspectRatio.actual) > 1 ? 220 : 320,
+              }}
+            />
           </View>
-          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
-            <ColorCategory title={item.colorTones[0]} onPress={(color) => update({ colorTones: [color, ...item.colorTones.slice(1)] })} disabled={disabled(item.userId)} />
-            <FeelCategory title={item.materialFeel} onPress={(materialFeel) => update({ materialFeel })} disabled={disabled(item.userId)} />
-            <GenderCategory title={item.gender} onPress={(gender) => update({ gender })} disabled={disabled(item.userId)} />
-          </View>
-          <DeleteItemButton path={path} />
+          <ColorsBlock style={{ marginTop: 24 }} />
+          {item.description && <View style={{ paddingHorizontal: 32, marginTop: 28, marginBottom: 24 }}>
+            <Text.Base color={Colors.neutral[200]} numberOfLines={4} style={{ textAlign: 'center' }}>
+              {item.description}
+            </Text.Base>
+          </View>}
         </View>
-        <SafeAreaView edges={{ top: 'off' }} />
-      </ParallaxScrollView>
-    </>
+      }
+    >
+      <View style={{ paddingHorizontal: 8, gap: 8 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8, alignItems: 'stretch' }}>
+          <ToggleBookmarkButton style={{ marginRight: 4 }} />
+          <Button
+            startIcon={User}
+            onPress={() => {
+              push(ROUTES.USER.PATH, {
+                pathParams: { id: item.userId }
+              })
+            }}
+            variant="blur"
+            size="rounded"
+            style={{ padding: 6 }}
+          />
+          {QuickAccessBar}
+          <Button
+            startIcon={Plus}
+            onPress={() => {
+              push(ROUTES.MODALS.PICK_OUTFIT, {
+                redirectTo: ROUTES.PROFILE.OUTFITS,
+                params: { itemIds: [item._id] }
+              })
+            }}
+            style={{ flex: 1 }}
+            variant="primary"
+          >
+            Add to outfit
+          </Button>
+        </View>
+        <LinkBlock />
+      </View>
+      <SimilarItems
+        path={path}
+        style={{ marginTop: 20, paddingHorizontal: 8 }}
+      />
+      <View style={{ paddingHorizontal: 8, gap: 8 }}>
+        <Text.Lg color={Colors.neutral[400]} weight={500}
+          style={{ marginBottom: 8, marginLeft: 4, marginTop: 12 }}
+        >
+          Information
+        </Text.Lg>
+        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
+          <ItemCategory title={item.category} onPress={(category) => update({ category })} disabled={disabled(item.userId)} />
+          <WeatherCategory title={item.weatherTags[0]} onPress={(weather) => update({ weatherTags: [weather, ...item.weatherTags.slice(1)] })} disabled={disabled(item.userId)} />
+        </View>
+        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
+          <ColorCategory title={item.colorTones[0]} onPress={(color) => update({ colorTones: [color, ...item.colorTones.slice(1)] })} disabled={disabled(item.userId)} />
+          <FeelCategory title={item.materialFeel} onPress={(materialFeel) => update({ materialFeel })} disabled={disabled(item.userId)} />
+          <GenderCategory title={item.gender} onPress={(gender) => update({ gender })} disabled={disabled(item.userId)} />
+        </View>
+        <DeleteItemButton path={path} />
+      </View>
+      {isFullScreen && <SafeAreaView edges={{ top: 'off', bottom: 'additive' }} />}
+      {!isFullScreen && <View style={{ height: 12 }} />}
+    </ParallaxScrollView>
   )
 }

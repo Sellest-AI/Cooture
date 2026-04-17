@@ -18,6 +18,7 @@ type ParamsDefault<T extends Route> =
   T extends "/admin/bots/outfits/extractor" ? { userId?: Id<'users'> | null } :
   T extends "/preset/create/thumbnail" ? { presetId: Id<'presets'> } :
   T extends "/turn-to-video" ? { predictionId: Id<'predictions'> } :
+  T extends "/preview-item" ? { itemId: Id<'items'>, onRemove?: () => void } :
   never;
 
 const LINKED_ROUTES: { parent: Route, child: Route }[] = [
