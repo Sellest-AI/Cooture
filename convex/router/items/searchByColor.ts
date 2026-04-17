@@ -8,12 +8,14 @@ import { publicQuery } from "../../procedures";
 export const anon = publicQuery({
   args: {
     hexColor: v.string(),
+    extraHexColors: v.optional(v.array(v.string())),
     category: v.optional(v.string()),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    const tags = getTagsFromHexColors([args.hexColor]);
-    const cleanedColor = tags[0]?.toLowerCase().trim().replaceAll(' ', '_') || '';
+    const tags = getTagsFromHexColors([args.hexColor, ...(args.extraHexColors || [])]);
+    const cleanedColors = tags.map((tag) => tag.toLowerCase().trim().replaceAll(' ', '_'));
+    const cleanedColor = cleanedColors.join(' ')
 
     const results = await ctx.db.query("items")
       .withSearchIndex("search_colors", (q) => q.search('colorTags', cleanedColor))

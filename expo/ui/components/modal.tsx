@@ -20,6 +20,7 @@ type Props = {
   children: ReactNode | Children;
   style?: ViewStyle;
   header?: {
+    style?: ViewStyle;
     title: string;
     showBackButton?: boolean;
     endContent?: ReactNode;
@@ -204,7 +205,12 @@ export const Modal = ({ children, open, onOpenChange, style, header }: Props) =>
                 >
                   {header && <ModalHeader
                     type={header.type}
-                    style={{ marginTop: 10 }}
+                    style={{
+                      marginTop: 10,
+                      // Make sure to always have horizontal padding
+                      paddingHorizontal: 12 - Number(style?.paddingHorizontal ?? 0),
+                      ...header.style
+                    }}
                     title={header.title}
                     endContent={header.endContent}
                     onBack={(header.showBackButton || currentStep > 0) ? () => {

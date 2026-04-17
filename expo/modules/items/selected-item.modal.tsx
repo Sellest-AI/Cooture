@@ -18,6 +18,7 @@ export const SelectedItemModal = ({ itemId, onRemove, ...props }: SelectedItemMo
 
   return (
     <Modal {...props}
+      style={{ paddingHorizontal: 0 }}
       open={open && !!item}
       header={{
         showBackButton: true,

@@ -10,18 +10,21 @@ import { ItemCategory } from "@/modules/items/category.item";
 import { WeatherCategory } from "@/modules/items/category.weather";
 import { LoadingBlock } from "@ui/block.loading";
 import { Button } from "@ui/button";
+import { CardItem } from "@ui/cards";
+import { FlashList } from "@ui/flat-list";
 import { GhostIconWrapper } from "@ui/ghost-animation";
-import { BookmarkIcon, ExternalLink, Plus, User } from "@ui/icons";
+import { BookmarkIcon, ExternalLink, Loader, Plus, User } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
 import * as Linking from 'expo-linking';
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Platform, View, ViewStyle } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
+import { useSearchItems } from "./_hooks/useSearchItems";
 
 const ColorsBlock = ({ style }: { style?: ViewStyle }) => {
   const { item } = useItem();
@@ -132,6 +135,70 @@ const ToggleBookmarkButton = ({ style }: { style?: ViewStyle }) => {
   )
 }
 
+const SimilarItems = ({ style, path }: { path: Route, style?: ViewStyle }) => {
+  const { push } = useRouter(path);
+  const { item } = useItem();
+
+  const query = useMemo(() => ({ query: '', category: item?.category, hexColor: item?.mainColors[0], extraHexColors: item?.mainColors.slice(1, 2) }), [item]);
+  const { isLoading, results, canLoadMore, loadMore } = useSearchItems(query);
+
+  const items = results?.filter((i) => i._id !== item?._id) || [];
+
+  const { paddingHorizontal, ...restStyle } = style || {};
+
+  if (!canLoadMore && items.length === 0) return null;
+
+  return (
+    <View style={{ ...restStyle }}>
+      <View style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: paddingHorizontal ?? 0,
+        marginLeft: 4,
+        gap: 4,
+      }}>
+        <Text.Lg color={Colors.neutral[400]} weight={500} style={{ marginBottom: 8 }}>
+          Similar items
+        </Text.Lg>
+        {isLoading && <Loader size={16} color={Colors.neutral[400]} />}
+      </View>
+      <FlashList
+        data={items}
+        horizontal
+        style={{ marginTop: 12, height: 156 }}
+        contentContainerStyle={{ paddingHorizontal: paddingHorizontal ?? 0 }}
+        showsHorizontalScrollIndicator={false}
+        onEndReached={() => canLoadMore ? loadMore() : undefined}
+        onEndReachedThreshold={0.7}
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => {
+          return (
+            <View
+              style={{
+                width: Math.min(200, Number(item.image.aspectRatio.actual) * 132),
+                height: 156,
+                marginRight: 24,
+                paddingBottom: 44
+              }}
+            >
+              <CardItem
+                onPress={() => push(ROUTES.ITEM.PATH, {
+                  pathParams: { id: item._id }
+                })}
+                source={item.image.sizes.small.url}
+                image={item.image.sizes.small}
+                title={item.name}
+                subtitle={item.brand}
+                style={{ height: '100%' }}
+              />
+            </View>
+          )
+        }}
+      />
+    </View>
+  )
+}
+
 type Props = {
   QuickAccessBar?: React.ReactNode;
   id: Id<'items'>;
@@ -196,10 +263,7 @@ export const ItemScreen = ({ id, path, QuickAccessBar, showHeader = true, isFull
           </View>
         }
       >
-        <SafeAreaView
-          edges={{ top: 'off' }}
-          style={{ padding: isFullScreen ? 8 : 0, gap: 8 }}
-        >
+        <View style={{ paddingHorizontal: 8, gap: 8 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8, alignItems: 'stretch' }}>
             <ToggleBookmarkButton style={{ marginRight: 4 }} />
             <Button
@@ -228,6 +292,18 @@ export const ItemScreen = ({ id, path, QuickAccessBar, showHeader = true, isFull
               Add to outfit
             </Button>
           </View>
+          <LinkBlock />
+        </View>
+        <SimilarItems
+          path={path}
+          style={{ marginTop: 20, paddingHorizontal: 8 }}
+        />
+        <View style={{ paddingHorizontal: 8, gap: 8 }}>
+          <Text.Lg color={Colors.neutral[400]} weight={500}
+            style={{ marginBottom: 8, marginLeft: 4, marginTop: 12 }}
+          >
+            Information
+          </Text.Lg>
           <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
             <ItemCategory title={item.category} onPress={(category) => update({ category })} disabled={disabled(item.userId)} />
             <WeatherCategory title={item.weatherTags[0]} onPress={(weather) => update({ weatherTags: [weather, ...item.weatherTags.slice(1)] })} disabled={disabled(item.userId)} />
@@ -237,9 +313,9 @@ export const ItemScreen = ({ id, path, QuickAccessBar, showHeader = true, isFull
             <FeelCategory title={item.materialFeel} onPress={(materialFeel) => update({ materialFeel })} disabled={disabled(item.userId)} />
             <GenderCategory title={item.gender} onPress={(gender) => update({ gender })} disabled={disabled(item.userId)} />
           </View>
-          <LinkBlock />
           <DeleteItemButton path={path} />
-        </SafeAreaView>
+        </View>
+        <SafeAreaView edges={{ top: 'off' }} />
       </ParallaxScrollView>
     </>
   )

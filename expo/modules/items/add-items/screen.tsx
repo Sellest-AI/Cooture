@@ -159,7 +159,7 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
   const [category, setCategory] = useState<string | null>(null);
   const [hexColor, setColor] = useState<string | null>(null);
   const [bookmarked, setBookmarked] = useState(false);
-  const { results, isLoading, isFiltering, isEmpty, onLoadMore } = useSearchItems({ query, category, hexColor, bookmarked, channel: 'public' });
+  const { results, isLoading, isFiltering, isEmpty, canLoadMore, loadMore } = useSearchItems({ query, category, hexColor, bookmarked, channel: 'public' });
 
   const { isHidden } = useSafety();
   const itemsLibrary = [...(isFiltering ? [] : latestItems), ...results] // unique;
@@ -184,7 +184,7 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
     >
       <FlashList
         ref={listRef}
-        onEndReached={onLoadMore}
+        onEndReached={() => canLoadMore ? loadMore() : undefined}
         ListHeaderComponent={<View style={{ marginHorizontal: PADDING_HORIZONTAL }}>
           <ModalHeader
             title="Select items"
