@@ -1,5 +1,6 @@
 import { useRouter } from "@/hooks";
 import { useAccount, useAuthActions } from "@/lib/convex/auth";
+import { presentManager } from "@/lib/revenue-cat";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
 import { ArrowLeft, Bell, Camera, ChevronRight, Credits, Gem, Info, Lock, Package, Settings, TriangleAlert, TShirt, UserRoundX } from "@ui/icons";
@@ -14,7 +15,6 @@ import { fetchUpdateAsync, reloadAsync, useUpdates } from 'expo-updates';
 import * as WebBrowser from 'expo-web-browser';
 import { WEBSITE } from "global";
 import { Linking, Platform, Pressable, View } from "react-native";
-import Purchases from "react-native-purchases";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -27,8 +27,8 @@ export default function Screen() {
   const { isAdmin } = useAccount.Admin();
 
   const manageSubscription = async () => {
-    if (isPremium) await Purchases.showManageSubscriptions();
-    else await push(ROUTES.MODALS.UPGRADE);
+    const result = await presentManager();
+    if (!result) push(ROUTES.MODALS.UPGRADE);
   }
 
   if (!user) return null;

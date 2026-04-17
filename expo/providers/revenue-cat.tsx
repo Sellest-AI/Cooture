@@ -10,7 +10,7 @@ type Props = {
 }
 
 export const RevenueCatProvider = ({ children }: Props) => {
-  const { user, isAuthenticated, isAuthLoading } = useAccount();
+  const { user, isAuthenticated, isAuthenticating } = useAccount();
 
   // 1. Initialize RevenueCat Once
   useEffect(() => {
@@ -33,7 +33,7 @@ export const RevenueCatProvider = ({ children }: Props) => {
       const userId = user?._id;
 
       // Wait until Convex auth has finished initializing on the device
-      if (isAuthLoading) return;
+      if (isAuthenticating) return;
 
       // If authenticated but the user document is still fetching, wait
       if (isAuthenticated && !userId) return;
@@ -69,7 +69,7 @@ export const RevenueCatProvider = ({ children }: Props) => {
     };
 
     syncRevenueCat();
-  }, [user, isAuthLoading, isAuthenticated]);
+  }, [user, isAuthenticating, isAuthenticated]);
 
   return (
     children

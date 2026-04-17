@@ -1,31 +1,6 @@
-import { Linking, Platform } from 'react-native';
 import Purchases from 'react-native-purchases';
 import RevenueCatUI, { PAYWALL_RESULT } from "react-native-purchases-ui";
-
-const presentManagerIfNeeded = async () => {
-  try {
-    const customerInfo = await Purchases.getCustomerInfo();
-
-    if (typeof customerInfo.entitlements.active["Cooture Plus"] !== "undefined") {
-      try {
-        if (Platform.OS === 'ios') {
-          await Purchases.showManageSubscriptions();
-          return true;
-        } else if (customerInfo.managementURL) {
-          await Linking.openURL(customerInfo.managementURL);
-          return true;
-        }
-      } catch {
-        if (customerInfo.managementURL) {
-          await Linking.openURL(customerInfo.managementURL);
-          return true;
-        }
-      }
-    }
-  } catch (e) {
-    console.warn("Failed to check subscription status before presenting paywall", e);
-  }
-}
+import { presentManagerIfNeeded } from './presentManager';
 
 // Make sure to configure a Paywall in the Dashboard first.
 export async function presentPaywall(): Promise<boolean> {
