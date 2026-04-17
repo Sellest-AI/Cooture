@@ -22,7 +22,7 @@ export const useAuthActions = () => {
   const signIn = useCallback(async (provider: "apple" | "google", route?: Href) => {
     try {
       setIsLoading(true);
-      const redirectTo = makeRedirectUri();
+      const redirectTo = makeRedirectUri({ path: "auth" });
       const { redirect } = await convex.signIn(provider, { redirectTo });
 
       if (Platform.OS === "web") { return; }

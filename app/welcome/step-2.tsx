@@ -206,7 +206,6 @@ export default function Screen() {
         style={{ paddingHorizontal: 8, paddingBottom: 8, width: '100%' }}
       >
         <Button
-          style={{ alignSelf: 'stretch' }}
           variant="primary"
           href={ROUTES.WELCOME.STEP_3}
         >

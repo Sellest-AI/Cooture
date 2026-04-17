@@ -109,6 +109,7 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
   if (!user) return null;
 
   const showRecentPosts = isSelf && recentPosts && recentPosts.length > 3;
+  const blurRadius = Platform.OS === 'android' ? recentPosts?.[0].image ? 0 : 2 : 2;
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={{ top: 'off', bottom: 'android' }}>
@@ -116,7 +117,7 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
         ref={scrollRef}
         contentNegativeSpace={56}
         headerBackgroundImagePosition="top center"
-        headerBackgroundImageStyle={{ blurRadius: 2, opacity: 0.8 }}
+        headerBackgroundImageStyle={{ blurRadius, opacity: 0.8 }}
         headerBackgroundImage={recentPosts?.[0]?.image?.sizes.large.url ??
           user.image ?? require('assets/backgrounds/dark-gradient.png')}
         contentContainerStyle={style}
