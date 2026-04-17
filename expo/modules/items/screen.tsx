@@ -198,7 +198,7 @@ export const ItemScreen = ({ id, path, QuickAccessBar, showHeader = true, isFull
       >
         <SafeAreaView
           edges={{ top: 'off' }}
-          style={{ padding: 8, gap: 8 }}
+          style={{ padding: isFullScreen ? 8 : 0, gap: 8 }}
         >
           <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8, alignItems: 'stretch' }}>
             <ToggleBookmarkButton style={{ marginRight: 4 }} />

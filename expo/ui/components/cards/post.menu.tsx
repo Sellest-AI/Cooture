@@ -1,3 +1,4 @@
+import { ButtonGhost } from "@ui/button.ghost"
 import { Text } from "@ui/text"
 import { ComponentProps, useState } from "react"
 import { View } from "react-native"
@@ -124,12 +125,14 @@ export const PostMenu = ({ open, onOpenChange, ...props }: Props) => {
             />}
           </MenuGroup>}
           {report && <View style={{ flexDirection: 'row', justifyContent: 'center', paddingHorizontal: 12, gap: 48, marginTop: 8, marginBottom: 12 }}>
-            <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
+            <ButtonGhost
+              variant="destructive"
               onPress={() => { setReportModalOpen(true); onOpenChange?.(false); }}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
+              startIcon={TriangleAlert}
             >
-              <TriangleAlert size={16} color={Colors.destructive[500]} />
-              <Text.Base color={Colors.neutral[400]} weight={500}>Report content</Text.Base>
-            </Pressable>
+              Report content
+            </ButtonGhost>
             <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
               onPress={() => { report?.onBlock?.(); onOpenChange?.(false); }}
             >

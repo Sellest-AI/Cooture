@@ -8,6 +8,7 @@ import { PremiumBlock } from "@/modules/premium/premium-block";
 import { useSafety } from "@/modules/safety";
 import { LoadingBlock } from "@ui/block.loading";
 import { Button } from "@ui/button";
+import { ButtonGhost } from "@ui/button.ghost";
 import { ImageGeneration } from "@ui/cards";
 import { CardItem } from "@ui/cards/card-item";
 import { ReportModal } from "@ui/cards/report.modal";
@@ -111,20 +112,17 @@ const ReportContentButton = () => {
 
   return (
     <>
-      <Pressable style={{
-        alignSelf: 'center',
-        marginTop: 4,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-      }}
+      <ButtonGhost
+        variant="destructive"
         onPress={() => setShowModal(true)}
+        startIcon={TriangleAlert}
+        style={{
+          alignSelf: 'center',
+          marginTop: 4,
+        }}
       >
-        <TriangleAlert size={16} color={Colors.destructive[500]} />
-        <Text.Base color={Colors.neutral[400]} weight={500}>Report outfit</Text.Base>
-      </Pressable>
+        Report outfit
+      </ButtonGhost>
       <ReportModal
         open={showModal}
         onCancel={() => setShowModal(false)}

@@ -17,6 +17,7 @@ export const Category = ({ icon, title, onPress, style, selected, category, bord
   const Icon = icon;
   return (
     <Pressable
+      disabled={!onPress}
       onPress={onPress}
       style={{ flex: 1, ...style }}
     >

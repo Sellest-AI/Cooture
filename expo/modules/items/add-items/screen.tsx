@@ -94,8 +94,8 @@ const ColorPicker = ({ style, hexColor, onPress }: { style?: ViewStyle, hexColor
       </Pressable>
       <AnimatePresence>
         {open && <MotiView
-          from={{ width: 0 }}
-          animate={{ width: COLOR_TAGS.length * (28 + 8) + 24 }}
+          from={{ width: 0, opacity: 0, paddingHorizontal: 8, marginLeft: 4 }}
+          animate={{ width: COLOR_TAGS.length * (28 + 8) + 24, opacity: 1, marginLeft: 8, paddingHorizontal: 12 }}
           exit={{ width: 0, opacity: 0, paddingHorizontal: 0, marginLeft: 0 }}
           style={{
             overflow: 'hidden',
@@ -107,6 +107,7 @@ const ColorPicker = ({ style, hexColor, onPress }: { style?: ViewStyle, hexColor
             backgroundColor: Colors.blur.dark,
             borderLeftWidth: 1,
             borderColor: Colors.blur.medium,
+            opacity: 1,
             marginLeft: 8,
           }}>
           {COLOR_TAGS.map((color, i) => {
@@ -129,7 +130,7 @@ const ColorPicker = ({ style, hexColor, onPress }: { style?: ViewStyle, hexColor
                   onPress(selected ? null : hex);
                 }}
               >
-                <MotiView
+                <View
                   style={{
                     width: selected ? 22 : 28,
                     height: 22,
