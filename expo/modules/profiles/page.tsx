@@ -109,7 +109,7 @@ export function Screen({ user, isSelf, recentPosts, style }: Props) {
   if (!user) return null;
 
   const showRecentPosts = isSelf && recentPosts && recentPosts.length > 3;
-  const blurRadius = Platform.OS === 'android' ? recentPosts?.[0].image ? 0 : 2 : 2;
+  const blurRadius = Platform.OS === 'android' ? recentPosts?.[0]?.image ? 0 : 2 : 2;
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={{ top: 'off', bottom: 'android' }}>

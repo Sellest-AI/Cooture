@@ -133,6 +133,7 @@ const LoginButtons = () => {
             key={item}
             isLoading={innerLoading === item}
             disabled={disableRuntime || !init}
+            align="stretch"
             style={{
               backgroundColor: isGoogle ? undefined : "white",
               marginTop: i > 0 ? 8 : 0

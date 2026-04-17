@@ -109,7 +109,7 @@ export const useAccount = () => {
   const { isAuthenticated, isAuthenticating } = useAuthenticated();
   const { data: user } = useQueryCached(api.router.users.getAccount.authed, isAuthenticated ? undefined : 'skip');
 
-  const isPremium = !!user?.plan;
+  const isPremium = user?.isPremium ?? false;
   const userId = user?._id;
 
   // Determine the account status

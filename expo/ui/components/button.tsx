@@ -17,7 +17,7 @@ type Props = {
   disabled?: boolean;
   href?: Parameters<ReturnType<typeof useRouter>['push']>[0];
   size?: "rounded" | "sm",
-  align?: "center" | "left" | "right";
+  align?: "center" | "left" | "right" | "stretch";
   isLoading?: boolean;
 } & ComponentProps<typeof Block> & Omit<ComponentProps<typeof Pressable>, 'style'>;
 
@@ -75,9 +75,10 @@ export const Button = ({ startIcon, startContent, endIcon, children, disabled, v
         width: style?.width,
         flex: style?.flex,
         borderRadius: isRounded ? 99 : undefined,
-        alignSelf: defaultAlign === "center" ? 'center' :
-          defaultAlign === "left" ? 'flex-start' :
-            defaultAlign === "right" ? 'flex-end' : undefined,
+        alignSelf: defaultAlign === "stretch" ? 'stretch' :
+          defaultAlign === "center" ? 'center' :
+            defaultAlign === "left" ? 'flex-start' :
+              defaultAlign === "right" ? 'flex-end' : undefined,
       }}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}

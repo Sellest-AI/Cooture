@@ -6,7 +6,7 @@ import { getItem } from "../items/getItem";
 import { getUserPublic } from "../users";
 
 const checkIfVideosOnly = (predictions: Doc<'predictions'>[]) => {
-  const completedPredictions = predictions.filter((p) => p.status === 'ACCEPTED' || p.status === 'REJECTED');
+  const completedPredictions = predictions.filter((p) => p.status === 'ACCEPTED' || p.status === 'REJECTED' || p.status === 'REVIEW');
   const pendingPredictions = predictions.filter((p) => p.status === 'LOADING');
 
   const completedAreVideos = completedPredictions.length === 0 ||
