@@ -1,3 +1,4 @@
+import { X } from "@ui/icons";
 import { ModalHeader } from "@ui/modal";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Stepper } from "@ui/stepper";
@@ -24,6 +25,7 @@ export default function Layout() {
           title="New Preset"
           subtitle="Turn any image into a copiable preset"
           style={{ marginBottom: 8 }}
+          customBackIcon={step > 1 ? undefined : X}
           onBack={step < 3 ? () => {
             if (router.canGoBack()) router.back()
             else router.dismissTo('/')

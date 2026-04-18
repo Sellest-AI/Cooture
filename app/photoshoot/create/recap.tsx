@@ -8,7 +8,7 @@ import { Block } from "@ui/block";
 import { Button } from "@ui/button";
 import { ButtonSlider } from "@ui/button.slider";
 import { Col, Grid, Row } from "@ui/grid";
-import { Credits, Flame, Plus, Squirish } from "@ui/icons";
+import { ArrowLeft, Credits, Flame, Plus, Squirish } from "@ui/icons";
 import { Image } from "@ui/image";
 import { LinearGradient } from "@ui/linear-gradient";
 import { Pressable } from "@ui/pressable";
@@ -258,6 +258,7 @@ export default function Screen() {
         onPress={() => dismissTo('/photoshoot/create', { resetNextRoute: false })}
         variant="secondary"
         style={{ marginBottom: 8 }}
+        startIcon={ArrowLeft}
       >
         Change Preset
       </Button>

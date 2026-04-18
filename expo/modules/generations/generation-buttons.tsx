@@ -87,6 +87,9 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
                 onPress={async () => {
                   const hasMedia = !!currentItem?.imageUrl || !!currentItem?.videoUrl;
                   if (!currentItem || !hasMedia) return;
+
+                  onNext(true);
+
                   try {
                     if (currentItem.videoUrl) {
                       const key = addToast({
@@ -125,7 +128,6 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
                         .catch(() => null);
                     }
                   } catch { }
-                  onNext(true);
                 }}
               >
                 Save

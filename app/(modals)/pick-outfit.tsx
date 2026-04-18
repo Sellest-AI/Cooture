@@ -56,7 +56,7 @@ export default function PickOutfitScreen() {
                 <Collection
                   title="New outfit"
                   onPress={() => {
-                    push(ROUTES.MODALS.NEW_OUTFIT, {
+                    push(ROUTES.OUTFIT.NEW, {
                       params: { itemIds },
                       forwardRedirect: true,
                     })

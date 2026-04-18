@@ -1,6 +1,7 @@
 import { useRoute, useRouter } from "@/hooks";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
 import { Badge } from "@ui/badge";
+import { X } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
@@ -57,6 +58,7 @@ export default function Layout() {
                 subtitle={subtitle}
                 type="alt"
                 onBack={router.canGoBack() ? () => router.back() : undefined}
+                customBackIcon={step > 1 ? undefined : X}
               />
               <Stepper
                 style={{ width: "90%", maxWidth: 280, alignSelf: 'center', marginTop: 12, paddingBottom: 2 }}

@@ -256,17 +256,19 @@ type ModalHeaderProps = {
   title: string;
   subtitle?: string;
   onBack?: () => void;
+  customBackIcon?: React.ComponentType<{ size?: number, color?: string, style?: ViewStyle }> | false;
   style?: ViewStyle;
   type?: 'default' | 'alt';
   size?: 'big' | 'normal';
   endContent?: ReactNode;
   align?: 'auto' | 'left';
 }
-export const ModalHeader = ({ title, onBack, style, subtitle, type, size, align, endContent }: ModalHeaderProps) => {
+export const ModalHeader = ({ title, onBack, style, subtitle, type, size, align, endContent, customBackIcon }: ModalHeaderProps) => {
   const isAlt = type === 'alt';
   const isBig = size === 'big';
 
   const Title = isBig ? Text.H1 : Text.H3;
+  const CustomBackIcon = customBackIcon;
 
   const justify =
     align === 'left' ? 'flex-start' :
@@ -300,7 +302,8 @@ export const ModalHeader = ({ title, onBack, style, subtitle, type, size, align,
               padding: 10,
             }}
           >
-            <ArrowLeft color={Colors.foreground} />
+            {CustomBackIcon ? <CustomBackIcon color={Colors.foreground} /> :
+              <ArrowLeft color={Colors.foreground} />}
           </Block>
         </Pressable>}
         <Title

@@ -189,6 +189,7 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
           <ModalHeader
             title="Select items"
             onBack={router.canGoBack() ? () => { router.back() } : undefined}
+            customBackIcon={X}
             style={{ marginBottom: 0, marginTop: 16 }}
           />
           <View style={{ flexDirection: 'row', gap: 8, marginTop: 12, marginBottom: 4, }}>
