@@ -250,7 +250,7 @@ export default function Screen() {
   const { outfitId, outfitSize, presetId, friendId, disabled, hasMultipleSubjects } = usePhotoshoot.New();
   const { dismissTo, push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
 
-  const { action, isLoading } = useAction(api.llm.triggers.photoshoot.authed);
+  const { action, isLoading } = useAction(api.llm.triggers.photoshootBytePlus.authed);
 
   return (
     <View style={{ paddingHorizontal: 12 }}>

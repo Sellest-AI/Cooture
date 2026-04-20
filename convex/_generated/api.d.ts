@@ -64,6 +64,7 @@ import type * as http_replicate from "../http/replicate.js";
 import type * as http_revenuecat from "../http/revenuecat.js";
 import type * as http_runpod_generateVideo from "../http/runpod/generateVideo.js";
 import type * as http_runpod_removeBackground from "../http/runpod/removeBackground.js";
+import type * as lib_byteplus_node from "../lib/byteplus/node.js";
 import type * as lib_color_index from "../lib/color/index.js";
 import type * as lib_image_index from "../lib/image/index.js";
 import type * as lib_image_node from "../lib/image/node.js";
@@ -106,6 +107,7 @@ import type * as llm_triggers_generateFace from "../llm/triggers/generateFace.js
 import type * as llm_triggers_generateVideo from "../llm/triggers/generateVideo.js";
 import type * as llm_triggers_itemCategorizer from "../llm/triggers/itemCategorizer.js";
 import type * as llm_triggers_photoshoot from "../llm/triggers/photoshoot.js";
+import type * as llm_triggers_photoshootBytePlus from "../llm/triggers/photoshootBytePlus.js";
 import type * as llm_triggers_presetCreator from "../llm/triggers/presetCreator.js";
 import type * as llm_triggers_presetPreview from "../llm/triggers/presetPreview.js";
 import type * as llm_triggers_removeBackground from "../llm/triggers/removeBackground.js";
@@ -341,6 +343,7 @@ declare const fullApi: ApiFromModules<{
   "http/revenuecat": typeof http_revenuecat;
   "http/runpod/generateVideo": typeof http_runpod_generateVideo;
   "http/runpod/removeBackground": typeof http_runpod_removeBackground;
+  "lib/byteplus/node": typeof lib_byteplus_node;
   "lib/color/index": typeof lib_color_index;
   "lib/image/index": typeof lib_image_index;
   "lib/image/node": typeof lib_image_node;
@@ -383,6 +386,7 @@ declare const fullApi: ApiFromModules<{
   "llm/triggers/generateVideo": typeof llm_triggers_generateVideo;
   "llm/triggers/itemCategorizer": typeof llm_triggers_itemCategorizer;
   "llm/triggers/photoshoot": typeof llm_triggers_photoshoot;
+  "llm/triggers/photoshootBytePlus": typeof llm_triggers_photoshootBytePlus;
   "llm/triggers/presetCreator": typeof llm_triggers_presetCreator;
   "llm/triggers/presetPreview": typeof llm_triggers_presetPreview;
   "llm/triggers/removeBackground": typeof llm_triggers_removeBackground;

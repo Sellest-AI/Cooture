@@ -11,6 +11,7 @@ export const env = {
   STRIPE_WEBHOOK_SECRETS: process.env.STRIPE_WEBHOOK_SECRETS ?? '',
   OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY ?? '',
   VOYAGE_API_KEY: process.env.VOYAGE_API_KEY ?? '',
+  BYTEPLUS_API_KEY: process.env.BYTEPLUS_API_KEY ?? '',
   // S3 Configuration
   S3_APP_KEY: process.env.S3_APP_KEY ?? '',
   S3_APP_KEY_ID: process.env.S3_APP_KEY_ID ?? '',
