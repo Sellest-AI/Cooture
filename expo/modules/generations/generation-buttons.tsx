@@ -18,7 +18,7 @@ type Generation = {
 }
 
 type Props = {
-  onNext: (validated: boolean) => void;
+  onNext: (validated: boolean) => (void | Promise<void>);
   currentItem: Generation | undefined;
   items: Generation[];
 }
@@ -42,6 +42,7 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
           exit={{ opacity: 0, translateY: 20 }}
         >
           <View
+            key={currentItem._id}
             style={{
               paddingBottom: bottom + 28,
               alignItems: 'center',
@@ -88,8 +89,6 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
                   const hasMedia = !!currentItem?.imageUrl || !!currentItem?.videoUrl;
                   if (!currentItem || !hasMedia) return;
 
-                  onNext(true);
-
                   try {
                     if (currentItem.videoUrl) {
                       const key = addToast({
@@ -128,6 +127,8 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
                         .catch(() => null);
                     }
                   } catch { }
+
+                  await onNext(true);
                 }}
               >
                 Save

@@ -79,13 +79,13 @@ export default function Screen() {
   const currentItem = visibleItems[currentIndex];
 
   // Functions
-  const next = (validated: boolean) => {
+  const next = async (validated: boolean) => {
     if (!currentItem) return;
 
     if (validated) {
-      acceptPrediction(currentItem._id);
+      await acceptPrediction(currentItem._id);
     } else {
-      rejectPrediction(currentItem._id);
+      await rejectPrediction(currentItem._id);
     }
 
     // Trigger animation
