@@ -27,11 +27,11 @@ export const applyWatermark = async (
   const wmWidth = watermarkImage.width() * scale;
   const wmHeight = watermarkImage.height() * scale;
 
-  // 5% padding bottom-right
-  const paddingRight = imgWidth * 0.05;
+  // 5% padding bottom
   const paddingBottom = imgWidth * 0.05;
-  const left = imgWidth - wmWidth - paddingRight;
   const top = imgHeight - wmHeight - paddingBottom;
+  // Center horizontally and place at the bottom with some padding
+  const left = (imgWidth - wmWidth) / 2;
 
   // Draw onto an offscreen surface
   const surface = Skia.Surface.Make(imgWidth, imgHeight)!;
