@@ -27,6 +27,7 @@ type Props = {
   onValueChange?: (value: number, closestValue: number) => void;
   style?: ViewStyle;
   customHeight?: number;
+  variant?: 'primary' | 'secondary';
 };
 
 type LabelIndicatorProps = {
@@ -41,7 +42,7 @@ const LabelIndicator = ({ position, translationX, knobSize, trackHeight, onPress
   const animatedStyle = useAnimatedStyle(() => {
     const hasPassed = translationX.value + knobSize / 2 >= position;
     return {
-      opacity: hasPassed ? 0.1 : 0.3,
+      opacity: hasPassed ? 0.15 : 0.3,
     };
   });
 
@@ -64,7 +65,7 @@ const LabelIndicator = ({ position, translationX, knobSize, trackHeight, onPress
   );
 };
 
-export const Slider = ({ value, label, labels, onValueChange, style, customHeight }: Props) => {
+export const Slider = ({ value, label, labels, onValueChange, style, customHeight, variant = 'primary' }: Props) => {
   const TRACK_HEIGHT = customHeight ?? 32;
   const KNOB_SIZE = TRACK_HEIGHT;
 
@@ -247,7 +248,7 @@ export const Slider = ({ value, label, labels, onValueChange, style, customHeigh
         <Animated.View
           className="absolute top-0 left-0 h-full"
           style={[filledTrackStyle, {
-            backgroundColor: Colors.primary[500],
+            backgroundColor: variant === 'primary' ? Colors.primary[500] : Colors.secondary[500],
             height: '100%',
             position: 'absolute',
             borderRadius: 99
@@ -287,7 +288,7 @@ export const Slider = ({ value, label, labels, onValueChange, style, customHeigh
               { width: KNOB_SIZE, height: KNOB_SIZE },
               knobStyle,
               {
-                backgroundColor: Colors.primary[500],
+                backgroundColor: variant === 'primary' ? Colors.primary[500] : Colors.secondary[500],
                 borderRadius: 99
               }
             ]}

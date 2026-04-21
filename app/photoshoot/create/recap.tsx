@@ -294,7 +294,7 @@ export default function Screen() {
         <Portrait style={{
           marginTop: 48,
           paddingHorizontal: 8,
-          marginBottom: 48,
+          marginBottom: 40,
         }}
         />
         <View style={{ flex: 1, justifyContent: 'flex-end' }}>

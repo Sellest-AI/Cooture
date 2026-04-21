@@ -1,4 +1,4 @@
-import { ComponentProps, useRef, useState } from 'react';
+import { ComponentProps, useEffect, useRef, useState } from 'react';
 import { TextInput as NativeTextInput, View, ViewStyle } from 'react-native';
 import { SvgProps } from 'react-native-svg';
 import { Colors } from 'theme';
@@ -19,7 +19,10 @@ export const TextInput = ({ className = "", style, startIcon, canClear, autoFocu
   const hasIcon = !!startIcon;
   const Icon = startIcon;
 
-  const hasText = props.value && props.value.toString().length > 0;
+  const [value, setValue] = useState(props.value?.toString() ?? '');
+  useEffect(() => { setValue(props.value?.toString() ?? '') }, [props.value]);
+
+  const hasText = value.length > 0;
 
   const ref = useRef<View>(null);
 
@@ -56,9 +59,17 @@ export const TextInput = ({ className = "", style, startIcon, canClear, autoFocu
       </View>}
       <NativeTextInput
         {...props}
+        value={value}
+        onChangeText={(text) => {
+          setValue(text);
+          props.onChangeText?.(text);
+        }}
         onBlur={(e) => {
-          // Native `onBlur` does not include text in the event, so we use `props.value` or an empty string as a fallback.
-          props.onBlur?.((props.value as string) ?? '');
+          if (!props.onBlur) return;
+          const value = (e.nativeEvent as unknown as { text: string }).text ??
+            e.currentTarget.nodeValue ?? props.value ?? '';
+          setValue(value.toString());
+          props.onBlur?.(value);
         }}
         autoFocus={autoFocus}
         onLayout={autoFocus ? (e) => e.currentTarget.focus() : undefined}
@@ -76,6 +87,7 @@ export const TextInput = ({ className = "", style, startIcon, canClear, autoFocu
       />
       {canClear && <Pressable
         onPress={() => {
+          setValue('');
           if (props.onBlur) props.onBlur('')
           else props.onChangeText?.('')
         }}
