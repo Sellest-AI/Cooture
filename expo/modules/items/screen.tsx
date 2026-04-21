@@ -154,13 +154,14 @@ const SimilarItems = ({ style, path }: { path: Route, style?: ViewStyle }) => {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: paddingHorizontal ?? 0,
+        marginBottom: 8,
         marginLeft: 4,
-        gap: 4,
+        gap: 6,
       }}>
-        <Text.Lg color={Colors.neutral[400]} weight={500} style={{ marginBottom: 8 }}>
+        <Text.Lg color={Colors.neutral[400]} weight={500}>
           Similar items
         </Text.Lg>
-        {isLoading && <Loader size={16} color={Colors.neutral[400]} />}
+        {isLoading && <Loader size={12} color={Colors.neutral[400]} />}
       </View>
       <FlashList
         data={items}

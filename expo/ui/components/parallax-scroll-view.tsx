@@ -217,6 +217,23 @@ export const ParallaxScrollView = ({
                 Dimensions.get('screen').height - headerHeightRuntime + contentNegativeSpace - bottom
                 : undefined,
             }}>
+            <View style={{
+              pointerEvents: 'none',
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: headerBackgroundGradient ? 0 : -32,
+              height: headerHeight,
+            }}
+            >
+              <LinearGradient
+                colors={['transparent', Colors.background]}
+                style={{
+                  height: 132,
+                }}
+              />
+              <View style={{ flex: 1, backgroundColor: Colors.background }} />
+            </View>
             {children}
           </View>
         </ParallaxScrollContext.Provider>
