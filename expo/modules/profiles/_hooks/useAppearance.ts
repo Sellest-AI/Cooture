@@ -17,8 +17,12 @@ export const useAppearance = () => {
     await mutate({ gender })
   }
 
+  const hasFullAppearance = Boolean(appearance?.frontImage && appearance?.sideImage && appearance?.smileImage
+    && appearance.heightCm && appearance.size && appearance.gender);
+
   return {
     isPending,
+    hasFullAppearance,
     frontImage: appearance?.frontImage,
     sideImage: appearance?.sideImage,
     smileImage: appearance?.smileImage,
