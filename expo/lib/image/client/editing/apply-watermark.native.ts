@@ -21,8 +21,8 @@ export const applyWatermark = async (
   const imgWidth = baseImage.width();
   const imgHeight = baseImage.height();
 
-  // 10% of the smaller dimension
-  const watermarkSize = Math.min(imgWidth, imgHeight) * 0.1;
+  // 7% of the smaller dimension
+  const watermarkSize = Math.min(imgWidth, imgHeight) * 0.07;
   const scale = watermarkSize / Math.min(watermarkImage.width(), watermarkImage.height());
   const wmWidth = watermarkImage.width() * scale;
   const wmHeight = watermarkImage.height() * scale;
