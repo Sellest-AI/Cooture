@@ -96,7 +96,7 @@ const OutfitGrid = ({ items, style }: { items: Items, style?: ViewStyle }) => {
   )
 }
 
-const OutfitComponent = () => {
+const OutfitComponent = ({ style }: { style?: ViewStyle }) => {
   const { outfit, outfitSize, outfitSizes, setOutfitSize, hasMultipleSubjects } = usePhotoshoot.New();
   const { push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
 
@@ -109,26 +109,44 @@ const OutfitComponent = () => {
   if (hasMultipleSubjects)
     return null;
 
+  const hasOutfit = Boolean(outfit);
+
   return (
-    <Block
-      variant="blur"
-      style={{
-        borderRadius: 32,
-        paddingHorizontal: 16,
-        paddingVertical: 20,
-        gap: 12,
-        marginTop: 8,
-      }}
+    <View
+      style={style}
     >
-      <Text.H4 color={Colors.neutral[50]}>Custom Outfit</Text.H4>
-      {outfit && <Text.Base color={Colors.neutral[400]}>
-        This outfit will be used for your photoshoot.
-      </Text.Base>}
-      {!outfit && <Text.Base color={Colors.neutral[400]}>
-        We&apos;ll use the model&apos;s default wardrobe instead.
-      </Text.Base>}
+      <View style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: 16
+      }}
+      >
+        <View>
+          <Text.H4 color={Colors.neutral[50]}>Outfit</Text.H4>
+          <Text.Base color={Colors.neutral[400]} style={{ marginTop: 4 }}>
+            {hasOutfit ? 'Your selected outfit.' : 'No outfit selected. The preset outfit will be used.'}
+          </Text.Base>
+        </View>
+        {hasOutfit && <Button
+          variant="blur"
+          size="sm"
+          onPress={() => {
+            push(ROUTES.MODALS.PICK_OUTFIT, {
+              params: {
+                canSkip: true,
+                itemIds: outfit?.items.map(i => i._id)
+              },
+              redirectHere: true,
+            });
+          }}
+        >
+          Edit
+        </Button>}
+      </View>
       {outfit && <OutfitGrid items={outfit.items} />}
       {outfit && <Slider
+        style={{ marginTop: 8 }}
         value={sizes.find(s => s.defaultLabel === outfitSize)?.value ?? 0}
         onValueChange={(v) => {
           const closest = sizes.reduce((prev, curr) => {
@@ -140,22 +158,24 @@ const OutfitComponent = () => {
         labels={sizes}
         label="Fit"
       />}
-      <Button
-        style={{ marginTop: 8 }}
-        variant="blur"
-        onPress={() => {
-          push(ROUTES.MODALS.PICK_OUTFIT, {
-            params: {
-              canSkip: true,
-              itemIds: outfit?.items.map(i => i._id)
-            },
-            redirectHere: true,
-          });
-        }}
-      >
-        {outfit ? 'Change outfit' : 'Select an outfit'}
-      </Button>
-    </Block>
+      {!hasOutfit && (
+        <Button
+          variant="blur"
+          style={{ marginTop: 4 }}
+          onPress={() => {
+            push(ROUTES.MODALS.PICK_OUTFIT, {
+              params: {
+                canSkip: true,
+                itemIds: outfit?.items.map(i => i._id)
+              },
+              redirectHere: true,
+            });
+          }}
+        >
+          {outfit ? 'Change outfit' : 'Select an outfit'}
+        </Button>
+      )}
+    </View>
   )
 }
 
@@ -265,21 +285,19 @@ export default function Screen() {
           Change Preset
         </Button>
         <FriendBlock />
-        <Block
-          variant="blur"
+        <OutfitComponent
           style={{
-            borderRadius: 32,
-            paddingHorizontal: 16,
-            paddingVertical: 20,
-            gap: 12,
+            marginTop: 24,
+            paddingHorizontal: 8,
           }}
-        >
-          <Text.H4 color={Colors.neutral[50]}>Portrait</Text.H4>
-          <Text.Base color={Colors.neutral[400]}>Make sure your portrait images are up to date.</Text.Base>
-          <Portrait style={{ marginTop: 16 }} />
-        </Block>
-        <OutfitComponent />
-        <View style={{ flex: 1, justifyContent: 'flex-end', marginTop: 12 }}>
+        />
+        <Portrait style={{
+          marginTop: 48,
+          paddingHorizontal: 8,
+          marginBottom: 48,
+        }}
+        />
+        <View style={{ flex: 1, justifyContent: 'flex-end' }}>
           <ButtonSlider
             startIcon={Flame}
             disabled={disabled || isLoading}
@@ -356,7 +374,7 @@ export default function Screen() {
           </View>
         </View>
         <View style={{ height: 12 }} />
-      </View>
+      </View >
       <ModalAppearance
         currentPath={ROUTES.PHOTOSHOOT.RECAP}
       />
