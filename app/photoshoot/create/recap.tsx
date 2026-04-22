@@ -247,7 +247,7 @@ const FriendBlock = ({ style }: { style?: ViewStyle }) => {
             alignItems: 'center'
           }}
         >
-          <Plus size={32} />
+          <Plus size={32} color={Colors.primary[900]} />
         </View>}
       </Block>
     </Pressable>

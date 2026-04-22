@@ -159,12 +159,14 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
   const [category, setCategory] = useState<string | null>(null);
   const [hexColor, setColor] = useState<string | null>(null);
   const [bookmarked, setBookmarked] = useState(false);
-  const { results, isLoading, isFiltering, isEmpty, canLoadMore, loadMore } = useSearchItems({ query, category, hexColor, bookmarked, channel: 'public' });
+  const { results, isLoading, isFiltering, canLoadMore, loadMore } = useSearchItems({ query, category, hexColor, bookmarked, channel: 'public' });
 
   const { isHidden } = useSafety();
   const itemsLibrary = [...(isFiltering ? [] : latestItems), ...results] // unique;
     .filter((item, i, arr) => arr.findIndex(it => it._id === item._id) === i)
     .filter((item) => !isHidden({ itemId: item._id, userId: item.userId, item }));
+
+  const isEmpty = itemsLibrary.length === 0 && !isLoading;
 
   // UI
   const listRef = useRef<FlashListRef<typeof itemsLibrary[number] | string>>(null);
