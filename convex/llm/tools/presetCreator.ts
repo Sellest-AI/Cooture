@@ -117,6 +117,7 @@ export const ImagePresetSchema = z.object({
   // Usually contains ONE subject. Only use multiple if there are 2+ clearly identifiable focal humans.
   // Crowds/blurred people belong in environment.surroundingElements.
   subjects: z.array(z.object({
+    gender: z.enum(['male', 'female']).describe('Only field that can be gendered because it is used for pronoun purposes.'),
     position: z.string().describe("General stance: e.g., 'Sitting', 'Standing', 'Jumping'."),
     bodyAlignment: z.string().describe("Relation to camera: e.g., 'Frontal', 'Profile', 'Three-quarter turn'."),
     legs: z.array(z.string()).describe("Leg positions. Example: ['Right leg bent at knee', 'Left leg straight supporting weight']."),
