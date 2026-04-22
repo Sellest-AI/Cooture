@@ -15,6 +15,7 @@ import { LinearGradient } from "@ui/linear-gradient";
 import { Pressable } from "@ui/pressable";
 import { Skeleton } from "@ui/skeleton";
 import { Slider } from "@ui/slider";
+import { Switch } from "@ui/switch";
 import { Text } from "@ui/text";
 import React, { useMemo, useState } from "react";
 import { Platform, View, ViewStyle } from "react-native";
@@ -97,7 +98,8 @@ const OutfitGrid = ({ items, style }: { items: Items, style?: ViewStyle }) => {
 }
 
 const OutfitComponent = ({ style }: { style?: ViewStyle }) => {
-  const { outfit, outfitSize, outfitSizes, setOutfitSize, hasMultipleSubjects } = usePhotoshoot.New();
+  const { outfit, outfitSize, outfitSizes, setOutfitSize, hasMultipleSubjects,
+    shareOutfit, setShareOutfit } = usePhotoshoot.New();
   const { push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
 
   const sizes = outfitSizes.map((size, i) => ({
@@ -122,7 +124,7 @@ const OutfitComponent = ({ style }: { style?: ViewStyle }) => {
         <View>
           <Text.H4 color={Colors.neutral[50]}>Outfit</Text.H4>
           <Text.Base color={Colors.neutral[400]} style={{ marginTop: 4 }}>
-            {hasOutfit ? (hasMultipleSubjects ? 'Worn by all participants.' : 'Your selected outfit.') :
+            {hasOutfit ? 'Your selected outfit.' :
               'No outfit selected. The preset outfit will be used.'}
           </Text.Base>
         </View>
@@ -153,6 +155,21 @@ const OutfitComponent = ({ style }: { style?: ViewStyle }) => {
         variant="secondary"
         label="Fit"
       />}
+      {(outfit && hasMultipleSubjects) && <View style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 24,
+      }}>
+        <View>
+          <Text.Base color={Colors.neutral[400]} weight={500}>
+            {shareOutfit ? 'Everyone wears this outfit' : 'Only you wear this outfit'}
+          </Text.Base>
+        </View>
+        <View>
+          <Switch value={shareOutfit} onValueChange={setShareOutfit} />
+        </View>
+      </View>}
       {!hasOutfit && (
         <Button
           variant="blur"
@@ -258,7 +275,7 @@ export default function Screen() {
   const [numberToGenerate] = useState(1);
   const { data: cost } = useQueryCached(api.router.credits.getCost.anon, { type: 'IMAGE_GENERATION_COST', amount: numberToGenerate });
   const { data: canPay } = useQueryCached(api.router.credits.canPay.authed, cost ? { amount: cost } : 'skip');
-  const { outfitId, outfitSize, presetId, friendId, disabled, hasMultipleSubjects } = usePhotoshoot.New();
+  const { outfitId, outfitSize, presetId, friendId, disabled, hasMultipleSubjects, shareOutfit } = usePhotoshoot.New();
   const { dismissTo, push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
 
   const { action, isLoading } = useAction(api.llm.triggers.photoshootBytePlus.authed);
@@ -313,7 +330,8 @@ export default function Screen() {
                 extraUserIds: friend,
                 outfit: outfitId ? {
                   _id: outfitId,
-                  size: outfitSize
+                  size: outfitSize,
+                  shared: shareOutfit
                 } : undefined,
               }).catch(() => null);
 

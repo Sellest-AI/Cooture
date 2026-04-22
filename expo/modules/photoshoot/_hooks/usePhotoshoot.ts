@@ -35,6 +35,7 @@ const outfitSizes = ['TIGHT', 'DEFAULT', 'LOOSE', 'EXTRA_LOOSE'] as const;
 type Sizes = typeof outfitSizes[number];
 
 const outfitSizeAtom = atom<Sizes>("DEFAULT");
+const shareOutfitAtom = atom(false);
 const outfitAtom = atom<Id<"outfits"> | null>(null);
 const presetAtom = atom<Id<"presets"> | null>(null);
 const friendIdAtom = atom<Id<"users"> | null>(null);
@@ -43,6 +44,7 @@ const useNew = () => {
   const [friendId, setFriendId] = useAtom(friendIdAtom);
   const [outfitSize, setOutfitSize] = useAtom(outfitSizeAtom);
   const [outfitId, setOutfitId] = useAtom(outfitAtom);
+  const [shareOutfit, setShareOutfit] = useAtom(shareOutfitAtom);
   const [presetId, setPresetId] = useAtom(presetAtom);
 
   const { data: outfit } = useQuery(api.router.outfits.getOne.anon, outfitId ? { outfitId } : 'skip');
@@ -54,6 +56,7 @@ const useNew = () => {
     setOutfitId(null);
     setPresetId(null);
     setFriendId(null);
+    setShareOutfit(false);
   }
 
   const hasMultipleSubjects = preset?.hasMultipleSubjects;
@@ -71,6 +74,8 @@ const useNew = () => {
     outfitSize,
     outfitSizes,
     setOutfitSize,
+    shareOutfit,
+    setShareOutfit,
     setFriendId,
     friendId,
     reset,

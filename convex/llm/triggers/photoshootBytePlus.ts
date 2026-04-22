@@ -16,7 +16,7 @@ const generateFunction = async (ctx: ActionCtx, args: {
   userId: Id<'users'>,
   generationId?: Id<'generations'>,
   presetId: Id<'presets'>,
-  outfit?: { _id: Id<'outfits'>, size?: "TIGHT" | "DEFAULT" | "LOOSE" | "EXTRA_LOOSE", },
+  outfit?: { _id: Id<'outfits'>, size?: "TIGHT" | "DEFAULT" | "LOOSE" | "EXTRA_LOOSE", shared?: boolean },
   extraUserIds?: Id<'users'>[],
   numberToGenerate?: number,
 }) => {
@@ -41,10 +41,11 @@ const generateFunction = async (ctx: ActionCtx, args: {
   }
 
   const subjects = [{ userId: args.userId, outfit: args.outfit },
-  ...(args.extraUserIds ?? []).map((id) => ({ userId: id }))
+  ...(args.extraUserIds ?? []).map((id) => ({ userId: id, outfit: args.outfit?.shared ? args.outfit : undefined }))
   ].map((subject, i) => ({ ...subject, prompt: baseSchema.prompt.subjects[i] }))
 
   const schema = await createPhotoshootSchema(ctx, baseSchema, subjects);
+
   const prompt = await schemaToMarkdown(schema.prompt);
 
   // only add extra users to generation, not the main user
@@ -98,6 +99,7 @@ const sharedArgs = {
   outfit: v.optional(v.object({
     _id: v.id("outfits"),
     size: v.optional(OUTFIT_SIZES_ARGS),
+    shared: v.optional(v.boolean()),
   })),
   /** Other users to be added when duo/trio shot */
   extraUserIds: v.optional(v.array(v.id("users"))),
