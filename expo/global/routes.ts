@@ -71,6 +71,7 @@ export const ROUTES = {
   },
   PHOTOSHOOT: {
     NEW: '/photoshoot/create',
+    OUTFIT: '/photoshoot/create/outfit',
     RECAP: '/photoshoot/create/recap',
   },
   USER: {

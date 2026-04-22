@@ -9,7 +9,7 @@ import { Block } from "@ui/block";
 import { Button } from "@ui/button";
 import { ButtonSlider } from "@ui/button.slider";
 import { Col, Grid, Row } from "@ui/grid";
-import { ArrowLeft, Credits, Flame, Plus, Squirish } from "@ui/icons";
+import { Credits, Flame, Plus, Squirish } from "@ui/icons";
 import { Image } from "@ui/image";
 import { LinearGradient } from "@ui/linear-gradient";
 import { Pressable } from "@ui/pressable";
@@ -106,9 +106,6 @@ const OutfitComponent = ({ style }: { style?: ViewStyle }) => {
     defaultLabel: size,
   }));
 
-  if (hasMultipleSubjects)
-    return null;
-
   const hasOutfit = Boolean(outfit);
 
   return (
@@ -125,18 +122,15 @@ const OutfitComponent = ({ style }: { style?: ViewStyle }) => {
         <View>
           <Text.H4 color={Colors.neutral[50]}>Outfit</Text.H4>
           <Text.Base color={Colors.neutral[400]} style={{ marginTop: 4 }}>
-            {hasOutfit ? 'Your selected outfit.' : 'No outfit selected. The preset outfit will be used.'}
+            {hasOutfit ? (hasMultipleSubjects ? 'Worn by all participants.' : 'Your selected outfit.') :
+              'No outfit selected. The preset outfit will be used.'}
           </Text.Base>
         </View>
         {hasOutfit && <Button
           variant="blur"
           size="sm"
           onPress={() => {
-            push(ROUTES.MODALS.PICK_OUTFIT, {
-              params: {
-                canSkip: true,
-                itemIds: outfit?.items.map(i => i._id)
-              },
+            push(ROUTES.PHOTOSHOOT.OUTFIT, {
               redirectHere: true,
             });
           }}
@@ -156,6 +150,7 @@ const OutfitComponent = ({ style }: { style?: ViewStyle }) => {
         }}
         customHeight={36}
         labels={sizes}
+        variant="secondary"
         label="Fit"
       />}
       {!hasOutfit && (
@@ -163,11 +158,7 @@ const OutfitComponent = ({ style }: { style?: ViewStyle }) => {
           variant="blur"
           style={{ marginTop: 4 }}
           onPress={() => {
-            push(ROUTES.MODALS.PICK_OUTFIT, {
-              params: {
-                canSkip: true,
-                itemIds: outfit?.items.map(i => i._id)
-              },
+            push(ROUTES.PHOTOSHOOT.OUTFIT, {
               redirectHere: true,
             });
           }}
@@ -179,7 +170,7 @@ const OutfitComponent = ({ style }: { style?: ViewStyle }) => {
   )
 }
 
-const FriendBlock = () => {
+const FriendBlock = ({ style }: { style?: ViewStyle }) => {
   const { push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
   const { hasMultipleSubjects, friendId } = usePhotoshoot.New();
   const { data: friend, isPending } = useQuery(api.router.users.getAccount.anon, friendId ? { userId: friendId } : 'skip');
@@ -187,80 +178,79 @@ const FriendBlock = () => {
   if (!hasMultipleSubjects) return null;
 
   return (
-    <Block
-      variant="blur"
-      style={{
-        marginBottom: 8,
-        borderRadius: 32,
-        paddingHorizontal: 16,
-        paddingBottom: 20,
-        paddingTop: 16,
-        gap: 12,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-end',
-      }}
+    <Pressable
+      onPress={() => push(ROUTES.MODALS.PICK_USER, { redirectHere: true })}
+      intensity={0.995}
     >
-      <LinearGradient
-        colors={['transparent', Colors.primary[500]]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
+      <Block
+        variant="blur"
         style={{
-          position: 'absolute',
-          right: 0,
-          top: 0,
-          bottom: 0,
-          width: 300,
-          opacity: Platform.OS === 'android' ? 0.05 : 0.1
-        }}
-      />
-      <View style={{ gap: 8 }}>
-        <View style={{
-          paddingHorizontal: 12,
-          paddingVertical: 6,
-          backgroundColor: Colors.primary[500],
-          alignSelf: 'flex-start',
-          borderRadius: 99,
-          marginBottom: 4,
-        }}>
-          <Text.Sm color={Colors.primary[900]} weight={600}>Required</Text.Sm>
-        </View>
-        <Text.H4 color={Colors.neutral[50]}>Friend</Text.H4>
-        {(isPending && friendId) && <Skeleton style={{ width: 128, height: 18 }} />}
-        {friend && <Text.Base color={Colors.neutral[400]}>{friend.name}</Text.Base>}
-        {!friendId && <Text.Base color={Colors.neutral[400]}>
-          Select a friend to join you.
-        </Text.Base>}
-      </View>
-      {friend && <Pressable onPress={() => push(ROUTES.MODALS.PICK_USER, {
-        redirectHere: true,
-      })}>
-        <Badge
-          source={friend?.image}
-          style={{ width: 86, height: 86, borderRadius: 99 }}
-        />
-      </Pressable>}
-      {!friendId && <Pressable
-        onPress={() => push(ROUTES.MODALS.PICK_USER, {
-          redirectHere: true,
-        })}
-        style={{
-          width: 72,
-          height: 72,
-          borderRadius: 99,
-          backgroundColor: Colors.primary[500],
-          borderWidth: 1,
-          borderTopColor: Colors.primary[200],
-          borderLeftColor: Colors.primary[200],
-          borderRightColor: Colors.primary[500],
-          borderBottomColor: Colors.primary[500],
-          justifyContent: 'center',
-          alignItems: 'center'
+          ...style,
+          borderRadius: 32,
+          gap: 12,
+          paddingHorizontal: 16,
+          paddingBottom: 20,
+          paddingTop: 16,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
         }}
       >
-        <Plus size={32} />
-      </Pressable>}
-    </Block>
+        <LinearGradient
+          colors={['transparent', Colors.primary[500]]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            bottom: 0,
+            width: 300,
+            opacity: Platform.OS === 'android' ? 0.05 : 0.1
+          }}
+        />
+        <View style={{ gap: 8 }}>
+          <View
+            style={{
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              backgroundColor: Colors.primary[500],
+              alignSelf: 'flex-start',
+              borderRadius: 99,
+              marginBottom: 4,
+            }}>
+            <Text.Sm color={Colors.primary[900]} weight={600}>{friendId ? 'Selected' : 'Required'}</Text.Sm>
+          </View>
+          <Text.H4 color={Colors.neutral[50]}>Friend</Text.H4>
+          {(isPending && friendId) && <Skeleton style={{ width: 128, height: 18 }} />}
+          {friend && <Text.Base color={Colors.neutral[400]}>{friend.name}</Text.Base>}
+          {!friendId && <Text.Base color={Colors.neutral[400]}>
+            Select a friend to join you.
+          </Text.Base>}
+        </View>
+        {friend && <Badge
+          source={friend?.image}
+          style={{ width: 86, height: 86, borderRadius: 99 }}
+        />}
+        {!friendId && <View
+          style={{
+            width: 72,
+            height: 72,
+            borderRadius: 99,
+            backgroundColor: Colors.primary[500],
+            borderWidth: 1,
+            borderTopColor: Colors.primary[200],
+            borderLeftColor: Colors.primary[200],
+            borderRightColor: Colors.primary[500],
+            borderBottomColor: Colors.primary[500],
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
+          <Plus size={32} />
+        </View>}
+      </Block>
+    </Pressable>
   )
 }
 
@@ -276,15 +266,12 @@ export default function Screen() {
   return (
     <>
       <View style={{ paddingHorizontal: 12 }}>
-        <Button
-          onPress={() => dismissTo('/photoshoot/create', { resetNextRoute: false })}
-          variant="secondary"
-          style={{ marginBottom: 8 }}
-          startIcon={ArrowLeft}
-        >
-          Change Preset
-        </Button>
-        <FriendBlock />
+        <FriendBlock
+          style={{
+            marginTop: 20,
+            marginBottom: 16
+          }}
+        />
         <OutfitComponent
           style={{
             marginTop: 24,
