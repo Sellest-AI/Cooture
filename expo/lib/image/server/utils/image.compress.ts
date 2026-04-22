@@ -165,7 +165,7 @@ export const compressImage = async (image: Buffer | string, options?: Options) =
   const quality = (() => {
     if (!options?.quality) return undefined;
     const _quality = Math.round(options.quality);
-    const lerpedQuality = lerpValue(_quality, [6, 0], [_quality, _quality * 0.95]);
+    const lerpedQuality = lerpValue(effort, [6, 0], [_quality, _quality * 0.95]);
     return Math.round(lerpedQuality);
   })();
 
@@ -177,7 +177,10 @@ export const compressImage = async (image: Buffer | string, options?: Options) =
     transformer = transformer.png({ compressionLevel });
   }
   else
-    transformer = transformer.webp({ quality: quality, effort });
+    transformer = transformer.webp({
+      quality: quality ? Math.round(quality) : undefined,
+      effort: Math.round(effort)
+    });
 
   const { width, height } = { width: metadata.width ?? 0, height: metadata.height ?? 0 }
   const maxSideSize = options?.maxSideSize ?? Infinity;
