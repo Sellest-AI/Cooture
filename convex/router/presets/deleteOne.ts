@@ -6,7 +6,7 @@ import { authMutation, internalMutation, MutationCtx } from "../../procedures";
 const handler = async (ctx: MutationCtx, args: { id: Id<'presets'>, onlyIfArchived?: boolean }) => {
   const preset = await ctx.db.get(args.id);
   if (!preset) throw new Error("Preset not found");
-  if (args.onlyIfArchived && !preset.archived) throw new Error("Preset is not archived");
+  if (args.onlyIfArchived && !preset.archived) return false;
 
   // Check if preset has been used to generate images, if so, prevent deletion
   const generations = await ctx.db.query("presetGenerations")
@@ -29,6 +29,8 @@ const handler = async (ctx: MutationCtx, args: { id: Id<'presets'>, onlyIfArchiv
   await Promise.all(categories.map(category => ctx.db.delete(category._id)));
 
   await ctx.db.delete(args.id);
+
+  return true;
 }
 
 export const _internal = internalMutation({
@@ -36,7 +38,7 @@ export const _internal = internalMutation({
     id: v.id("presets"),
     onlyIfArchived: v.optional(v.boolean()),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<boolean> => {
     return await handler(ctx, args);
   }
 })
@@ -45,7 +47,7 @@ export const authed = authMutation({
   args: {
     id: v.id("presets"),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<boolean> => {
     return await handler(ctx, args);
   }
 })
