@@ -150,7 +150,7 @@ export default function Screen() {
           redirectTo: ROUTES.TABS.DISCOVER
         })}
       >
-        Discover the future
+        I&apos;m ready
       </Button>
     </View>
   );
