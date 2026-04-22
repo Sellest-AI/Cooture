@@ -1,9 +1,12 @@
 import { v } from "convex/values";
-import { getAccount, getUserPublic } from "../../functions/users";
+import { getAccount, getUserPublic, isPremium } from "../../functions/users";
 import { adminQuery, authQuery, internalQuery, publicQuery, serverQuery } from "../../procedures";
 
 export const authed = authQuery({
-  handler: async (ctx) => ctx.user
+  handler: async (ctx) => {
+    const premium = await isPremium(ctx, { throwOnReject: false });
+    return { ...ctx.user, isPremium: premium };
+  }
 });
 
 export const admin = adminQuery({

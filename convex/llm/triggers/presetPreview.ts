@@ -22,8 +22,10 @@ export const authed = authAction({
       depthMap: preset.depthMaps[0]
     }
 
-    const subjects = [{ userId: ctx.userId }]
-      .map((subject, i) => ({ ...subject, prompt: baseSchema.prompt.subjects[i] }))
+    const subjects = baseSchema.prompt.subjects.map((prompt) => ({
+      userId: undefined,
+      prompt: prompt,
+    }))
 
     const schema = await createPhotoshootSchema(ctx, baseSchema, subjects);
     const prompt = await schemaToMarkdown(schema.prompt);

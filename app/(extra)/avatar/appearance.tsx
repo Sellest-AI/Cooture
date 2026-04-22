@@ -158,7 +158,7 @@ const GenderButton = ({ gender, onPress, selected }: { gender: string; onPress: 
 }
 
 export function Content() {
-  const { redirect } = useRouter();
+  const { redirect } = useRouter(ROUTES.EXTRA.AVATAR.APPEARANCE);
 
   // Height
   const { heightCm, updateHeight } = useAppearance();

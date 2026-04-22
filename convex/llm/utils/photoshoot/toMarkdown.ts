@@ -1,4 +1,3 @@
-import { sliceText } from "@shared/utils";
 import { PromptExtended } from "./jsonCreator";
 
 const sectionCreator = (title: string, content: Record<string, undefined | string | (string | undefined)[]>[]): string => {
@@ -31,6 +30,8 @@ const sectionCreator = (title: string, content: Record<string, undefined | strin
 export const schemaToMarkdown = (schema: PromptExtended): string => {
   const prompt: string[] = [];
 
+  const hasCustomOutfit = schema.subjects.some(s => s.outfit?.isCustom);
+
   schema.subjects.forEach((subject, index) => {
     prompt.push(sectionCreator(`SUBJECT ${index + 1}`, [
       { "Reference": subject.reference },
@@ -43,18 +44,24 @@ export const schemaToMarkdown = (schema: PromptExtended): string => {
     ]))
 
     const outfit = subject.outfit;
+    if (!outfit) return;
+
     const isCustomOutfit = outfit.isCustom === true;
+
+    const references = isCustomOutfit ?
+      outfit.references : (hasCustomOutfit ? "Don't use reference image." : undefined);
+
     // If only one subject is present, we can afford to include more detailed information about the outfit, 
     // as there is no risk of confusing the model with multiple outfits.
     if (schema.subjects.length === 1) {
       prompt.push(sectionCreator(`SUBJECT ${index + 1} OUTFIT (VERY IMPORTANT)`, [
-        { "Description": sliceText(outfit?.description, 125) },
-        { "References": outfit.references },
-        { "Outerwear": [isCustomOutfit ? outfit.outerwear?.type : outfit.outerwear?.details, outfit.outerwear?.reference] },
-        { "Top": [isCustomOutfit ? outfit.top?.type : outfit.top?.details, outfit.top?.reference] },
+        { "Description": outfit.description },
+        { "References": references },
+        { "Outerwear": [isCustomOutfit ? outfit.outerwear?.type : outfit.outerwear?.details] },
+        { "Top": [isCustomOutfit ? outfit.top?.type : outfit.top?.details] },
         { "Inner Layer": outfit.innerLayer },
-        { "Bottom": [isCustomOutfit ? outfit.bottom?.type : outfit.bottom?.details, outfit.bottom?.reference] },
-        { "Legwear": [isCustomOutfit ? outfit.legwear?.type : outfit.legwear?.details, outfit.legwear?.reference] },
+        { "Bottom": [isCustomOutfit ? outfit.bottom?.type : outfit.bottom?.details] },
+        { "Legwear": [isCustomOutfit ? outfit.legwear?.type : outfit.legwear?.details] },
         { "Shoes": outfit.shoes },
         ...outfit.accessories.map((accessory, i) => ({ [`Accessory ${i + 1}`]: [Object.keys(accessory)[0], Object.values(accessory)[0]] }))
       ]))
@@ -63,8 +70,11 @@ export const schemaToMarkdown = (schema: PromptExtended): string => {
     // to avoid overwhelming the model with details that may be hard to associate with the correct subject.
     else {
       prompt.push(sectionCreator(`SUBJECT ${index + 1} OUTFIT (VERY IMPORTANT)`, [
-        { "Description": sliceText(outfit?.description, 175) },
-        { "References": outfit.references },
+        { "Description": outfit.description },
+        { "References": references },
+        { "Outerwear": isCustomOutfit ? [] : [outfit.outerwear?.details] },
+        // Only include the top description if the outfit has no outerwear (reducing tokens)
+        { "Top": (outfit.outerwear || isCustomOutfit) ? [] : [outfit.top?.details] },
         ...outfit.accessories.map((accessory, i) => ({ [`Accessory ${i + 1}`]: [Object.keys(accessory)[0], Object.values(accessory)[0]] }))
       ]))
     }

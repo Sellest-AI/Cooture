@@ -79,13 +79,13 @@ export default function Screen() {
   const currentItem = visibleItems[currentIndex];
 
   // Functions
-  const next = (validated: boolean) => {
+  const next = async (validated: boolean) => {
     if (!currentItem) return;
 
     if (validated) {
-      acceptPrediction(currentItem._id);
+      await acceptPrediction(currentItem._id);
     } else {
-      rejectPrediction(currentItem._id);
+      await rejectPrediction(currentItem._id);
     }
 
     // Trigger animation
@@ -216,6 +216,9 @@ export default function Screen() {
                     </AnimatedGeneration>
                   )
 
+                const isFailed = s.status === 'FAILED' ||
+                  (s.status !== 'LOADING' && !s.imageUrl);
+
                 return (
                   <AnimatedGeneration
                     key={s._id}
@@ -225,9 +228,27 @@ export default function Screen() {
                     <ImageGeneration
                       loading={s.status === 'LOADING'}
                       source={s.imageUrl}
-                      text={s.status === 'LOADING' ? "Generating..." : "Ready in 13s."}
-                      onDownload={s.imageUrl ? () => downloadImageCrossPlatform(s.imageUrl!) : undefined}
+                      text={s.status === 'LOADING' ? "Generating..." :
+                        isFailed ? "Failed" : "Ready"}
+                      onDownload={s.imageUrl ? () => downloadImageCrossPlatform(s.imageUrl!, { applyWatermark: true }) : undefined}
                     />
+                    {isFailed && <View style={{
+                      position: 'absolute',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      inset: 0,
+                    }}>
+                      <Text.Base color={Colors.neutral[400]}
+                        style={{ textAlign: 'center', maxWidth: '70%', marginTop: -32 }}
+                        weight={500}>
+                        This generation failed. You have not been charged for it.
+                      </Text.Base>
+                      <Text.Base color={Colors.neutral[400]}
+                        style={{ textAlign: 'center', maxWidth: '70%', marginTop: 16 }}
+                        weight={500}>
+                        Please try again.
+                      </Text.Base>
+                    </View>}
                   </AnimatedGeneration>
                 )
               })}

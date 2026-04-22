@@ -1,3 +1,4 @@
+import { X } from "@ui/icons";
 import { ModalHeader } from "@ui/modal";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Stepper } from "@ui/stepper";
@@ -15,15 +16,16 @@ export default function Layout() {
       style={{
         flex: 1,
         backgroundColor: Colors.background,
-        paddingBottom: Platform.OS !== 'ios' ? 8 : 0
+        paddingBottom: (Platform.OS !== 'ios' && step > 1) ? 8 : 0
       }}
-      edges={{ bottom: 'android' }}
+      edges={{ bottom: step > 1 ? 'android' : 'off' }}
     >
       <View style={{ paddingHorizontal: 12, paddingTop: 8 }}>
         <ModalHeader
           title="New Preset"
           subtitle="Turn any image into a copiable preset"
           style={{ marginBottom: 8 }}
+          customBackIcon={step > 1 ? undefined : X}
           onBack={step < 3 ? () => {
             if (router.canGoBack()) router.back()
             else router.dismissTo('/')

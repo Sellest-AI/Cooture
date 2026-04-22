@@ -2,13 +2,15 @@ import { useScrollToTop } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
 import { useQuery, useQueryCached } from "@/lib/convex/client";
 import { useFeed } from "@/modules/feed/_hooks";
+import { useSafety } from "@/modules/safety";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Block } from "@ui/block";
 import { BlurKeys, BlurTargetView } from "@ui/blur-view";
+import { Post as PostComponent } from "@ui/cards";
 import { FlashList } from "@ui/flat-list";
 import { Col, Grid, Row } from "@ui/grid";
 import { Loader, Search } from "@ui/icons";
-import { Image } from "@ui/image";
+import { Image, prefetch } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { Pressable as AnimatedPressable } from "@ui/pressable";
 import { SafeAreaView, useSafeAreaInsets } from "@ui/safe-area-view";
@@ -63,14 +65,19 @@ const GridSkeleton = () => {
 }
 
 const Generation = ({ id, style, size = 'large' }: { id: Id<'generations'>, style?: ViewStyle, size?: 'small' | 'large' }) => {
+  const { isHidden } = useSafety();
   const { data: post } = useQuery(api.router.generations.getOne.anon, { id });
 
-  const prediction = post?.predictions.find(p => p.videoId) ?? post?.predictions[0];
+  const predictionVideo = post?.predictions.find(p => p.videoId) ?? post?.predictions[0];
+  const predictionImage = post?.predictions.find(p => p.imageId) ?? post?.predictions[0];
+  const prediction = predictionVideo || predictionImage;
 
-  const { data: image } = useQueryCached(api.router.storage.images.getOne.anon, prediction?.imageId ? { id: prediction?.imageId } : 'skip');
-  const { data: video } = useQueryCached(api.router.storage.videos.getOne.anon, prediction?.videoId ? { id: prediction?.videoId } : 'skip');
+  const { data: image } = useQueryCached(api.router.storage.images.getOne.anon, predictionImage?.imageId ? { id: predictionImage?.imageId } : 'skip');
+  const { data: video } = useQueryCached(api.router.storage.videos.getOne.anon, predictionVideo?.videoId ? { id: predictionVideo?.videoId } : 'skip');
 
   if (!post || (!image && !video)) return <Skeleton style={style} />;
+  if (isHidden({ generationId: id, userId: post?.userId, itemIds: post?.outfit?.items.map(i => i._id), outfitId: post?.outfitId, preset: post?.preset }))
+    return (<PostComponent.Hidden style={{ ...style, borderRadius: 16 }} src={image?.sizes.thumbnail?.url} />);
 
   const finalSize = size === 'large' ? 'medium' : 'small';
 
@@ -78,7 +85,10 @@ const Generation = ({ id, style, size = 'large' }: { id: Id<'generations'>, styl
 
   return (
     <Pressable style={{ borderRadius: 16, overflow: 'hidden', flex: 1, ...style }}
-      onPress={prediction ? () => router.push(ROUTES.POST.ID(prediction._id)) : undefined}
+      onPress={prediction ? () => {
+        router.push(ROUTES.POST.ID(prediction._id));
+        if (image) prefetch(image.url)
+      } : undefined}
     >
       {showVideo && <VideoView
         style={{ flex: 1 }}
@@ -95,10 +105,16 @@ const Generation = ({ id, style, size = 'large' }: { id: Id<'generations'>, styl
 }
 
 const Outfit = ({ id, style, size = 'large' }: { id: Id<'outfits'>, style?: ViewStyle, size: 'small' | 'large' }) => {
+  const { isHidden } = useSafety();
+
   const { data: outfit } = useQuery(api.router.outfits.getOne.anon, { outfitId: id });
   if (!outfit) return <Skeleton style={style} />;
 
   const image = outfit.cover ?? outfit.items[0].image;
+
+  if (isHidden({ outfitId: id, userId: outfit?.userId, itemIds: outfit?.items.map(i => i._id) }))
+    return (<PostComponent.Hidden style={{ ...style, borderRadius: 16 }} src={image?.sizes.thumbnail?.url} />);
+
 
   const finalSize = size === 'large' ? 'medium' : 'small';
 
@@ -223,18 +239,14 @@ export default function Screen() {
                         {posts[4] ? <Post id={posts[4]._id} type={posts[4].type} size="small" style={{ flex: 1 }} /> : <Skeleton style={{ flex: 1 }} />}
                       </Row>
                     </Col>
-                    {posts.length > 5 && (
-                      <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
-                        {posts[5] ? <Row><Post id={posts[5]._id} type={posts[5].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
-                        {posts[6] ? <Row><Post id={posts[6]._id} type={posts[6].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
-                      </Col>
-                    )}
-                    {posts.length > 7 && (
-                      <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
-                        {posts[7] ? <Row><Post id={posts[7]._id} type={posts[7].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
-                        {posts[8] ? <Row><Post id={posts[8]._id} type={posts[8].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
-                      </Col>
-                    )}
+                    <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
+                      {posts[5] ? <Row><Post id={posts[5]._id} type={posts[5].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                      {posts[6] ? <Row><Post id={posts[6]._id} type={posts[6].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                    </Col>
+                    <Col style={{ height: HEIGHT, gap: GAP }} size={1}>
+                      {posts[7] ? <Row><Post id={posts[7]._id} type={posts[7].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                      {posts[8] ? <Row><Post id={posts[8]._id} type={posts[8].type} size="small" style={{ flex: 1 }} /></Row> : <Row><Skeleton style={{ flex: 1 }} /></Row>}
+                    </Col>
                   </Grid>
                 )}
 

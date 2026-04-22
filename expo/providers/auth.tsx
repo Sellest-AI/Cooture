@@ -31,10 +31,11 @@ type Props = {
   children: React.ReactNode
 }
 
-const AuthenticationGate = () => {
+const AuthenticationGate = ({ enabled }: { enabled: boolean }) => {
   const { user, isInWaitlist } = useAccount();
   const pathname = usePathname();
 
+  if (!enabled) return null;
   if (!user) return <LoadingView />;
 
   const WAITLIST_PATHS_ALLOWED = ["/welcome/", "/avatar/"]
@@ -56,8 +57,10 @@ const AuthenticationGate = () => {
   return null;
 }
 
-const UnauthenticatedGate = () => {
+const UnauthenticatedGate = ({ enabled }: { enabled: boolean }) => {
   const pathname = usePathname();
+
+  if (!enabled) return null;
 
   if (pathname.startsWith(ROUTES.AUTH)) return null;
 
@@ -73,10 +76,10 @@ export const AuthProvider = ({ children }: Props) => {
       <LoadingView />
     </AuthLoading>
     <Authenticated>
-      <AuthenticationGate />
+      <AuthenticationGate enabled={!isAuthenticating} />
     </Authenticated>
     <Unauthenticated>
-      <UnauthenticatedGate />
+      <UnauthenticatedGate enabled={!isAuthenticating} />
     </Unauthenticated>
     <AnimatePresence>
       {isAuthenticating && <LoadingView animateState={true} />}

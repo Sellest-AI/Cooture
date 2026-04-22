@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   track: {
-    borderRadius: 20,
+    borderRadius: 22,
     width: "100%",
   },
   labelContainer: {
@@ -216,10 +216,10 @@ const styles = StyleSheet.create({
     position: "absolute",
     elevation: 4,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: -6, height: 10 },
     borderRadius: 20,
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
   },
   knobContent: {
     flexDirection: "row",

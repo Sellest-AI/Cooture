@@ -13,7 +13,9 @@ import { Colors } from 'theme';
 import { Image } from '../image';
 import { Pressable as AnimatedPressable } from '../pressable';
 import { Text } from '../text';
+import { PostHiddenCard } from './post.hidden';
 import { PostMenu } from './post.menu';
+import { ReportConfig } from './report.modal';
 
 type Props = {
   style?: ViewStyle;
@@ -61,11 +63,12 @@ type Props = {
   }
   onRecreate?: () => void;
   onTurnToVideo?: (_id: string) => void;
+  report?: ReportConfig;
 }
 
 export const Post = ({ style, image, users, preset, outfit, images, likedAccounts, onRecreate,
   onShare, paddingHorizontal, isBookmarked, onPress, onToggleBookmark, onToggleLike, isLiked,
-  recreateCount, onDownload, videos, onTurnToVideo,
+  recreateCount, onDownload, videos, onTurnToVideo, report
 }: Props) => {
   const [showMenu, setShowMenu] = useState(false);
   const [doubleTap, setDoubleTap] = useState<number | null>(null);
@@ -425,14 +428,12 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
       <PostMenu
         open={showMenu}
         onOpenChange={setShowMenu}
-        liked={isLiked}
-        onToggleLike={onToggleLike}
         bookmarked={isBookmarked}
         onToggleBookmark={onToggleBookmark}
         onProfilePress={users?.[0].onPress}
         onOutfitPress={outfit?.onPress}
-        onPresetPress={preset?.onPress}
         onRecreate={onRecreate ?? preset?.onPress}
+        report={report}
         onDownload={onDownload ? async () => {
           const url = currentItem?.url;
           if (url) await onDownload?.(url);
@@ -534,3 +535,4 @@ const SkeletonPost = ({ style }: SkeletonPostProps) => {
 }
 
 Post.Skeleton = SkeletonPost;
+Post.Hidden = PostHiddenCard;

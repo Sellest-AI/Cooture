@@ -2,7 +2,7 @@
   "expo": {
     "name": "Cooture",
     "slug": "cooture",
-    "version": "0.9.7",
+    "version": "0.9.9",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "cooture",
@@ -148,23 +148,23 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
-          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera so you can scan clothing items, take selfies for virtual photoshoots, and capture pictures to edit.",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone to record audio while capturing outfit videos.",
           "recordAudioAndroid": true
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos",
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera"
+          "photosPermission": "Allow $(PRODUCT_NAME) access to your photo library to choose pictures for editing or uploading to your virtual closet.",
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera so you can scan clothing items, take selfies for virtual photoshoots, and capture pictures to edit."
         }
       ],
       [
         "expo-media-library",
         {
-          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos",
-          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos",
+          "photosPermission": "Allow $(PRODUCT_NAME) access to your photo library so you can edit images or upload existing items.",
+          "savePhotosPermission": "Allow $(PRODUCT_NAME) to save your edited images, virtual photoshoots, and outfit pictures directly to your camera roll.",
           "isAccessMediaLocationEnabled": true,
           "granularPermissions": [
             "photo"
@@ -172,7 +172,8 @@
         }
       ],
       "expo-video",
-      "expo-image"
+      "expo-image",
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true,

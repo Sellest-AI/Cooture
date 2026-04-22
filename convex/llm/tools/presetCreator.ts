@@ -62,6 +62,10 @@ CONTENT RATING FOR THE SCENE:
 - NSFW = When the image contains highly revealing, fetish wear, or explicit content. Use this rating only for images that are clearly adult in nature.
 When in doubt about content rating, default to the most conservative option.
 
+NOTES:
+- Unless the image IS black & white, do not EVERY mention "black and white" in the "composition" or "style" fields.
+- Strict separation of wearable items vs props: Never list fashion accessories (hats, gloves, purses, bags) in "hands" or "heldObjects". These belong exclusively in "outfit.accessories". "heldObjects" is strictly for environmental props. Examples of valid heldObjects: "Bouquet of flowers, coffee cup, book, phone, skateboard".
+
 OUTPUT FORMAT (VERY IMPORTANT):
 - Return a JSON object that exactly matches the schema structure.
 - Use plain strings for textual fields, arrays for lists, nested objects only when visible and describable.
@@ -113,6 +117,7 @@ export const ImagePresetSchema = z.object({
   // Usually contains ONE subject. Only use multiple if there are 2+ clearly identifiable focal humans.
   // Crowds/blurred people belong in environment.surroundingElements.
   subjects: z.array(z.object({
+    gender: z.enum(['male', 'female']).describe('Only field that can be gendered because it is used for pronoun purposes.'),
     position: z.string().describe("General stance: e.g., 'Sitting', 'Standing', 'Jumping'."),
     bodyAlignment: z.string().describe("Relation to camera: e.g., 'Frontal', 'Profile', 'Three-quarter turn'."),
     legs: z.array(z.string()).describe("Leg positions. Example: ['Right leg bent at knee', 'Left leg straight supporting weight']."),
@@ -158,7 +163,7 @@ export const ImagePresetSchema = z.object({
           .optional(),
       }).optional().describe("If not visible, return undefined."),
 
-      accessories: z.array(z.record(z.string(), z.string())).describe("Worn items (Glasses, Necklace, Hat). If none, return []."),
+      accessories: z.array(z.record(z.string(), z.string())).describe("Worn items (Glasses, Necklace, Hat, Cap). If none, return []."),
 
       shoes: z.string().optional().describe("If feet are not visible, return undefined."),
     }),
@@ -230,7 +235,7 @@ export const presetCreator = createTool({
     // check for any string "undefined" or "[]" in the result and fix them
     const sanitize = <T>(obj: T): T => {
       if (typeof obj === 'string') {
-        if (obj === 'undefined') return undefined as T;
+        if (obj.toLowerCase() === 'undefined') return undefined as T;
         if (obj === '[]') return [] as T;
         return obj;
       }

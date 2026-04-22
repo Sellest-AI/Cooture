@@ -15,14 +15,19 @@ const ITEM_HEIGHT = 76;
 type Props = {
   onPress?: (items: Id<'items'>[]) => void;
   items: Id<'items'>[];
+  maxItems?: number;
   onItemRemoved?: (item: Id<'items'>) => void;
   disabled?: boolean;
   onOpenChange?: (open: boolean) => void;
   open?: boolean;
 }
 
-export const ItemsValidator = ({ onPress, items, onItemRemoved, disabled, onOpenChange, open = true }: Props) => {
+export const ItemsValidator = ({ onPress, items, onItemRemoved, maxItems, disabled, onOpenChange, open = true }: Props) => {
   const isOpen = open && items.length > 0;
+
+  const hasReachedMax = maxItems !== undefined && items.length >= maxItems;
+  const isOutOfRange = items.length > (maxItems ?? Infinity) || items.length === 0;
+  const count = `${items.length}${hasReachedMax ? `/${maxItems}` : ''}`;
 
   return (
     <MotiView
@@ -97,7 +102,7 @@ export const ItemsValidator = ({ onPress, items, onItemRemoved, disabled, onOpen
                 marginLeft: 8,
                 flex: 1,
               }}>
-              <Text.Base color={Colors.neutral[400]} weight={500}>{items.length} selected</Text.Base>
+              <Text.Base color={Colors.neutral[400]} weight={500}>{count} selected</Text.Base>
               <MotiView animate={{
                 transform: [{ rotate: isOpen ? '0deg' : '180deg' }]
               }}>
@@ -108,7 +113,7 @@ export const ItemsValidator = ({ onPress, items, onItemRemoved, disabled, onOpen
               variant="primary"
               size="sm"
               endIcon={ArrowRight}
-              disabled={disabled}
+              disabled={disabled || isOutOfRange}
               onPress={() => onPress?.(items)}
             >
               Next

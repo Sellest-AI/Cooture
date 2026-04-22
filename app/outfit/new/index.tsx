@@ -1,4 +1,4 @@
-import { ROUTES, useRouter } from "@/hooks";
+import { ROUTES, useRoute, useRouter } from "@/hooks";
 import { useAccount } from "@/lib/convex/auth";
 import { api, useQueryCached } from "@/lib/convex/client";
 import { Block } from "@ui/block";
@@ -15,17 +15,20 @@ import { Colors } from "theme";
 import AddItemScreen from "@/modules/items/add-items/screen";
 
 export default function Screen() {
+  const { outfitId } = useRoute(ROUTES.OUTFIT.NEW)
+
   return (
     <SafeAreaView
       style={{ flex: 1 }}
       edges={{ bottom: 'off' }}
     >
-      <AddItemScreen />
+      <AddItemScreen outfitId={outfitId} />
     </SafeAreaView>
   )
 }
 
 /** @deprecated */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function DeprecatedScreen() {
   const { push, replace } = useRouter();
 

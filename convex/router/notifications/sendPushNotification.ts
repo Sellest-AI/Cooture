@@ -26,8 +26,8 @@ export const _internal = internalAction({
       .filter(t => Expo.isExpoPushToken(t))
       .map(t => ({
         to: t,
-        title: args.title,
-        body: args.body,
+        title: args.title.trim(),
+        body: args.body.trim(),
         data: args.redirectUrl ? { ...args.data, url: args.redirectUrl } : args.data,
         sound: "default" as const,
         channelId: args.channelId,

@@ -9,6 +9,7 @@ export const NOTIFICATION_TYPE = v.union(
   v.literal("waitlist_approval"),
   v.literal("outfit_used"),
   v.literal("preset_used"),
+  v.literal("quest_progress"),
 )
 
 export const NOTIFICATION_CHANNEL: Record<typeof NOTIFICATION_TYPE['type'], string> = {
@@ -19,6 +20,7 @@ export const NOTIFICATION_CHANNEL: Record<typeof NOTIFICATION_TYPE['type'], stri
   "new_follower": "social",
   "tagged_in_generation": "social",
   "waitlist_approval": "system",
+  "quest_progress": "system",
 }
 
 export const notifications = defineTable({
@@ -30,9 +32,11 @@ export const notifications = defineTable({
   actorId: v.optional(v.id("users")),
 
   // references — only populate what's relevant
+  transactionId: v.optional(v.id("creditTransactions")),
   generationId: v.optional(v.id("generations")),
   outfitId: v.optional(v.id("outfits")),
   presetId: v.optional(v.id("presets")),
+  questId: v.optional(v.id("quests")),
 
   // aggregation
   aggregationCount: v.optional(v.number()), // starts at 1

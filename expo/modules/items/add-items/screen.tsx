@@ -1,44 +1,176 @@
-import { ROUTES, useRoute, useRouter, useStateEffect } from "@/hooks";
+import { ROUTES, useRoute, useRouter } from "@/hooks";
 import { api, Id, useQuery, useQueryCached } from "@/lib/convex/client";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
+import { useSafety } from "@/modules/safety";
 import { Block } from "@ui/block";
 import { EmptyBlock } from "@ui/block.empty";
 import { CardItem } from "@ui/cards/card-item";
 import { FlashList, FlashListRef } from "@ui/flat-list";
 import { Col, Grid } from "@ui/grid";
-import { Camera, Globe, TShirt } from "@ui/icons";
+import { BookmarkIcon, Camera, Globe, Loader, TShirt, X } from "@ui/icons";
+import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
+import { AnimatePresence, MotiView } from "@ui/motion";
 import { Pressable } from "@ui/pressable";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
-import { normalizeArray, notEmpty } from "@utils/convex-allowed";
+import { hslToHex, notEmpty, parseColorToHsl } from "@utils/convex-allowed";
+import { COLOR_TAGS } from "@utils/convex-allowed/lib/color";
 import { Route, router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
-import { View } from "react-native";
+import { View, ViewStyle } from "react-native";
 import { Colors } from "theme";
+import { useItem } from "../_hooks/useItem";
 import { useSearchItems } from "../_hooks/useSearchItems";
 import { Categories } from "./categories";
 import { ItemsValidator } from "./items-validator";
 import { SearchInput } from "./search-input";
 
 const PADDING_HORIZONTAL = 12;
+const MAX_ITEMS = 6;
 
-function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outfits'> }) {
-  const { outfit, updateItems } = useOutfit(outfitId ?? null);
-  const { items } = useOutfit.New();
-  const [innerItems, setInnerItems] = useStateEffect(mode === 'edit' ? outfit?.items.map((i) => i._id) ?? [] : items);
+function PendingItems() {
+  const { pendingItems, newItems, reset } = useItem.Create();
+  const { setItems } = useOutfit.New();
 
-  const newDelay = Date.now() - 3 * 24 * 60 * 60 * 1000 // 3 days
+  useEffect(() => {
+    if (newItems.length === 0) return;
+    setItems((prev) =>
+      Array.from(new Set([...prev, ...newItems.map((i) => i._id)])));
+  }, [newItems, setItems])
+
+  useEffect(() => {
+    if (newItems.length === 0) return;
+    if (pendingItems.length === 0) return;
+    if (newItems.length < pendingItems.length) return;
+    reset();
+  }, [newItems, newItems.length, pendingItems.length, reset, setItems])
+
+  const pendingLength = pendingItems.length - newItems.length;
+
+  if (pendingLength <= 0) return null;
+
+  return (
+    <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 32 }}>
+      <View style={{ position: 'relative', width: 20, height: 20 }}>
+        <Loader size={20} color={Colors.primary[500]} />
+      </View>
+      <Text.Base color={Colors.neutral[400]} style={{ marginLeft: 4 }}>
+        Adding {pendingLength} item{pendingLength > 1 ? 's' : ''} to your wardrobe
+      </Text.Base>
+    </View>
+  )
+}
+
+const ColorPicker = ({ style, hexColor, onPress }: { style?: ViewStyle, hexColor?: string, onPress: (hexColor: null | string) => void }) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <View style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      ...style
+    }}>
+      <Pressable
+        onLongPress={() => { onPress(null); setOpen(false); }}
+        onPress={() => { setOpen((v) => !v); }}
+        intensity={0.9}
+        style={{
+          width: 24,
+          height: 24,
+          borderRadius: 99,
+          backgroundColor: open ? undefined : hexColor || Colors.blur.dark,
+          overflow: 'hidden',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        {(!open && !hexColor) && <Image
+          source={require('assets/images/palette-gradient.jpg')}
+          style={{ width: '100%', height: '100%', opacity: 0.8 }}
+        />}
+        {open && <X size={24} color={Colors.neutral[400]} />}
+      </Pressable>
+      <AnimatePresence>
+        {open && <MotiView
+          from={{ width: 0, opacity: 0, paddingHorizontal: 8, marginLeft: 4 }}
+          animate={{ width: COLOR_TAGS.length * (28 + 8) + 24, opacity: 1, marginLeft: 8, paddingHorizontal: 12 }}
+          exit={{ width: 0, opacity: 0, paddingHorizontal: 0, marginLeft: 0 }}
+          style={{
+            overflow: 'hidden',
+            flexDirection: 'row',
+            gap: 8,
+            padding: 6,
+            paddingHorizontal: 12,
+            borderRadius: 999,
+            backgroundColor: Colors.blur.dark,
+            borderLeftWidth: 1,
+            borderColor: Colors.blur.medium,
+            opacity: 1,
+            marginLeft: 8,
+          }}>
+          {COLOR_TAGS.map((color, i) => {
+            const rgb = `rgb(${color.r}, ${color.g}, ${color.b})`;
+            const hsl = parseColorToHsl(rgb);
+
+            if (!hsl) return null;
+
+            const hex = hslToHex(...hsl);
+
+            const selected = hexColor === hex;
+
+            return (
+              <Pressable
+                style={{ width: selected ? 22 : 28 }}
+                key={color.tag}
+                intensity={0.9}
+                onPress={() => {
+                  if (selected) setOpen(false);
+                  onPress(selected ? null : hex);
+                }}
+              >
+                <View
+                  style={{
+                    width: selected ? 22 : 28,
+                    height: 22,
+                    borderRadius: 99,
+                    backgroundColor: `rgb(${color.r}, ${color.g}, ${color.b})`
+                  }}
+                />
+              </Pressable>
+            )
+          })}
+        </MotiView>}
+      </AnimatePresence>
+    </View>
+  )
+}
+
+const newDelay = Date.now() - 3 * 24 * 60 * 60 * 1000 // 3 days
+
+function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
+  const { updateItems } = useOutfit(outfitId ?? null);
+  const { items, setItems } = useOutfit.New();
+  const { latestItems } = useItem.Create();
 
   // Search
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string | null>(null);
-  const { results, isLoading, isEmpty } = useSearchItems({ query, category, channel: 'public' });
+  const [hexColor, setColor] = useState<string | null>(null);
+  const [bookmarked, setBookmarked] = useState(false);
+  const { results, isLoading, isFiltering, canLoadMore, loadMore } = useSearchItems({ query, category, hexColor, bookmarked, channel: 'public' });
+
+  const { isHidden } = useSafety();
+  const itemsLibrary = [...(isFiltering ? [] : latestItems), ...results] // unique;
+    .filter((item, i, arr) => arr.findIndex(it => it._id === item._id) === i)
+    .filter((item) => !isHidden({ itemId: item._id, userId: item.userId, item }));
+
+  const isEmpty = itemsLibrary.length === 0 && !isLoading;
 
   // UI
-  const listRef = useRef<FlashListRef<typeof results[number] | string>>(null);
-  const [validatorOpen, setValidatorOpen] = useState(innerItems.length > 0);
+  const listRef = useRef<FlashListRef<typeof itemsLibrary[number] | string>>(null);
+  const [validatorOpen, setValidatorOpen] = useState(items.length > 0);
 
   const { pathname } = useRoute.Path();
   const { redirect, push } = useRouter(pathname as Route);
@@ -54,10 +186,12 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
     >
       <FlashList
         ref={listRef}
+        onEndReached={() => canLoadMore ? loadMore() : undefined}
         ListHeaderComponent={<View style={{ marginHorizontal: PADDING_HORIZONTAL }}>
           <ModalHeader
             title="Select items"
             onBack={router.canGoBack() ? () => { router.back() } : undefined}
+            customBackIcon={X}
             style={{ marginBottom: 0, marginTop: 16 }}
           />
           <View style={{ flexDirection: 'row', gap: 8, marginTop: 12, marginBottom: 4, }}>
@@ -79,7 +213,7 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
             />
           </View>
         </View>}
-        ListFooterComponent={(isLoading && results.length === 0) ? <Grid style={{
+        ListFooterComponent={isLoading ? <Grid style={{
           height: 0,
           flex: 1,
           paddingHorizontal: PADDING_HORIZONTAL,
@@ -105,7 +239,7 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
         overrideItemLayout={(layout, item, index) => {
           if (typeof item === "string") { layout.span = 2; }
         }}
-        data={["header", isEmpty ? "empty" : undefined, ...(results ?? [])].filter(notEmpty)}
+        data={["header", "pending", isEmpty ? "empty" : undefined, ...(itemsLibrary ?? [])].filter(notEmpty)}
         contentContainerStyle={{ paddingBottom: 56 }}
         showsVerticalScrollIndicator={false}
         keyExtractor={(item) => typeof item === "string" ? item : item._id}
@@ -120,6 +254,9 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
                 variant="secondary"
               />
 
+            if (item === "pending")
+              return <PendingItems />
+
             if (item === "header")
               return <>
                 <SearchInput
@@ -131,9 +268,35 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
                   }}
                 />
                 <Categories
+                  extraCategories={{
+                    bookmarks: <Pressable
+                      style={{ paddingRight: 10, paddingVertical: 4 }}
+                      onPress={() => {
+                        listRef.current?.scrollToTop({ animated: true });
+                        setBookmarked((b) => !b);
+                        setCategory(null);
+                        setColor(null);
+                      }}>
+                      <BookmarkIcon
+                        color={bookmarked ? Colors.primary[500] : Colors.neutral[400]}
+                        weight={bookmarked ? 'fill' : 'regular'}
+                        size={24}
+                      />
+                    </Pressable>,
+                    colors: <ColorPicker
+                      hexColor={hexColor ?? undefined}
+                      onPress={(hex) => {
+                        listRef.current?.scrollToTop({ animated: true });
+                        setBookmarked(false);
+                        setColor(hex);
+                      }}
+                      style={{ marginRight: 12 }}
+                    />
+                  }}
                   category={category}
                   onCategoryChange={(category) => {
                     listRef.current?.scrollToTop({ animated: true });
+                    setBookmarked(false);
                     setCategory(category);
                   }}
                   style={{
@@ -150,6 +313,10 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
           const badgeNew = item._creationTime > newDelay ? "New" : undefined;
           const badge = badgeNew;
 
+          // For items with a very vertical aspect ratio, we want to use the medium size
+          const isTall = Number(item.image.aspectRatio.actual) < 4 / 6;
+          const imageUrl = isTall ? item.image.sizes.medium.url : item.image.sizes.small.url;
+
           return (
             <View style={{
               marginBottom: 36,
@@ -159,14 +326,19 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
             }}>
               <CardItem
                 image={item.image}
-                source={item.image.sizes.small.url}
+                source={imageUrl}
                 // title={item.name}
                 // subtitle={item.brand || item.category}
-                selected={!!innerItems.find((i) => i === item._id)}
+                selected={!!items.find((i) => i === item._id)}
                 badge={badge}
+                onLongPress={() => {
+                  push(ROUTES.ITEM.PATH, {
+                    pathParams: { id: item._id }
+                  })
+                }}
                 onPress={() => {
                   setValidatorOpen(true);
-                  setInnerItems((prev) => {
+                  setItems((prev) => {
                     if (prev.find((i) => i === item._id)) {
                       return prev.filter((i) => i !== item._id);
                     } else {
@@ -191,9 +363,9 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
         <ItemsValidator
           open={validatorOpen}
           onOpenChange={setValidatorOpen}
-          disabled={innerItems.length === 0}
-          items={innerItems.toReversed()}
-          onItemRemoved={(item) => setInnerItems((prev) => {
+          maxItems={MAX_ITEMS}
+          items={items.toReversed()}
+          onItemRemoved={(item) => setItems((prev) => {
             if (prev.length === 1) setValidatorOpen(false);
             return prev.filter((p) => p !== item);
           })}
@@ -201,7 +373,7 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
             // Outfit creation is free
             // if (!canPay) { return push(ROUTES.MODALS.UPGRADE); }
 
-            if (mode === 'new') {
+            if (!outfitId) {
               push(ROUTES.MODALS.NEW_OUTFIT, {
                 forwardRedirect: true,
                 params: { itemIds: items }
@@ -211,7 +383,8 @@ function Content({ mode, outfitId }: { mode: 'new' | 'edit', outfitId?: Id<'outf
 
             await updateItems(items);
             redirect({
-              params: { itemIds: items },
+              params: { itemIds: items, outfitId },
+              pathParams: { id: outfitId },
               fallbackTo: ['back', '/'],
               resetNextRoute: false
             });
@@ -245,17 +418,7 @@ const HeaderButton = ({ label, icon, onPress }: { onPress: () => void, label: st
   )
 }
 
-export default function Screen() {
-  const { itemIds, outfitId } = useRoute(ROUTES.OUTFIT.NEW);
-
-  const mode = outfitId ? 'edit' : 'new';
-
-  const { setItems } = useOutfit.New();
-
-  // Initialize items if itemIds are provided
-  useEffect(() => {
-    if (itemIds && itemIds.length > 0) setItems(normalizeArray(itemIds))
-  }, [itemIds, setItems])
-
-  return <Content mode={mode} outfitId={outfitId} />;
+type Props = { outfitId?: Id<'outfits'> };
+export default function Screen({ outfitId }: Props) {
+  return <Content outfitId={outfitId} />;
 }

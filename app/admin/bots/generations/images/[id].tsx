@@ -47,7 +47,6 @@ const UnlockMore = () => {
         <View style={{
           alignItems: 'center',
           justifyContent: 'center',
-          transform: [{ scale: 1.2 }],
           flex: 1,
         }}>
           <Text.H3 color={Colors.primary[500]} style={{ maxWidth: '65%', textAlign: 'center' }}>
@@ -135,13 +134,13 @@ export default function Screen() {
   const currentItem = visibleItems[currentIndex];
 
   // Functions
-  const next = (validated: boolean) => {
+  const next = async (validated: boolean) => {
     if (!currentItem) return;
 
     if (validated) {
-      mutate({ predictionId: currentItem._id, status: 'ACCEPTED' });
+      await mutate({ predictionId: currentItem._id, status: 'ACCEPTED' });
     } else {
-      mutate({ predictionId: currentItem._id, status: 'REJECTED' });
+      await mutate({ predictionId: currentItem._id, status: 'REJECTED' });
     }
 
     setHiddenItems(prev => [...prev, currentItem._id]);
@@ -189,7 +188,8 @@ export default function Screen() {
                   <ImageGeneration
                     loading={s.status === 'LOADING'}
                     source={s.imageUrl}
-                    text={s.status === 'LOADING' ? "Generating..." : "Ready in 13s."}
+                    text={s.status === 'LOADING' ? "Generating..." :
+                      s.status === 'FAILED' ? "Failed to generate." : "Ready"}
                   />
                 </AnimatedGeneration>
               )

@@ -24,11 +24,12 @@ const compression8k: Level = {
 
 const compression4k: Level = {
   resolution: 4 * 1024,
-  targetSizeKb: Math.round(1.8 * 1024),
+  targetSizeKb: Math.round(1.3 * 1024),
   initialQuality: 90,
   compressionStrength: [
     { sizeKb: 20 * 1024, initialQuality: 60 },
     { sizeKb: 10 * 1024, initialQuality: 75 },
+    { sizeKb: 4 * 1024, initialQuality: 83 },
     { sizeKb: 2 * 1024, initialQuality: 87 },
   ]
 }
@@ -142,6 +143,8 @@ export const getCompression = (resolution: number, sizeKb: number): Compression 
   };
 };
 
+const lerpValue = (x: number, range: [number, number], output: [number, number]) => x <= range[0] ? output[0] : x >= range[1] ? output[1] : output[0] + (output[1] - output[0]) * (1 - (x - range[0]) / (range[1] - range[0]));
+
 type Options = {
   maxSideSize?: number;
   quality?: number;
@@ -153,8 +156,18 @@ export const compressImage = async (image: Buffer | string, options?: Options) =
 
   const metadata = await sharp(buffer).metadata(); // Get the image's metadata
 
-  const quality = options?.quality ? Math.round(options.quality) : undefined;
   const mimeType = options?.mimeType ?? 'image/webp';
+
+  // Scale effort from 0 to 6 based on resolution
+  const maxSide = Math.max(metadata.width ?? 0, metadata.height ?? 0);
+  const effort = lerpValue(maxSide, [2048, 4096], [6, 0]);
+
+  const quality = (() => {
+    if (!options?.quality) return undefined;
+    const _quality = Math.round(options.quality);
+    const lerpedQuality = lerpValue(effort, [6, 0], [_quality, _quality * 0.95]);
+    return Math.round(lerpedQuality);
+  })();
 
   let transformer = sharp(buffer).rotate();
   if (mimeType === 'image/png') {
@@ -164,7 +177,10 @@ export const compressImage = async (image: Buffer | string, options?: Options) =
     transformer = transformer.png({ compressionLevel });
   }
   else
-    transformer = transformer.webp({ quality: quality, effort: 6 });
+    transformer = transformer.webp({
+      quality: quality ? Math.round(quality) : undefined,
+      effort: Math.round(effort)
+    });
 
   const { width, height } = { width: metadata.width ?? 0, height: metadata.height ?? 0 }
   const maxSideSize = options?.maxSideSize ?? Infinity;
@@ -225,7 +241,7 @@ export const compressImageAuto = async (image: Buffer | string, options?: Compre
   while (tries > 0) {
     if (toKb(compressedImage.buffer.length) < compression.targetSizeKb) return compressedImage;
     compressionQuality = Math.max(1, compressionQuality - 3);
-    compressedImage = await compressImage(buffer, { quality: compressionQuality });
+    compressedImage = await compressImage(buffer, { mimeType, quality: compressionQuality });
     tries--;
   }
 

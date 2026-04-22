@@ -1,4 +1,5 @@
 import { useAccount } from "@/lib/convex/auth";
+import { removeUndefinedKeys } from "@utils/convex-allowed";
 import { env } from "env";
 import { ReactNode, useEffect } from "react";
 import { Platform } from "react-native";
@@ -9,7 +10,7 @@ type Props = {
 }
 
 export const RevenueCatProvider = ({ children }: Props) => {
-  const { user } = useAccount();
+  const { user, isAuthenticated, isAuthenticating } = useAccount();
 
   // 1. Initialize RevenueCat Once
   useEffect(() => {
@@ -29,17 +30,35 @@ export const RevenueCatProvider = ({ children }: Props) => {
   // 2. Sync RevenueCat with Convex Authentication
   useEffect(() => {
     const syncRevenueCat = async () => {
-      try {
-        const isAnonymous = await Purchases.isAnonymous();
+      const userId = user?._id;
 
-        if (user?.userId) {
+      // Wait until Convex auth has finished initializing on the device
+      if (isAuthenticating) return;
+
+      // If authenticated but the user document is still fetching, wait
+      if (isAuthenticated && !userId) return;
+
+      try {
+        if (userId) {
           // Identify user in RevenueCat with their Convex userId if not already set
           const currentRcUserId = await Purchases.getAppUserID();
-          if (currentRcUserId !== user.userId) {
-            await Purchases.logIn(user.userId);
-          }
+
+          // Only log in if the current RevenueCat user ID doesn't match the Convex user ID to avoid unnecessary logins
+          if (currentRcUserId === userId) return;
+
+          await Purchases.logIn(userId);
+          if (user.name) await Purchases.setDisplayName(user.name);
+          if (user.email) await Purchases.setEmail(user.email);
+          if (user.phone) await Purchases.setPhoneNumber(user.phone);
+          await Purchases.setAttributes(removeUndefinedKeys({
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+          }))
+
         } else {
           // If logged out and not already anonymous, log out of RevenueCat
+          const isAnonymous = await Purchases.isAnonymous();
           if (!isAnonymous) {
             await Purchases.logOut();
           }
@@ -50,7 +69,7 @@ export const RevenueCatProvider = ({ children }: Props) => {
     };
 
     syncRevenueCat();
-  }, [user?.userId]);
+  }, [user, isAuthenticating, isAuthenticated]);
 
   return (
     children

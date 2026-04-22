@@ -3,7 +3,7 @@ export const CREDITS_CONFIG = {
   COST_PER_IMAGE_GENERATION: 100,
   COST_PER_VIDEO_GENERATION: 150,
   COST_PER_ITEM: 5,
-  COST_PER_PRESET: 20,
+  COST_PER_PRESET: 30,
 
   // Daily rewards
   WEEKLY_REWARDS: 120, // Total credits earned over a 7-day streak (1.2 × COST_PER_IMAGE_GENERATION)
@@ -14,8 +14,9 @@ export const CREDITS_CONFIG = {
   MAX_HOURS_TO_MAINTAIN_STREAK: 48, // Missing 2 days breaks the streak
 
   // Initial credits for new users
-  STARTING_CREDITS: 200, // Enough for 2 generations to try the app
+  STARTING_CREDITS: 140, // Enough for 1 generation to try the app
   COOTURE_PLUS_CREDITS: 100 * 15,
+  PRESET_USAGE_REWARD: 5, // Credits awarded to the creator of a preset
 } as const;
 
 /**

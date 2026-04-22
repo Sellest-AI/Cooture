@@ -18,6 +18,7 @@ type ParamsDefault<T extends Route> =
   T extends "/admin/bots/outfits/extractor" ? { userId?: Id<'users'> | null } :
   T extends "/preset/create/thumbnail" ? { presetId: Id<'presets'> } :
   T extends "/turn-to-video" ? { predictionId: Id<'predictions'> } :
+  T extends "/preview-item" ? { itemId: Id<'items'>, onRemove?: () => void } :
   never;
 
 const LINKED_ROUTES: { parent: Route, child: Route }[] = [
@@ -100,6 +101,7 @@ const retrieveData = <T extends Route>(href: T | undefined, data: Record<string,
 type Options<T extends Route> = {
   resetFnc?: Params<T> extends { reset?: boolean } ? () => void : never,
   onInit?: (params: ParamsDefault<T>) => void,
+  onUpdate?: (params: ParamsDefault<T>) => void,
 }
 
 export const useRoute = <K extends Record<string, any> = EmptyObject, T extends Route = Route>(_href?: T, options?: Options<T>) => {
@@ -143,7 +145,15 @@ export const useRoute = <K extends Record<string, any> = EmptyObject, T extends 
 
   useFocusEffect(useCallback(() => {
     if (!options?.onInit) return;
+    if (initialized) return;
     options.onInit(localData ?? {} as ParamsDefault<T>);
+    setInitialized(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localData]));
+
+  useFocusEffect(useCallback(() => {
+    if (!options?.onUpdate) return;
+    options.onUpdate(localData ?? {} as ParamsDefault<T>);
     setInitialized(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localData]));

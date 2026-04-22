@@ -1,14 +1,20 @@
-import { ArrowLeft, ArrowRight, Home, X } from "@ui/icons";
+import { KeyboardAvoiderView } from "@good-react-native/keyboard-avoider";
+import { ArrowLeft, ArrowRight, Home, Search, X } from "@ui/icons";
 import { Image } from "@ui/image";
 import { Pressable } from "@ui/pressable";
+import { TextInput } from "@ui/text-input";
+import { notEmpty } from "@utils/convex-allowed";
 import { router } from "expo-router";
 import { atom, useAtom } from "jotai";
+import { AnimatePresence, MotiView } from "moti";
 import { nanoid } from "nanoid/non-secure";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { BackHandler, Platform, View } from "react-native";
+import ViewShot from 'react-native-view-shot';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { ROUTES } from "routes";
 import { Colors } from "theme";
+import { BrowserCapture } from "./browser.capture";
 
 // Types for extracted product data
 export type BrowserProductItem = {
@@ -17,7 +23,7 @@ export type BrowserProductItem = {
   brand?: string;
   description?: string;
   url: string;
-  images: { url: string; width: number; height: number }[];
+  images: { url?: string; uri?: string, width: number; height: number }[];
 };
 
 export type BrowserProductData = {
@@ -284,7 +290,7 @@ true; // Required for iOS
 interface BrowserProps {
   onTouchStart?: () => void;
   onProductExtracted: (data: BrowserProductData) => void;
-  extractProductRef: React.RefObject<() => void>;
+  extractProductRef?: React.RefObject<() => void>;
   goBackRef?: React.RefObject<() => void>;
   goForwardRef?: React.RefObject<() => void>;
   children?: React.ReactNode;
@@ -299,6 +305,11 @@ const latestUrlAtom = atom<string>(BASE_URL);
 
 export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goForwardRef, children, onRouteChange, onTouchStart, autoExtractDelay }: BrowserProps) => {
   const webviewRef = useRef<WebView>(null);
+  const captureRef = useRef<ViewShot>(null);
+
+  const [showInput, setShowInput] = useState(false);
+  const [image, setImage] = useState<BrowserProductItem['images'][number] | null>(null);
+
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoForward, setCanGoForward] = useState(false);
   const [currentUrl, setCurrentUrl] = useAtom(latestUrlAtom);
@@ -330,6 +341,7 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
         ...data,
         items: data.items?.map(item => ({
           ...item,
+          images: [image, ...item.images].filter(notEmpty),
           key: nanoid()
         })),
       }
@@ -343,7 +355,8 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
     webviewRef.current?.injectJavaScript(EXTRACT_PRODUCT_INFO);
   }
 
-  extractProductRef.current = extractProductInfo;
+  if (extractProductRef)
+    extractProductRef.current = extractProductInfo;
 
   if (goBackRef) goBackRef.current = goBack;
   if (goForwardRef) goForwardRef.current = goForward;
@@ -360,24 +373,71 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
           borderTopStartRadius: 0,
           overflow: 'hidden'
         }}>
-        <WebView
-          ref={webviewRef}
-          style={{ flex: 1 }}
-          source={{ uri: currentUrl }}
-          onMessage={handleMessage}
-          onNavigationStateChange={(navState) => {
-            const url = navState.url.trim();
-            setCanGoForward(navState.canGoForward);
-            setCanGoBack(navState.canGoBack);
-            setCurrentUrl(url);
-            onRouteChange?.(url);
+        <ViewShot
+          ref={captureRef}
+          style={{
+            flex: 1
+          }}>
+          <WebView
+            ref={webviewRef}
+            style={{ flex: 1 }}
+            source={{ uri: currentUrl }}
+            onMessage={handleMessage}
+            onNavigationStateChange={(navState) => {
+              const url = navState.url.trim();
+              setCanGoForward(navState.canGoForward);
+              setCanGoBack(navState.canGoBack);
+              setCurrentUrl(url);
+              onRouteChange?.(url);
 
-            if (autoExtractDelay) {
-              if (timer.current) clearTimeout(timer.current);
-              timer.current = setTimeout(() => { extractProductInfo() }, autoExtractDelay);
-            }
-          }}
-        />
+              if (autoExtractDelay) {
+                if (timer.current) clearTimeout(timer.current);
+                timer.current = setTimeout(() => { extractProductInfo() }, autoExtractDelay);
+              }
+            }}
+          />
+        </ViewShot>
+        <AnimatePresence>
+          <MotiView
+            key="extract"
+            style={{ position: 'absolute', right: 12, bottom: 12 }}
+            from={{ bottom: 0, opacity: 0 }}
+            animate={{ bottom: 12, opacity: 1 }}
+            transition={{ delay: 1000 }}
+          >
+            <BrowserCapture
+              captureRef={captureRef}
+              onCrop={async (image) => {
+                setImage({ ...image, url: image.uri });
+                requestAnimationFrame(() => extractProductInfo());
+              }}
+            />
+          </MotiView>
+          {showInput && <MotiView
+            key="input"
+            style={{ position: 'absolute', bottom: 12, left: 12, right: 12 }}
+            from={{ bottom: 0, opacity: 0 }}
+            animate={{ bottom: 12, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+          >
+            <KeyboardAvoiderView>
+              <TextInput
+                placeholder="Search or url"
+                autoFocus
+                onBlur={(value) => {
+                  setShowInput(false);
+
+                  if (value.length < 2) return;
+
+                  const sanitizedValue = value.startsWith('http') ? value :
+                    `${BASE_URL}/search?q=${encodeURIComponent(value)}`;
+
+                  navigateTo(sanitizedValue);
+                }}
+              />
+            </KeyboardAvoiderView>
+          </MotiView>}
+        </AnimatePresence>
       </View>
       {children}
       <View style={{
@@ -387,6 +447,11 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
         paddingHorizontal: Platform.OS === 'ios' ? 24 : 12
       }}>
         <View style={{ flexDirection: 'row', gap: 24 }}>
+          <X
+            onPress={() => router.canGoBack() ? router.back() : router.dismissTo(ROUTES.TABS.NEW)}
+            color={Colors.foreground}
+            size={24}
+          />
           <Pressable onPress={goBack} disabled={!canGoBack} style={{ opacity: canGoBack ? 1 : 0.5 }}>
             <ArrowLeft color={Colors.foreground} size={24} />
           </Pressable>
@@ -395,10 +460,13 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
           </Pressable>
         </View>
         <View style={{ flexDirection: 'row', gap: 24 }}>
+          <Pressable onPress={() => setShowInput(true)}>
+            <Search size={24} color={Colors.foreground} />
+          </Pressable>
+          <Pressable onPress={() => navigateTo(BASE_URL)}>
+            <Home color={Colors.foreground} size={24} />
+          </Pressable>
           <View style={{ flexDirection: 'row', gap: 12 }}>
-            <Pressable onPress={() => navigateTo(BASE_URL)}>
-              <Home color={Colors.foreground} size={24} />
-            </Pressable>
             <FaviconPressable
               favicon="https://www.endclothing.com/static/images/end-logo.svg"
               onPress={() => navigateTo("https://www.endclothing.com")}
@@ -409,11 +477,6 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
               onPress={() => navigateTo("https://www.zalando.com/get-the-look-femme/?style=style_all")}
             />
           </View>
-          <X
-            onPress={() => router.canGoBack() ? router.back() : router.dismissTo(ROUTES.TABS.NEW)}
-            color={Colors.foreground}
-            size={24}
-          />
         </View>
       </View>
     </View>

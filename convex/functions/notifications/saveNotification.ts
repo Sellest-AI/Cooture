@@ -38,6 +38,15 @@ type PresetUsed = {
   presetId: Id<'presets'>,
   /** The actor who used the preset */
   actorId: Id<'users'>,
+  transactionId?: Id<'creditTransactions'>,
+}
+
+type QuestProgress = {
+  type: "quest_progress",
+  /** The user whose quest progress is updated */
+  actorId: Id<'users'>,
+  questId: Id<'quests'>,
+  transactionId?: Id<'creditTransactions'>,
 }
 
 type Args<T extends Type> = {
@@ -54,6 +63,7 @@ type Args<T extends Type> = {
     T extends "tagged_in_generation" ? TaggedInGeneration :
     T extends "outfit_used" ? OutfitUsed :
     T extends "preset_used" ? PresetUsed :
+    T extends "quest_progress" ? QuestProgress :
     never
   )
 
@@ -67,7 +77,8 @@ type ArgsExtended<T extends Type> = Args<T> & (
   T extends "new_like" ? { generation?: Nullable<GenerationExtended>, outfit?: Nullable<OutfitExtended>, actor?: Nullable<Doc<'usersExtended'>>, type: "new_like" } :
   T extends "new_follower" ? { follower: Nullable<Doc<'usersExtended'>>, type: "new_follower" } :
   T extends "outfit_used" ? { outfit: Nullable<OutfitExtended>, type: "outfit_used", actor?: Nullable<Doc<'usersExtended'>> } :
-  T extends "preset_used" ? { preset: Nullable<PresetExtended>, type: "preset_used", actor?: Nullable<Doc<'usersExtended'>> } :
+  T extends "preset_used" ? { preset: Nullable<PresetExtended>, transaction: Nullable<Doc<'creditTransactions'>>, type: "preset_used", actor?: Nullable<Doc<'usersExtended'>> } :
+  T extends "quest_progress" ? { type: "quest_progress", quest: Nullable<Doc<'quests'>>, transaction: Nullable<Doc<'creditTransactions'>> } :
   never
 )
 
@@ -83,8 +94,18 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
   const FALLBACK_ROUTE = ROUTES.EXTRA.NOTIFICATIONS;
 
   const aggregationCount = notification?.aggregationCount ?? 0;
+  const aggregationText = "actor" in args ? `${args.actor?.name ?? "Someone"} and ${aggregationCount} others` : "";
 
   switch (args.type) {
+    case "quest_progress":
+      const questRewardCredits = args.transaction?.amount ?? args.quest?.rewardCredits ?? 0;
+      return {
+        title: `Quest progress: ${args.quest?.title}`,
+        body: Number(questRewardCredits) > 0 ?
+          `You earned ${questRewardCredits} credits! Tap to view your quests` :
+          `Tap to view your quests`,
+        redirectUrl: ROUTES.COLLECTION.PATH,
+      }
     case "generation_ready":
       return {
         title: "Your generation is ready",
@@ -108,25 +129,28 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
     case "new_like":
       if (aggregationCount > 1)
         return {
-          title: `+${aggregationCount} people liked your post`,
+          title: `${aggregationText} liked your post`,
           body: "Tap to view",
           icon: args.actor?.imageUrl,
           image: args.generation?.coverUrl,
           redirectUrl: FALLBACK_ROUTE
         }
       return {
-        title: "You have a new like",
+        title: `${args.actor?.name ?? "Someone"} liked your post`,
         body: "Tap to view",
         icon: args.actor?.imageUrl,
         image: args.generation?.coverUrl,
         redirectUrl: FALLBACK_ROUTE
       }
     case "preset_used":
+      const presetRewardCredits = args.transaction?.amount ?? 0;
       return {
         title:
-          aggregationCount > 1 ? `📷 +${aggregationCount} people used your preset` :
+          aggregationCount > 1 ? `📷 ${aggregationText} used your preset` :
             `📷 ${args.actor?.name ?? "Someone"} used your preset`,
-        body: "Tap to view",
+        body: `${Number(presetRewardCredits) > 0 ?
+          `You earned ${presetRewardCredits} credits! Tap to view` :
+          "Tap to view"}`,
         icon: args.actor?.imageUrl,
         image: args.preset?.coverUrl,
         redirectUrl: FALLBACK_ROUTE
@@ -134,7 +158,7 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
     case "outfit_used":
       return {
         title:
-          aggregationCount > 1 ? `👕 +${aggregationCount} people used your outfit` :
+          aggregationCount > 1 ? `👕 ${aggregationText} used your outfit` :
             `👕 ${args.actor?.name ?? "Someone"} used your outfit`,
         body: "Tap to view",
         icon: args.actor?.imageUrl,
@@ -146,8 +170,10 @@ const createPushNotification = async (args: ArgsExtended<Type>, notification?: D
 
 const aggregationKey = (args: Args<Type>) => {
   switch (args.type) {
+    case "quest_progress":
+      return `quest_progress:${args.actorId}:${args.questId}`
     case "generation_ready":
-      return `generation_ready:${args.userId}:${args.generationId}`
+      return `generation_ready:${args.actorId}:${args.generationId}`
     case "tagged_in_generation":
       return `tagged_in_generation:${args.userId}:${args.generationId}`
     case "new_follower":
@@ -163,10 +189,12 @@ const aggregationKey = (args: Args<Type>) => {
 
 const getUserId = (args: ArgsExtended<Type>) => {
   switch (args.type) {
+    case "quest_progress":
+      return args.userId ?? args.actorId;
     case "generation_ready":
       return args.generation?.userId;
     case "tagged_in_generation":
-      return args.generation?.userId;
+      return args.userId;
     case "new_follower":
       return args.actorId;
     case "new_like":
@@ -208,7 +236,7 @@ async function getObjects(ctx: QueryCtx, args: Args<Type>): Promise<ArgsExtended
       ]);
       const coverId = predictions.find((p) => p.status === 'ACCEPTED')?.imageId ?? predictions[0]?.imageId;
       const cover = coverId ? await ctx.db.get(coverId) : undefined;
-      return { ...args, generation: generation ? { ...generation, coverUrl: cover?.url } : undefined };
+      return { ...args, generation: generation ? { ...generation, coverUrl: cover?.url } : undefined, actor };
     }
     else if (args.outfitId) {
       const outfit = await ctx.db.query("outfits").withIndex("by_id", q => q.eq("_id", args.outfitId)).first();
@@ -227,8 +255,18 @@ async function getObjects(ctx: QueryCtx, args: Args<Type>): Promise<ArgsExtended
   if (args.type === "preset_used") {
     const preset = await ctx.db.query("presets").withIndex("by_id", q => q.eq("_id", args.presetId)).first();
     const actor = await ctx.db.query("usersExtended").withIndex("by_user_id", q => q.eq("userId", args.actorId)).first();
+    const transaction = args.transactionId ? await ctx.db.get(args.transactionId) : null;
     const cover = preset?.imageIds?.[0] ? await ctx.db.get(preset.imageIds[0]) : undefined;
-    return { ...args, preset: preset ? { ...preset, coverUrl: cover?.url } : undefined, actor };
+    return { ...args, preset: preset ? { ...preset, coverUrl: cover?.url } : undefined, actor, transaction };
+  }
+
+  if (args.type === "quest_progress") {
+    const [quest, transaction] = await Promise.all([
+      await ctx.db.get(args.questId),
+      args.transactionId ? await ctx.db.get(args.transactionId) : null,
+    ])
+
+    return { ...args, quest, transaction };
   }
 
   return args;
@@ -238,6 +276,7 @@ const isNotificationAllowed = (args: ArgsExtended<Type>) => {
   const userId = args.userId ?? getUserId(args);
 
   if (args.type === "generation_ready") return true;
+  if (args.type === "quest_progress") return true;
 
   // Don't allow notifications if the actor is the same as the user (e.g. liking your own generation, following yourself, etc.)
   if (userId === args.actorId) return false;
@@ -323,9 +362,11 @@ export const saveNotification = async <T extends Type>(ctx: MutationCtx, args: A
     type: args.type,
     read: false,
     actorId: args.actorId,
+    transactionId: "transactionId" in args ? args.transactionId : undefined,
     generationId: "generationId" in args ? args.generationId : undefined,
     outfitId: "outfitId" in args ? args.outfitId : undefined,
     presetId: "presetId" in args ? args.presetId : undefined,
+    questId: "questId" in args ? args.questId : undefined,
     aggregationCount: 1,
     aggregationKey: aggregationKey(args),
     aggregatedUntil: NEW_AGGREGATION_WINDOW,

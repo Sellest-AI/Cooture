@@ -19,6 +19,7 @@ export const ROUTES = {
     UPGRADE: '/upgrade',
     DAILY_STREAK: '/daily-streak',
     TURN_TO_VIDEO: '/turn-to-video',
+    PREVIEW_ITEM: '/preview-item',
   },
   POST: {
     PATH: '/post/[id]',
@@ -39,6 +40,7 @@ export const ROUTES = {
     PATH: '/collection',
     SAVED_POSTS: '/collection/saved-posts',
     SAVED_OUTFITS: '/collection/saved-outfits',
+    SAVED_ITEMS: '/collection/saved-items',
   },
   SHARE: {
     POST: (postId: string) => `/p/${postId}` as const,
@@ -69,6 +71,7 @@ export const ROUTES = {
   },
   PHOTOSHOOT: {
     NEW: '/photoshoot/create',
+    OUTFIT: '/photoshoot/create/outfit',
     RECAP: '/photoshoot/create/recap',
   },
   USER: {

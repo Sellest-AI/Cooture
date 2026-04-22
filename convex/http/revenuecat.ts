@@ -1,10 +1,29 @@
 import { v } from "convex/values";
+import z from "zod";
 import { internal } from "../_generated/api";
 import { httpAction, MutationCtx } from "../_generated/server";
 import { env } from "../env";
 import { getUserWallet } from "../functions/credits";
 import { CREDITS_CONFIG } from "../functions/credits/credits.config";
 import { internalMutation } from "../procedures";
+
+const eventSchema = z.object({
+  type: z.string(),
+  product_id: z.string(),
+  entitlement_ids: z.array(z.string()),
+  period_type: z.string().optional(),
+  app_user_id: z.string(),
+  original_app_user_id: z.string().optional(),
+});
+
+const eventArgs = v.object({
+  type: v.string(),
+  product_id: v.string(),
+  entitlement_ids: v.array(v.string()),
+  period_type: v.optional(v.string()),
+  app_user_id: v.string(),
+  original_app_user_id: v.optional(v.string()),
+})
 
 export const revenueCatHandler = httpAction(async (ctx, request) => {
   const authorization = request.headers.get("authorization");
@@ -24,7 +43,16 @@ export const revenueCatHandler = httpAction(async (ctx, request) => {
   }
 
   try {
-    await ctx.runMutation(internal.http.revenuecat.processWebhook, { event });
+    const sanitizedEvent = eventSchema.parse({
+      type: event.type,
+      product_id: event.product_id,
+      entitlement_ids: event.entitlement_ids ?? [],
+      period_type: event.period_type,
+      app_user_id: event.app_user_id,
+      original_app_user_id: event.original_app_user_id,
+    });
+
+    await ctx.runMutation(internal.http.revenuecat.processWebhook, { event: sanitizedEvent });
     return new Response("Success", { status: 200 });
   } catch (error) {
     console.error("Error processing RC webhook:", error);
@@ -64,7 +92,7 @@ const extractUser = async (ctx: MutationCtx, event: any) => {
 }
 
 export const processWebhook = internalMutation({
-  args: { event: v.any() },
+  args: { event: eventArgs },
   handler: async (ctx, args) => {
     const { event } = args;
 

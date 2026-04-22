@@ -170,7 +170,6 @@ export default function Screen() {
         </MotiView>
       </View>
       <Button
-        style={{ alignSelf: 'stretch' }}
         variant="primary"
         href={ROUTES.WELCOME.STEP_2}
       >

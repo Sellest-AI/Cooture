@@ -65,6 +65,8 @@ const uploadFileToS3 = async (url: string, data: Data) => {
 
   const uploadedFile = await StorageCloud.uploadFile(videoFile, folder);
 
+  await StorageCloud.updateCacheControl(uploadedFile.key);
+
   const tagsSet: Set<VideoTags> = new Set([
     'VIDEO' as const,
     ...(data.tags ?? [])])
@@ -73,8 +75,6 @@ const uploadFileToS3 = async (url: string, data: Data) => {
 
   const size = buffer.length;
   const format = mimeType.split('/')[1] || 'mp4'; // Default to mp4 if unknown
-
-  await StorageCloud.updateCacheControl(uploadedFile.key);
 
   return {
     url: uploadedFile.location,

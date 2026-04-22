@@ -23,10 +23,9 @@ import { Colors } from "theme";
 const loading = false;
 
 export default function Screen() {
-  const { userId, isPremium } = useAccount();
-  const { isAdmin } = useAccount.Admin();
-  const { push } = useRouter('/photoshoot/create');
-  const { setPresetId, presetId, outfitId, friendId } = usePhotoshoot.New();
+  const { userId } = useAccount();
+  const { push, redirect } = useRouter(ROUTES.PHOTOSHOOT.NEW);
+  const { setPresetId, presetId, friendId } = usePhotoshoot.New();
 
   const [category, setCategory] = useState<Api['router']['presets']['getByCategory']['anon']['_args']['category'] | null>(friendId ? "DUO" : null);
   const { data: categories } = useQueryCached(api.router.presets.getCategories.anon);
@@ -37,7 +36,8 @@ export default function Screen() {
 
   const { isLoading, presets } = useSearchPresets({ category, query, userId });
 
-  const displayedPresets = outfitId ? presets.filter((p) => !p.hasMultipleSubjects) : presets;
+  // const displayedPresets = presets.filter((p) => !p.hasMultipleSubjects);
+  const displayedPresets = presets;
 
   const listRef = useRef<FlashListRef<typeof displayedPresets[number] | string>>(null);
 
@@ -108,8 +108,7 @@ export default function Screen() {
                     style={{ padding: Platform.OS === 'android' ? 6 : 0 }}
                     title="New preset"
                     onPress={() => {
-                      if (isPremium || isAdmin) push(ROUTES.PRESETS.CREATE.PATH, { redirectHere: true })
-                      else push(ROUTES.MODALS.UPGRADE);
+                      push(ROUTES.PRESETS.CREATE.PATH, { redirectHere: true })
                     }}
                   />
                 </View>
@@ -169,9 +168,17 @@ export default function Screen() {
                   style={{ padding: Platform.OS === 'android' ? 6 : 0 }}
                   contentFit="cover"
                   title={item.name}
+                  onLongPress={() => {
+                    push(ROUTES.PRESETS.ID.PATH, { pathParams: { id: item._id } });
+                  }}
                   onPress={() => {
-                    setPresetId((p) => p === item._id ? null : item._id);
-                    if (!selected) requestAnimationFrame(() => push(ROUTES.PHOTOSHOOT.RECAP, { resetNextRoute: false }));
+                    setPresetId(item._id);
+                    // setPresetId((p) => p === item._id ? null : item._id);
+                    // if (!selected) 
+                    requestAnimationFrame(() => redirect({
+                      fallbackTo: ROUTES.PHOTOSHOOT.OUTFIT,
+                      resetNextRoute: false
+                    }));
                   }}
                 />
               </BlurTargetView>
@@ -184,7 +191,7 @@ export default function Screen() {
           style={{ position: 'absolute', left: 12, right: 12, bottom: 12 }}
           from={{ opacity: 0, translateY: 10 }}
           animate={{ opacity: 1, translateY: 0 }}
-          transition={{ delay: 800 }}
+          transition={{ delay: 500 }}
           exit={{ opacity: 0, translateY: 10 }}
           exitTransition={{ duration: 100, delay: 0 }}
         >
@@ -192,9 +199,12 @@ export default function Screen() {
             style={{ marginTop: 12 }}
             variant="primary"
             endIcon={ArrowRight}
-            onPress={() => push(ROUTES.PHOTOSHOOT.RECAP, { resetNextRoute: false })}
+            onPress={() => redirect({
+              fallbackTo: ROUTES.PHOTOSHOOT.RECAP,
+              resetNextRoute: false
+            })}
           >
-            Next step
+            Continue
           </Button>
         </MotiView>}
       </AnimatePresence>

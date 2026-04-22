@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
+import { saveNotification } from "../../functions/notifications";
 import { internalMutation } from "../../procedures";
 import { questTypes } from "../../schema/quests";
 
@@ -58,13 +59,22 @@ export const _internal = internalMutation({
       }
 
       if (claimReward) {
-        await ctx.runMutation(internal.router.credits.grantCredits._internal, {
+        const { transactionId } = await ctx.runMutation(internal.router.credits.grantCredits._internal, {
           userId,
           amount: quest.rewardCredits,
           type: "QUEST_REWARD",
           metadata: {
             reason: `Quest completed: ${quest.title} (${quest.type})`,
           }
+        })
+
+        await saveNotification(ctx, {
+          userId: userId,
+          actorId: userId,
+          type: 'quest_progress',
+          questId: quest._id,
+          transactionId,
+          pushToDevice: true,
         })
       }
     }

@@ -2,6 +2,7 @@ import { useRouter } from "@/hooks";
 import { api, useAction, useQuery, useQueryCached } from "@/lib/convex/client";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { usePhotoshoot } from "@/modules/photoshoot/_hooks/usePhotoshoot";
+import { ModalAppearance } from "@/modules/photoshoot/modal.appearance";
 import { Portrait } from "@/modules/profiles/portrait";
 import { Badge } from "@ui/badge";
 import { Block } from "@ui/block";
@@ -10,12 +11,14 @@ import { ButtonSlider } from "@ui/button.slider";
 import { Col, Grid, Row } from "@ui/grid";
 import { Credits, Flame, Plus, Squirish } from "@ui/icons";
 import { Image } from "@ui/image";
+import { LinearGradient } from "@ui/linear-gradient";
 import { Pressable } from "@ui/pressable";
 import { Skeleton } from "@ui/skeleton";
 import { Slider } from "@ui/slider";
+import { Switch } from "@ui/switch";
 import { Text } from "@ui/text";
 import React, { useMemo, useState } from "react";
-import { View, ViewStyle } from "react-native";
+import { Platform, View, ViewStyle } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
 
@@ -94,8 +97,9 @@ const OutfitGrid = ({ items, style }: { items: Items, style?: ViewStyle }) => {
   )
 }
 
-const OutfitComponent = () => {
-  const { outfit, outfitSize, outfitSizes, setOutfitSize, hasMultipleSubjects } = usePhotoshoot.New();
+const OutfitComponent = ({ style }: { style?: ViewStyle }) => {
+  const { outfit, outfitSize, outfitSizes, setOutfitSize, hasMultipleSubjects,
+    shareOutfit, setShareOutfit } = usePhotoshoot.New();
   const { push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
 
   const sizes = outfitSizes.map((size, i) => ({
@@ -104,29 +108,41 @@ const OutfitComponent = () => {
     defaultLabel: size,
   }));
 
-  if (hasMultipleSubjects)
-    return null;
+  const hasOutfit = Boolean(outfit);
 
   return (
-    <Block
-      variant="blur"
-      style={{
-        borderRadius: 32,
-        paddingHorizontal: 16,
-        paddingVertical: 20,
-        gap: 12,
-        marginTop: 8,
-      }}
+    <View
+      style={style}
     >
-      <Text.H4 color={Colors.neutral[50]}>Custom Outfit</Text.H4>
-      {outfit && <Text.Base color={Colors.neutral[400]}>
-        This outfit will be used for your photoshoot.
-      </Text.Base>}
-      {!outfit && <Text.Base color={Colors.neutral[400]}>
-        We&apos;ll use the model&apos;s default wardrobe instead.
-      </Text.Base>}
+      <View style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: 16
+      }}
+      >
+        <View>
+          <Text.H4 color={Colors.neutral[50]}>Outfit</Text.H4>
+          <Text.Base color={Colors.neutral[400]} style={{ marginTop: 4 }}>
+            {hasOutfit ? 'Your selected outfit.' :
+              'No outfit selected. The preset outfit will be used.'}
+          </Text.Base>
+        </View>
+        {hasOutfit && <Button
+          variant="blur"
+          size="sm"
+          onPress={() => {
+            push(ROUTES.PHOTOSHOOT.OUTFIT, {
+              redirectHere: true,
+            });
+          }}
+        >
+          Edit
+        </Button>}
+      </View>
       {outfit && <OutfitGrid items={outfit.items} />}
       {outfit && <Slider
+        style={{ marginTop: 8 }}
         value={sizes.find(s => s.defaultLabel === outfitSize)?.value ?? 0}
         onValueChange={(v) => {
           const closest = sizes.reduce((prev, curr) => {
@@ -136,25 +152,42 @@ const OutfitComponent = () => {
         }}
         customHeight={36}
         labels={sizes}
+        variant="secondary"
         label="Fit"
       />}
-      <Button
-        style={{ marginTop: 8 }}
-        variant="blur"
-        onPress={() => {
-          push(ROUTES.MODALS.PICK_OUTFIT, {
-            params: { canSkip: true },
-            redirectHere: true,
-          });
-        }}
-      >
-        {outfit ? 'Change outfit' : 'Select an outfit'}
-      </Button>
-    </Block>
+      {(outfit && hasMultipleSubjects) && <View style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 24,
+      }}>
+        <View>
+          <Text.Base color={Colors.neutral[400]} weight={500}>
+            {shareOutfit ? 'Everyone wears this outfit' : 'Only you wear this outfit'}
+          </Text.Base>
+        </View>
+        <View>
+          <Switch value={shareOutfit} onValueChange={setShareOutfit} />
+        </View>
+      </View>}
+      {!hasOutfit && (
+        <Button
+          variant="blur"
+          style={{ marginTop: 4 }}
+          onPress={() => {
+            push(ROUTES.PHOTOSHOOT.OUTFIT, {
+              redirectHere: true,
+            });
+          }}
+        >
+          {outfit ? 'Change outfit' : 'Select an outfit'}
+        </Button>
+      )}
+    </View>
   )
 }
 
-const FriendBlock = () => {
+const FriendBlock = ({ style }: { style?: ViewStyle }) => {
   const { push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
   const { hasMultipleSubjects, friendId } = usePhotoshoot.New();
   const { data: friend, isPending } = useQuery(api.router.users.getAccount.anon, friendId ? { userId: friendId } : 'skip');
@@ -162,182 +195,194 @@ const FriendBlock = () => {
   if (!hasMultipleSubjects) return null;
 
   return (
-    <Block
-      variant="blur"
-      style={{
-        marginBottom: 8,
-        borderRadius: 32,
-        paddingHorizontal: 16,
-        paddingBottom: 20,
-        paddingTop: 16,
-        gap: 12,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-end',
-      }}
+    <Pressable
+      onPress={() => push(ROUTES.MODALS.PICK_USER, { redirectHere: true })}
+      intensity={0.995}
     >
-      {!friend && <>
-      </>}
-      <View style={{ gap: 8 }}>
-        <View style={{
-          paddingHorizontal: 12,
-          paddingVertical: 6,
-          backgroundColor: Colors.primary[500],
-          alignSelf: 'flex-start',
-          borderRadius: 99,
-          marginBottom: 4,
-        }}>
-          <Text.Sm color={Colors.primary[900]} weight={600}>Required</Text.Sm>
-        </View>
-        <Text.H4 color={Colors.neutral[50]}>Friend</Text.H4>
-        {(isPending && friendId) && <Skeleton style={{ width: 128, height: 18 }} />}
-        {friend && <Text.Base color={Colors.neutral[400]}>{friend.name}</Text.Base>}
-        {!friendId && <Text.Base color={Colors.neutral[400]}>
-          Select a friend to join you.
-        </Text.Base>}
-      </View>
-      {friend && <Pressable onPress={() => push(ROUTES.MODALS.PICK_USER, {
-        redirectHere: true,
-      })}>
-        <Badge
-          source={friend?.image}
-          style={{ width: 86, height: 86, borderRadius: 99 }}
-        />
-      </Pressable>}
-      {!friendId && <Pressable
-        onPress={() => push(ROUTES.MODALS.PICK_USER, {
-          redirectHere: true,
-        })}
+      <Block
+        variant="blur"
         style={{
-          width: 72,
-          height: 72,
-          borderRadius: 99,
-          backgroundColor: Colors.primary[500],
-          borderWidth: 2,
-          borderTopColor: Colors.primary[200],
-          borderLeftColor: Colors.primary[200],
-          borderRightColor: Colors.primary[700],
-          borderBottomColor: Colors.primary[700],
-          justifyContent: 'center',
-          alignItems: 'center'
+          ...style,
+          borderRadius: 32,
+          gap: 12,
+          paddingHorizontal: 16,
+          paddingBottom: 20,
+          paddingTop: 16,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
         }}
       >
-        <Plus size={32} />
-      </Pressable>}
-    </Block>
+        <LinearGradient
+          colors={['transparent', Colors.primary[500]]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            bottom: 0,
+            width: 300,
+            opacity: Platform.OS === 'android' ? 0.05 : 0.1
+          }}
+        />
+        <View style={{ gap: 8 }}>
+          <View
+            style={{
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              backgroundColor: Colors.primary[500],
+              alignSelf: 'flex-start',
+              borderRadius: 99,
+              marginBottom: 4,
+            }}>
+            <Text.Sm color={Colors.primary[900]} weight={600}>{friendId ? 'Selected' : 'Required'}</Text.Sm>
+          </View>
+          <Text.H4 color={Colors.neutral[50]}>Friend</Text.H4>
+          {(isPending && friendId) && <Skeleton style={{ width: 128, height: 18 }} />}
+          {friend && <Text.Base color={Colors.neutral[400]}>{friend.name}</Text.Base>}
+          {!friendId && <Text.Base color={Colors.neutral[400]}>
+            Select a friend to join you.
+          </Text.Base>}
+        </View>
+        {friend && <Badge
+          source={friend?.image}
+          style={{ width: 86, height: 86, borderRadius: 99 }}
+        />}
+        {!friendId && <View
+          style={{
+            width: 72,
+            height: 72,
+            borderRadius: 99,
+            backgroundColor: Colors.primary[500],
+            borderWidth: 1,
+            borderTopColor: Colors.primary[200],
+            borderLeftColor: Colors.primary[200],
+            borderRightColor: Colors.primary[500],
+            borderBottomColor: Colors.primary[500],
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+        >
+          <Plus size={32} color={Colors.primary[900]} />
+        </View>}
+      </Block>
+    </Pressable>
   )
 }
 
 export default function Screen() {
-  const [numberToGenerate] = useState(2);
+  const [numberToGenerate] = useState(1);
   const { data: cost } = useQueryCached(api.router.credits.getCost.anon, { type: 'IMAGE_GENERATION_COST', amount: numberToGenerate });
   const { data: canPay } = useQueryCached(api.router.credits.canPay.authed, cost ? { amount: cost } : 'skip');
-  const { outfitId, outfitSize, presetId, friendId, disabled, hasMultipleSubjects } = usePhotoshoot.New();
+  const { outfitId, outfitSize, presetId, friendId, disabled, hasMultipleSubjects, shareOutfit } = usePhotoshoot.New();
   const { dismissTo, push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
 
-  const { action, isLoading } = useAction(api.llm.triggers.photoshoot.authed);
+  const { action, isLoading } = useAction(api.llm.triggers.photoshootBytePlus.authed);
 
   return (
-    <View style={{ paddingHorizontal: 12 }}>
-      <Button
-        onPress={() => dismissTo('/photoshoot/create', { resetNextRoute: false })}
-        variant="secondary"
-        style={{ marginBottom: 8 }}
-      >
-        Change Preset
-      </Button>
-      <FriendBlock />
-      <Block
-        variant="blur"
-        style={{
-          borderRadius: 32,
-          paddingHorizontal: 16,
-          paddingVertical: 20,
-          gap: 12,
-        }}
-      >
-        <Text.H4 color={Colors.neutral[50]}>Portrait</Text.H4>
-        <Text.Base color={Colors.neutral[400]}>Make sure your portrait images are up to date.</Text.Base>
-        <Portrait style={{ marginTop: 16 }} />
-      </Block>
-      <OutfitComponent />
-      <View style={{ flex: 1, justifyContent: 'flex-end', marginTop: 12 }}>
-        <ButtonSlider
-          startIcon={Flame}
-          disabled={disabled || isLoading}
-          onComplete={async () => {
-            if (!presetId) return false;
-            if (disabled) return false;
-
-            if (!canPay) {
-              push(ROUTES.MODALS.UPGRADE, { redirectHere: true });
-              return false;
-            }
-
-            let cancel = false;
-            const timer = setTimeout(() => {
-              if (cancel) return;
-              if (!outfitId) return;
-              cancel = true;
-              dismissTo(ROUTES.GENERATIONS.PHOTOSHOOT.NEXT);
-            }, 500);
-
-            const friend = hasMultipleSubjects ? (friendId ? [friendId] : undefined) : undefined;
-
-            const generationId = await action({
-              presetId: presetId,
-              numberToGenerate: numberToGenerate,
-              extraUserIds: friend,
-              outfit: outfitId ? {
-                _id: outfitId,
-                size: outfitSize
-              } : undefined,
-            }).catch(() => null);
-
-            if (cancel) return true; // Successfully navigating via timer
-
-            cancel = true;
-            clearTimeout(timer);
-
-            if (!generationId) return false; // Error creating, reset slider
-
-            dismissTo(ROUTES.GENERATIONS.PHOTOSHOOT.PATH, {
-              pathParams: { id: generationId },
-            });
-
-            return true; // Navigating away
+    <>
+      <View style={{ paddingHorizontal: 12 }}>
+        <FriendBlock
+          style={{
+            marginTop: 20,
+            marginBottom: 16
           }}
-        >
-          Slide to generate
-        </ButtonSlider>
-        <View style={{
-          gap: 4,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginTop: 12,
-        }}>
-          {cost && <Text.Sm
-            style={{
-              textAlign: 'center',
-              maxWidth: 172,
+        />
+        <OutfitComponent
+          style={{
+            marginTop: 24,
+            paddingHorizontal: 8,
+          }}
+        />
+        <Portrait style={{
+          marginTop: 48,
+          paddingHorizontal: 8,
+          marginBottom: 40,
+        }}
+        />
+        <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+          <ButtonSlider
+            startIcon={Flame}
+            disabled={disabled || isLoading}
+            onComplete={async () => {
+              if (!presetId) return false;
+              if (disabled) return false;
+
+              if (!canPay) {
+                push(ROUTES.MODALS.UPGRADE, { redirectHere: true });
+                return false;
+              }
+
+              let cancel = false;
+              const timer = setTimeout(() => {
+                if (cancel) return;
+                if (!outfitId) return;
+                cancel = true;
+                dismissTo(ROUTES.GENERATIONS.PHOTOSHOOT.NEXT);
+              }, 500);
+
+              const friend = hasMultipleSubjects ? (friendId ? [friendId] : undefined) : undefined;
+
+              const generationId = await action({
+                presetId: presetId,
+                numberToGenerate: numberToGenerate,
+                extraUserIds: friend,
+                outfit: outfitId ? {
+                  _id: outfitId,
+                  size: outfitSize,
+                  shared: shareOutfit
+                } : undefined,
+              }).catch(() => null);
+
+              if (cancel) return true; // Successfully navigating via timer
+
+              cancel = true;
+              clearTimeout(timer);
+
+              if (!generationId) return false; // Error creating, reset slider
+
+              dismissTo(ROUTES.GENERATIONS.PHOTOSHOOT.PATH, {
+                pathParams: { id: generationId },
+              });
+
+              return true; // Navigating away
             }}
-            color={Colors.neutral[400]}
           >
-            You will generate {numberToGenerate} image{numberToGenerate > 1 ? 's' : ''} for
-          </Text.Sm>}
-          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-            <Credits size={12} />
-            <Text.Base
-              color={Colors.primary[200]} weight={600}
-              style={{ marginLeft: 2 }}
+            Slide to generate
+          </ButtonSlider>
+          <View style={{
+            gap: 4,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: 12,
+          }}>
+            {cost && <Text.Sm
+              style={{
+                textAlign: 'center',
+                maxWidth: 172,
+              }}
+              color={Colors.neutral[400]}
             >
-              {cost}
-            </Text.Base>
+              You will generate {numberToGenerate} image{numberToGenerate > 1 ? 's' : ''} for
+            </Text.Sm>}
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+              <Credits size={12} />
+              <Text.Base
+                color={Colors.primary[200]} weight={600}
+                style={{ marginLeft: 2 }}
+              >
+                {cost}
+              </Text.Base>
+            </View>
           </View>
         </View>
-      </View>
-      <View style={{ height: 12 }} />
-    </View>
+        <View style={{ height: 12 }} />
+      </View >
+      <ModalAppearance
+        currentPath={ROUTES.PHOTOSHOOT.RECAP}
+      />
+    </>
   );
 }

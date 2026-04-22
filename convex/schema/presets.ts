@@ -51,6 +51,7 @@ export const PRESET_PROMPT = v.object({
     surroundingElements: v.array(v.string()),
   }),
   subjects: v.array(v.object({
+    gender: v.optional(v.union(v.literal("male"), v.literal("female"))),
     position: v.string(),
     bodyAlignment: v.string(),
     legs: v.array(v.string()),

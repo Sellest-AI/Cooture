@@ -1,3 +1,4 @@
+import { AnimatePresence } from 'moti';
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { Dimensions, Modal as NativeModal, Pressable, View, ViewStyle } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView, GestureType } from 'react-native-gesture-handler';
@@ -7,8 +8,9 @@ import { runOnJS } from 'react-native-worklets';
 import { Colors } from 'theme';
 import { Block } from './block';
 import { BlurKeys } from './blur-view';
-import { ArrowLeft } from './icons';
-import { SafeAreaView, useSafeAreaInsets } from './safe-area-view';
+import { ArrowLeft, X } from './icons';
+import { LinearGradient } from './linear-gradient';
+import { useSafeAreaInsets } from './safe-area-view';
 import { Text } from './text';
 
 type Children = (actions: { next: () => void, back: () => void, close: () => void }) => ReactNode[] | ReactNode;
@@ -18,11 +20,10 @@ type Props = {
   onOpenChange?: (open: boolean) => void;
   children: ReactNode | Children;
   style?: ViewStyle;
-  header?: {
-    title: string;
+  header?: Pick<ModalHeaderProps, 'style' | 'title' | 'type' | 'customBackIcon' | 'endContent'>
+  & {
     showBackButton?: boolean;
-    type?: 'default' | 'alt';
-  }
+  };
 }
 
 export type ModalProps = Omit<Props, 'children'>;
@@ -33,7 +34,10 @@ export const SlideToDismiss = ({
   threshold = 150,
   scrollY,
   simultaneousHandlers,
+  /** Check if dismiss is allowed */
   canDismiss,
+  /** Disable dismiss */
+  disabled = false,
 }: {
   children: ReactNode,
   onDismiss: () => void,
@@ -41,17 +45,23 @@ export const SlideToDismiss = ({
   scrollY?: SharedValue<number>,
   simultaneousHandlers?: GestureType,
   canDismiss: SharedValue<boolean>,
+  disabled?: boolean,
 }) => {
   const translateY = useSharedValue(0);
+  const opacity = useAnimatedStyle(() => ({
+    opacity: 1 - translateY.value / (threshold * 2),
+  }));
 
   const gesture = Gesture.Pan()
     .onBegin((event) => {
+      if (disabled) return;
       // If we aren't tapping explicitly on the grab handle, check scroll layout
       if (!canDismiss.value) {
         canDismiss.value = !scrollY || scrollY.value <= 1;
       }
     })
     .onChange((event) => {
+      if (disabled) return;
       if (!canDismiss.value) return;
 
       // If we are at the default position and the user drags UP (negative changeY),
@@ -64,6 +74,7 @@ export const SlideToDismiss = ({
       translateY.value = Math.max(0, translateY.value + event.changeY);
     })
     .onEnd((event) => {
+      if (disabled) return;
       if (!canDismiss.value) return;
 
       // Allow dismissing if translated past threshold OR if throwing it down hard enough
@@ -88,10 +99,18 @@ export const SlideToDismiss = ({
 
   return (
     <GestureDetector gesture={gesture}>
-      <Animated.View style={[animatedStyle, { pointerEvents: 'auto' }]}>
-        <Pressable style={{ position: 'absolute', inset: 0 }} onPress={() => onDismiss()} />
-        {children}
-      </Animated.View>
+      <View style={[{ flex: 1 }]}>
+        <Animated.View style={[opacity, { position: 'absolute', inset: 0 }]}>
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.6)', 'rgba(0,0,0,0.6)', 'rgba(0,0,0,0.6)', 'rgba(0,0,0,0.6)']}
+            style={{ flex: 1 }}
+          />
+        </Animated.View>
+        <Animated.View style={[animatedStyle, { pointerEvents: 'auto', justifyContent: 'flex-end' }]}>
+          <Pressable style={{ position: 'absolute', inset: 0 }} onPress={() => onDismiss()} />
+          {children}
+        </Animated.View>
+      </View>
     </GestureDetector>
   );
 };
@@ -100,6 +119,7 @@ export const Modal = ({ children, open, onOpenChange, style, header }: Props) =>
   const [currentStep, setCurrentStep] = useState(0);
   const stepsLengthRef = useRef<number>(0);
 
+  const canClose = !!onOpenChange;
   const scrollY = useSharedValue(0);
   const canDismiss = useSharedValue(false);
   const nativeScroll = Gesture.Native();
@@ -115,7 +135,7 @@ export const Modal = ({ children, open, onOpenChange, style, header }: Props) =>
   }, [open]);
 
   const closeAnimation = useCallback(() => {
-    onOpenChange && onOpenChange(false);
+    if (onOpenChange) onOpenChange(false);
   }, [onOpenChange]);
 
   // navigation helpers that reference current steps length
@@ -135,15 +155,9 @@ export const Modal = ({ children, open, onOpenChange, style, header }: Props) =>
     setCurrentStep((s) => Math.max(0, s - 1));
   }, []);
 
-  // const FinalView = scrollable ? Animated.ScrollView : View;
   const { bottom } = useSafeAreaInsets();
 
-  const [contentHeight, setContentHeight] = useState(0);
-
-  const FinalView = Animated.ScrollView;
-
-  const paddingBottom = bottom + 28;
-  const addPadding = contentHeight + paddingBottom >= (Dimensions.get('window').height * 0.95);
+  const paddingBottom = bottom;
 
   return (
     <NativeModal
@@ -153,12 +167,13 @@ export const Modal = ({ children, open, onOpenChange, style, header }: Props) =>
       transparent
     >
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+        <AnimatePresence>
           <SlideToDismiss
             onDismiss={() => { if (onOpenChange) closeAnimation(); }}
             scrollY={scrollY}
             simultaneousHandlers={nativeScroll}
             canDismiss={canDismiss}
+            disabled={!canClose}
           >
             <Block
               blurKey={BlurKeys.FEED}
@@ -176,82 +191,81 @@ export const Modal = ({ children, open, onOpenChange, style, header }: Props) =>
                 paddingHorizontal: 12,
                 pointerEvents: 'auto',
                 ...style,
-                maxHeight: "95%",
                 paddingBottom: 0,
+                alignSelf: 'flex-end'
               }}
             >
-              <SafeAreaView
-                edges={{
-                  top: 'off',
-                  bottom: 'additive'
-                }}
-              >
-                <GestureDetector gesture={Gesture.Tap().onBegin(() => {
-                  'worklet';
-                  canDismiss.value = true;
-                }).onEnd(() => {
-                  'worklet';
-                  canDismiss.value = scrollY ? scrollY.value <= 1 : true;
-                }).simultaneousWithExternalGesture(nativeScroll)}>
-                  <Animated.View style={{ width: '100%', paddingVertical: 12, alignItems: 'center' }}>
-                    <View
-                      style={{ width: 56, height: 4, borderRadius: 2, backgroundColor: Colors.neutral[400] }}
-                    />
-                  </Animated.View>
-                </GestureDetector>
-                <GestureDetector gesture={nativeScroll}>
-                  <FinalView
-                    showsVerticalScrollIndicator={false}
-                    // bottom + Pan handler offset
-                    contentContainerStyle={{
-                      paddingBottom: addPadding ? paddingBottom : 0
+              <GestureDetector gesture={Gesture.Tap().onBegin(() => {
+                'worklet';
+                canDismiss.value = true;
+              }).onEnd(() => {
+                'worklet';
+                canDismiss.value = scrollY ? scrollY.value <= 1 : true;
+              }).simultaneousWithExternalGesture(nativeScroll)}>
+                <Animated.View style={{ width: '100%', paddingVertical: 12, alignItems: 'center' }}>
+                  <View
+                    style={{ width: 56, height: 4, borderRadius: 2, backgroundColor: Colors.neutral[400] }}
+                  />
+                </Animated.View>
+              </GestureDetector>
+              <GestureDetector gesture={nativeScroll}>
+                <Animated.ScrollView
+                  showsVerticalScrollIndicator={false}
+                  // 95% - Pan handler offset
+                  style={{
+                    maxHeight: (Dimensions.get('window').height * 0.95) - 24,
+                  }}
+                  // bottom
+                  contentContainerStyle={{ paddingBottom }}
+                  bounces={false}
+                  onScroll={scrollHandler}
+                  scrollEventThrottle={16}
+                >
+                  {header && <ModalHeader
+                    type={header.type}
+                    style={{
+                      marginTop: 10,
+                      // Make sure to always have horizontal padding
+                      paddingHorizontal: 12 - Number(style?.paddingHorizontal ?? 0),
+                      ...header.style
                     }}
-                    bounces={false}
-                    onScroll={scrollHandler}
-                    scrollEventThrottle={16}
-                    onContentSizeChange={(_, height) => {
-                      setContentHeight(height);
-                    }}
-                  >
-                    {header && <ModalHeader
-                      type={header.type}
-                      style={{ marginTop: 10 }}
-                      title={header.title}
-                      onBack={(header.showBackButton || currentStep > 0) ? () => {
-                        back?.();
-                        if (currentStep === 0 && onOpenChange) closeAnimation();
-                      } : undefined}
-                    />}
+                    title={header.title}
+                    endContent={header.endContent}
+                    customBackIcon={header.customBackIcon}
+                    onBack={(header.showBackButton || currentStep > 0) ? () => {
+                      back?.();
+                      if (currentStep === 0 && onOpenChange) closeAnimation();
+                    } : undefined}
+                  />}
 
-                    {/* handle children as array of steps, render-prop, or single node */}
-                    {(() => {
-                      // if children is a function, call it with actions
-                      if (typeof children === 'function') {
-                        const res = (children as Children)({ next, back, close: () => { if (onOpenChange) closeAnimation(); } });
-                        if (Array.isArray(res)) {
-                          stepsLengthRef.current = res.length;
-                          return res[currentStep] ?? null;
-                        }
-                        stepsLengthRef.current = 0;
-                        return res;
+                  {/* handle children as array of steps, render-prop, or single node */}
+                  {(() => {
+                    // if children is a function, call it with actions
+                    if (typeof children === 'function') {
+                      const res = (children as Children)({ next, back, close: () => { if (onOpenChange) closeAnimation(); } });
+                      if (Array.isArray(res)) {
+                        stepsLengthRef.current = res.length;
+                        return res[currentStep] ?? null;
                       }
-
-                      // if children is an array, treat as steps
-                      if (Array.isArray(children)) {
-                        const arr = children as ReactNode[];
-                        stepsLengthRef.current = arr.length;
-                        return arr[currentStep] ?? null;
-                      }
-
                       stepsLengthRef.current = 0;
-                      return children;
-                    })()}
-                  </FinalView>
-                </GestureDetector>
-              </SafeAreaView>
+                      return res;
+                    }
+
+                    // if children is an array, treat as steps
+                    if (Array.isArray(children)) {
+                      const arr = children as ReactNode[];
+                      stepsLengthRef.current = arr.length;
+                      return arr[currentStep] ?? null;
+                    }
+
+                    stepsLengthRef.current = 0;
+                    return children;
+                  })()}
+                </Animated.ScrollView>
+              </GestureDetector>
             </Block>
           </SlideToDismiss>
-        </View>
+        </AnimatePresence>
       </GestureHandlerRootView>
     </NativeModal>
   )
@@ -261,17 +275,20 @@ type ModalHeaderProps = {
   title: string;
   subtitle?: string;
   onBack?: () => void;
+  customBackIcon?: 'back' | 'x' | React.ComponentType<{ size?: number, color?: string, style?: ViewStyle }> | false;
   style?: ViewStyle;
   type?: 'default' | 'alt';
   size?: 'big' | 'normal';
   endContent?: ReactNode;
   align?: 'auto' | 'left';
 }
-export const ModalHeader = ({ title, onBack, style, subtitle, type, size, align, endContent }: ModalHeaderProps) => {
+export const ModalHeader = ({ title, onBack, style, subtitle, type, size, align, endContent, customBackIcon }: ModalHeaderProps) => {
   const isAlt = type === 'alt';
   const isBig = size === 'big';
 
   const Title = isBig ? Text.H1 : Text.H3;
+  const CustomBackIcon = customBackIcon === 'back' ? ArrowLeft :
+    customBackIcon === 'x' ? X : customBackIcon;
 
   const justify =
     align === 'left' ? 'flex-start' :
@@ -305,7 +322,8 @@ export const ModalHeader = ({ title, onBack, style, subtitle, type, size, align,
               padding: 10,
             }}
           >
-            <ArrowLeft color={Colors.foreground} />
+            {CustomBackIcon ? <CustomBackIcon color={Colors.foreground} /> :
+              <ArrowLeft color={Colors.foreground} />}
           </Block>
         </Pressable>}
         <Title
@@ -314,7 +332,7 @@ export const ModalHeader = ({ title, onBack, style, subtitle, type, size, align,
           style={{
             textAlign: 'center',
             maxWidth: "60%",
-            marginTop: isBig ? 3 : (isAlt ? 6 : 2),
+            marginTop: isBig ? 3 : (isAlt ? 4 : 2),
           }}
         >
           {title}

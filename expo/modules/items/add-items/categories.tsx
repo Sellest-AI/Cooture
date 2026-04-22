@@ -3,8 +3,8 @@ import { BlurKeys } from "@ui/blur-view";
 import { FlashList } from "@ui/flat-list";
 import { Pressable } from "@ui/pressable";
 import { Text } from "@ui/text";
-import { useEffect, useState } from "react";
-import { ViewStyle } from "react-native";
+import { ReactNode, useEffect, useState } from "react";
+import { View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 
 const categories = [
@@ -36,11 +36,14 @@ type Props = {
   style?: ViewStyle;
   category?: string | null;
   onCategoryChange?: (category: string | null) => void;
+  extraCategories?: Record<string, ReactNode | string>;
 }
 
-export const Categories = ({ style, category: _category, onCategoryChange }: Props) => {
+export const Categories = ({ style, category: _category, extraCategories, onCategoryChange }: Props) => {
   const [category, setCategory] = useState<string | null>(_category ?? null);
   useEffect(() => { setCategory(_category ?? null); }, [_category]);
+
+  const extraCategoriesKeys = extraCategories ? Object.keys(extraCategories) : [];
 
   return (
     <FlashList
@@ -50,10 +53,24 @@ export const Categories = ({ style, category: _category, onCategoryChange }: Pro
         minHeight: 34,
         ...style,
       }}
-      data={categories}
+      data={[...extraCategoriesKeys, ...categories]}
       keyExtractor={(item) => item}
       renderItem={({ item, index }) => {
         const isSelected = category === item || (item === 'ALL' && category === null);
+
+        if (extraCategories && extraCategoriesKeys.includes(item)) {
+          return (
+            <View style={{ height: '100%', justifyContent: 'center', alignItems: 'center' }}>
+              {typeof extraCategories[item] === 'string' ? (
+                <Text.Base weight={500} color={Colors.neutral[200]}>
+                  {extraCategories[item]}
+                </Text.Base>
+              ) : (
+                extraCategories[item]
+              )}
+            </View>
+          )
+        }
 
         return (
           <Pressable

@@ -49,9 +49,9 @@ const generateFunction = async (ctx: ActionCtx, args: {
   const extraUsers = Array.from(new Set(subjects.map(s => s.userId)))
     .filter(id => id !== args.userId).slice(0, schema.prompt.subjects.length - 1);
 
-  // seedream 4.5 has a max prompt length of 2000 characters, 
+  // seedream 4.5 has a max prompt length of 5000 characters, 
   // so we need to shrink the prompt if it's too long
-  const shrinkedPrompt = sliceText(prompt, 2000);
+  const shrinkedPrompt = sliceText(prompt, 5000);
 
   const predictions = await Promise.all(Array.from({ length: NUMBER_OF_IMAGES }).map(async () => predictImage({
     model: 'bytedance/seedream-4.5',

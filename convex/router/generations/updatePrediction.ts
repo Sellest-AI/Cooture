@@ -38,6 +38,16 @@ const updateGenerationStatus = async (ctx: MutationCtx, generationId: Id<'genera
       completedAt: completedAt,
       publication: allRejected ? "ARCHIVED" : "PUBLISHED"
     });
+
+    // Only increment quests if the generation is moving to DRAFT (waiting for review) 
+    // or PUBLISHED (approved) status, not when it's archived
+    if (generation.publication === "DRAFT" && someAccepted)
+      await updateQuest(ctx, {
+        questType: "posts_published",
+        userId: generation.userId,
+        increment: 1,
+      })
+
     return;
   }
 
@@ -71,9 +81,13 @@ const updatePrediction = async (ctx: MutationCtx, args: {
 }) => {
   const { prediction, imageId, videoId } = args;
 
-  const hasResult = !!imageId || !!videoId;
+  const hasResult = !!imageId || !!videoId || prediction.imageId || prediction.videoId;
 
-  const status = args.status ?? (hasResult ? "REVIEW" : undefined);
+  // Force REJECTED status if trying to accept without a result
+  const newStatus = (args.status === "ACCEPTED" && !hasResult) ? "REJECTED" : args.status;
+  // If no status provided, set to REVIEW if there's a result, or keep it unchanged
+  const status = newStatus ?? (hasResult ? "REVIEW" : undefined);
+
   const readyAt = prediction.readyAt ?? (hasResult ? Date.now() : undefined);
 
   const patch = removeUndefinedKeys({

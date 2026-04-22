@@ -15,13 +15,14 @@ type DateComponent = ({ paddingLeft }: {
 type Props = {
   read?: boolean;
   onPress?: () => void;
+  onProfilePress?: () => void;
   leftImage?: string;
   rightImage?: { url?: string; backgroundColor?: string };
   date?: number | Date;
   children?: ((date: DateComponent) => ReactNode) | string;
 }
 
-export const Notification = ({ read, onPress, leftImage, rightImage, date, children }: Props) => {
+export const Notification = ({ read, onPress, onProfilePress, leftImage, rightImage, date, children }: Props) => {
   const Component = read ? View : Block;
 
   const minutesAgo = date ? Math.floor((Date.now() - new Date(date).getTime()) / 60000) : null;
@@ -62,10 +63,15 @@ export const Notification = ({ read, onPress, leftImage, rightImage, date, child
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
           {!leftImage ?
             <Skeleton style={{ width: 46, height: 46, borderRadius: 99 }} /> :
-            <Badge
-              style={{ width: 46, height: 46, flexShrink: 0 }}
-              source={leftImage}
-            />
+            <Pressable onPress={(e) => {
+              onProfilePress?.();
+              e.stopPropagation();
+            }}>
+              <Badge
+                style={{ width: 46, height: 46, flexShrink: 0 }}
+                source={leftImage}
+              />
+            </Pressable>
           }
           <View style={{
             overflow: 'hidden',
@@ -73,6 +79,7 @@ export const Notification = ({ read, onPress, leftImage, rightImage, date, child
             minWidth: 0,
             flexDirection: 'row',
             flexWrap: 'wrap',
+            paddingRight: rightImage ? 0 : 8,
           }}>
             {typeof children === 'string' ? (
               <Text.Base color={Colors.neutral[50]} weight={500}>

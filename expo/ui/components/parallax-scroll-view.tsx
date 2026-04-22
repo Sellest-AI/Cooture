@@ -15,9 +15,10 @@ type Props = {
   headerContent: ReactNode;
   headerContentEdges?: ComponentProps<typeof SafeAreaView>['edges'];
   headerBackgroundImage?: ComponentProps<typeof Image>['source'];
-  headerBackgroundImageStyle?: ComponentProps<typeof Image>['style'];
+  headerBackgroundImageStyle?: ComponentProps<typeof Image>['style'] & { blurRadius?: number };
   headerBackgroundImagePosition?: ComponentProps<typeof Image>['contentPosition'];
   headerBackground?: ReactNode;
+  headerBackgroundGradient?: boolean;
   children: ReactNode;
   contentContainerStyle?: ViewStyle;
   showsVerticalScrollIndicator?: boolean;
@@ -35,6 +36,7 @@ export const ParallaxScrollView = ({
   headerContentEdges,
   headerBackgroundImageStyle,
   headerBackgroundImagePosition,
+  headerBackgroundGradient = true,
   headerBackgroundImage,
   headerBackground,
   children,
@@ -135,12 +137,13 @@ export const ParallaxScrollView = ({
                 height: '100%',
                 paddingTop: layoutToggle,
               }, headerBackgroundImageStyle]}
+              blurRadius={headerBackgroundImageStyle?.blurRadius ?? 0}
               contentPosition={headerBackgroundImagePosition}
               contentFit="cover"
             />
           )}
         </Animated.View>
-        <Animated.View style={{
+        {headerBackgroundGradient && <Animated.View style={{
           position: 'absolute',
           left: 0,
           right: 0,
@@ -154,8 +157,8 @@ export const ParallaxScrollView = ({
               height: '100%'
             }}
           />
-        </Animated.View>
-        <LinearGradient
+        </Animated.View>}
+        {headerBackgroundGradient && <LinearGradient
           colors={[Colors.background, 'transparent']}
           style={{
             position: 'absolute',
@@ -165,7 +168,7 @@ export const ParallaxScrollView = ({
             height: '30%',
             opacity: 0.8
           }}
-        />
+        />}
       </Animated.View>
 
       {/* Scrollable Content */}
@@ -214,6 +217,23 @@ export const ParallaxScrollView = ({
                 Dimensions.get('screen').height - headerHeightRuntime + contentNegativeSpace - bottom
                 : undefined,
             }}>
+            <View style={{
+              pointerEvents: 'none',
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: headerBackgroundGradient ? 0 : -32,
+              height: headerHeight,
+            }}
+            >
+              <LinearGradient
+                colors={['transparent', Colors.background]}
+                style={{
+                  height: 132,
+                }}
+              />
+              <View style={{ flex: 1, backgroundColor: Colors.background }} />
+            </View>
             {children}
           </View>
         </ParallaxScrollContext.Provider>

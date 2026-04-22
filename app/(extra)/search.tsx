@@ -1,5 +1,7 @@
 import { ROUTES, useDebounce } from "@/hooks";
 import { api, Id, useQuery, useQueryCached } from "@/lib/convex/client";
+import { useTrackValues } from "@/lib/posthog/useTrackValues";
+import { useSafety } from "@/modules/safety";
 import { Badge } from "@ui/badge";
 import { Block } from "@ui/block";
 import { CardItem, Collection } from "@ui/cards";
@@ -90,10 +92,14 @@ const Item = ({ id }: { id: Id<'items'> }) => {
   useEffect(() => { if (item) setAspectRatio(item.image.width / item.image.height) }, [item])
   if (!item) return <Skeleton style={{ flex: 1, aspectRatio }} />;
 
+  // For items with a very vertical aspect ratio, we want to use the medium size
+  const isTall = Number(item.image.aspectRatio.actual) < 4 / 6;
+  const imageUrl = isTall ? item.image.sizes.medium.url : item.image.sizes.small.url;
+
   return (
     <CardItem
       image={item.image}
-      source={item.image.sizes.small.url}
+      source={imageUrl}
       title={item.name}
       subtitle={item.category.toLowerCase()}
       onPress={() => router.push(ROUTES.ITEM.ID(item._id))}
@@ -132,10 +138,19 @@ export default function Screen() {
   const isSuccess = isUsersSuccess && isItemsSuccess && isOutfitsSuccess;
   const showLoading = search && !isSuccess;
 
+  useTrackValues('search_screen_query_submitted', {
+    query,
+    enabled: hasQuery && isSuccess
+  });
+
+  const { isHidden } = useSafety();
+
   const data = useMemo(() => shuffleArray([
-    ...(items ?? []).map((chunk) => ({ type: 'item' as const, data: chunk })).slice(0, 20),
+    ...(items ?? []).map((chunk) => ({ type: 'item' as const, data: chunk })).slice(0, 20)
+      .filter((x) => !isHidden({ itemId: x?.data?._id, userId: x?.data?.userId, item: x?.data })),
     ...((outfits ?? []).map((chunk) => ({ type: 'outfit' as const, data: chunk }))).slice(0, 10)
-  ], query), [items, outfits, query]);
+      .filter((x) => !isHidden({ outfitId: x?.data?._id, userId: x?.data?.userId, itemIds: x?.data?.items.map(i => i.itemId), outfit: x?.data })),
+  ], query), [items, outfits, query, isHidden]);
 
   return (
     <SafeAreaView

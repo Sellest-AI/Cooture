@@ -16,11 +16,11 @@ export const replicateHandler = httpAction(async (ctx, request) => {
     return Response.json({ received: true }, { status: 200 });
   }
 
+  if (body.status !== 'succeeded') return Response.json({ received: true }, { status: 200 });
+
   const output = parseReplicateWebhookOutput(body.output);
 
   const userId = await ctx.runQuery(internal.router.generations.getUser._internal, { predictionId: body.id });
-
-  if (body.status !== 'succeeded') return Response.json({ received: true }, { status: 200 });
 
   const images = await ctx.runAction(internal.router.storage.images.uploadMany._internal, {
     images: output.map((url: string) => ({ url })),

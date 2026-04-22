@@ -12,6 +12,7 @@ import { notifications, pushTokens } from "./schema/notifications";
 import { outfitItems, outfits } from "./schema/outfits";
 import { presetCategories, presetGenerations, presets } from "./schema/presets";
 import { quests, userQuestProgress } from "./schema/quests";
+import { userBlocks, userReports } from "./schema/safety";
 import { subscriptions, subscriptionsHistory } from "./schema/subscriptions";
 import { bots, usersAppearance, usersExtended } from "./schema/users";
 import { userVideos, videos } from "./schema/videos";
@@ -55,4 +56,6 @@ export default defineSchema({
   waitlist,
   notifications,
   pushTokens,
+  userBlocks,
+  userReports,
 });

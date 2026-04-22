@@ -92,9 +92,10 @@ const SectionPresets = ({ category, style }: { category: Category, style: ViewSt
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <Collection
-            onPress={() => push(ROUTES.PHOTOSHOOT.RECAP, {
-              params: { presetId: item._id }
-            })}
+            onPress={() => push(ROUTES.PRESETS.ID.PATH, { pathParams: { id: item._id } })}
+            // onPress={() => push(ROUTES.PHOTOSHOOT.RECAP, {
+            //   params: { presetId: item._id }
+            // })}
             source={item.cover.sizes.medium.url}
             title={item.name}
             style={{ width: 132 }}
@@ -145,9 +146,10 @@ const SectionOutfits = ({ outfits, style }: { outfits: Outfits, style?: ViewStyl
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <Collection
-            onPress={() => push(ROUTES.PHOTOSHOOT.NEW, {
-              params: { outfitId: item._id }
-            })}
+            onPress={() => push(ROUTES.OUTFIT.PATH, { pathParams: { id: item._id } })}
+            // onPress={() => push(ROUTES.PHOTOSHOOT.NEW, {
+            //   params: { outfitId: item._id }
+            // })}
             backgroundColor={item.backgroundColor}
             source={item.cover.sizes.small.url}
             title={item.name}

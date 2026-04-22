@@ -1,21 +1,23 @@
-import { Button } from "@ui/button"
+import { ButtonGhost } from "@ui/button.ghost"
 import { Text } from "@ui/text"
 import { ComponentProps, useState } from "react"
-import { Platform, View } from "react-native"
+import { View } from "react-native"
 import { Colors } from "theme"
-import { BookmarkIcon, Camera, Download, HeartIcon, ImageIcon, Loader, ShareIcon, TShirt, User } from "../icons"
+import { BookmarkIcon, Camera, Download, Loader, ShareIcon, TriangleAlert, TShirt, User, UserRoundX } from "../icons"
 import { MenuGroup, MenuItem } from "../menu"
 import { Modal } from "../modal"
 import { Pressable } from "../pressable"
+import { ReportConfig, ReportModal } from "./report.modal"
 
 type RoundButtonProps = {
   title: string;
   icon: React.ComponentType<{ size?: number, color?: string, weight?: 'regular' | 'fill' }>;
   weight?: 'regular' | 'fill';
   onPress?: (() => Promise<void>) | (() => void);
+  variant?: 'blur' | 'destructive'
 }
 
-const RoundButton = ({ title, icon, weight, onPress }: RoundButtonProps) => {
+const RoundButton = ({ title, icon, weight, onPress, variant = 'blur' }: RoundButtonProps) => {
   const [loading, setLoading] = useState(false);
   const Icon = loading ? Loader : icon;
 
@@ -38,16 +40,22 @@ const RoundButton = ({ title, icon, weight, onPress }: RoundButtonProps) => {
         style={{
           padding: 16,
           borderRadius: 99,
-          backgroundColor: Colors.blur.dark,
-          borderColor: Colors.blur.medium,
+          backgroundColor: variant === 'destructive' ? Colors.destructive[500] : Colors.blur.dark,
+          borderColor: variant === 'destructive' ? Colors.destructive[500] : Colors.blur.medium,
           borderBottomColor: 'transparent',
           borderRightColor: 'transparent',
           borderWidth: 1,
         }}
       >
-        <Icon size={24} color={Colors.neutral[50]} weight={weight || "regular"} />
+        <Icon size={24}
+          color={variant === "destructive" ? Colors.destructive[50] : Colors.neutral[50]}
+          weight={weight || "regular"}
+        />
       </View>
-      <Text.Sm color={Colors.neutral[200]} style={{ marginTop: 10 }}>
+      <Text.Sm
+        weight={500}
+        color={variant === "destructive" ? Colors.destructive[500] : Colors.neutral[400]}
+        style={{ marginTop: 10 }}>
         {title}
       </Text.Sm>
     </Pressable>
@@ -55,8 +63,6 @@ const RoundButton = ({ title, icon, weight, onPress }: RoundButtonProps) => {
 }
 
 type Props = {
-  liked?: boolean;
-  onToggleLike?: (liked: boolean) => void;
   bookmarked?: boolean;
   onToggleBookmark?: (bookmarked: boolean) => void;
   onDownload?: () => Promise<void>;
@@ -64,28 +70,29 @@ type Props = {
   onProfilePress?: () => void;
   onRecreate?: () => void;
   onOutfitPress?: () => void;
-  onPresetPress?: () => void;
+  report?: ReportConfig;
 } & Omit<ComponentProps<typeof Modal>, 'children'>
 
 export const PostMenu = ({ open, onOpenChange, ...props }: Props) => {
-  const { liked, onToggleLike, bookmarked, onRecreate, onOutfitPress,
-    onToggleBookmark, onShare, onProfilePress, onPresetPress, onDownload } = props;
+  const { bookmarked, onRecreate, onOutfitPress,
+    onToggleBookmark, onShare, onProfilePress, onDownload, report } = props;
+
+  const [reportModalOpen, setReportModalOpen] = useState(false);
 
   return (
-    <Modal
-      open={open}
-      onOpenChange={onOpenChange}
-    >
-      <View
-        style={{ paddingTop: 20 }}
+    <>
+      <Modal
+        open={open}
+        onOpenChange={onOpenChange}
       >
-        {(onToggleLike || onToggleBookmark || onShare) && (
-          <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-            {onToggleLike && <RoundButton
-              title={liked ? "Liked" : "Like"}
-              onPress={() => onToggleLike?.(!liked)}
-              weight={liked ? "fill" : "regular"}
-              icon={HeartIcon}
+        <View
+          style={{ paddingTop: 20 }}
+        >
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            {onShare && <RoundButton
+              title="Share"
+              icon={ShareIcon}
+              onPress={() => { onShare?.(); onOpenChange?.(false); }}
             />}
             {onToggleBookmark && <RoundButton
               title={bookmarked ? "Bookmarked" : "Bookmark"}
@@ -93,52 +100,54 @@ export const PostMenu = ({ open, onOpenChange, ...props }: Props) => {
               weight={bookmarked ? "fill" : "regular"}
               icon={BookmarkIcon}
             />}
-            {onShare && <RoundButton
-              title="Share"
-              icon={ShareIcon}
-              onPress={() => { onShare?.(); onOpenChange?.(false); }}
+            {onDownload && <RoundButton
+              title="Download"
+              icon={Download}
+              onPress={async () => { await onDownload?.(); onOpenChange?.(false); }}
             />}
-          </View>)}
-        {(onOutfitPress || onRecreate) && <MenuGroup title="Quick Access" style={{ marginTop: 28 }}>
-          {onRecreate && <MenuItem
-            icon={Camera}
-            text="Recreate look"
-            variant="primary"
-            onPress={() => { onRecreate?.(); onOpenChange?.(false); }}
-          />}
-          {onOutfitPress && <MenuItem
-            icon={TShirt}
-            text="Open outfit"
-            variant="secondary"
-            onPress={() => { onOutfitPress?.(); onOpenChange?.(false); }}
-          />}
-        </MenuGroup>}
-        <MenuGroup title="More">
-          {onPresetPress && <MenuItem
-            icon={ImageIcon}
-            text="View preset"
-            onPress={() => { onPresetPress?.(); onOpenChange?.(false); }}
-          />}
-          {onProfilePress && <MenuItem
-            icon={User}
-            text="View profile"
-            onPress={() => { onProfilePress?.(); onOpenChange?.(false); }}
-          />}
-          {onDownload && <MenuItem
-            icon={Download}
-            text="Download"
-            rightIcon={false}
-            onPress={async () => { await onDownload?.(); onOpenChange?.(false); }}
-          />}
-        </MenuGroup>
-        <Button
-          variant="blur"
-          style={{ marginBottom: Platform.OS === 'ios' ? 20 : 12 }}
-          onPress={() => onOpenChange?.(false)}
-        >
-          Close
-        </Button>
-      </View>
-    </Modal >
+            {(onProfilePress && !onDownload) && <RoundButton
+              title="Profile"
+              icon={User}
+              onPress={() => { onProfilePress?.(); onOpenChange?.(false); }}
+            />}
+          </View>
+          {(onOutfitPress || onRecreate) && <MenuGroup title="Quick Access" style={{ marginTop: 40, paddingHorizontal: 8 }}>
+            {onRecreate && <MenuItem
+              icon={Camera}
+              text="Recreate look"
+              variant="primary"
+              onPress={() => { onRecreate?.(); onOpenChange?.(false); }}
+            />}
+            {onOutfitPress && <MenuItem
+              icon={TShirt}
+              text="Open outfit"
+              onPress={() => { onOutfitPress?.(); onOpenChange?.(false); }}
+            />}
+          </MenuGroup>}
+          {report && <View style={{ flexDirection: 'row', justifyContent: 'center', paddingHorizontal: 12, gap: 48, marginTop: 8, marginBottom: 12 }}>
+            <ButtonGhost
+              variant="destructive"
+              onPress={() => { setReportModalOpen(true); onOpenChange?.(false); }}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
+              startIcon={TriangleAlert}
+            >
+              Report content
+            </ButtonGhost>
+            <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
+              onPress={() => { report?.onBlock?.(); onOpenChange?.(false); }}
+            >
+              <UserRoundX size={16} color={Colors.neutral[400]} />
+              <Text.Base color={Colors.neutral[400]} weight={500}>Block user</Text.Base>
+            </Pressable>
+          </View>}
+        </View>
+      </Modal>
+      {(report && !open) && <ReportModal
+        open={reportModalOpen}
+        report={report}
+        onComplete={() => { setReportModalOpen(false); }}
+        onCancel={() => { setReportModalOpen(false); }}
+      />}
+    </>
   )
 }

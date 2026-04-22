@@ -76,7 +76,8 @@ const PresetSchema = z.object({
 export const checkIfExists = async (convex: ConvexClient, name: string) => {
   const sanitizeName = (n: string) => n.trim().toUpperCase().replaceAll(' ', '_');
   const existingPresets = await convex.query(api.router.admin.presets.findByName.anon, { name });
-  return existingPresets.some(p => sanitizeName(p.name) === sanitizeName(name));
+  // Only check against global presets (userId === undefined)
+  return existingPresets.filter((p) => p.userId === undefined).some(p => sanitizeName(p.name) === sanitizeName(name));
 }
 
 export default async function main() {

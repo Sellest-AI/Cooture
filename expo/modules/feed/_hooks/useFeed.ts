@@ -51,7 +51,7 @@ export const useFeed = (params: Props = { initialNumItems: 8 }) => {
     );
 
     // 2. Only shuffle the initial items (first page)
-    const numToShuffle = 24;
+    const numToShuffle = params.initialNumItems ?? 8;
     const firstItems = uniqueFeed.slice(0, numToShuffle);
     const rest = uniqueFeed.slice(numToShuffle);
 
@@ -83,7 +83,7 @@ export const useFeed = (params: Props = { initialNumItems: 8 }) => {
 
     // Add recent user posts at the top
     return [...recentUserPosts, ...feedWithoutDuplicates];
-  }, [_feed, userFeed, seed, age]);
+  }, [_feed, params.initialNumItems, seed, userFeed, age]);
 
   const canLoadMore = status !== 'Exhausted' && status !== 'LoadingFirstPage';
 

@@ -16,10 +16,11 @@ type Props = {
   source?: ComponentProps<typeof Image>['source'];
   contentFit?: ComponentProps<typeof Image>['contentFit'];
   onPress?: ComponentProps<typeof Pressable>['onPress'];
+  onLongPress?: ComponentProps<typeof Pressable>['onLongPress'];
   backgroundColor?: string;
 }
 
-export const Collection = ({ title, subtitle, disabled, selected, source, contentFit, style, backgroundColor, onPress }: Props) => {
+export const Collection = ({ title, subtitle, disabled, selected, source, contentFit, style, backgroundColor, onPress, onLongPress }: Props) => {
   const [loading, setLoading] = useState(false);
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const rotate = useRef(new Animated.Value(7)).current;
@@ -83,6 +84,9 @@ export const Collection = ({ title, subtitle, disabled, selected, source, conten
         setLoading(true);
         requestAnimationFrame(() => onPress?.(e));
         setTimeout(() => setLoading(false), 200);
+      }}
+      onLongPress={(e) => {
+        onLongPress?.(e);
       }}
       style={{
         flex: 1,

@@ -18,7 +18,7 @@ export const _internal = internalMutation({
     const fallbackType = args.metadata?.adminId ? "ADMIN_GRANT" : "SYSTEM_GRANT";
 
     // Grant credits to the user
-    await grantCredits(ctx, {
+    return await grantCredits(ctx, {
       userId,
       amount,
       type: type || fallbackType,

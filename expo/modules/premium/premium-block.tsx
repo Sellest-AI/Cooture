@@ -1,9 +1,11 @@
 import { useRouter } from "@/hooks";
+import { useAccount } from "@/lib/convex/auth";
 import { Block } from "@ui/block";
 import { ArrowUpRight, Credits } from "@ui/icons";
+import { LinearGradient } from "@ui/linear-gradient";
 import { Pressable } from "@ui/pressable";
 import { Text } from "@ui/text";
-import { View, ViewStyle } from "react-native";
+import { Platform, View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 
 type Props = {
@@ -11,7 +13,11 @@ type Props = {
 }
 
 export const PremiumBlock = ({ style }: Props) => {
+  const { isPremium } = useAccount();
   const { push } = useRouter();
+
+  if (isPremium) return null;
+
   return (
     <Pressable onPress={() => push("/upgrade")}>
       <Block
@@ -27,6 +33,19 @@ export const PremiumBlock = ({ style }: Props) => {
           ...style,
         }}
       >
+        <LinearGradient
+          colors={[Colors.primary[500], 'transparent']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: 300,
+            opacity: Platform.OS === 'android' ? 0.1 : 0.2
+          }}
+        />
         <Block
           variant="primary"
           style={{

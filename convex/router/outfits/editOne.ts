@@ -14,6 +14,12 @@ export const authed = authMutation({
   handler: async (ctx, args) => {
     await isAuthorized(ctx, args.outfitId);
 
+    const hasBeenUsed = await ctx.db.query('presetGenerations')
+      .withIndex('by_outfit_id', (q) => q.eq('outfitId', args.outfitId))
+      .first();
+
+    if (hasBeenUsed) return false;
+
     let contentRating: ContentRating | undefined = undefined;
 
     if (args.items !== undefined) {

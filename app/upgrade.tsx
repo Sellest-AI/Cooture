@@ -1,6 +1,6 @@
+import { ROUTES, useRouter } from "@/hooks"
 import { presentPaywall } from "@/lib/revenue-cat"
 import { LogoLoading } from "@ui/icons"
-import { router } from "expo-router"
 import { useEffect, useState } from "react"
 import { View } from "react-native"
 import { Colors } from "theme"
@@ -21,12 +21,13 @@ const LoadingView = () => {
 }
 
 export default function Screen() {
+  const { redirect } = useRouter(ROUTES.MODALS.UPGRADE);
+
   useEffect(() => {
     presentPaywall().finally(() => {
-      if (router.canGoBack()) router.back();
-      else router.dismissTo('/');
+      redirect({ fallbackTo: ['back', ROUTES.TABS.FEED] })
     })
-  }, [])
+  }, [redirect])
 
   return <View style={{
     flex: 1,

@@ -30,8 +30,8 @@ export const GoodBadPictures = ({ badPictures, goodPicture, style }: Props) => {
       paddingHorizontal: 32,
       justifyContent: 'space-between',
       alignItems: 'flex-start',
+      paddingTop: 16,
       flex: 1,
-      gap: 12,
     }, style]}>
       <View style={{ flexDirection: 'row', gap: 4 }}>
         <View style={{ transform: [{ rotate: '-3deg' }] }}>

@@ -52,27 +52,14 @@ export const useCreateItem = () => {
     return pendingItems.reduce((oldest, item) => item.createdAt < oldest ? item.createdAt : oldest, new Date().getTime());
   }, [pendingItems]);
 
-  const { results } = usePaginatedQuery(api.router.items.getPaginated.authed, {}, { initialNumItems: 8 });
+  const { results } = usePaginatedQuery(api.router.items.getPaginated.authed, {}, { initialNumItems: 24 });
+  // Show items created in the last hour as "latest items"
+  const latestItems = useMemo(() => results.filter((i) => i._creationTime > Date.now() - 1 * 60 * 60 * 1000), [results]);
   const newItems = useMemo(() => oldestCreatedAt ? results.filter((i) => i._creationTime > oldestCreatedAt) : [], [oldestCreatedAt, results]);
 
   const create = async (item: PendingItem) => {
     // Prevent creating the same item multiple times
     if (pendingItems.find(i => i.key === item.key)) return item.key;
-
-    const compressed = await compressImage(item.image.url, { maxResolution: 2048, keepMimeType: false });
-    const base64 = await compressed.toBase64();
-    await removeBackground({
-      base64: base64,
-      nextStep: 'CREATE_ITEM',
-      nextArgs: {
-        CREATE_ITEM: {
-          brand: item.brand,
-          name: item.name,
-          description: item.description,
-          itemUrl: item.url,
-        }
-      }
-    });
 
     setPendingItems((prev) => [...prev, {
       key: item.key,
@@ -83,14 +70,39 @@ export const useCreateItem = () => {
       createdAt: item.createdAt,
     }]);
 
-    return item.key;
+    try {
+      const compressed = await compressImage(item.image.url, { maxResolution: 2048, keepMimeType: false });
+      const base64 = await compressed.toBase64();
+      await removeBackground({
+        base64: base64,
+        nextStep: 'CREATE_ITEM',
+        nextArgs: {
+          CREATE_ITEM: {
+            brand: item.brand,
+            name: item.name,
+            description: item.description,
+            itemUrl: item.url,
+          }
+        }
+      });
+      return item.key;
+    } catch {
+      setPendingItems((prev) => prev.filter(i => i.key !== item.key));
+      return undefined;
+    }
   }
 
   const reset = () => {
     setPendingItems([]);
   }
 
-  return { create, newItems, pendingItems, reset }
+  return {
+    create,
+    newItems,
+    pendingItems,
+    latestItems,
+    reset
+  }
 }
 
 useItem.Create = useCreateItem;

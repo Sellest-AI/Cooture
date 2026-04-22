@@ -1,8 +1,9 @@
 import { Check } from '@ui/icons';
-import { ComponentProps, useEffect, useRef, useState } from 'react';
-import { Animated, LayoutChangeEvent, Pressable, Image as RNImage, View, ViewStyle } from 'react-native';
+import { ComponentProps, useEffect, useState } from 'react';
+import { LayoutChangeEvent, Image as RNImage, View, ViewStyle } from 'react-native';
 import { Colors } from 'theme';
 import { Image, ImageObject } from '../image';
+import { Pressable, } from '../pressable';
 import { Text } from '../text';
 
 type Props = {
@@ -20,8 +21,6 @@ type Props = {
 }
 
 export const CardItem = ({ title, subtitle, selected, disabled, badge, style, source, onPress, onLongPress, image, animate = true }: Props) => {
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-
   // Default height if we can't compute one from the image
   const DEFAULT_HEIGHT = 160;
 
@@ -57,43 +56,22 @@ export const CardItem = ({ title, subtitle, selected, disabled, badge, style, so
 
   const aspectRatio = image ? (image.width / image.height) : (intrinsicSize ? (intrinsicSize.width / intrinsicSize.height) : undefined);
 
-  const handlePressIn = () => {
-    if (disabled || !animate) return;
-    Animated.spring(scaleAnim, {
-      toValue: 0.98,
-      useNativeDriver: true,
-      speed: 40,
-      bounciness: 4,
-    }).start();
-  };
-
-  const handlePressOut = () => {
-    if (disabled || !animate) return;
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 30,
-      bounciness: 18,
-    }).start();
-  };
-
   const showText = title || subtitle;
 
   return (
     <Pressable
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      onPress={(e) => { onPress?.(e); }}
-      onLongPress={(e) => { onLongPress?.(e); }}
+      disabled={disabled}
+      animated={animate}
+      onPress={onPress}
+      onLongPress={onLongPress}
       style={{ flex: style?.flex ?? 1, opacity: style?.opacity }}
     >
-      <Animated.View
+      <View
         onLayout={(e: LayoutChangeEvent) => {
           const w = e.nativeEvent.layout.width;
           if (!layoutWidth) setLayoutWidth(w);
         }}
         style={{
-          transform: [{ scale: scaleAnim }],
           overflow: 'hidden',
           aspectRatio: style?.height ? undefined : aspectRatio,
           height: style?.height ?? (aspectRatio ? undefined : containerHeight),
@@ -101,6 +79,7 @@ export const CardItem = ({ title, subtitle, selected, disabled, badge, style, so
         }}
       >
         {source && <Image
+          key={source.toString()}
           source={source}
           // Let the image scale to fit vertically while preserving aspect ratio
           contentFit="contain"
@@ -142,7 +121,7 @@ export const CardItem = ({ title, subtitle, selected, disabled, badge, style, so
             {badge}
           </Text.Sm>
         </View>}
-      </Animated.View>
+      </View>
       {showText && <View
         style={{
           paddingHorizontal: selected ? 20 : 0,

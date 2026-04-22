@@ -17,8 +17,12 @@ export const useAppearance = () => {
     await mutate({ gender })
   }
 
+  const hasFullAppearance = Boolean(appearance?.frontImage && appearance?.sideImage && appearance?.smileImage
+    && appearance.heightCm && appearance.size && appearance.gender);
+
   return {
     isPending,
+    hasFullAppearance,
     frontImage: appearance?.frontImage,
     sideImage: appearance?.sideImage,
     smileImage: appearance?.smileImage,
@@ -42,6 +46,12 @@ export const usePortraitsLocal = () => {
 
   const { mutate: pushImagesToServer } = useMutation(api.router.users.upsertAppearance.authed);
 
+  const resetImages = () => {
+    setFrontImage(null);
+    setSideImage(null);
+    setSmileImage(null);
+  }
+
   return {
     frontImage,
     setFrontImage,
@@ -49,7 +59,8 @@ export const usePortraitsLocal = () => {
     setSideImage,
     smileImage,
     setSmileImage,
-    pushImagesToServer
+    pushImagesToServer,
+    resetImages
   }
 }
 

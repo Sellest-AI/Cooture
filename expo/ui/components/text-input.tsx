@@ -1,4 +1,4 @@
-import { ComponentProps, useRef, useState } from 'react';
+import { ComponentProps, useEffect, useRef, useState } from 'react';
 import { TextInput as NativeTextInput, View, ViewStyle } from 'react-native';
 import { SvgProps } from 'react-native-svg';
 import { Colors } from 'theme';
@@ -19,7 +19,10 @@ export const TextInput = ({ className = "", style, startIcon, canClear, autoFocu
   const hasIcon = !!startIcon;
   const Icon = startIcon;
 
-  const hasText = props.value && props.value.toString().length > 0;
+  const [value, setValue] = useState(props.value?.toString() ?? '');
+  useEffect(() => { setValue(props.value?.toString() ?? '') }, [props.value]);
+
+  const hasText = value.length > 0;
 
   const ref = useRef<View>(null);
 
@@ -36,7 +39,7 @@ export const TextInput = ({ className = "", style, startIcon, canClear, autoFocu
       style={{
         borderRadius: 20,
         backgroundColor: Colors.blur.dark,
-        borderTopColor: Colors.blur.medium,
+        borderColor: Colors.blur.medium,
         borderTopWidth: 1,
         overflow: 'hidden',
         flexDirection: 'row',
@@ -56,8 +59,18 @@ export const TextInput = ({ className = "", style, startIcon, canClear, autoFocu
       </View>}
       <NativeTextInput
         {...props}
-        onBlur={(e) =>
-          props.onBlur?.((e.nativeEvent as unknown as { text: string }).text)}
+        value={value}
+        onChangeText={(text) => {
+          setValue(text);
+          props.onChangeText?.(text);
+        }}
+        onBlur={(e) => {
+          if (!props.onBlur) return;
+          const value = (e.nativeEvent as unknown as { text: string }).text ??
+            e.currentTarget.nodeValue ?? props.value ?? '';
+          setValue(value.toString());
+          props.onBlur?.(value);
+        }}
         autoFocus={autoFocus}
         onLayout={autoFocus ? (e) => e.currentTarget.focus() : undefined}
         placeholderTextColor={Colors.neutral[400]}
@@ -74,6 +87,7 @@ export const TextInput = ({ className = "", style, startIcon, canClear, autoFocu
       />
       {canClear && <Pressable
         onPress={() => {
+          setValue('');
           if (props.onBlur) props.onBlur('')
           else props.onChangeText?.('')
         }}

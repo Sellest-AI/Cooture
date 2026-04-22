@@ -159,7 +159,7 @@ export default function Screen() {
 
                 const photo = result.assets?.[0];
                 if (!result.canceled && photo) {
-                  const photoCompressed = await compressImage(photo.uri, { maxResolution: 192 });
+                  const photoCompressed = await compressImage(photo.uri, { maxResolution: 256 });
                   const base64 = await photoCompressed.toBase64();
                   setImage(base64);
                 }

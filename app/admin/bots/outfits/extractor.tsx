@@ -166,7 +166,6 @@ export default function Screen() {
               />
               <Button
                 style={{ flex: 1 }}
-                align="stretch"
                 variant="blur"
                 onPress={() => {
                   listen.current = true;

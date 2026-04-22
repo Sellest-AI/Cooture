@@ -145,11 +145,12 @@ const Line = ({ active, inProgress, delay = 0, reverseDelay = 0 }: LineProps) =>
 };
 
 type StepperProps = {
-  value: 0 | 1 | 2 | 3;
+  value: 0 | 1 | 2 | 3 | 4;
+  steps?: 3 | 4;
   style?: ViewStyle;
 }
 
-export const Stepper = ({ value, style }: StepperProps) => {
+export const Stepper = ({ value, style, steps = 3 }: StepperProps) => {
   return (
     <View
       style={{
@@ -175,6 +176,10 @@ export const Stepper = ({ value, style }: StepperProps) => {
       <Step active={value >= 2} delay={200}>2</Step>
       <Line active={value >= 3} inProgress={value === 2} delay={400} />
       <Step active={value >= 3} delay={800}>3</Step>
+      {steps === 4 && <>
+        <Line active={value >= 4} inProgress={false} delay={600} />
+        <Step active={value >= 4} delay={1000}>4</Step>
+      </>}
     </View>
   )
 }

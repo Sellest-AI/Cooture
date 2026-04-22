@@ -36,7 +36,7 @@ export const Button = ({ startIcon, startContent, endIcon, children, disabled, v
   const handlePressIn = () => {
     if (runtimeDisabled) return;
     Animated.spring(scaleAnim, {
-      toValue: 0.98,
+      toValue: size ? 0.95 : 0.98,
       useNativeDriver: true,
       speed: 40,
       bounciness: 4,
@@ -56,6 +56,7 @@ export const Button = ({ startIcon, startContent, endIcon, children, disabled, v
   const colors = getBlockColors(variant, runtimeDisabled);
   const isRounded = size === "rounded";
   const defaultAlign = align || (isRounded ? "center" : "stretch");
+  const hasIcon = !!StartIcon || !!EndIcon || !!startContent;
 
   const onPressWrapper = async (e: GestureResponderEvent, fnc?: (((event: GestureResponderEvent) => void | Promise<void>) | null)) => {
     if (runtimeDisabled) return;
@@ -98,7 +99,7 @@ export const Button = ({ startIcon, startContent, endIcon, children, disabled, v
         >
           <View
             style={{
-              height: isRounded ? undefined : (style?.height ?? (size === "sm" ? 48 : 56)),
+              height: isRounded ? undefined : (style?.height ?? (size === "sm" ? (hasIcon ? 48 : 40) : 56)),
               position: 'relative',
               flexDirection: 'row',
               justifyContent: 'center',

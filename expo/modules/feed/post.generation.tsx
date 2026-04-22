@@ -1,24 +1,30 @@
 import { ROUTES, useRouter } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
+import { useAccount } from "@/lib/convex/auth";
 import { useMutation, useQuery, useQueryCached, useQueryCachedData } from "@/lib/convex/client";
 import { downloadImageCrossPlatform } from "@/lib/image/client";
+import { downloadVideo } from "@/lib/video";
+import { useSafety } from "@/modules/safety";
 import { Post } from "@ui/cards";
 import { notEmpty } from "@utils/convex-allowed";
 import { env } from "env";
 import { WEBSITE } from "global";
+import { usePostHog } from "posthog-react-native";
 import { Platform, Share, ViewStyle } from "react-native";
 
 type Props = {
   id: Id<'generations'>;
   style?: ViewStyle;
   imageQuality?: 'optimized' | 'full';
-  /** Disable long press if the current view is the post */
-  disableLongPress?: boolean;
-  ownedByCurrentUser?: boolean;
 }
 
-export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableLongPress, ownedByCurrentUser }: Props) => {
+export const GenerationPost = ({ id, style, imageQuality = 'optimized' }: Props) => {
+  const posthog = usePostHog();
+  const { reportContent, blockUser, isHidden } = useSafety();
+  const { userId } = useAccount();
+
   const { push } = useRouter('/feed');
+
   const { data: post } = useQuery(api.router.generations.getOne.anon, { id });
 
   const imageIds = post?.predictions.map((p) => p.imageId).filter(notEmpty) ?? [];
@@ -35,7 +41,15 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
   const { data: likes } = useQueryCachedData(api.router.likes.getLikes.anon, { generationId: id, key: "likes" });
   const { mutate: toggleLike } = useMutation(api.router.likes.toggleLike.authed);
 
+  const ownedByCurrentUser = post?.userId === userId;
+
   if (!post || !images) return <Post.Skeleton style={{ ...style, paddingHorizontal: 12 }} />;
+
+  if (isHidden({ generationId: id, userId: post?.userId, itemIds: post?.outfit?.items.map(i => i._id), outfitId: post?.outfitId, preset: post?.preset }))
+    return <Post.Hidden
+      src={images?.[0].sizes.thumbnail.url}
+      style={{ ...style, marginHorizontal: 12, aspectRatio: 3 / 4, borderRadius: 28 }}
+    />;
 
   return (<Post
     style={{ ...style }}
@@ -45,13 +59,27 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
     isBookmarked={isBookmarked}
     onToggleBookmark={() => toggleBookmark({ generationId: id })}
     onToggleLike={(v) => toggleLike({ generationId: id, value: v })}
+    report={ownedByCurrentUser ? undefined : {
+      generationId: id,
+      outfitId: post.outfitId,
+      presetId: post.presetId,
+      onReport: (data) => reportContent({
+        reason: data.reason,
+        generationId: data.generationId as Id<'generations'>,
+        outfitId: data.outfitId as Id<'outfits'>,
+        itemId: data.itemId as Id<'items'>,
+        presetId: data.presetId as Id<'presets'>,
+      }),
+      onBlock: () => blockUser(post.userId),
+    }}
     likedAccounts={likes?.latestLikers.map(l => l.image).filter(notEmpty)}
     isLiked={liked}
     onShare={(_id) => {
+      posthog.capture('post_share_button_pressed', { generationId: id });
       const url = WEBSITE.URL + ROUTES.SHARE.POST(_id);
       Share.share(Platform.OS === 'ios' ? {
         url,
-        message: `Check out this post on Cooture! ${url}`,
+        message: `Check out this post on Cooture!`,
       } : {
         title: `Check out this post on Cooture!`,
         message: url,
@@ -76,7 +104,8 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized', disableL
       })
     }))}
     onDownload={async (url) => {
-      await downloadImageCrossPlatform(url).catch(() => null)
+      await downloadImageCrossPlatform(url, { applyWatermark: true })
+        .catch(async () => downloadVideo(url).catch(() => null))
     }}
     onTurnToVideo={(ownedByCurrentUser && env.PUBLIC_NODE_ENV !== 'production') ? (_id: string) => {
       const prediction = post.predictions.find(p => p._id === _id);

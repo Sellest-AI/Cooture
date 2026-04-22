@@ -2,7 +2,7 @@ import { Image } from "@ui/image";
 import { Text } from "@ui/text";
 import { CameraView } from "expo-camera";
 import { ComponentProps, useEffect, useRef, useState } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { Colors } from "theme";
 import { CameraPermission } from "../camera/camera-permission";
 import { CaptureButtons } from "../camera/capture-buttons";
@@ -11,6 +11,7 @@ import { GoodBadPictures } from "../camera/good-bad-pictures";
 type Props = {
   imageUri?: string;
   onCapture?: (photoUri: string) => (void | Promise<void>);
+  guideline?: 'default' | 'smile' | 'side';
   examples?: {
     hint?: string,
     good: ComponentProps<typeof GoodBadPictures>['goodPicture'];
@@ -18,7 +19,7 @@ type Props = {
   }
 }
 
-export const UpdatePortraits = ({ imageUri, onCapture, examples }: Props) => {
+export const UpdatePortraits = ({ imageUri, onCapture, examples, guideline = 'default' }: Props) => {
   const cameraRef = useRef<CameraView>(null);
   const [hasPermission, setHasPermission] = useState(false);
   const [showCamera, setShowCamera] = useState(imageUri ? false : true);
@@ -29,7 +30,7 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples }: Props) => {
     // Only update internal state if not currently processing
     if (!isProcessingRef.current) {
       setInternalImageUri(imageUri);
-      if (imageUri) { setShowCamera(false); }
+      setShowCamera(!imageUri);
     }
   }, [imageUri])
 
@@ -37,66 +38,14 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples }: Props) => {
     return <CameraPermission onSuccess={() => setHasPermission(true)} />
   }
 
+  const scale = Platform.OS === 'android' ? 1.6 : 1.4;
+
   return (
     <View style={{
       flex: 1,
     }}>
-      <View style={{
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        aspectRatio: 2 / 3,
-        marginHorizontal: 'auto',
-        marginBottom: 56,
-      }}>
-        <View style={{
-          backgroundColor: Colors.blur.dark,
-          flex: 1,
-          width: '100%',
-          borderBottomLeftRadius: 64,
-          borderBottomRightRadius: 64,
-          overflow: 'hidden',
-        }}>
-          {showCamera && <CameraView
-            ref={cameraRef}
-            style={{ flex: 1 }}
-            mirror={true}
-            animateShutter={false}
-            facing="front"
-            flash="off"
-          />}
-          {(internalImageUri && !showCamera) && <Image
-            source={internalImageUri}
-            style={{ flex: 1, position: 'absolute', inset: 0 }}
-          />}
-        </View>
-        <CaptureButtons
-          style={{
-            position: 'absolute',
-            padding: 0,
-            bottom: -28,
-            marginLeft: -28
-          }}
-          showBackButton={false}
-          cameraRef={cameraRef}
-          onDelete={!showCamera ? () => {
-            setShowCamera(true);
-            setInternalImageUri(undefined);
-          } : undefined}
-          onCapture={async (photo) => {
-            try {
-              isProcessingRef.current = true;
-              setInternalImageUri(photo.uri);
-              setShowCamera(false);
-              await onCapture?.(photo.uri);
-            } finally {
-              isProcessingRef.current = false;
-            }
-          }}
-        />
-      </View>
       {examples?.hint && <Text.Base
-        color={Colors.neutral[400]}
+        color={Colors.neutral[50]}
         weight={600}
         textBreakStrategy="balanced"
         style={{
@@ -107,10 +56,145 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples }: Props) => {
         {examples.hint}
       </Text.Base>}
       {(examples?.bad && examples?.good) && <GoodBadPictures
-        style={{ marginTop: 36 }}
+        style={{ marginTop: 16, flex: 0 }}
         badPictures={examples.bad}
         goodPicture={examples.good}
       />}
+      <View style={{ marginTop: 24, flex: 1 }}>
+        <View style={{
+          marginHorizontal: 'auto',
+        }}>
+          <View style={{
+            width: '100%',
+            aspectRatio: 3 / 4,
+            borderColor: Colors.blur.medium,
+            borderWidth: 1,
+            borderRadius: 64,
+            padding: 12,
+          }}>
+            <View style={{
+              backgroundColor: Colors.blur.dark,
+              flex: 1,
+              width: '100%',
+              borderRadius: 52,
+              overflow: 'hidden',
+            }}>
+              {showCamera && <CameraView
+                ref={cameraRef}
+                style={{
+                  flex: 1,
+                  transform: [{ scale }]
+                }}
+                mirror={true}
+                animateShutter={false}
+                facing="front"
+                flash="off"
+              />}
+              {(internalImageUri && !showCamera) && <Image
+                cachePolicy="none"
+                source={{ uri: internalImageUri }}
+                style={{ flex: 1, position: 'absolute', inset: 0 }}
+              />}
+            </View>
+            <View
+              style={{
+                width: '55%',
+                aspectRatio: 3 / 4,
+                position: 'absolute',
+                top: '20%',
+                alignSelf: 'center',
+                borderRadius: 999,
+                borderBottomRightRadius: 512,
+                borderBottomLeftRadius: 512,
+                borderWidth: 3,
+                borderColor: 'white',
+                borderStyle: 'dashed',
+                opacity: 0.5
+              }}
+            >
+              {guideline === 'smile' && <View style={{
+                position: 'absolute',
+                alignSelf: 'center',
+                width: '35%',
+                height: 32,
+                borderWidth: 3,
+                borderColor: 'white',
+                borderRadius: 256,
+                borderBottomLeftRadius: 999,
+                borderBottomRightRadius: 999,
+                bottom: '12%'
+              }} />}
+              {guideline === 'side' && <View style={{
+                position: 'absolute',
+                width: '25%',
+                height: 8,
+                borderWidth: 3,
+                borderColor: 'white',
+                borderRadius: 4,
+                borderTopRightRadius: 0,
+                borderBottomRightRadius: 0,
+                bottom: '17%',
+                right: '4%'
+              }} />}
+              {guideline === 'default' && <View style={{
+                position: 'absolute',
+                alignSelf: 'center',
+                width: '25%',
+                height: 8,
+                borderWidth: 3,
+                borderColor: 'white',
+                borderRadius: 4,
+                bottom: '17%',
+              }} />}
+            </View>
+          </View>
+          <CaptureButtons
+            style={{
+              position: 'absolute',
+              padding: 0,
+              bottom: -24,
+              marginLeft: -12
+            }}
+            showBackButton={false}
+            cameraRef={cameraRef}
+            onDelete={!showCamera ? () => {
+              setShowCamera(true);
+              setInternalImageUri(undefined);
+            } : undefined}
+            onCapture={async (photo) => {
+              try {
+                isProcessingRef.current = true;
+
+                const { ImageManipulator, SaveFormat } = await import('expo-image-manipulator');
+
+                const cropWidth = Math.round(photo.width / scale);
+                const cropHeight = Math.round(photo.height / scale);
+                const originX = Math.round((photo.width - cropWidth) / 2);
+                const originY = Math.round((photo.height - cropHeight) / 2);
+
+                const manipulatedPhoto = await (await ImageManipulator.manipulate(photo.uri)
+                  .crop({
+                    originX,
+                    originY,
+                    width: cropWidth,
+                    height: cropHeight,
+                  }).renderAsync())
+                  .saveAsync({
+                    format: SaveFormat.JPEG,
+                    compress: 1,
+                  });
+
+                setInternalImageUri(manipulatedPhoto.uri);
+                setShowCamera(false);
+                await onCapture?.(manipulatedPhoto.uri);
+              } finally {
+                isProcessingRef.current = false;
+              }
+            }}
+          />
+        </View>
+      </View>
     </View>
   )
 }
+

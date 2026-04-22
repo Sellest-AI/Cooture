@@ -2,17 +2,18 @@ import { useRoute, useRouter, useStateEffect } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
 import { useAccount } from "@/lib/convex/auth";
 import { useMutation, useQuery, useQueryCached } from "@/lib/convex/client";
-import { SelectedItemModal } from "@/modules/items/selected-item.modal";
 import { useOutfit } from "@/modules/outfits/_hooks/useOutfit";
 import { PremiumBlock } from "@/modules/premium/premium-block";
-import { Block } from "@ui/block";
+import { useSafety } from "@/modules/safety";
 import { LoadingBlock } from "@ui/block.loading";
 import { Button } from "@ui/button";
+import { ButtonGhost } from "@ui/button.ghost";
 import { ImageGeneration } from "@ui/cards";
 import { CardItem } from "@ui/cards/card-item";
+import { ReportModal } from "@ui/cards/report.modal";
 import { FlashList } from "@ui/flat-list";
 import { GhostIconWrapper } from "@ui/ghost-animation";
-import { ArrowUpRight, BookmarkIcon, CircleFadingArrowUp, Credits, Pencil, ShareIcon, SquirishPlus, Trash } from "@ui/icons";
+import { BookmarkIcon, CircleFadingArrowUp, Credits, Pencil, ShareIcon, SquirishPlus, Trash, TriangleAlert } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
@@ -22,69 +23,11 @@ import { Text } from "@ui/text";
 import { TextInput } from "@ui/text-input";
 import { router } from "expo-router";
 import { WEBSITE } from "global";
+import { usePostHog } from "posthog-react-native";
 import { useMemo, useState } from "react";
 import { Keyboard, Platform, Share, View } from "react-native";
 import { ROUTES } from "routes";
 import { Colors } from "theme";
-
-const UserBlock = () => {
-  const { push } = useRouter(ROUTES.OUTFIT.PATH);
-  const { id } = useRoute.Params<{ id: Id<'outfits'> }>();
-  const { outfit } = useOutfit(id);
-
-  const { data: user } = useQuery(api.router.users.getAccount.anon, outfit ? { userId: outfit.userId } : 'skip');
-
-  if (!user) return null;
-
-  return (
-    <Pressable
-      onPress={() => push(ROUTES.USER.PATH, { pathParams: { id: user._id } })}
-    >
-      <Block
-        variant="blur"
-        style={{
-          borderRadius: 28,
-          paddingHorizontal: 16,
-          paddingVertical: 20,
-          width: '100%',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-          gap: 10
-        }}
-      >
-        <View style={{
-          width: 32, height: 32,
-          borderRadius: 99,
-          borderColor: Colors.blur.medium,
-          borderWidth: 1,
-          backgroundColor: Colors.blur.dark,
-          overflow: 'hidden'
-        }}>
-          <Image
-            source={user.image}
-            style={{ flex: 1 }}
-          />
-        </View>
-        <View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <Text.Sm color={Colors.neutral[50]} weight={600}>{user.name}</Text.Sm>
-            {user.isPremium && <Credits size={12} />}
-          </View>
-          <Text.Sm color={Colors.neutral[400]} style={{ marginTop: 2 }}>@{user.username}</Text.Sm>
-        </View>
-        <ArrowUpRight
-          style={{
-            position: 'absolute',
-            right: 20,
-            bottom: 20,
-          }}
-          color={Colors.neutral[200]}
-        />
-      </Block>
-    </Pressable>
-  )
-}
 
 const Generation = ({ imageId, predictionId }: { imageId: Id<'images'>, predictionId: Id<'predictions'> }) => {
   const { push } = useRouter(ROUTES.OUTFIT.PATH);
@@ -160,7 +103,45 @@ const Generations = ({ customText }: { customText?: string }) => {
   )
 }
 
-export default function ItemScreen() {
+
+const ReportContentButton = () => {
+  const { reportContent } = useSafety();
+  const { id } = useRoute.Params<{ id: Id<'outfits'> }>();
+  const [showModal, setShowModal] = useState(false);
+
+  return (
+    <>
+      <ButtonGhost
+        variant="destructive"
+        onPress={() => setShowModal(true)}
+        startIcon={TriangleAlert}
+        style={{
+          alignSelf: 'center',
+          marginTop: 4,
+        }}
+      >
+        Report outfit
+      </ButtonGhost>
+      <ReportModal
+        open={showModal}
+        onCancel={() => setShowModal(false)}
+        onComplete={() => {
+          setShowModal(false);
+          if (router.canGoBack()) router.back();
+          else router.dismissTo(ROUTES.HOME);
+        }}
+        report={{
+          outfitId: id,
+          onReport: ({ reason }) => reportContent({ outfitId: id, reason })
+        }}
+      />
+    </>
+  )
+}
+
+
+export default function Screen() {
+  const posthog = usePostHog();
   const { user: me } = useAccount();
   const { bottom } = useSafeAreaInsets();
 
@@ -172,7 +153,6 @@ export default function ItemScreen() {
   const { data: isBookmarked } = useQuery(api.router.collection.getBookmarked.authed, { outfitId: id });
   const { mutate: toggleBookmark } = useMutation(api.router.collection.toggleBookmark.authed);
 
-  const [selectedItem, setSelectedItem] = useState<Id<'items'> | null>(null);
   const [items, setItems] = useStateEffect(outfit?.items ?? []);
   const [name, setName] = useStateEffect('');
 
@@ -317,12 +297,19 @@ export default function ItemScreen() {
                       onPress={async () => {
                         await updateItems(items.map((i) => i._id));
                         push(ROUTES.OUTFIT.NEW, {
-                          params: { outfitId: id },
+                          params: {
+                            outfitId: id,
+                            itemIds: items.map((i) => i._id)
+                          },
                           redirectHere: true,
                         })
                       }}
                     />)
                 }
+
+                // For items with a very vertical aspect ratio, we want to use the medium size
+                const isTall = Number(item.image.aspectRatio.actual) < 4 / 6;
+                const imageUrl = isTall ? item.image.sizes.medium.url : item.image.sizes.small.url;
 
                 return (
                   <View style={{
@@ -334,10 +321,22 @@ export default function ItemScreen() {
                   >
                     <CardItem
                       image={item.image}
-                      source={item.image.sizes.small.url}
+                      source={imageUrl}
                       title={item.name}
                       subtitle={item.category}
-                      onPress={() => setSelectedItem(item._id)}
+                      onLongPress={() => push(ROUTES.ITEM.PATH, { pathParams: { id: item._id } })}
+                      onPress={() => {
+                        push(ROUTES.MODALS.PREVIEW_ITEM, {
+                          forwardRedirect: false,
+                          params: {
+                            itemId: item._id,
+                            onRemove: (editable && items.length > 1) ? () => {
+                              router.back();
+                              setItems((p) => p.filter(x => x._id !== item._id));
+                            } : undefined
+                          }
+                        })
+                      }}
                     />
                   </View>
                 )
@@ -346,7 +345,7 @@ export default function ItemScreen() {
               masonry
             />
             <FlashList
-              data={['share', 'user', 'premium', 'generations', 'cant-edit']}
+              data={['share', 'premium', 'generations', 'cant-edit']}
               keyExtractor={(i) => i}
               renderItem={({ item }) => {
                 if (item === 'share') return (
@@ -355,10 +354,11 @@ export default function ItemScreen() {
                     style={{ marginBottom: 12 }}
                     startIcon={ShareIcon}
                     onPress={() => {
+                      posthog.capture('outfit_share_button_pressed', { generationId: id });
                       const url = WEBSITE.URL + ROUTES.SHARE.OUTFIT(id);
                       Share.share(Platform.OS === 'ios' ? {
                         url,
-                        message: `Check out this outfit on Cooture! ${url}`,
+                        message: `Check out this outfit on Cooture!`,
                       } : {
                         title: `Check out this outfit on Cooture!`,
                         message: url,
@@ -368,8 +368,7 @@ export default function ItemScreen() {
                     Share outfit
                   </Button>
                 )
-                if (item === 'user') return <UserBlock />
-                if (item === 'premium') return <PremiumBlock style={{ marginTop: 12 }} />
+                if (item === 'premium') return <PremiumBlock />
                 if (item === 'generations') return <Generations
                   customText={(!editable && ownOutfit) ? "This outfit has been used and is now locked to preserve your generated looks." : undefined}
                 />
@@ -388,8 +387,9 @@ export default function ItemScreen() {
                 else router.replace(ROUTES.PROFILE.OUTFITS);
               }}
             >
-              Delete Outfit
+              Long press to delete outfit
             </Button>}
+            {!ownOutfit && <ReportContentButton />}
           </SafeAreaView>
         </ParallaxScrollView>
         {(editable && hasChanges) && <View style={{
@@ -411,15 +411,6 @@ export default function ItemScreen() {
           </Button>
         </View>}
       </View>
-      <SelectedItemModal
-        onRemove={(editable && items.length > 1) ? () => {
-          setSelectedItem(null);
-          setItems((p) => p.filter(x => x._id !== selectedItem))
-        } : undefined}
-        itemId={selectedItem}
-        open={!!selectedItem}
-        onOpenChange={() => setSelectedItem(null)}
-      />
     </>
   )
 }

@@ -1,5 +1,5 @@
 import { Paths, File as SystemFile } from "expo-file-system";
-import { Platform } from "react-native";
+import { Platform, Image as ReactNativeImage } from "react-native";
 import { getImageDimensions } from '../metadata';
 
 const randomId = () => Math.random().toString(36).slice(2, 12);
@@ -146,7 +146,12 @@ async function uriToImage(uri: string) {
   }
 }
 
-export const urlToImage = async (url: string) => {
+export const urlToImage = async (url: string | number) => {
+  if (typeof url === 'number') {
+    const uri = ReactNativeImage.resolveAssetSource(url).uri;
+    return await uriToImage(uri);
+  }
+
   // Check if URL is external (http/https)
   if (url.startsWith('http://') || url.startsWith('https://')) {
     // Download to cache directory with unique filename

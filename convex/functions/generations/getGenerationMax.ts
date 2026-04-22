@@ -6,11 +6,13 @@ import { getItem } from "../items/getItem";
 import { getUserPublic } from "../users";
 
 const checkIfVideosOnly = (predictions: Doc<'predictions'>[]) => {
-  const completedPredictions = predictions.filter((p) => p.status === 'ACCEPTED' || p.status === 'REJECTED');
+  const completedPredictions = predictions.filter((p) => p.status === 'ACCEPTED' || p.status === 'REJECTED' || p.status === 'REVIEW');
   const pendingPredictions = predictions.filter((p) => p.status === 'LOADING');
 
-  const completedAreVideos = completedPredictions.every((p) => !!p.videoId);
-  const pendingAreVideos = pendingPredictions.every((p) => !!p.imageId);
+  const completedAreVideos = completedPredictions.length === 0 ||
+    completedPredictions.every((p) => !!p.videoId);
+  const pendingAreVideos = pendingPredictions.length === 0 ||
+    pendingPredictions.every((p) => !!p.imageId);
 
   return completedAreVideos && pendingAreVideos;
 }
@@ -78,7 +80,7 @@ export const getGenerationMax = async (ctx: QueryCtx, generationId: Id<'generati
       // Sanitize sensitive data
       prompts: undefined,
       cover: presetCover || null,
-    } : null,
+    } : undefined,
     outfit,
     isVideosOnly
   }

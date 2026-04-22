@@ -62,6 +62,7 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: SubjectExt
     .filter(notEmpty)
     .map((item, i) => ({
       type: item.position,
+      name: item.name,
       url: item.url,
       hasAlpha: item.hasAlpha,
       text: `Image ${baseImageIndex + i} for ${item.position.toLowerCase()}.`
@@ -70,8 +71,7 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: SubjectExt
   const images = [...schema.images, ...references]
 
   // Build outfit description
-  const itemNames = outfit.items.map(item => item.name);
-  const description = itemNames.length > 0 ? `An outfit featuring ${itemNames.join(', ')}` : subject.prompt.outfit.description;
+  const description = references.length > 0 ? `An outfit featuring ${references.map((r) => r.name).join(', ')}` : subject.prompt.outfit.description;
   const _outfitSize = subject.outfit.size === 'DEFAULT' ? undefined : subject.outfit.size;
   const outfitSize = _outfitSize ? `IMPORTANT: ${_outfitSize.replaceAll('_', ' ')} FIT` : undefined;
 
@@ -154,43 +154,88 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: SubjectExt
   return { ...schema, images, prompt: finalPrompt }
 }
 
+const SUBJECT_CONFIG = {
+  gender: 'female',
+  ethnicity: 'european',
+  tallHeight: 180,
+  mediumHeight: 167,
+} as const;
+
 const updateSubjects = async (ctx: ActionCtx, schema: Schema, subjects: SubjectExtended[]): Promise<Schema> => {
-  let finalPrompt: Prompt = schema.prompt;
+  const pushFakeSubject = (subject: Prompt['subjects'][number]) => {
+    const object = {
+      ...subject,
+      gender: subject.gender ?? SUBJECT_CONFIG.gender,
+      reference: SUBJECT_CONFIG.ethnicity,
+    }
+    newSubjects.push(object);
+  }
+
   let images = [...schema.images];
 
-  for await (const subject of subjects) {
-    if (!subject.userId) continue;
+  // Fetch appearances strictly aligned with the subjects array
+  const appearances = await Promise.all(subjects.map(s => s.userId ?
+    ctx.runQuery(internal.router.users.getAppearance._internal, { userId: s.userId }) : null));
 
-    const appearance = await ctx.runQuery(internal.router.users.getAppearance._internal, { userId: subject.userId });
-    if (!appearance) continue;
+  let availablePresetSubjects = [...schema.prompt.subjects];
+  let newSubjects: Prompt['subjects'] = [];
+
+  // Iterate over the input users (subjects) to pair them with the best preset subject
+  for (let i = 0; i < subjects.length; i++) {
+    const appearance = appearances[i];
+
+    // Find the best matching preset subject based on the user's actual gender
+    let presetSubjectIndex = -1;
+    if (appearance)
+      presetSubjectIndex = availablePresetSubjects.findIndex(ps => ps.gender === appearance.gender);
+
+    // Fallback to the next available preset subject if no perfect gender match
+    if (presetSubjectIndex === -1) presetSubjectIndex = 0;
+
+    const presetSubject = availablePresetSubjects.splice(presetSubjectIndex, 1)[0];
+    if (!presetSubject) continue;
+
+    // If no appearance data is available, preserve the preset subject
+    if (!appearance) { pushFakeSubject(presetSubject); continue; }
+
+    const heightAdjective = appearance.heightCm ? (appearance.heightCm > SUBJECT_CONFIG.tallHeight ? 'tall' :
+      appearance.heightCm > SUBJECT_CONFIG.mediumHeight ? 'medium' : 'short') : undefined;
+
+    const buildCleaned = appearance.size ? (appearance.size === 'heavy' ? 'heavyset' :
+      appearance.size === 'heavyset' ? 'extremely heavyset' : appearance.size) : undefined;
+
+    let image = presetSubject.head.direction === "side" ? appearance.sideImage : appearance.frontImage;
+    if (!image) image = appearance.frontImage;
+    if (image) images.push({ url: image.url, hasAlpha: image.hasAlpha });
 
     const prompt = {
-      ...subject.prompt,
-      reference: `Image ${images.length + 1}. Use facial expression from prompt.`,
+      ...presetSubject,
+      reference: image ? `Image ${images.length}. Use facial expression from prompt.` : undefined,
       gender: appearance.gender,
-      height: appearance.heightCm ? `${appearance.heightCm}cm tall` : undefined,
-      size: appearance.size,
+      height: appearance.heightCm ? `${appearance.heightCm}cm ${heightAdjective} height` : undefined,
+      size: buildCleaned ? `${buildCleaned} build` : undefined,
     }
 
-    let image = prompt.head.direction === "side" ? appearance.sideImage : appearance.frontImage;
-    if (!image) image = appearance.frontImage;
+    newSubjects.push(prompt);
+  }
 
-    if (!image) continue;
+  // Push any remaining preset subjects (e.g. preset has 3 people, but only 2 users provided)
+  // Ensure they have a gender assigned so the type matches FinalPrompt
+  for (const remaining of availablePresetSubjects) { pushFakeSubject(remaining); }
 
-    images = [...images, { url: image.url, hasAlpha: image.hasAlpha }];
-
-    finalPrompt = {
-      ...finalPrompt,
-      subjects: finalPrompt.subjects.map((s, i) =>
-        i === subject.index ? { ...subject.prompt, ...prompt } : s
-      )
-    };
+  // NOTE: We also need to update the `subjects` array since we re-ordered the prompt subjects,
+  // we want `subjects[i].prompt` to match `newSubjects[i]` for the subsequent `updateOutfits` run.
+  for (let i = 0; i < subjects.length; i++) {
+    if (newSubjects[i]) subjects[i].prompt = newSubjects[i];
   }
 
   return {
     ...schema,
     images,
-    prompt: finalPrompt
+    prompt: {
+      ...schema.prompt,
+      subjects: newSubjects
+    }
   }
 }
 
@@ -269,6 +314,42 @@ const updateScene = (schema: Schema) => {
   }
 }
 
+const updateOutfits = async (ctx: ActionCtx, schema: Schema, subjects: Subject[]): Promise<Schema> => {
+  for (const [index, _subject] of schema.prompt.subjects.entries()) {
+    let subject: SubjectExtended = {
+      index: index,
+      prompt: _subject,
+      outfit: subjects[index]?.outfit,
+      userId: subjects[index]?.userId,
+    }
+
+    const outfitIndex = subject.outfit ? subjects.findIndex(s => s.outfit?._id === subject.outfit?._id) : -1;
+    // Use an earlier processed subject's outfit to avoid duplicate API calls and image references
+    const shareCustomOutfit = outfitIndex !== -1 && outfitIndex < index;
+
+    if (!shareCustomOutfit) {
+      schema = await updateOutfit(ctx, schema, subject);
+      continue;
+    }
+
+    schema = {
+      ...schema,
+      prompt: {
+        ...schema.prompt,
+        subjects: schema.prompt.subjects.map((s, i, arr) => {
+          if (i !== index) return s;
+          return {
+            ...s,
+            outfit: arr[outfitIndex].outfit,
+          }
+        }),
+      }
+    }
+  }
+
+  return schema
+}
+
 type BaseSchema = {
   prompt: Prompt;
   depthMap?: Id<'images'>,
@@ -281,7 +362,7 @@ export type PromptExtended = Omit<Prompt, 'subjects' | 'style' | 'composition' |
   composition: Prompt['composition'] & { depthMapReference?: string };
   technical: Prompt['technical'];
   subjects: (Prompt['subjects'][number] & {
-    reference: string;
+    reference?: string;
     gender: string;
     size?: string;
     height?: string;
@@ -300,16 +381,7 @@ export const createPhotoshootSchema = async (ctx: ActionCtx, _schema: BaseSchema
   let schema: Schema = { ..._schema, images: [] }
 
   schema = await updateSubjects(ctx, schema, subjects.map((s, i) => ({ ...s, index: i })));
-
-  for (const [index, _subject] of schema.prompt.subjects.entries()) {
-    let subject: SubjectExtended = {
-      index: index,
-      prompt: _subject,
-      outfit: index === 0 ? subjects[index]?.outfit : undefined,
-      userId: subjects[index]?.userId,
-    }
-    schema = await updateOutfit(ctx, schema, subject);
-  }
+  schema = await updateOutfits(ctx, schema, subjects);
 
   schema = await updateStyle(schema);
   schema = await addDepthMap(ctx, schema);
