@@ -235,7 +235,7 @@ export const presetCreator = createTool({
     // check for any string "undefined" or "[]" in the result and fix them
     const sanitize = <T>(obj: T): T => {
       if (typeof obj === 'string') {
-        if (obj === 'undefined') return undefined as T;
+        if (obj.toLowerCase() === 'undefined') return undefined as T;
         if (obj === '[]') return [] as T;
         return obj;
       }
