@@ -62,6 +62,7 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: SubjectExt
     .filter(notEmpty)
     .map((item, i) => ({
       type: item.position,
+      name: item.name,
       url: item.url,
       hasAlpha: item.hasAlpha,
       text: `Image ${baseImageIndex + i} for ${item.position.toLowerCase()}.`
@@ -70,8 +71,7 @@ const updateOutfit = async (ctx: ActionCtx, schema: Schema, subject?: SubjectExt
   const images = [...schema.images, ...references]
 
   // Build outfit description
-  const itemNames = outfit.items.map(item => item.name);
-  const description = itemNames.length > 0 ? `An outfit featuring ${itemNames.join(', ')}` : subject.prompt.outfit.description;
+  const description = references.length > 0 ? `An outfit featuring ${references.map((r) => r.name).join(', ')}` : subject.prompt.outfit.description;
   const _outfitSize = subject.outfit.size === 'DEFAULT' ? undefined : subject.outfit.size;
   const outfitSize = _outfitSize ? `IMPORTANT: ${_outfitSize.replaceAll('_', ' ')} FIT` : undefined;
 
