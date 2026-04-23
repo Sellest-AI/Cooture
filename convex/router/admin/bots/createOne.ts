@@ -1,11 +1,9 @@
-import { createCustomer } from "@/lib/stripe";
 import { createAccount } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { api, internal } from "../../../_generated/api";
 import { Id } from "../../../_generated/dataModel";
 import { internalAction } from "../../../_generated/server";
 import { env } from "../../../env";
-import { createUserWallet } from "../../../functions/credits";
 import { adminAction, internalMutation } from "../../../procedures";
 
 const sharedArgs = {
@@ -53,16 +51,17 @@ export const admin = adminAction({
       return { base64: url }
     }
 
-    const profileImages = await ctx.runAction(internal.router.storage.images.uploadMany._internal, {
-      images: [extractImage(args.images.profileUrl)], userId: null,
-    });
-
     const { images: argsImages, ...shared } = args;
 
     // User
     const userId = await ctx.runAction(internal.router.admin.bots.createOne._internal_step_1, {
       ...shared,
       username: sanitizedUsername,
+    });
+
+    const profileImages = await ctx.runAction(internal.router.storage.images.uploadMany._internal, {
+      images: [extractImage(args.images.profileUrl)],
+      userId,
     });
 
     await ctx.runMutation(internal.router.admin.bots.createOne._internal_step_2, {
@@ -72,13 +71,6 @@ export const admin = adminAction({
       userId,
     });
 
-    // Stripe User
-    const stripeCustomer = await createCustomer({
-      id: userId,
-      email: args.email,
-      name: args.name,
-    })
-
     // Appearance images
     const images = await ctx.runAction(internal.router.storage.images.uploadMany._internal, {
       images: [
@@ -86,15 +78,14 @@ export const admin = adminAction({
         extractImage(argsImages.sideUrl),
         extractImage(argsImages.smileUrl),
       ],
-      userId: userId,
+      userId,
     });
 
-    // Appearance
-    await ctx.runMutation(internal.router.admin.bots.createOne._internal_step_3, {
+    // Update user info after 1-2 minutes to ensure the account is fully created and avoid potential race
+    await ctx.scheduler.runAfter(1000 * 60 * 1, internal.router.admin.bots.createOne._internal_step_3, {
       ...shared,
       username: sanitizedUsername,
-      userId: userId,
-      stripeCustomerId: stripeCustomer.id,
+      userId,
       images: {
         profileImageId: profileImages[0]._id,
         frontImageId: images[0]._id,
@@ -103,8 +94,8 @@ export const admin = adminAction({
       }
     })
 
-    // Cron trigger after 2 minutes to start liking content
-    await ctx.scheduler.runAfter(1000 * 60 * 2, internal.router.admin.bots.crons._internal, { id: userId });
+    // Cron trigger after 10 minutes to start liking content
+    await ctx.scheduler.runAfter(1000 * 60 * 10, internal.router.admin.bots.crons._internal, { id: userId });
 
     return userId;
   }
@@ -146,8 +137,6 @@ export const _internal_step_2 = internalMutation({
       age: args.age,
     })
 
-    await createUserWallet(ctx, userId);
-
     return userId;
   }
 })
@@ -156,7 +145,6 @@ export const _internal_step_3 = internalMutation({
   args: {
     ...sharedArgs,
     userId: v.id('users'),
-    stripeCustomerId: v.string(),
     images: v.object({
       frontImageId: v.id('images'),
       sideImageId: v.id('images'),
@@ -165,12 +153,15 @@ export const _internal_step_3 = internalMutation({
     })
   },
   handler: async (ctx, args) => {
+    const userExtended = await ctx.db.query('usersExtended')
+      .withIndex('by_user_id', (q) => q.eq('userId', args.userId)).first();
+
+    if (!userExtended) return;
+
     const image = await ctx.db.get(args.images.profileImageId);
 
-    await ctx.db.insert("usersExtended", {
-      userId: args.userId,
+    await ctx.db.patch(userExtended._id, {
       canTakeFreeTrial: false,
-      stripeCustomerId: args.stripeCustomerId,
       accountStatus: "ACTIVE",
       role: "BOT",
       firstName: args.firstName.trim(),
