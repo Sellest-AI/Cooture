@@ -9,8 +9,10 @@ type Args = {
   userId?: Id<'users'>;
 }
 
-export const useSearchPresets = ({ category, userId, query = '' }: Args) => {
+export const useSearchPresets = ({ category, userId, query: _query = '' }: Args) => {
+  const query = _query.trim();
   const [seed] = useState(new Date().getHours());
+
   const { data: _presetsByCategory, isPending: isCategoryLoading } = useQuery(api.router.presets.getByCategory.anon, category ? { category } : 'skip');
   const { data: _presetsByCategoryUser, isPending: isUserCategoryLoading } = useQuery(api.router.presets.getByCategory.authed, category ? { category } : 'skip');
 

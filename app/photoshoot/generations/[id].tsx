@@ -11,6 +11,7 @@ import { Block } from "@ui/block";
 import { ImageGeneration } from "@ui/cards";
 import { ArrowLeft, Check, X } from "@ui/icons";
 import { Image } from "@ui/image";
+import { MotiView } from "@ui/motion";
 import { Pressable } from "@ui/pressable";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Carousel, ICarouselInstance } from "@ui/screen-carousel";
@@ -84,21 +85,24 @@ export default function Screen() {
   const next = async (validated: boolean) => {
     if (!currentItem) return;
 
-    // Trigger animation
-    setAnimatingItem({ id: currentItem.providerId, status: validated ? 'ACCEPTING' : 'REJECTING' });
-
     if (validated) {
       acceptPrediction(currentItem.providerId).catch(() => null);
     } else {
       rejectPrediction(currentItem.providerId).catch(() => null);
     }
+
+    // Trigger animation
+    setAnimatingItem({ id: currentItem.providerId, status: validated ? 'ACCEPTING' : 'REJECTING' });
   }
 
+  const animationRef = useRef(false);
   const handleAnimationComplete = useCallback(() => {
     const currentItem = animatingItem;
-    if (!currentItem) return;
+    if (!currentItem || animationRef.current) return;
 
-    // Reset animation state first
+    animationRef.current = true;
+
+    // Reset animation state immediately so it doesn't fire again
     setAnimatingItem(null);
 
     // Small delay before removing item to allow gesture handlers to clean up
@@ -114,9 +118,11 @@ export default function Screen() {
         if (predictionId) router.dismissTo(ROUTES.POST.ID(predictionId));
         else router.dismissTo(ROUTES.PROFILE.GENERATIONS);
       }
+
+      animationRef.current = false;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [animatingItem])
+
+  }, [animatingItem, visibleItems, photoshoot]);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -200,62 +206,70 @@ export default function Screen() {
           justifyContent: 'center',
           paddingVertical: 24,
         }}>
-          {visibleItems.length > 0 && <Carousel
-            itemHeight={460}
-            defaultIndex={currentIndex}
-            ref={carouselRef}
-            onProgressChange={(_, v) => {
-              const length = visibleItems.length + 1;
-              const value = v > length - 1 ? length - 1 : v < 0 ? 0 : v;
-              setCurrentIndex(Math.ceil(value));
-            }}
-            scaleAnimation={true}
-            items={[...visibleItems, undefined]
-              .map((s, i) => {
-                if (s === undefined)
-                  return (
-                    <AnimatedGeneration key={i} status={'IDLE'}>
-                      <UnlockMore />
-                    </AnimatedGeneration>
-                  )
+          {items.length > 0 &&
+            <MotiView
+              style={{ width: '100%' }}
+              animate={{ translateY: 0, opacity: 1 }}
+              from={{ translateY: 30, opacity: 0 }}
+              transition={{ duration: 500, delay: 300 }}
+            >
+              <Carousel
+                itemHeight={460}
+                defaultIndex={currentIndex}
+                ref={carouselRef}
+                onProgressChange={(_, v) => {
+                  const length = visibleItems.length + 1;
+                  const value = v > length - 1 ? length - 1 : v < 0 ? 0 : v;
+                  setCurrentIndex(Math.ceil(value));
+                }}
+                scaleAnimation={true}
+                items={[...visibleItems, undefined]
+                  .map((s, i) => {
+                    if (s === undefined)
+                      return (
+                        <AnimatedGeneration key={i} status={'IDLE'}>
+                          <UnlockMore />
+                        </AnimatedGeneration>
+                      )
 
-                const isFailed = s.status === 'FAILED' ||
-                  (s.status !== 'LOADING' && !s.imageUrl);
+                    const isFailed = s.status === 'FAILED' ||
+                      (s.status !== 'LOADING' && !s.imageUrl);
 
-                return (
-                  <AnimatedGeneration
-                    key={s.providerId}
-                    status={animatingItem?.id === s.providerId ? animatingItem.status : 'IDLE'}
-                    onAnimationComplete={handleAnimationComplete}
-                  >
-                    <ImageGeneration
-                      loading={s.status === 'LOADING'}
-                      source={s.imageUrl}
-                      text={s.status === 'LOADING' ? "Generating..." :
-                        isFailed ? "Failed" : "Ready"}
-                      onDownload={s.imageUrl ? () => downloadImageCrossPlatform(s.imageUrl!, { applyWatermark: true }) : undefined}
-                    />
-                    {isFailed && <View style={{
-                      position: 'absolute',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      inset: 0,
-                    }}>
-                      <Text.Base color={Colors.neutral[400]}
-                        style={{ textAlign: 'center', maxWidth: '70%', marginTop: -32 }}
-                        weight={500}>
-                        This generation failed. You have not been charged for it.
-                      </Text.Base>
-                      <Text.Base color={Colors.neutral[400]}
-                        style={{ textAlign: 'center', maxWidth: '70%', marginTop: 16 }}
-                        weight={500}>
-                        Please try again.
-                      </Text.Base>
-                    </View>}
-                  </AnimatedGeneration>
-                )
-              })}
-          />}
+                    return (
+                      <AnimatedGeneration
+                        key={s.providerId}
+                        status={animatingItem?.id === s.providerId ? animatingItem.status : 'IDLE'}
+                        onAnimationComplete={handleAnimationComplete}
+                      >
+                        <ImageGeneration
+                          loading={s.status === 'LOADING'}
+                          source={s.imageUrl}
+                          text={s.status === 'LOADING' ? "Generating..." :
+                            isFailed ? "Failed" : "Ready"}
+                          onDownload={s.imageUrl ? () => downloadImageCrossPlatform(s.imageUrl!, { applyWatermark: true }) : undefined}
+                        />
+                        {isFailed && <View style={{
+                          position: 'absolute',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          inset: 0,
+                        }}>
+                          <Text.Base color={Colors.neutral[400]}
+                            style={{ textAlign: 'center', maxWidth: '70%', marginTop: -32 }}
+                            weight={500}>
+                            This generation failed. You have not been charged for it.
+                          </Text.Base>
+                          <Text.Base color={Colors.neutral[400]}
+                            style={{ textAlign: 'center', maxWidth: '70%', marginTop: 16 }}
+                            weight={500}>
+                            Please try again.
+                          </Text.Base>
+                        </View>}
+                      </AnimatedGeneration>
+                    )
+                  })}
+              />
+            </MotiView>}
         </View>
       </View>
       <GenerationButtons
