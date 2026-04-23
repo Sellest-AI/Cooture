@@ -122,9 +122,18 @@ export const processWebhook = internalMutation({
       const creditsToAdd = CREDITS_CONFIG.COOTURE_PLUS_CREDITS * multiplier;
       const finalProductId = `COOTURE_PLUS_${renewalInterval.toUpperCase().replaceAll(' ', '_')}`;
 
+      // Delete any existing cancellation job since the subscription is active again
+      if (user.plan?.cancelFunctionId) await ctx.scheduler.cancel(user.plan.cancelFunctionId);
+
       // Update the user's plan
       const planId = entitlementIds.length > 0 ? entitlementIds[0] : "COOTURE_PLUS";
-      await ctx.db.patch(user._id, { plan: { id: planId, renewalInterval } });
+      await ctx.db.patch(user._id, {
+        plan: {
+          id: planId,
+          renewalInterval,
+          cancelFunctionId: undefined
+        }
+      });
 
       // Add credits
       const wallet = await getUserWallet(ctx, user.userId);
@@ -145,10 +154,11 @@ export const processWebhook = internalMutation({
     }
     // Process Expirations
     else if (type === "EXPIRATION") {
+      if (user.plan?.cancelFunctionId) await ctx.scheduler.cancel(user.plan.cancelFunctionId);
       // Note: "CANCELLATION" just means auto-renew is off. RevenueCat 
       // highly recommends removing entitlements ONLY on "EXPIRATION".
       await ctx.db.patch(user._id, {
-        plan: undefined
+        plan: undefined,
       });
     }
   },
