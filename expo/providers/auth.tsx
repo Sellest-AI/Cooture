@@ -38,7 +38,7 @@ const AuthenticationGate = ({ enabled }: { enabled: boolean }) => {
   if (!enabled) return null;
   if (!user) return <LoadingView />;
 
-  const WAITLIST_PATHS_ALLOWED = ["/welcome/", "/avatar/"]
+  const WAITLIST_PATHS_ALLOWED = ["/welcome/", "/avatar/", "/upgrade"]
 
   if (isInWaitlist) {
     if (!WAITLIST_PATHS_ALLOWED.some(path => pathname.startsWith(path)))

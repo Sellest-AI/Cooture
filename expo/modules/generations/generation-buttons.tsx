@@ -75,9 +75,9 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
               <Button
                 variant="blur"
                 startIcon={X}
-                onPress={() => {
+                onPress={async () => {
                   if (!currentItem) return;
-                  onNext(false);
+                  await onNext(false);
                 }}
               >
                 Archive
