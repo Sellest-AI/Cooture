@@ -24,8 +24,8 @@ export const Providers = ({ children }: Props) => {
             <BlurProvider>
               <SafeAreaProvider>
                 <KeyboardAvoiderProvider>
-                  <AsyncProviders>
-                    <AuthProvider>
+                  <AuthProvider>
+                    <AsyncProviders>
                       <ToastsProvider>
                         <PostHogProvider>
                           <RevenueCatProvider>
@@ -33,8 +33,8 @@ export const Providers = ({ children }: Props) => {
                           </RevenueCatProvider>
                         </PostHogProvider>
                       </ToastsProvider>
-                    </AuthProvider>
-                  </AsyncProviders>
+                    </AsyncProviders>
+                  </AuthProvider>
                 </KeyboardAvoiderProvider>
               </SafeAreaProvider>
             </BlurProvider>

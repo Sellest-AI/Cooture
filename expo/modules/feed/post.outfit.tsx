@@ -65,9 +65,9 @@ export const OutfitPost = ({ id, style }: { id: Id<'outfits'>, style?: ViewStyle
     onToggleLike={(v) => toggleLike({ outfitId: id, value: v })}
     likedAccounts={likes?.latestLikers.map(l => l.image).filter(notEmpty)}
     isLiked={liked}
-    onShare={(_id) => {
-      posthog.capture('post_share_button_pressed', { generationId: id });
-      const url = WEBSITE.URL + ROUTES.SHARE.OUTFIT(_id);
+    onShare={() => {
+      posthog.capture('post_share_button_pressed', { outfitId: id });
+      const url = WEBSITE.URL + ROUTES.SHARE.OUTFIT(id);
       Share.share(Platform.OS === 'ios' ? {
         url,
         message: `Check out this outfit on Cooture!`,
