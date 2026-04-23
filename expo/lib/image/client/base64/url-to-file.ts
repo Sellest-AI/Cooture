@@ -163,5 +163,16 @@ export const urlToImage = async (url: string | number) => {
   if (Platform.OS === 'web')
     return await uriToImageWeb(url);
 
+  // Check if URL is a iOS Photos framework URI (ph://)
+  if (url.startsWith('ph://')) {
+    // Convert ph:// URI to local file URI using expo-media-library
+    const { getAssetInfoAsync } = await import('expo-media-library');
+    // Extract the asset ID from the ph:// URI (remove ph:// prefix and any /L0/001 suffix)
+    const assetId = url.replace('ph://', '').split('/')[0];
+    const assetInfo = await getAssetInfoAsync(assetId);
+    if (!assetInfo?.localUri) throw new Error('Could not get local URI for ph:// asset');
+    return await uriToImage(assetInfo.localUri);
+  }
+
   return await uriToImage(url);
 }
