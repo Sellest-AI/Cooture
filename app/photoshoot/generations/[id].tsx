@@ -1,6 +1,7 @@
 import { api, Id } from "@/lib/convex/api";
 import { useQuery } from "@/lib/convex/client";
 import { downloadImageCrossPlatform } from "@/lib/image/client";
+import { presentPaywallIfNeeded } from "@/lib/revenue-cat";
 import { AnimatedGeneration } from "@/modules/generations/animated-generation";
 import { GenerationButtons } from "@/modules/generations/generation-buttons";
 import { UnlockMore } from "@/modules/generations/images/unlock-more";
@@ -60,7 +61,8 @@ export default function Screen() {
   const outfitId = photoshoot?.outfitId;
 
   const items = (photoshoot?.predictions ?? []).map((p) => ({
-    _id: p.predictionId,
+    _id: p._id,
+    providerId: p.predictionId,
     imageUrl: results?.find((r) => r._id === p.imageId)?.url,
     status: p.status,
   }))
@@ -72,7 +74,7 @@ export default function Screen() {
   const [animatedItemIds, setAnimatedItemIds] = useState<Set<string>>(new Set());
 
   // Filter out animated items
-  const visibleItems = items.filter(item => !animatedItemIds.has(item._id));
+  const visibleItems = items.filter(item => !animatedItemIds.has(item.providerId));
 
   const currentStatus = visibleItems[currentIndex] ? (
     visibleItems[currentIndex].status === 'LOADING' ? 'LOADING' : 'READY') : 'UNLOCK';
@@ -82,14 +84,14 @@ export default function Screen() {
   const next = async (validated: boolean) => {
     if (!currentItem) return;
 
-    if (validated) {
-      await acceptPrediction(currentItem._id);
-    } else {
-      await rejectPrediction(currentItem._id);
-    }
-
     // Trigger animation
-    setAnimatingItem({ id: currentItem._id, status: validated ? 'ACCEPTING' : 'REJECTING' });
+    setAnimatingItem({ id: currentItem.providerId, status: validated ? 'ACCEPTING' : 'REJECTING' });
+
+    if (validated) {
+      acceptPrediction(currentItem.providerId).catch(() => null);
+    } else {
+      rejectPrediction(currentItem.providerId).catch(() => null);
+    }
   }
 
   const handleAnimationComplete = useCallback(() => {
@@ -100,13 +102,14 @@ export default function Screen() {
     setAnimatingItem(null);
 
     // Small delay before removing item to allow gesture handlers to clean up
-    requestAnimationFrame(() => {
+    requestAnimationFrame(async () => {
       // Add to animated items set
       setAnimatedItemIds(prev => new Set([...prev, currentItem.id]));
 
       // Check if we should navigate away
-      const nextItem = visibleItems.find(item => item._id !== currentItem.id);
+      const nextItem = visibleItems.find(item => item.providerId !== currentItem.id);
       if (!nextItem) {
+        await presentPaywallIfNeeded();
         const predictionId = photoshoot?.predictions[0]?._id;
         if (predictionId) router.dismissTo(ROUTES.POST.ID(predictionId));
         else router.dismissTo(ROUTES.PROFILE.GENERATIONS);
@@ -221,8 +224,8 @@ export default function Screen() {
 
                 return (
                   <AnimatedGeneration
-                    key={s._id}
-                    status={animatingItem?.id === s._id ? animatingItem.status : 'IDLE'}
+                    key={s.providerId}
+                    status={animatingItem?.id === s.providerId ? animatingItem.status : 'IDLE'}
                     onAnimationComplete={handleAnimationComplete}
                   >
                     <ImageGeneration

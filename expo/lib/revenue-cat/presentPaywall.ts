@@ -2,10 +2,7 @@ import Purchases from 'react-native-purchases';
 import RevenueCatUI, { PAYWALL_RESULT } from "react-native-purchases-ui";
 import { presentManagerIfNeeded } from './presentManager';
 
-// Make sure to configure a Paywall in the Dashboard first.
-export async function presentPaywall(): Promise<boolean> {
-  await presentManagerIfNeeded();
-
+export async function presentPaywallIfNeeded(): Promise<boolean> {
   // Present paywall for current offering:
   // const paywallResult: PAYWALL_RESULT = await RevenueCatUI.presentPaywall();
 
@@ -32,4 +29,10 @@ export async function presentPaywall(): Promise<boolean> {
     default:
       return false;
   }
+}
+
+// Make sure to configure a Paywall in the Dashboard first.
+export async function presentPaywall(): Promise<boolean> {
+  await presentManagerIfNeeded();
+  return await presentPaywallIfNeeded();
 }
