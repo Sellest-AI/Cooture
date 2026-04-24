@@ -4,7 +4,8 @@ import { CREDITS_CONFIG, grantCredits } from "../../functions/credits";
 import { internalMutation } from "../../procedures";
 
 /**
- * This will auto refund the user if the task takes too much time to complete
+ * This will auto refund the user if the task takes too much time to complete,
+ * Or if the prediction failed
  */
 export const _internal = internalMutation({
   args: {

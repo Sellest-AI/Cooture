@@ -65,6 +65,7 @@ export default function Screen() {
     _id: p._id,
     providerId: p.predictionId,
     imageUrl: results?.find((r) => r._id === p.imageId)?.url,
+    imageId: p.imageId,
     status: p.status,
   }))
 
@@ -233,7 +234,7 @@ export default function Screen() {
                       )
 
                     const isFailed = s.status === 'FAILED' ||
-                      (s.status !== 'LOADING' && !s.imageUrl);
+                      (s.status !== 'LOADING' && !s.imageId);
 
                     return (
                       <AnimatedGeneration

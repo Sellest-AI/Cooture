@@ -28,6 +28,7 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
   const isCurrentLoading = currentItem?.status === 'LOADING';
   const processed = items.filter((i) => i.status !== 'LOADING').length;
   const loading = items.filter((i) => i.status === 'LOADING').length;
+  const isCurrentFailed = currentItem?.status === 'FAILED';
 
   const { bottom: _bottom } = useSafeAreaInsets();
   const bottom = Platform.OS === 'ios' ? 0 : _bottom;
@@ -82,7 +83,7 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
               >
                 Archive
               </Button>
-              <Button
+              {!isCurrentFailed && <Button
                 variant="primary"
                 startIcon={HeartIcon}
                 onPress={async () => {
@@ -132,7 +133,7 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
                 }}
               >
                 Save
-              </Button>
+              </Button>}
             </View>}
           </View>
         </MotiView>}
