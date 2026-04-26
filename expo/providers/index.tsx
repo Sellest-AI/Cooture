@@ -9,6 +9,7 @@ import { I18nProvider } from "./i18n"
 import { MotionProvider } from "./motion"
 import { PostHogProvider } from './posthog'
 import { RevenueCatProvider } from './revenue-cat'
+import { ShareIntentProvider } from "./share-intent"
 import { ThemeProvider } from "./theme"
 
 type Props = {
@@ -26,13 +27,15 @@ export const Providers = ({ children }: Props) => {
                 <KeyboardAvoiderProvider>
                   <AuthProvider>
                     <AsyncProviders>
-                      <ToastsProvider>
-                        <PostHogProvider>
-                          <RevenueCatProvider>
-                            {children}
-                          </RevenueCatProvider>
-                        </PostHogProvider>
-                      </ToastsProvider>
+                      <ShareIntentProvider>
+                        <ToastsProvider>
+                          <PostHogProvider>
+                            <RevenueCatProvider>
+                              {children}
+                            </RevenueCatProvider>
+                          </PostHogProvider>
+                        </ToastsProvider>
+                      </ShareIntentProvider>
                     </AsyncProviders>
                   </AuthProvider>
                 </KeyboardAvoiderProvider>

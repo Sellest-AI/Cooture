@@ -173,7 +173,22 @@
       ],
       "expo-video",
       "expo-image",
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-share-intent",
+        {
+          "iosActivationRules": {
+            "NSExtensionActivationSupportsWebURLWithMaxCount": 1,
+            "NSExtensionActivationSupportsWebPageWithMaxCount": 1,
+            "NSExtensionActivationSupportsImageWithMaxCount": 1
+          },
+          "androidIntentFilters": [
+            "text/*",
+            "image/*"
+          ],
+          "iosHideView": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

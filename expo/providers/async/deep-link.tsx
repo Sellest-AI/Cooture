@@ -13,6 +13,9 @@ export function DeepLinkProvider() {
     if (!url || url === lastUrl.current) return;
     lastUrl.current = url;
 
+    // If URL is a share-intent URL, ignore it. The ShareIntentProvider will handle it and open the modal.
+    if (url.includes('://dataUrl=')) return;
+
     const { path, queryParams } = parse(url);
 
     // For App Links / Universal Links, we only need the path part
