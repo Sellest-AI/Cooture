@@ -167,18 +167,28 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples, guideline = 'de
 
                 const { ImageManipulator, SaveFormat } = await import('expo-image-manipulator');
 
-                const cropWidth = Math.round(photo.width / scale);
-                const cropHeight = Math.round(photo.height / scale);
-                const originX = Math.round((photo.width - cropWidth) / 2);
-                const originY = Math.round((photo.height - cropHeight) / 2);
+                const imageWidth = photo.width;
+                const imageHeight = photo.height;
+
+                // On some Android devices, width and height might be swapped compared to the portrait view
+                const isPortrait = imageHeight > imageWidth;
+                const actualWidth = isPortrait ? imageWidth : imageHeight;
+                const actualHeight = isPortrait ? imageHeight : imageWidth;
+
+                const cropWidth = Math.round(actualWidth / scale);
+                const cropHeight = Math.round(actualHeight / scale);
+
+                const originX = Math.round((imageWidth - cropWidth) / 2);
+                const originY = Math.round((imageHeight - cropHeight) / 2);
 
                 const manipulatedPhoto = await (await ImageManipulator.manipulate(photo.uri)
                   .crop({
-                    originX,
-                    originY,
+                    originX: Math.max(0, originX),
+                    originY: Math.max(0, originY),
                     width: cropWidth,
                     height: cropHeight,
-                  }).renderAsync())
+                  })
+                  .renderAsync())
                   .saveAsync({
                     format: SaveFormat.JPEG,
                     compress: 1,

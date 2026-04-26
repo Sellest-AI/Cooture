@@ -13,13 +13,16 @@ type Props = {
 }
 export const ModalAppearance = ({ currentPath }: Props) => {
   const { push } = useRouter(currentPath);
+  const { pathname } = useRoute.Path();
+
   const { isPending, hasFullAppearance } = useAppearance();
   const [open, setOpen] = useState(false);
 
   const checkStatus = useCallback(() => {
+    if (pathname !== currentPath) return;
     if (isPending) return;
     if (!hasFullAppearance) setOpen(true);
-  }, [isPending, hasFullAppearance]);
+  }, [isPending, pathname, currentPath, hasFullAppearance]);
 
   useRoute(currentPath, { onUpdate: () => { checkStatus(); } });
   useEffect(() => { checkStatus(); }, [checkStatus])
@@ -35,7 +38,7 @@ export const ModalAppearance = ({ currentPath }: Props) => {
         customBackIcon: 'x'
       }}
     >
-      <View>
+      <View style={{ paddingBottom: 8 }}>
         <View style={styles.imagesContainer}>
           <Image
             source={require('assets/placeholders/portraits/front-good.webp')}
