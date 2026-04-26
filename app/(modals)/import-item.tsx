@@ -1,5 +1,6 @@
+import { ModalHeader } from "@ui/modal";
 import { Text } from "@ui/text";
-import { useRouter } from "expo-router";
+import { Redirect, useRouter } from "expo-router";
 import { useShareIntentContext } from "expo-share-intent";
 import { Button, View } from "react-native";
 import { ROUTES } from "routes";
@@ -29,19 +30,15 @@ export default function Screen() {
   };
 
   // Safe fallback if opened without intent
-  if (!hasShareIntent) {
-    return (
-      <View style={{ flex: 1, padding: 24, justifyContent: 'center' }}>
-        <Text.Base>No item found to import</Text.Base>
-        <Button title="Go Back" onPress={() => router.back()} />
-      </View>
-    );
-  }
+  if (!hasShareIntent)
+    return (<Redirect href={ROUTES.HOME} />);
 
   return (
-    <View style={{ flex: 1, padding: 24, marginTop: 40, gap: 16 }}>
-      <Text.Base style={{ fontSize: 24, fontWeight: "bold" }}>Import Item</Text.Base>
-
+    <View style={{ flex: 1, padding: 12, gap: 16 }}>
+      <ModalHeader
+        customBackIcon="x"
+        title="Import item"
+      />
       {shareIntent.webUrl ? (
         <Text.Base>Found a Link to Import: {shareIntent.webUrl}</Text.Base>
       ) : shareIntent.files?.length ? (
