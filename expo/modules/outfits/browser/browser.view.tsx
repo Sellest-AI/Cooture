@@ -297,13 +297,14 @@ interface BrowserProps {
   onRouteChange?: (url: string) => void;
   /** Deactivated by default */
   autoExtractDelay?: number; // Optional delay in milliseconds before auto-extracting product info
+  defaultUrl?: string;
 }
 
 // History
 const BASE_URL = 'https://www.google.com';
 const latestUrlAtom = atom<string>(BASE_URL);
 
-export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goForwardRef, children, onRouteChange, onTouchStart, autoExtractDelay }: BrowserProps) => {
+export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goForwardRef, children, onRouteChange, onTouchStart, autoExtractDelay, defaultUrl }: BrowserProps) => {
   const webviewRef = useRef<WebView>(null);
   const captureRef = useRef<ViewShot>(null);
 
@@ -381,7 +382,7 @@ export const Browser = ({ onProductExtracted, extractProductRef, goBackRef, goFo
           <WebView
             ref={webviewRef}
             style={{ flex: 1 }}
-            source={{ uri: currentUrl }}
+            source={{ uri: defaultUrl ?? currentUrl }}
             onMessage={handleMessage}
             onNavigationStateChange={(navState) => {
               const url = navState.url.trim();

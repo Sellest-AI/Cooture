@@ -135,6 +135,7 @@ import type * as router_admin_items_fixColorsAction from "../router/admin/items/
 import type * as router_admin_outfits_regenerateCovers from "../router/admin/outfits/regenerateCovers.js";
 import type * as router_admin_presets_findByName from "../router/admin/presets/findByName.js";
 import type * as router_admin_presets_repairOne from "../router/admin/presets/repairOne.js";
+import type * as router_admin_users_addFakePremium from "../router/admin/users/addFakePremium.js";
 import type * as router_admin_users_approveWaitlist from "../router/admin/users/approveWaitlist.js";
 import type * as router_auth_getTestAccount from "../router/auth/getTestAccount.js";
 import type * as router_auth_linkStripeSubscription from "../router/auth/linkStripeSubscription.js";
@@ -414,6 +415,7 @@ declare const fullApi: ApiFromModules<{
   "router/admin/outfits/regenerateCovers": typeof router_admin_outfits_regenerateCovers;
   "router/admin/presets/findByName": typeof router_admin_presets_findByName;
   "router/admin/presets/repairOne": typeof router_admin_presets_repairOne;
+  "router/admin/users/addFakePremium": typeof router_admin_users_addFakePremium;
   "router/admin/users/approveWaitlist": typeof router_admin_users_approveWaitlist;
   "router/auth/getTestAccount": typeof router_auth_getTestAccount;
   "router/auth/linkStripeSubscription": typeof router_auth_linkStripeSubscription;

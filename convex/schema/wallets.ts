@@ -45,6 +45,7 @@ export const creditTransactions = defineTable({
     reason: v.optional(v.string()),
     claim: v.optional(v.object({ streakDay: v.number() })),
     generationId: v.optional(v.id("generations")),
+    itemId: v.optional(v.id("items")),
     adminId: v.optional(v.id("users")),
     refund: v.optional(v.object({
       originalTransactionId: v.optional(v.id("creditTransactions")),

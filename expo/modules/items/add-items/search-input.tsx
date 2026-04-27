@@ -29,7 +29,7 @@ export const SearchInput = ({ value, style, isLoading, onValueChange, onBlur }: 
       startIcon={isLoading ? Loader : Search}
       value={search}
       onChangeText={setSearch}
-      onBlur={() => onBlur?.(search)}
+      onBlur={(v) => onBlur?.(v)}
       placeholder="Search for items..."
       style={style}
       canClear

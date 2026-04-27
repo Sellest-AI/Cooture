@@ -28,6 +28,7 @@ export const userSizes = v.union(
 
 const userPlan = v.object({
   id: v.string(), // e.g., "COOTURE_PLUS"
+  cancelFunctionId: v.optional(v.id("_scheduled_functions")), // For scheduling plan cancellation (e.g., end of trial)
   renewalInterval: v.union(
     v.literal("weekly"),
     v.literal("monthly"),

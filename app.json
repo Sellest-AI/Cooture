@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "cooture",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
     "ios": {
       "supportsTablet": false,
       "usesAppleSignIn": true,
@@ -173,7 +173,26 @@
       ],
       "expo-video",
       "expo-image",
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-share-intent",
+        {
+          "iosActivationRules": {
+            "NSExtensionActivationSupportsWebURLWithMaxCount": 1,
+            "NSExtensionActivationSupportsWebPageWithMaxCount": 1,
+            "NSExtensionActivationSupportsImageWithMaxCount": 10,
+            "NSExtensionActivationSupportsText": true
+          },
+          "androidIntentFilters": [
+            "text/*",
+            "image/*"
+          ],
+          "androidMultiIntentFilters": [
+            "image/*"
+          ],
+          "iosHideView": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

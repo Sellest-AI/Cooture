@@ -81,6 +81,9 @@ const updatePrediction = async (ctx: MutationCtx, args: {
 }) => {
   const { prediction, imageId, videoId } = args;
 
+  // Don't allow updates to failed predictions
+  if (prediction.status === 'FAILED') return false;
+
   const hasResult = !!imageId || !!videoId || prediction.imageId || prediction.videoId;
 
   // Force REJECTED status if trying to accept without a result

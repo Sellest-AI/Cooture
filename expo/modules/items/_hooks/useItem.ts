@@ -30,7 +30,7 @@ export const useItem = (_id?: Id<'items'> | null) => {
 
 type PendingItem = {
   key: string;
-  url: string;
+  url?: string;
   name?: string;
   brand?: string;
   description?: string;

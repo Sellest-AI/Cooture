@@ -38,7 +38,7 @@ const AuthenticationGate = ({ enabled }: { enabled: boolean }) => {
   if (!enabled) return null;
   if (!user) return <LoadingView />;
 
-  const WAITLIST_PATHS_ALLOWED = ["/welcome/", "/avatar/"]
+  const WAITLIST_PATHS_ALLOWED = ["/welcome/", "/avatar/", "/upgrade"]
 
   if (isInWaitlist) {
     if (!WAITLIST_PATHS_ALLOWED.some(path => pathname.startsWith(path)))
@@ -48,7 +48,7 @@ const AuthenticationGate = ({ enabled }: { enabled: boolean }) => {
 
   if (!isInWaitlist && !user.username) return <Redirect href={ROUTES.EXTRA.AVATAR.PROFILE} />
 
-  if (!isInWaitlist && pathname.startsWith(ROUTES.WELCOME.WAIT_LIST)) return <Redirect href={ROUTES.TABS.FEED} />
+  if (!isInWaitlist && pathname.startsWith(ROUTES.WELCOME.WAIT_LIST)) return <Redirect href={ROUTES.TABS.DISCOVER} />
 
   if (pathname.startsWith(ROUTES.AUTH)) return <Redirect href={ROUTES.TABS.DISCOVER} />
 

@@ -25,8 +25,7 @@ export default function RemoveBackgroundScreen() {
 
   const [displayImage, setDisplayImage] = useState<string | null>(null);
   const [step, setStep] = useState<
-    'compressing' | 'removing' | 'uploading' | 'analyzing'>
-    ('removing');
+    'compressing' | 'removing' | 'uploading' | 'analyzing'>('removing');
 
   const { action: removeBackground } = useAction(api.llm.triggers.removeBackground.authed);
 
@@ -149,7 +148,7 @@ export default function RemoveBackgroundScreen() {
             <Image
               cachePolicy="none"
               source={{ uri: displayImage ?? imageScanned }}
-              contentFit={displayImage ? 'contain' : 'cover'}
+              contentFit={step === 'analyzing' ? 'contain' : 'cover'}
               style={{
                 aspectRatio: 3 / 4,
                 width: '100%',

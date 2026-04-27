@@ -20,6 +20,7 @@ export const ROUTES = {
     DAILY_STREAK: '/daily-streak',
     TURN_TO_VIDEO: '/turn-to-video',
     PREVIEW_ITEM: '/preview-item',
+    IMPORT_ITEM: '/import-item',
   },
   POST: {
     PATH: '/post/[id]',

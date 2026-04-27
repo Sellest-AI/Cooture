@@ -11,7 +11,10 @@ type Parameters = {
   channel?: 'public' | 'user';
 }
 
-export const useSearchItems = ({ query, category, bookmarked, channel = 'public', hexColor, extraHexColors }: Parameters) => {
+export const useSearchItems = ({ query: _query, category: _category, bookmarked, channel = 'public', hexColor, extraHexColors }: Parameters) => {
+  const query = _query.trim();
+  const category = _category?.trim();
+
   const { data: _items, isLoading: isItemsLoading } = useQueryCachedData(api.router.items.getAll.authed, { key: "getAllItems", filter: category ?? undefined });
   const { data: searchResults } = useQuery(api.router.items.searchMany.anon, query ? { query, filter: category ?? undefined } : 'skip');
 
@@ -19,7 +22,7 @@ export const useSearchItems = ({ query, category, bookmarked, channel = 'public'
   const { data: _bookmarkedItems, isPending: isBookmarkedItemsLoading } = useQuery(api.router.items.getMany.anon, bookmarked ? { itemIds: bookmarkedItemIds.map((b) => b.itemId).filter(notEmpty) } : 'skip');
 
   const extraColors = extraHexColors && extraHexColors.length > 0 ? extraHexColors : undefined;
-  const { results: colorResults, isLoading: isLoadingColorResults, status: colorStatus, loadMore: loadMoreColor } = usePaginatedQuery(api.router.items.searchByColor.anon, hexColor ? { hexColor, extraHexColors: extraColors, category: category ?? undefined } : 'skip', { initialNumItems: 24 });
+  const { results: colorResults, isLoading: isLoadingColorResults, status: colorStatus, loadMore: loadMoreColor } = usePaginatedQuery(api.router.items.searchByColor.anon, hexColor ? { hexColor, extraHexColors: extraColors, category } : 'skip', { initialNumItems: 24 });
 
   const hasQuery = query.length > 0;
   const isLoading = ((hasQuery && !searchResults) || isItemsLoading)

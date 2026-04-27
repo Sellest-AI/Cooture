@@ -66,10 +66,10 @@ export const TextInput = ({ className = "", style, startIcon, canClear, autoFocu
         }}
         onBlur={(e) => {
           if (!props.onBlur) return;
-          const value = (e.nativeEvent as unknown as { text: string }).text ??
-            e.currentTarget.nodeValue ?? props.value ?? '';
-          setValue(value.toString());
-          props.onBlur?.(value);
+          const _value = (e.nativeEvent as unknown as { text: string }).text ??
+            e.currentTarget.nodeValue ?? value ?? props.value ?? '';
+          setValue(_value.toString());
+          props.onBlur?.(_value);
         }}
         autoFocus={autoFocus}
         onLayout={autoFocus ? (e) => e.currentTarget.focus() : undefined}
