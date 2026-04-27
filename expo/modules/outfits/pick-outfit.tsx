@@ -71,6 +71,7 @@ export default function PickOutfitScreen({ header, canSkipText, preSelectedItemI
                   push(ROUTES.OUTFIT.NEW, {
                     params: { itemIds: preSelectedItemIds },
                     forwardRedirect: true,
+                    redirectTo: redirectTo,
                     resetNextRoute: true
                   })
                 }}
