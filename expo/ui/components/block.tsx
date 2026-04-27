@@ -162,6 +162,7 @@ export const Block = <T extends Variant>({ className = "", children, variant, st
           aspectRatio,
         },
         style?.alignSelf === 'stretch' ? { flex: 1 } : {},
+        { flex: style?.flex === 1 ? 1 : undefined },
         {
           overflow: 'hidden',
           borderRadius,
