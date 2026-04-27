@@ -26,7 +26,6 @@ const useShareIntent = () => {
   }
 
   const imageFiles = shareIntent.files || [];
-  console.log(shareIntent);
 
   return {
     imageFiles,
