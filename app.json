@@ -180,11 +180,14 @@
           "iosActivationRules": {
             "NSExtensionActivationSupportsWebURLWithMaxCount": 1,
             "NSExtensionActivationSupportsWebPageWithMaxCount": 1,
-            "NSExtensionActivationSupportsImageWithMaxCount": 1,
+            "NSExtensionActivationSupportsImageWithMaxCount": 10,
             "NSExtensionActivationSupportsText": true
           },
           "androidIntentFilters": [
             "text/*",
+            "image/*"
+          ],
+          "androidMultiIntentFilters": [
             "image/*"
           ],
           "iosHideView": true
