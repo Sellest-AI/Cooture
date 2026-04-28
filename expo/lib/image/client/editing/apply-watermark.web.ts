@@ -3,22 +3,22 @@ type Anchor = 'center' | 'bottom-right' | 'bottom-left' | 'top-right' | 'top-lef
 type Options = {
   watermarkUrl?: string;
   opacity?: number;
-  offsetPourcent?: number;
-  sizePourcent?: number;
+  offsetPercent?: number;
+  sizePercent?: number;
   anchor?: Anchor;
 };
 
 const DEFAULT_OPTIONS: Required<Options> = {
   watermarkUrl: '/watermark.png',
   opacity: 1,
-  sizePourcent: 6,
-  offsetPourcent: 3,
+  sizePercent: 6,
+  offsetPercent: 3,
   anchor: 'bottom-right',
 };
 
 export const applyWatermark = async (url: string, options?: Options): Promise<string> => {
   const _options = { ...DEFAULT_OPTIONS, ...options };
-  const { watermarkUrl, opacity, sizePourcent, offsetPourcent, anchor } = _options;
+  const { watermarkUrl, opacity, sizePercent, offsetPercent, anchor } = _options;
 
   const { StaticCanvas, FabricImage } = await import('fabric');
 
@@ -43,13 +43,13 @@ export const applyWatermark = async (url: string, options?: Options): Promise<st
 
   // Calculate watermark dimensions
   const aspectRatio = watermarkImage.getScaledWidth() / watermarkImage.getScaledHeight();
-  const watermarkHeight = Math.floor(Math.min(imageElement.width, imageElement.height) * (sizePourcent / 100));
+  const watermarkHeight = Math.floor(Math.min(imageElement.width, imageElement.height) * (sizePercent / 100));
   const watermarkWidth = Math.floor(watermarkHeight * aspectRatio);
 
   watermarkImage.scaleToWidth(watermarkWidth);
 
-  const _offsetPourcent = offsetPourcent / 100;
-  const offset = imageElement.width > imageElement.height ? (imageElement.width * _offsetPourcent) : (imageElement.height * _offsetPourcent);
+  const _offsetPercent = offsetPercent / 100;
+  const offset = imageElement.width > imageElement.height ? (imageElement.width * _offsetPercent) : (imageElement.height * _offsetPercent);
 
   // Calculate position based on anchor
   let watermarkX: number;

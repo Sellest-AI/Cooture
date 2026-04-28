@@ -13,23 +13,23 @@ type ItemPosition = Item['position'];
 
 type Column = {
   items: {
-    xPourcent: number;
-    yPourcent: number;
-    widthPourcent: number;
-    heightPourcent: number;
+    xPercent: number;
+    yPercent: number;
+    widthPercent: number;
+    heightPercent: number;
     zIndex: number;
     item: Item;
     position: 'top' | 'center' | 'bottom'
   }[];
-  xPourcent: number;
-  widthPourcent: number;
+  xPercent: number;
+  widthPercent: number;
 }
 
 type ColumnLimits = {
-  bottomPourcent: number;
-  topPourcent: number;
-  leftPourcent: number;
-  widthPourcent: number;
+  bottomPercent: number;
+  topPercent: number;
+  leftPercent: number;
+  widthPercent: number;
 }
 
 type ExtraItemProcessingData = {
@@ -43,10 +43,10 @@ type ExtraItemProcessingData = {
 }
 
 type ExtraItemProcessing = (data: ExtraItemProcessingData) => {
-  widthPourcent: number;
-  heightPourcent: number;
-  xPourcent: number;
-  yPourcent: number;
+  widthPercent: number;
+  heightPercent: number;
+  xPercent: number;
+  yPercent: number;
   zIndex: number;
   position: 'top' | 'center' | 'bottom';
 }
@@ -69,13 +69,13 @@ const compileColumn = (limits: ColumnLimits, items: Item[], extraItemProcessing:
       index,
     });
 
-    const { widthPourcent, heightPourcent, xPourcent, yPourcent, zIndex, position } = result;
+    const { widthPercent, heightPercent, xPercent, yPercent, zIndex, position } = result;
 
     columnItems.push({
-      xPourcent,
-      yPourcent,
-      widthPourcent,
-      heightPourcent,
+      xPercent,
+      yPercent,
+      widthPercent,
+      heightPercent,
       zIndex,
       item,
       position
@@ -84,8 +84,8 @@ const compileColumn = (limits: ColumnLimits, items: Item[], extraItemProcessing:
 
   return {
     items: columnItems.sort((a, b) => a.zIndex - b.zIndex),
-    xPourcent: limits.leftPourcent,
-    widthPourcent: limits.widthPourcent
+    xPercent: limits.leftPercent,
+    widthPercent: limits.widthPercent
   };
 }
 
@@ -133,101 +133,101 @@ const updateCover = async ({ items }: { items: Item[] }) => {
   const hasRightColumn = rightItems.length > 0 || accessoriesItems.length > 0;
 
   const leftColumn = compileColumn({
-    bottomPourcent: 5,
-    topPourcent: hasRightColumn ? 10 : 5,
-    leftPourcent: hasRightColumn ? 5 : 20,
-    widthPourcent: 45
+    bottomPercent: 5,
+    topPercent: hasRightColumn ? 10 : 5,
+    leftPercent: hasRightColumn ? 5 : 20,
+    widthPercent: 45
   }, leftItems, (data) => {
     const { isHorizontal, item, previousItem, limits, index, isLast, isFirst } = data;
 
-    const _widthPourcent = (isHorizontal && isLast) ? limits.widthPourcent * 1.2 : limits.widthPourcent;
-    const bagWidth = limits.widthPourcent * 0.8;
-    const widthPourcent = item.category === 'BAG' ? bagWidth : _widthPourcent;
+    const _widthPercent = (isHorizontal && isLast) ? limits.widthPercent * 1.2 : limits.widthPercent;
+    const bagWidth = limits.widthPercent * 0.8;
+    const widthPercent = item.category === 'BAG' ? bagWidth : _widthPercent;
 
-    const heightPourcent = (item.image.height / item.image.width) * limits.widthPourcent;
+    const heightPercent = (item.image.height / item.image.width) * limits.widthPercent;
 
-    const defaultY = previousItem?.yPourcent ?? (100 - limits.bottomPourcent);
-    const expectedY = defaultY - heightPourcent;
+    const defaultY = previousItem?.yPercent ?? (100 - limits.bottomPercent);
+    const expectedY = defaultY - heightPercent;
     const expectedYWhenLast = (isLast && index === 1 && isHorizontal) ? expectedY * 0.8 : expectedY;
-    const expectedYWhenLegwear = (item.position === 'LEGWEAR' && !isFirst) ? 100 - limits.bottomPourcent - (heightPourcent * 1.2) : expectedYWhenLast;
-    const yPourcent = Math.max(expectedYWhenLegwear, limits.topPourcent);
+    const expectedYWhenLegwear = (item.position === 'LEGWEAR' && !isFirst) ? 100 - limits.bottomPercent - (heightPercent * 1.2) : expectedYWhenLast;
+    const yPercent = Math.max(expectedYWhenLegwear, limits.topPercent);
 
     // Shoes must be a bit centered
     const hasAccessories = accessoriesItems.length > 0;
-    const xPourcent = item.position === 'SHOES' ?
-      limits.leftPourcent + (hasAccessories ? 7 : 15) : limits.leftPourcent;
+    const xPercent = item.position === 'SHOES' ?
+      limits.leftPercent + (hasAccessories ? 7 : 15) : limits.leftPercent;
 
     // Legwears always at the bottom
     const zIndex = item.position === 'LEGWEAR' ? 0 : leftItems.length - index;
 
     return {
       position: isLast ? 'top' : 'bottom',
-      widthPourcent,
-      heightPourcent,
-      xPourcent,
-      yPourcent,
+      widthPercent,
+      heightPercent,
+      xPercent,
+      yPercent,
       zIndex
     }
   });
 
   const rightColumn = compileColumn({
-    bottomPourcent: rightItems.length > 0 ? 10 : 25,
-    topPourcent: 5,
-    leftPourcent: 40,
-    widthPourcent: 57
+    bottomPercent: rightItems.length > 0 ? 10 : 25,
+    topPercent: 5,
+    leftPercent: 40,
+    widthPercent: 57
   }, rightItems, (data) => {
     const { item, previousItem, limits, index } = data;
-    const widthPourcent = limits.widthPourcent;
-    const heightPourcent = (item.image.height / item.image.width) * widthPourcent;
+    const widthPercent = limits.widthPercent;
+    const heightPercent = (item.image.height / item.image.width) * widthPercent;
 
-    const expectedYPourcent = limits.topPourcent + (previousItem?.heightPourcent ?? 0) * 0.5;
+    const expectedYPercent = limits.topPercent + (previousItem?.heightPercent ?? 0) * 0.5;
     // Center the item if it's the only one in the column
     const accessoryOffset = accessoriesItems.length > 0 ? (2 + (0.5 * accessoriesItems.length)) : 2;
-    const singleItemYPourcent = rightItems.length === 1 ? (100 - limits.bottomPourcent - heightPourcent) / accessoryOffset : expectedYPourcent;
+    const singleItemYPercent = rightItems.length === 1 ? (100 - limits.bottomPercent - heightPercent) / accessoryOffset : expectedYPercent;
 
-    const yPourcent = Math.min(singleItemYPourcent, 100 - limits.bottomPourcent);
+    const yPercent = Math.min(singleItemYPercent, 100 - limits.bottomPercent);
 
-    const xPourcent = limits.leftPourcent;
+    const xPercent = limits.leftPercent;
 
     const zIndex = index;
 
     return {
       position: 'center',
-      widthPourcent,
-      heightPourcent,
-      xPourcent,
-      yPourcent,
+      widthPercent,
+      heightPercent,
+      xPercent,
+      yPercent,
       zIndex
     }
   });
 
   const accessoriesColumn = compileColumn({
-    bottomPourcent: 10,
-    topPourcent: 30,
-    leftPourcent: 58,
-    widthPourcent: 30
+    bottomPercent: 10,
+    topPercent: 30,
+    leftPercent: 58,
+    widthPercent: 30
   }, accessoriesItems, (data) => {
     const { isHorizontal, item, previousItem, limits, index } = data;
-    const widthPourcent = isHorizontal ? limits.widthPourcent * 1.2 : limits.widthPourcent;
+    const widthPercent = isHorizontal ? limits.widthPercent * 1.2 : limits.widthPercent;
 
-    const minY = 100 - (limits.topPourcent + limits.bottomPourcent);
+    const minY = 100 - (limits.topPercent + limits.bottomPercent);
 
-    const expectedHeightPourcent = (item.image.height / item.image.width) * limits.widthPourcent;
-    const heightPourcent = Math.min(expectedHeightPourcent, minY);
+    const expectedHeightPercent = (item.image.height / item.image.width) * limits.widthPercent;
+    const heightPercent = Math.min(expectedHeightPercent, minY);
 
-    const expectedYPourcent = (100 - limits.bottomPourcent) - heightPourcent - (previousItem?.heightPourcent ?? 0);
-    const yPourcent = Math.max(expectedYPourcent, limits.topPourcent);
+    const expectedYPercent = (100 - limits.bottomPercent) - heightPercent - (previousItem?.heightPercent ?? 0);
+    const yPercent = Math.max(expectedYPercent, limits.topPercent);
 
-    const xPourcent = limits.leftPourcent;
+    const xPercent = limits.leftPercent;
 
     const zIndex = accessoriesItems.length - index;
 
     return {
       position: 'center',
-      widthPourcent,
-      heightPourcent,
-      xPourcent,
-      yPourcent,
+      widthPercent,
+      heightPercent,
+      xPercent,
+      yPercent,
       zIndex
     }
   });
@@ -235,11 +235,11 @@ const updateCover = async ({ items }: { items: Item[] }) => {
   const promises = [...rightColumn.items, ...accessoriesColumn.items, ...leftColumn.items]
 
   for await (const data of promises) {
-    const { xPourcent, yPourcent, widthPourcent, heightPourcent, item, position } = data;
-    const _left = Math.round((xPourcent / 100) * DIMENSIONS.width);
-    const _top = Math.round((yPourcent / 100) * DIMENSIONS.height);
-    const _width = Math.round((widthPourcent / 100) * DIMENSIONS.width);
-    const _height = Math.round((heightPourcent / 100) * DIMENSIONS.height);
+    const { xPercent, yPercent, widthPercent, heightPercent, item, position } = data;
+    const _left = Math.round((xPercent / 100) * DIMENSIONS.width);
+    const _top = Math.round((yPercent / 100) * DIMENSIONS.height);
+    const _width = Math.round((widthPercent / 100) * DIMENSIONS.width);
+    const _height = Math.round((heightPercent / 100) * DIMENSIONS.height);
 
     const left = Math.max(_left, 0);
     const top = Math.max(_top, 0);

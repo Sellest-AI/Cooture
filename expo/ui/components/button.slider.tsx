@@ -91,13 +91,13 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
   };
 
   const lastHaptic = useRef(0);
-  const triggerHaptic = (pourcent: number) => {
+  const triggerHaptic = (percent: number) => {
     const now = Date.now();
     if (now - lastHaptic.current < 100) return;
     lastHaptic.current = now;
     Haptics.impactAsync(
-      pourcent > 0.5 ? Haptics.ImpactFeedbackStyle.Heavy :
-        pourcent > 0.2 ? Haptics.ImpactFeedbackStyle.Medium :
+      percent > 0.5 ? Haptics.ImpactFeedbackStyle.Heavy :
+        percent > 0.2 ? Haptics.ImpactFeedbackStyle.Medium :
           Haptics.ImpactFeedbackStyle.Soft
     );
   };
@@ -121,8 +121,8 @@ export const ButtonSlider = ({ onComplete, startIcon, endIcon, children, disable
       translateX.setValue(value);
       currentX.current = value;
 
-      const pourcent = value / max;
-      triggerHaptic(pourcent);
+      const percent = value / max;
+      triggerHaptic(percent);
 
       if (value >= max * 0.95) {
         completeSlide(max, 180);
