@@ -130,16 +130,24 @@ export const WaitingBots = (props: SharedProps) => {
                   gap: 16,
                 }}
               >
-                <Image
-                  style={{
-                    width: 56,
-                    height: 56,
-                    borderRadius: 99,
-                    borderTopWidth: 1,
-                    borderColor: Colors.blur.medium,
+                <Pressable
+                  onPress={() => {
+                    push(ROUTES.USER.PATH, {
+                      pathParams: { id: i.userId }
+                    })
                   }}
-                  source={i.user?.image ?? require('assets/backgrounds/dark-gradient.png')}
-                />
+                >
+                  <Image
+                    style={{
+                      width: 56,
+                      height: 56,
+                      borderRadius: 99,
+                      borderTopWidth: 1,
+                      borderColor: Colors.blur.medium,
+                    }}
+                    source={i.user?.image ?? require('assets/backgrounds/dark-gradient.png')}
+                  />
+                </Pressable>
                 <View style={{ flex: 1 }}>
                   <Text.Sm color={Colors.neutral[400]} style={{ marginBottom: 2 }}>
                     @{i.user?.username}
