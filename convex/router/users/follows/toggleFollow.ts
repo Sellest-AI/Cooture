@@ -39,7 +39,6 @@ const toggleFollow = async (
     await ctx.db.insert("follows", {
       followerId: args.userId,
       followingId: targetUserId,
-      createdAt: Date.now(),
     });
 
     // Notify the user that they have a new follower

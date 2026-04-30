@@ -57,7 +57,6 @@ const sharedFunction = async (ctx: MutationCtx, args: { userId: Id<'users'>, val
       generationId,
       outfitId,
       type,
-      createdAt: Date.now(),
     });
     // Schedule stats update
     await updateStats(ctx, { generationId, outfitId }, 1);
