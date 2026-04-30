@@ -1,16 +1,8 @@
-import { useAccount } from "@/lib/convex/auth";
-import { Redirect, Slot, Stack } from "expo-router";
+import { Slot, Stack } from "expo-router";
 import { Platform } from "react-native";
-import { ROUTES } from "routes";
 import { Colors } from "theme";
 
 export default function Layout() {
-  const { isAdmin } = useAccount.Admin();
-
-  if (!isAdmin) return (
-    <Redirect href={ROUTES.TABS.FEED} />
-  )
-
   return (
     <Stack
       screenOptions={{

@@ -8,8 +8,9 @@ import { defineApp } from "convex/server";
 const app = defineApp();
 
 app.use(migrations);
+// app.use(workflow);
 app.use(cache);
 app.use(agent);
-app.use(rag)
+app.use(rag);
 
 export default app;
