@@ -31,6 +31,7 @@ export const _internal = internalAction({
       storage: ctx.storage,
       vectorSearch: ctx.vectorSearch,
       userId: undefined,
+      meta: ctx.meta,
     }
 
     const [prompt, categories] = (await Promise.all([

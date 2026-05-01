@@ -41,7 +41,7 @@
     "@t3-oss/env-core": "^0.13.10",
     "ai": "^5.0.121",
     "clsx": "^2.1.1",
-    "convex": "^1.31.4",
+    "convex": "^1.31.7",
     "convex-helpers": "^0.1.109",
     "expo": "~55.0.6",
     "expo-apple-authentication": "~55.0.8",
