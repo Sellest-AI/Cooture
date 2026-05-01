@@ -30,6 +30,7 @@ export const _internal = internalAction({
       storage: ctx.storage,
       vectorSearch: ctx.vectorSearch,
       userId: undefined,
+      meta: ctx.meta,
     }
 
     const object = await itemCategorizer.handler(toolCtx, { imageUrl: image.url, extractText, metadata });

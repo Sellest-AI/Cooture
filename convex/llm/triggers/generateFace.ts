@@ -26,6 +26,7 @@ export const admin = adminAction({
       storage: ctx.storage,
       vectorSearch: ctx.vectorSearch,
       userId: ctx.userId,
+      meta: ctx.meta,
     }
 
     const result = await faceGenerator.handler(toolCtx, {
