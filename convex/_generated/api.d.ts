@@ -9,9 +9,9 @@
  */
 
 import type * as auth from "../auth.js";
-import type * as cron_feedRecentUpdate from "../cron/feedRecentUpdate.js";
-import type * as cron_updateStatistics from "../cron/updateStatistics.js";
 import type * as crons from "../crons.js";
+import type * as crons_feedRecentUpdate from "../crons/feedRecentUpdate.js";
+import type * as crons_updateStatistics from "../crons/updateStatistics.js";
 import type * as env from "../env.js";
 import type * as functions_credits_canPay from "../functions/credits/canPay.js";
 import type * as functions_credits_createUserWallet from "../functions/credits/createUserWallet.js";
@@ -285,7 +285,7 @@ import type * as schema_videos from "../schema/videos.js";
 import type * as schema_waitlist from "../schema/waitlist.js";
 import type * as schema_wallets from "../schema/wallets.js";
 import type * as utils_isAuthorized from "../utils/isAuthorized.js";
-import type * as workflows_statistics_update from "../workflows/statistics/update.js";
+import type * as workflows_config from "../workflows/config.js";
 
 import type {
   ApiFromModules,
@@ -295,9 +295,9 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
-  "cron/feedRecentUpdate": typeof cron_feedRecentUpdate;
-  "cron/updateStatistics": typeof cron_updateStatistics;
   crons: typeof crons;
+  "crons/feedRecentUpdate": typeof crons_feedRecentUpdate;
+  "crons/updateStatistics": typeof crons_updateStatistics;
   env: typeof env;
   "functions/credits/canPay": typeof functions_credits_canPay;
   "functions/credits/createUserWallet": typeof functions_credits_createUserWallet;
@@ -571,7 +571,7 @@ declare const fullApi: ApiFromModules<{
   "schema/waitlist": typeof schema_waitlist;
   "schema/wallets": typeof schema_wallets;
   "utils/isAuthorized": typeof utils_isAuthorized;
-  "workflows/statistics/update": typeof workflows_statistics_update;
+  "workflows/config": typeof workflows_config;
 }>;
 
 /**

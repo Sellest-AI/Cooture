@@ -110,7 +110,7 @@ export const _internal = internalMutation({
 
     // If there are more results, schedule another iteration
     if (!result.isDone)
-      await ctx.scheduler.runAfter(0, internal.cron.feedRecentUpdate._internal,
+      await ctx.scheduler.runAfter(0, internal.crons.feedRecentUpdate._internal,
         { minAgeHours, maxAgeHours, cursor: result.continueCursor });
 
     return {
