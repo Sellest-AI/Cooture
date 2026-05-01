@@ -25,11 +25,11 @@ crons.interval(
   { minAgeHours: 72, maxAgeHours: FEED_CONFIG.FREEZE_AGE_HOURS + 24 }
 )
 
-// Update statistics every 6 hours
+// Update statistics every 24 hours
 crons.interval(
   "update admin statistics",
-  { hours: 6 }, // every 6 hours
-  internal.crons.updateStatistics.updateAll,
+  { hours: 24 }, // every 24 hours
+  internal.crons.updateStatistics._internal,
 )
 
 export default crons;

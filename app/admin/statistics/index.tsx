@@ -1,35 +1,57 @@
 import { api, useQuery } from "@/lib/convex/client";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { ModalHeader } from "@ui/modal";
+import { SafeAreaView } from "@ui/safe-area-view";
 import { SafeScrollView } from "@ui/safe-scroll-view";
+import { Tabs } from "@ui/tabs";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 
 type TimeRange = {
-  startAt?: number;
-  endAt: number;
+  durationMs?: number;
   label: string;
 }
 
 const TIME_RANGES: TimeRange[] = [
-  { startAt: undefined, endAt: Date.now(), label: "All Time" },
-  { startAt: Date.now() - 30 * 24 * 60 * 60 * 1000, endAt: Date.now(), label: "30 Days" },
-  { startAt: Date.now() - 7 * 24 * 60 * 60 * 1000, endAt: Date.now(), label: "7 Days" },
-  { startAt: Date.now() - 24 * 60 * 60 * 1000, endAt: Date.now(), label: "24 Hours" },
+  { durationMs: undefined, label: "All Time" },
+  { durationMs: 30 * 24 * 60 * 60 * 1000, label: "Month" },
+  { durationMs: 7 * 24 * 60 * 60 * 1000, label: "Week" },
+  { durationMs: 24 * 60 * 60 * 1000, label: "Today" },
 ];
 
 export default function StatisticsScreen() {
   const [selectedRange, setSelectedRange] = useState<number>(2); // Default to 7 days
   const currentRange = TIME_RANGES[selectedRange];
   const { data: stats, isPending } = useQuery(api.router.admin.statistics.getAll.admin, {
-    startAt: currentRange.startAt,
-    endAt: currentRange.endAt,
+    durationMs: currentRange.durationMs,
   });
 
   // Handle loading state
   if (isPending || !stats) {
+    return (
+      <SafeAreaView
+        style={{
+          paddingTop: Platform.OS !== 'ios' ? 12 : 0,
+          paddingHorizontal: 12,
+          paddingBottom: TOTAL_TABS_SPACE,
+          flex: 1,
+        }}
+        edges={{ bottom: 'android' }}
+      >
+        <ModalHeader
+          title="Statistics"
+          onBack={router.canGoBack() ? router.back : undefined}
+        />
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if ("error" in stats) {
     return (
       <SafeScrollView
         contentContainerStyle={{
@@ -43,15 +65,35 @@ export default function StatisticsScreen() {
           title="Statistics"
           onBack={router.canGoBack() ? router.back : undefined}
         />
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <ActivityIndicator size="large" />
+
+        {/* Time Range Selector */}
+        <View style={{ flexDirection: 'row', marginBottom: 16, gap: 8, flexWrap: 'wrap' }}>
+          {TIME_RANGES.map((range, index) => (
+            <Text.Base
+              key={range.label}
+              onPress={() => setSelectedRange(index)}
+              style={{
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                borderRadius: 6,
+                backgroundColor: selectedRange === index ? '#007AFF' : '#E5E5EA',
+                color: selectedRange === index ? 'white' : 'black',
+              }}
+            >
+              {range.label}
+            </Text.Base>
+          ))}
+        </View>
+
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+          <Text.Base style={{ textAlign: "center", color: 'red' }}>{stats.error}</Text.Base>
         </View>
       </SafeScrollView>
     );
   }
 
   // TypeScript knows stats is a statistics object here
-  const statsData = stats as any;
+  const statsData = stats;
   const { users, content, engagement, aiUsage, snapshotAt, startAt, endAt } = statsData;
 
   return (
@@ -68,24 +110,15 @@ export default function StatisticsScreen() {
         onBack={router.canGoBack() ? router.back : undefined}
       />
 
-      {/* Time Range Selector */}
-      <View style={{ flexDirection: 'row', marginBottom: 16, gap: 8, flexWrap: 'wrap' }}>
-        {TIME_RANGES.map((range, index) => (
-          <Text.Base
-            key={range.label}
-            onPress={() => setSelectedRange(index)}
-            style={{
-              paddingHorizontal: 12,
-              paddingVertical: 6,
-              borderRadius: 6,
-              backgroundColor: selectedRange === index ? '#007AFF' : '#E5E5EA',
-              color: selectedRange === index ? 'white' : 'black',
-            }}
-          >
-            {range.label}
-          </Text.Base>
-        ))}
-      </View>
+      {/* Tabs */}
+      <Tabs
+        activeTab={`${TIME_RANGES[selectedRange].durationMs}`}
+        tabs={TIME_RANGES.map(r => ({ label: r.label, value: `${r.durationMs}` }))}
+        onTabChange={(tab) => {
+          const index = TIME_RANGES.findIndex(r => `${r.durationMs}` === tab);
+          setSelectedRange(index);
+        }}
+      />
 
       {/* User Stats */}
       <View style={{ marginBottom: 20 }}>
@@ -160,11 +193,13 @@ export default function StatisticsScreen() {
           <Text.Lg style={{ marginBottom: 4 }}>Generations</Text.Lg>
           <StatRow label="Total" value={aiUsage.generations.total} indent />
           <StatRow label="Completed" value={aiUsage.generations.completed} indent />
+          <StatRow label="Accepted" value={aiUsage.generations.accepted} indent />
+          <StatRow label="Rejected" value={aiUsage.generations.rejected} indent />
           <StatRow label="Failed" value={aiUsage.generations.failed} indent />
           <StatRow label="In Review" value={aiUsage.generations.inReview} indent />
 
-          <StatRow label="Tokens Used" value={aiUsage.tokensUsed} />
-          <StatRow label="Credits Used" value={aiUsage.creditsUsed} />
+          {/* <StatRow label="Tokens Used" value={aiUsage.tokensUsed} />
+          <StatRow label="Credits Used" value={aiUsage.creditsUsed} /> */}
         </View>
       </View>
 

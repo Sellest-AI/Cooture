@@ -48,8 +48,6 @@ import type * as functions_presets_index from "../functions/presets/index.js";
 import type * as functions_presets_sanitizePresets from "../functions/presets/sanitizePresets.js";
 import type * as functions_quests_index from "../functions/quests/index.js";
 import type * as functions_quests_updateQuest from "../functions/quests/updateQuest.js";
-import type * as functions_statistics_index from "../functions/statistics/index.js";
-import type * as functions_statistics_updateStats from "../functions/statistics/updateStats.js";
 import type * as functions_subscriptions_getUserSubscription from "../functions/subscriptions/getUserSubscription.js";
 import type * as functions_subscriptions_index from "../functions/subscriptions/index.js";
 import type * as functions_subscriptions_isSubscriptionActive from "../functions/subscriptions/isSubscriptionActive.js";
@@ -286,6 +284,10 @@ import type * as schema_waitlist from "../schema/waitlist.js";
 import type * as schema_wallets from "../schema/wallets.js";
 import type * as utils_isAuthorized from "../utils/isAuthorized.js";
 import type * as workflows_config from "../workflows/config.js";
+import type * as workflows_database_countByField from "../workflows/database/countByField.js";
+import type * as workflows_database_countDocuments from "../workflows/database/countDocuments.js";
+import type * as workflows_database_countUserMetrics from "../workflows/database/countUserMetrics.js";
+import type * as workflows_statistics_update from "../workflows/statistics/update.js";
 
 import type {
   ApiFromModules,
@@ -334,8 +336,6 @@ declare const fullApi: ApiFromModules<{
   "functions/presets/sanitizePresets": typeof functions_presets_sanitizePresets;
   "functions/quests/index": typeof functions_quests_index;
   "functions/quests/updateQuest": typeof functions_quests_updateQuest;
-  "functions/statistics/index": typeof functions_statistics_index;
-  "functions/statistics/updateStats": typeof functions_statistics_updateStats;
   "functions/subscriptions/getUserSubscription": typeof functions_subscriptions_getUserSubscription;
   "functions/subscriptions/index": typeof functions_subscriptions_index;
   "functions/subscriptions/isSubscriptionActive": typeof functions_subscriptions_isSubscriptionActive;
@@ -572,6 +572,10 @@ declare const fullApi: ApiFromModules<{
   "schema/wallets": typeof schema_wallets;
   "utils/isAuthorized": typeof utils_isAuthorized;
   "workflows/config": typeof workflows_config;
+  "workflows/database/countByField": typeof workflows_database_countByField;
+  "workflows/database/countDocuments": typeof workflows_database_countDocuments;
+  "workflows/database/countUserMetrics": typeof workflows_database_countUserMetrics;
+  "workflows/statistics/update": typeof workflows_statistics_update;
 }>;
 
 /**

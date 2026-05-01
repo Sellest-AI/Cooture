@@ -81,12 +81,15 @@ export const statistics = defineTable({
   aiUsage: v.object({
     generations: v.object({
       total: v.number(),
+      loading: v.number(),
       completed: v.number(),
+      accepted: v.number(),
+      rejected: v.number(),
       failed: v.number(),
       inReview: v.number(),
     }),
-    tokensUsed: v.number(),
-    creditsUsed: v.number(),
+    tokensUsed: v.optional(v.number()),
+    creditsUsed: v.optional(v.number()),
   }),
 })
   .index("by_time_range", ["startAt", "endAt"])
