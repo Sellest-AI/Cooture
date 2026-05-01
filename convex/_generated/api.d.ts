@@ -9,8 +9,9 @@
  */
 
 import type * as auth from "../auth.js";
-import type * as cron_feedRecentUpdate from "../cron/feedRecentUpdate.js";
 import type * as crons from "../crons.js";
+import type * as crons_feedRecentUpdate from "../crons/feedRecentUpdate.js";
+import type * as crons_updateStatistics from "../crons/updateStatistics.js";
 import type * as env from "../env.js";
 import type * as functions_credits_canPay from "../functions/credits/canPay.js";
 import type * as functions_credits_createUserWallet from "../functions/credits/createUserWallet.js";
@@ -135,6 +136,7 @@ import type * as router_admin_items_fixColorsAction from "../router/admin/items/
 import type * as router_admin_outfits_regenerateCovers from "../router/admin/outfits/regenerateCovers.js";
 import type * as router_admin_presets_findByName from "../router/admin/presets/findByName.js";
 import type * as router_admin_presets_repairOne from "../router/admin/presets/repairOne.js";
+import type * as router_admin_statistics_getAll from "../router/admin/statistics/getAll.js";
 import type * as router_admin_users_addFakePremium from "../router/admin/users/addFakePremium.js";
 import type * as router_admin_users_approveWaitlist from "../router/admin/users/approveWaitlist.js";
 import type * as router_auth_getTestAccount from "../router/auth/getTestAccount.js";
@@ -274,12 +276,18 @@ import type * as schema_outfits from "../schema/outfits.js";
 import type * as schema_presets from "../schema/presets.js";
 import type * as schema_quests from "../schema/quests.js";
 import type * as schema_safety from "../schema/safety.js";
+import type * as schema_statistics from "../schema/statistics.js";
 import type * as schema_subscriptions from "../schema/subscriptions.js";
 import type * as schema_users from "../schema/users.js";
 import type * as schema_videos from "../schema/videos.js";
 import type * as schema_waitlist from "../schema/waitlist.js";
 import type * as schema_wallets from "../schema/wallets.js";
 import type * as utils_isAuthorized from "../utils/isAuthorized.js";
+import type * as workflows_config from "../workflows/config.js";
+import type * as workflows_database_countByField from "../workflows/database/countByField.js";
+import type * as workflows_database_countDocuments from "../workflows/database/countDocuments.js";
+import type * as workflows_database_countUserMetrics from "../workflows/database/countUserMetrics.js";
+import type * as workflows_statistics_update from "../workflows/statistics/update.js";
 
 import type {
   ApiFromModules,
@@ -289,8 +297,9 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
-  "cron/feedRecentUpdate": typeof cron_feedRecentUpdate;
   crons: typeof crons;
+  "crons/feedRecentUpdate": typeof crons_feedRecentUpdate;
+  "crons/updateStatistics": typeof crons_updateStatistics;
   env: typeof env;
   "functions/credits/canPay": typeof functions_credits_canPay;
   "functions/credits/createUserWallet": typeof functions_credits_createUserWallet;
@@ -415,6 +424,7 @@ declare const fullApi: ApiFromModules<{
   "router/admin/outfits/regenerateCovers": typeof router_admin_outfits_regenerateCovers;
   "router/admin/presets/findByName": typeof router_admin_presets_findByName;
   "router/admin/presets/repairOne": typeof router_admin_presets_repairOne;
+  "router/admin/statistics/getAll": typeof router_admin_statistics_getAll;
   "router/admin/users/addFakePremium": typeof router_admin_users_addFakePremium;
   "router/admin/users/approveWaitlist": typeof router_admin_users_approveWaitlist;
   "router/auth/getTestAccount": typeof router_auth_getTestAccount;
@@ -554,12 +564,18 @@ declare const fullApi: ApiFromModules<{
   "schema/presets": typeof schema_presets;
   "schema/quests": typeof schema_quests;
   "schema/safety": typeof schema_safety;
+  "schema/statistics": typeof schema_statistics;
   "schema/subscriptions": typeof schema_subscriptions;
   "schema/users": typeof schema_users;
   "schema/videos": typeof schema_videos;
   "schema/waitlist": typeof schema_waitlist;
   "schema/wallets": typeof schema_wallets;
   "utils/isAuthorized": typeof utils_isAuthorized;
+  "workflows/config": typeof workflows_config;
+  "workflows/database/countByField": typeof workflows_database_countByField;
+  "workflows/database/countDocuments": typeof workflows_database_countDocuments;
+  "workflows/database/countUserMetrics": typeof workflows_database_countUserMetrics;
+  "workflows/statistics/update": typeof workflows_statistics_update;
 }>;
 
 /**

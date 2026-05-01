@@ -28,6 +28,7 @@ const subscriptionUsages = v.object({
   tokensUsed: v.number(), // Number of tokens already used.
 })
 
+/** @deprecated */
 export const subscriptions = defineTable({
   userId: v.id('users'),
   isActive: v.boolean(),
