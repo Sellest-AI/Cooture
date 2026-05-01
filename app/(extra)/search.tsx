@@ -6,7 +6,7 @@ import { Badge } from "@ui/badge";
 import { Block } from "@ui/block";
 import { CardItem, Collection } from "@ui/cards";
 import { FlashList } from "@ui/flat-list";
-import { ArrowLeft, Search } from "@ui/icons";
+import { ArrowLeft, Loader, Search } from "@ui/icons";
 import { Pressable } from "@ui/pressable";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { Skeleton } from "@ui/skeleton";
@@ -173,7 +173,7 @@ export default function Screen() {
           </Block>
         </Pressable>
         <TextInput
-          startIcon={Search}
+          startIcon={showLoading ? Loader : Search}
           canClear
           autoFocus
           value={search}
