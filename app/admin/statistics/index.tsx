@@ -1,5 +1,7 @@
 import { api, useQuery } from "@/lib/convex/client";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
+import { Block } from "@ui/block";
+import { Check, X } from "@ui/icons";
 import { ModalHeader } from "@ui/modal";
 import { SafeAreaView } from "@ui/safe-area-view";
 import { SafeScrollView } from "@ui/safe-scroll-view";
@@ -8,6 +10,7 @@ import { Text } from "@ui/text";
 import { router } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
+import { Colors } from "theme";
 
 type TimeRange = {
   durationMs?: number;
@@ -104,6 +107,7 @@ export default function StatisticsScreen() {
         paddingBottom: TOTAL_TABS_SPACE
       }}
       edges={{ bottom: 'android' }}
+      stickyHeaderIndices={[1]}
     >
       <ModalHeader
         title="Statistics"
@@ -111,86 +115,88 @@ export default function StatisticsScreen() {
       />
 
       {/* Tabs */}
-      <Tabs
-        activeTab={`${TIME_RANGES[selectedRange].durationMs}`}
-        tabs={TIME_RANGES.map(r => ({ label: r.label, value: `${r.durationMs}` }))}
-        onTabChange={(tab) => {
-          const index = TIME_RANGES.findIndex(r => `${r.durationMs}` === tab);
-          setSelectedRange(index);
-        }}
-      />
+      <View style={{ marginBottom: 16, paddingTop: 8 }}>
+        <Tabs
+          activeTab={`${TIME_RANGES[selectedRange].durationMs}`}
+          tabs={TIME_RANGES.map(r => ({ label: r.label, value: `${r.durationMs}` }))}
+          onTabChange={(tab) => {
+            const index = TIME_RANGES.findIndex(r => `${r.durationMs}` === tab);
+            setSelectedRange(index);
+          }}
+        />
+      </View>
+
+      {/* Content Stats */}
+      <View style={{ marginBottom: 20, marginTop: 16 }}>
+        <Text.H3 color={Colors.neutral[50]}>Content</Text.H3>
+        <Block style={{ padding: 12, marginTop: 12 }} variant="blur">
+          <Text.Lg style={{ marginBottom: 4 }} color={Colors.neutral[400]}>Items</Text.Lg>
+          <StatRow label="Total" value={content.items.total} indent />
+          <StatRow label="New" value={content.items.new} indent />
+
+          <Text.Lg style={{ marginTop: 16, marginBottom: 4 }} color={Colors.neutral[400]}>Outfits</Text.Lg>
+          <StatRow label="Total" value={content.outfits.total} indent />
+          <StatRow label="New" value={content.outfits.new} indent />
+
+          <Text.Lg style={{ marginTop: 16, marginBottom: 4 }} color={Colors.neutral[400]}>Generations</Text.Lg>
+          <StatRow label="Total" value={content.generations.total} indent />
+          <StatRow label="New" value={content.generations.new} indent />
+          <StatRow label="Completed" value={content.generations.completed} indent />
+
+          <Text.Lg style={{ marginTop: 16, marginBottom: 4 }} color={Colors.neutral[400]}>Videos</Text.Lg>
+          <StatRow label="Total" value={content.videos.total} indent />
+          <StatRow label="New" value={content.videos.new} indent />
+        </Block>
+      </View>
 
       {/* User Stats */}
-      <View style={{ marginBottom: 20 }}>
-        <Text.H3>Users</Text.H3>
-        <View style={{ backgroundColor: 'white', borderRadius: 8, padding: 12 }}>
+      <View style={{ marginBottom: 20, marginTop: 16 }}>
+        <Text.H3 color={Colors.neutral[50]}>Users</Text.H3>
+        <Block style={{ padding: 12, marginTop: 12 }} variant="blur">
           <StatRow label="Total Users" value={users.total} />
           <StatRow label="New Registrations" value={users.newRegistrations} />
           <StatRow label="Active" value={users.active} />
           <StatRow label="With Subscriptions" value={users.withSubscriptions} />
 
-          <Text.Lg style={{ marginTop: 8, marginBottom: 4 }}>By Role</Text.Lg>
+          <Text.Lg style={{ marginTop: 16, marginBottom: 4 }} color={Colors.neutral[400]}>By Role</Text.Lg>
           <StatRow label="Admin" value={users.byRole.admin} indent />
           <StatRow label="User" value={users.byRole.user} indent />
           <StatRow label="Guest" value={users.byRole.guest} indent />
           <StatRow label="Bot" value={users.byRole.bot} indent />
 
-          <Text.Lg style={{ marginTop: 8, marginBottom: 4 }}>By Status</Text.Lg>
+          <Text.Lg style={{ marginTop: 16, marginBottom: 4 }} color={Colors.neutral[400]}>By Status</Text.Lg>
           <StatRow label="Active" value={users.byStatus.active} indent />
           <StatRow label="Inactive" value={users.byStatus.inactive} indent />
           <StatRow label="Flagged" value={users.byStatus.flagged} indent />
           <StatRow label="Suspended" value={users.byStatus.suspended} indent />
-        </View>
-      </View>
-
-      {/* Content Stats */}
-      <View style={{ marginBottom: 20 }}>
-        <Text.H3>Content</Text.H3>
-        <View style={{ backgroundColor: 'white', borderRadius: 8, padding: 12 }}>
-          <Text.Lg style={{ marginBottom: 4 }}>Items</Text.Lg>
-          <StatRow label="Total" value={content.items.total} indent />
-          <StatRow label="New" value={content.items.new} indent />
-
-          <Text.Lg style={{ marginTop: 8, marginBottom: 4 }}>Outfits</Text.Lg>
-          <StatRow label="Total" value={content.outfits.total} indent />
-          <StatRow label="New" value={content.outfits.new} indent />
-
-          <Text.Lg style={{ marginTop: 8, marginBottom: 4 }}>Generations</Text.Lg>
-          <StatRow label="Total" value={content.generations.total} indent />
-          <StatRow label="New" value={content.generations.new} indent />
-          <StatRow label="Completed" value={content.generations.completed} indent />
-
-          <Text.Lg style={{ marginTop: 8, marginBottom: 4 }}>Videos</Text.Lg>
-          <StatRow label="Total" value={content.videos.total} indent />
-          <StatRow label="New" value={content.videos.new} indent />
-        </View>
+        </Block>
       </View>
 
       {/* Engagement Stats */}
-      <View style={{ marginBottom: 20 }}>
-        <Text.H3>Engagement</Text.H3>
-        <View style={{ backgroundColor: 'white', borderRadius: 8, padding: 12 }}>
-          <Text.Lg style={{ marginBottom: 4 }}>Likes</Text.Lg>
+      <View style={{ marginBottom: 20, marginTop: 16 }}>
+        <Text.H3 color={Colors.neutral[50]}>Engagement</Text.H3>
+        <Block style={{ padding: 12, marginTop: 12 }} variant="blur">
+          <Text.Lg style={{ marginBottom: 4 }} color={Colors.neutral[400]}>Likes</Text.Lg>
           <StatRow label="Total" value={engagement.likes.total} indent />
           <StatRow label="New" value={engagement.likes.new} indent />
           <StatRow label="Generations" value={engagement.likes.byType.generation} indent />
           <StatRow label="Outfits" value={engagement.likes.byType.outfit} indent />
 
-          <Text.Lg style={{ marginTop: 8, marginBottom: 4 }}>Follows</Text.Lg>
+          <Text.Lg style={{ marginTop: 16, marginBottom: 4 }} color={Colors.neutral[400]}>Follows</Text.Lg>
           <StatRow label="Total" value={engagement.follows.total} indent />
           <StatRow label="New" value={engagement.follows.new} indent />
 
-          <Text.Lg style={{ marginTop: 8, marginBottom: 4 }}>Bookmarks</Text.Lg>
+          <Text.Lg style={{ marginTop: 16, marginBottom: 4 }} color={Colors.neutral[400]}>Bookmarks</Text.Lg>
           <StatRow label="Total" value={engagement.bookmarks.total} indent />
           <StatRow label="New" value={engagement.bookmarks.new} indent />
-        </View>
+        </Block>
       </View>
 
       {/* AI Usage Stats */}
-      <View style={{ marginBottom: 20 }}>
-        <Text.H3>AI Usage</Text.H3>
-        <View style={{ backgroundColor: 'white', borderRadius: 8, padding: 12 }}>
-          <Text.Lg style={{ marginBottom: 4 }}>Generations</Text.Lg>
+      <View style={{ marginBottom: 20, marginTop: 16 }}>
+        <Text.H3 color={Colors.neutral[50]}>AI Usage</Text.H3>
+        <Block style={{ padding: 12, marginTop: 12 }} variant="blur">
+          <Text.Lg style={{ marginBottom: 4 }} color={Colors.neutral[400]}>Generations</Text.Lg>
           <StatRow label="Total" value={aiUsage.generations.total} indent />
           <StatRow label="Completed" value={aiUsage.generations.completed} indent />
           <StatRow label="Accepted" value={aiUsage.generations.accepted} indent />
@@ -200,14 +206,120 @@ export default function StatisticsScreen() {
 
           {/* <StatRow label="Tokens Used" value={aiUsage.tokensUsed} />
           <StatRow label="Credits Used" value={aiUsage.creditsUsed} /> */}
-        </View>
+        </Block>
       </View>
 
+      <Block
+        variant="blur"
+        style={{
+          marginTop: 0,
+          marginBottom: 16,
+          gap: 8,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingHorizontal: 16,
+          overflow: 'hidden',
+          backgroundColor: Colors.blur.dark,
+          height: 48,
+          borderRadius: 20,
+        }}>
+        <X color={Colors.neutral[400]} size={24} />
+        <View style={{
+          flex: 1,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 16,
+          overflow: 'hidden'
+        }}>
+          <View style={{ flex: 1, alignItems: 'flex-end' }}>
+            <View
+              style={{
+                height: '100%',
+                width: `${(aiUsage.generations.rejected / aiUsage.generations.completed) * 120}%`,
+                backgroundColor: Colors.neutral[400],
+                borderTopLeftRadius: 16,
+                borderBottomLeftRadius: 16,
+              }}
+            />
+          </View>
+          <View style={{ flex: 1, alignItems: 'flex-start' }}>
+            <View
+              style={{
+                height: '100%',
+                width: `${(aiUsage.generations.accepted / aiUsage.generations.completed) * 120}%`,
+                backgroundColor: Colors.primary[500],
+                borderTopRightRadius: 16,
+                borderBottomRightRadius: 16,
+              }}
+            />
+          </View>
+        </View>
+        <Check color={Colors.primary[500]} size={24} />
+      </Block>
+      <Text.Sm style={{ color: Colors.neutral[400], textAlign: 'center' }}>
+        {`Acceptance Rate: ${aiUsage.generations.completed > 0 ? ((aiUsage.generations.accepted / aiUsage.generations.completed) * 100).toFixed(2) : 'N/A'}%`}
+      </Text.Sm>
+
+      <Block
+        variant="blur"
+        style={{
+          marginTop: 16,
+          marginBottom: 16,
+          gap: 16,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingHorizontal: 16,
+          overflow: 'hidden',
+          backgroundColor: Colors.blur.dark,
+          height: 48,
+          borderRadius: 20,
+        }}>
+        <X color={Colors.destructive[500]} size={24} />
+        <View style={{
+          flex: 1,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 16,
+          overflow: 'hidden'
+        }}>
+          <View style={{ flex: 1, alignItems: 'flex-end' }}>
+            <View
+              style={{
+                height: '100%',
+                width: `${(aiUsage.generations.failed / aiUsage.generations.completed) * 100}%`,
+                backgroundColor: Colors.destructive[500],
+                borderTopLeftRadius: 16,
+                borderBottomLeftRadius: 16,
+              }}
+            />
+          </View>
+          <View style={{ flex: 1, alignItems: 'flex-start' }}>
+            <View
+              style={{
+                height: '100%',
+                width: `${(aiUsage.generations.completed / aiUsage.generations.completed) * 100}%`,
+                backgroundColor: Colors.primary[500],
+                borderTopRightRadius: 16,
+                borderBottomRightRadius: 16,
+              }}
+            />
+          </View>
+        </View>
+        <Check color={Colors.primary[500]} size={24} />
+      </Block>
+      <Text.Sm style={{ color: Colors.neutral[400], textAlign: 'center' }}>
+        {`Failure Rate: ${aiUsage.generations.completed > 0 ? ((aiUsage.generations.failed / aiUsage.generations.completed) * 100).toFixed(2) : 'N/A'}%`}
+      </Text.Sm>
+
       {/* Time Range & Snapshot */}
-      <Text.Sm style={{ color: '#8E8E93', textAlign: 'center', marginTop: 8 }}>
+      <Text.Sm style={{ color: Colors.neutral[400], textAlign: 'center', marginTop: 28 }}>
         {startAt ? `From: ${new Date(startAt).toLocaleDateString()}` : 'From: Beginning of time'} - {`To: ${new Date(endAt).toLocaleDateString()}`}
       </Text.Sm>
-      <Text.Sm style={{ color: '#8E8E93', textAlign: 'center' }}>
+      <Text.Sm style={{ color: Colors.neutral[400], textAlign: 'center' }}>
         Last updated: {new Date(snapshotAt).toLocaleString()}
       </Text.Sm>
     </SafeScrollView>
@@ -222,8 +334,8 @@ function StatRow({ label, value, indent }: { label: string; value: number; inden
       paddingVertical: 4,
       paddingLeft: indent ? 12 : 0,
     }}>
-      <Text.Base style={{ color: indent ? '#8E8E93' : '#000' }}>{label}</Text.Base>
-      <Text.Base style={{ fontWeight: '500' }}>{value.toLocaleString()}</Text.Base>
+      <Text.Base color={Colors.neutral[200]}>{label}</Text.Base>
+      <Text.Base style={{ fontWeight: '500' }} color={Colors.neutral[50]}>{value.toLocaleString()}</Text.Base>
     </View>
   );
 }
