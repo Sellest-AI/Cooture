@@ -1,11 +1,14 @@
 import { useFocusEffect } from "expo-router";
 import { ComponentProps, ReactNode, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Animated, Dimensions, Platform, ScrollView, View, ViewStyle } from "react-native";
+import Reanimated, { interpolate, useAnimatedStyle, useSharedValue } from "react-native-reanimated";
 import { Colors } from "theme";
 import { Image } from "./image";
 import { LinearGradient } from "./linear-gradient";
 import { ParallaxScrollContext } from "./parallax-scroll-view.context";
 import { SafeAreaView, useSafeAreaInsets } from "./safe-area-view";
+
+const AnimatedImage = Platform.OS === 'ios' ? Reanimated.Image : Animated.createAnimatedComponent(Image);
 
 type Props = {
   ref?: React.Ref<ScrollView>;
@@ -26,6 +29,8 @@ type Props = {
   style?: ViewStyle;
   /** Scroll key to control scroll position */
   scrollKey?: string | number;
+  /** Allow negative scroll */
+  enableExpandHeader?: boolean;
 };
 
 export const ParallaxScrollView = ({
@@ -43,6 +48,7 @@ export const ParallaxScrollView = ({
   contentContainerStyle,
   showsVerticalScrollIndicator = false,
   locked = false,
+  enableExpandHeader = false,
   style,
 
 }: Props) => {
@@ -63,34 +69,59 @@ export const ParallaxScrollView = ({
   }, []));
 
   const scrollY = useRef(new Animated.Value(0)).current;
-  const headerTranslateY = scrollY.interpolate({
-    inputRange: [0, headerHeight],
-    outputRange: [0, -headerHeight / 2],
-    extrapolate: 'clamp',
-  });
 
   // For content inside ScrollView: counteract natural scroll to create parallax
   const headerContentParallax = scrollY.interpolate({
-    inputRange: [0, headerHeight],
-    outputRange: [0, headerHeight / 2], // Positive to slow down natural scroll
+    inputRange: [-headerHeight, 0, headerHeight],
+    outputRange: [-headerHeight * 1.2, 0, headerHeight / 2], // Positive to slow down natural scroll
     extrapolate: 'clamp',
   });
 
   const headerOpacity = scrollY.interpolate({
-    inputRange: [0, headerHeight / 1.3, headerHeight],
-    outputRange: [1, 0.05, 0],
+    inputRange: [-headerHeight / 4, 0, headerHeight / 1.3, headerHeight],
+    outputRange: [0, 1, 0.05, 0],
+    extrapolate: 'clamp',
+  });
+
+  const backgroundImageOpacity = Number((headerBackgroundImageStyle as { opacity?: number })?.opacity) || 1;
+  const headerBackgroundImageOpacity = scrollY.interpolate({
+    inputRange: [-headerHeight / 4, 0, headerHeight / 1.3, headerHeight],
+    outputRange: [1.1, backgroundImageOpacity, 0.05, 0],
     extrapolate: 'clamp',
   });
 
   const headerBackgroundScale = scrollY.interpolate({
-    inputRange: [0, headerHeight / 2.5],
-    outputRange: [1, 1.02],
+    inputRange: [-headerHeight, 0, headerHeight / 2.5],
+    outputRange: [1.1, 1, 1.02],
     extrapolate: 'clamp',
   });
 
+  const scrollYReanimated = useSharedValue(0);
+  useEffect(() => {
+    const listener = scrollY.addListener(({ value }) => {
+      scrollYReanimated.value = value;
+    });
+    return () => scrollY.removeListener(listener);
+  }, [scrollY, scrollYReanimated]);
+  const headerAnimatedStyle = useAnimatedStyle(() => ({
+    height: interpolate(
+      scrollYReanimated.value,
+      [-headerHeight, 0],
+      [headerHeight * 2, headerHeight],
+      'clamp'
+    ),
+    transform: [{
+      translateY: interpolate(
+        scrollYReanimated.value,
+        [0, headerHeight],
+        [0, -headerHeight / 2],
+        'clamp'
+      )
+    }]
+  }));
+
   const { bottom: _bottom } = useSafeAreaInsets();
-  const headerHeightRuntime = headerHeight;
-  const headerOffset = headerHeightRuntime - contentNegativeSpace;
+  const headerOffset = headerHeight - contentNegativeSpace;
   const bottom = Platform.OS === 'android' ? _bottom : 0;
 
   // Scroll to top when scrollKey changes
@@ -103,25 +134,25 @@ export const ParallaxScrollView = ({
   return (
     <View style={{ flex: 1, ...style }}>
       {/* Parallax Background Header */}
-      <Animated.View
-        style={{
+      <Reanimated.View
+        style={[{
           position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
-          height: headerHeightRuntime,
-          transform: [{ translateY: headerTranslateY }],
+          height: headerHeight,
           zIndex: 0,
           overflow: 'hidden',
-        }}
+          paddingTop: layoutToggle,
+        }, headerAnimatedStyle]}
         pointerEvents="none"
       >
-        <Animated.View style={{
+        <Animated.View style={[{
           position: 'absolute',
           inset: 0,
-          opacity: headerOpacity,
+          opacity: headerBackgroundImageOpacity,
           transform: [{ scale: headerBackgroundScale }],
-        }}>
+        }]}>
           {headerBackground && <View style={{
             position: 'absolute',
             inset: 0,
@@ -129,15 +160,23 @@ export const ParallaxScrollView = ({
             {headerBackground}
           </View>}
           {headerBackgroundImage && (
-            <Image
-              source={headerBackgroundImage}
+            <AnimatedImage
+              source={{
+                uri: headerBackgroundImage.toString(),
+                cache: 'force-cache'
+              }}
               style={[{
                 position: 'absolute',
                 width: '100%',
                 height: '100%',
                 paddingTop: layoutToggle,
-              }, headerBackgroundImageStyle]}
+              },
+                headerBackgroundImageStyle,
+              { opacity: 1 }
+              ]}
               blurRadius={headerBackgroundImageStyle?.blurRadius ?? 0}
+              // DISABLED: reanimated wraps react native component and not expo image
+              // Expo image causes black bar on ios
               contentPosition={headerBackgroundImagePosition}
               contentFit="cover"
             />
@@ -169,7 +208,7 @@ export const ParallaxScrollView = ({
             opacity: 0.8
           }}
         />}
-      </Animated.View>
+      </Reanimated.View>
 
       {/* Scrollable Content */}
       <Animated.ScrollView
@@ -182,7 +221,8 @@ export const ParallaxScrollView = ({
           { useNativeDriver: true }
         )}
         scrollEventThrottle={16}
-        bounces={false}
+        bounces={enableExpandHeader}
+        overScrollMode={enableExpandHeader ? 'always' : 'never'}
         nestedScrollEnabled={true}
       >
         {/* Interactive Header Content */}
@@ -214,7 +254,7 @@ export const ParallaxScrollView = ({
               flex: 1,
               marginTop: -contentNegativeSpace,
               height: locked ?
-                Dimensions.get('screen').height - headerHeightRuntime + contentNegativeSpace - bottom
+                Dimensions.get('screen').height - headerHeight + contentNegativeSpace - bottom
                 : undefined,
             }}>
             <View style={{
