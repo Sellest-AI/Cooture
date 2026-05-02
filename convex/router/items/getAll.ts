@@ -53,6 +53,7 @@ export const _internal_query_1 = internalQuery({
         ...item,
         image
       });
+      i++;
     }
 
     return detailedItems;
