@@ -121,12 +121,15 @@ const EXTRACT_PRODUCT_INFO = `
     let modifiedUrl = url;
     
     // Handle imwidth?= or width?= patterns
-    modifiedUrl = modifiedUrl.replace(/imwidth\?=[^&]*/g, 'imwidth?=1024');
-    modifiedUrl = modifiedUrl.replace(/width\?=[^&]*/g, 'width?=1024');
+    modifiedUrl = modifiedUrl.replace(/imwidth\\?=[^&]*/g, 'imwidth?=1024');
+    modifiedUrl = modifiedUrl.replace(/width\\?=[^&]*/g, 'width?=1024');
     
     // Also handle &width= and &imwidth= patterns
     modifiedUrl = modifiedUrl.replace(/[&?]imwidth=[^&]*/g, '&imwidth=1024');
     modifiedUrl = modifiedUrl.replace(/[&?]width=[^&]*/g, '&width=1024');
+    
+    // Handle &w= pattern (e.g. Zara). Removing it returns the full image.
+    modifiedUrl = modifiedUrl.replace(/&w=[^&]*/g, '').replace(/\\?w=[^&]*&/, '?').replace(/\\?w=[^&]*$/, '');
     
     return modifiedUrl;
   }
@@ -162,19 +165,38 @@ const EXTRACT_PRODUCT_INFO = `
     // Store images with their dimensions for sorting
     const imgElements = document.querySelectorAll('img');
     imgElements.forEach(img => {
-      const src = getFullSizeImageUrl(img.src);
+      let src = img.currentSrc || img.src || img.getAttribute('data-src');
+
+      // Look for picture source sibling if src is missing or empty
+      if (!src || src.includes('data:image')) {
+        const picture = img.closest('picture');
+        if (picture) {
+          const source = picture.querySelector('source[srcset]');
+          if (source) {
+            const srcset = source.getAttribute('srcset');
+            if (srcset) {
+              const srcs = srcset.split(',').map(s => s.trim().split(' ')[0]);
+              src = srcs[srcs.length - 1];
+            }
+          }
+        }
+      }
+
+      src = getFullSizeImageUrl(src);
       const alt = img.alt || '';
       const width = img.naturalWidth || img.width;
       const height = img.naturalHeight || img.height;
       
       // Filter out small images (likely icons/logos) and already included meta images
-      if (src && width > 300 && height > 300 && !metaImages.find(i => i.url === src)) {
+      if (src && src.startsWith('http') && width > 300 && height > 300 && !metaImages.find(i => i.url === src)) {
         const imageData = { url: src, width, height, size: width * height };
         
         // Separate images with product-related keywords
+        const className = typeof img.className === 'string' ? img.className : '';
         const isProductImage = alt.toLowerCase().includes('product') ||
                                src.toLowerCase().includes('product') ||
-                               img.className.toLowerCase().includes('product');
+                               className.toLowerCase().includes('product') ||
+                               !!img.closest('[class*="product-detail"], [class*="product_detail"], [class*="gallery"], [class*="carousel"]');
         
         if (isProductImage && !productImages.find(i => i.url === src)) {
           productImages.push(imageData);
@@ -188,11 +210,11 @@ const EXTRACT_PRODUCT_INFO = `
     productImages.sort((a, b) => b.size - a.size);
     regularImages.sort((a, b) => b.size - a.size);
     
-    // Combine in priority order: product images, regular images, meta images
+    // Combine in priority order: product images, meta images, regular images
     const allImages = [
       ...productImages.map(i => ({ url: i.url, width: i.width, height: i.height })),
-      ...regularImages.map(i => ({ url: i.url, width: i.width, height: i.height })),
       ...metaImages,
+      ...regularImages.map(i => ({ url: i.url, width: i.width, height: i.height })),
     ];
     
     // Return unique images by URL, limit to top 10

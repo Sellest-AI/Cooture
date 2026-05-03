@@ -70,19 +70,20 @@ const ExtractItemBrowser = ({ onGoBack }: SharedProps) => {
           const item = data.items?.[0];
           if (!item) return;
 
-          setItem({
+          setItem((_item) => ({
             url: sourceUrl,
             name: item.title,
             brand: item.brand ?? '',
             description: item.description ?? '',
-            images: item.images
-              .map((data) => ({ ...data, url: data.url!, selected: false }))
-          })
+            images: (_item?.images ?? []).concat(item.images
+              .map((data) => ({ ...data, url: data.url!, selected: false })))
+              .filter((data, i, arr) => data.url && arr.findIndex(d => d.url === data.url) === i) // unique by url
+          }))
         }}
       /></View>}
       {!item && <View style={{ height: 512 }}><LoadingBlock type="logo" /></View>}
       {item && <FlashList
-        data={item?.images.toReversed()}
+        data={item?.images}
         numColumns={2}
         keyExtractor={(item) => item.url}
         showsVerticalScrollIndicator={false}
@@ -109,6 +110,7 @@ const ExtractItemBrowser = ({ onGoBack }: SharedProps) => {
               borderRadius: 12,
             }}>
               <Image
+                transition={false}
                 source={item.url}
                 contentFit="cover"
                 style={{
