@@ -32,7 +32,7 @@ export type BrowserProductData = {
 
 // JavaScript code to extract product information from the current webpage
 const EXTRACT_PRODUCT_INFO = `
-(function() {
+(async function() {
   // Helper function to get meta tag content
   function getMetaContent(name) {
     const meta = document.querySelector('meta[name="' + name + '"]') || 
@@ -117,25 +117,45 @@ const EXTRACT_PRODUCT_INFO = `
   function getFullSizeImageUrl(url) {
     if (!url) return url;
     
-    // Replace width/imwidth parameters with 1024
     let modifiedUrl = url;
     
-    // Handle imwidth?= or width?= patterns
-    modifiedUrl = modifiedUrl.replace(/imwidth\\?=[^&]*/g, 'imwidth?=1024');
-    modifiedUrl = modifiedUrl.replace(/width\\?=[^&]*/g, 'width?=1024');
-    
-    // Also handle &width= and &imwidth= patterns
-    modifiedUrl = modifiedUrl.replace(/[&?]imwidth=[^&]*/g, '&imwidth=1024');
-    modifiedUrl = modifiedUrl.replace(/[&?]width=[^&]*/g, '&width=1024');
-    
-    // Handle &w= pattern (e.g. Zara). Removing it returns the full image.
-    modifiedUrl = modifiedUrl.replace(/&w=[^&]*/g, '').replace(/\\?w=[^&]*&/, '?').replace(/\\?w=[^&]*$/, '');
-    
+    // Cut off ANY parameters (&, ?, #) that come after a standard image extension
+    // e.g. .jpg&imwidth=1024 -> .jpg
+    const extMatch = modifiedUrl.match(/(\\.(jpg|jpeg|png|webp|avif|gif))([&?#].*)$/i);
+    if (extMatch) {
+      modifiedUrl = modifiedUrl.substring(0, extMatch.index + extMatch[1].length);
+    } else if (modifiedUrl.includes('?')) {
+      modifiedUrl = modifiedUrl.split('?')[0];
+    }
+
+    // Handle Shein thumbnails that are built into the actual filename
+    modifiedUrl = modifiedUrl.replace(/_thumbnail_\\d+x/g, '');
+
     return modifiedUrl;
   }
   
+  // Load image to get its actual natural dimensions
+  function getOriginalImageSize(url) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const timeoutId = setTimeout(() => resolve(null), 2000); // 2s timeout
+      
+      img.onload = () => {
+        clearTimeout(timeoutId);
+        resolve({ width: img.naturalWidth, height: img.naturalHeight });
+      };
+      
+      img.onerror = () => {
+        clearTimeout(timeoutId);
+        resolve(null);
+      };
+      
+      img.src = url;
+    });
+  }
+  
   // Extract images (prioritize larger, product-related images)
-  function getImages() {
+  async function getImages() {
     const metaImages = [];
     const productImages = [];
     const regularImages = [];
@@ -161,9 +181,10 @@ const EXTRACT_PRODUCT_INFO = `
       });
     }
     
-    // Third priority: Look for product images or large images in the page
-    // Store images with their dimensions for sorting
+    // Collect potential images from the document
     const imgElements = document.querySelectorAll('img');
+    const imagePromises = [];
+    
     imgElements.forEach(img => {
       let src = img.currentSrc || img.src || img.getAttribute('data-src');
 
@@ -183,26 +204,40 @@ const EXTRACT_PRODUCT_INFO = `
       }
 
       src = getFullSizeImageUrl(src);
-      const alt = img.alt || '';
-      const width = img.naturalWidth || img.width;
-      const height = img.naturalHeight || img.height;
       
-      // Filter out small images (likely icons/logos) and already included meta images
-      if (src && src.startsWith('http') && width > 300 && height > 300 && !metaImages.find(i => i.url === src)) {
-        const imageData = { url: src, width, height, size: width * height };
-        
-        // Separate images with product-related keywords
+      if (src && src.startsWith('http') && !metaImages.find(i => i.url === src)) {
+        const alt = img.alt || '';
         const className = typeof img.className === 'string' ? img.className : '';
         const isProductImage = alt.toLowerCase().includes('product') ||
                                src.toLowerCase().includes('product') ||
                                className.toLowerCase().includes('product') ||
                                !!img.closest('[class*="product-detail"], [class*="product_detail"], [class*="gallery"], [class*="carousel"]');
         
-        if (isProductImage && !productImages.find(i => i.url === src)) {
-          productImages.push(imageData);
-        } else if (!regularImages.find(i => i.url === src)) {
-          regularImages.push(imageData);
-        }
+        imagePromises.push(
+          getOriginalImageSize(src).then(size => {
+            if (size && size.width > 200 && size.height > 200) {
+              return { 
+                url: src, 
+                width: size.width, 
+                height: size.height, 
+                size: size.width * size.height,
+                isProduct: isProductImage
+              };
+            }
+            return null;
+          })
+        );
+      }
+    });
+    
+    // Wait for all image sizes to be measured
+    const resolvedImages = (await Promise.all(imagePromises)).filter(Boolean);
+    
+    resolvedImages.forEach(img => {
+      if (img.isProduct && !productImages.find(i => i.url === img.url)) {
+        productImages.push(img);
+      } else if (!regularImages.find(i => i.url === img.url)) {
+        regularImages.push(img);
       }
     });
     
@@ -297,7 +332,7 @@ const EXTRACT_PRODUCT_INFO = `
         title: getTitle(),
         brand: getBrand(),
         description: getDescription(),
-        images: getImages(),
+        images: await getImages(),
         url: window.location.href
       }]
     };

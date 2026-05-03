@@ -53,6 +53,7 @@ const ExtractItemBrowser = ({ onGoBack }: SharedProps) => {
   } | null>(null);
 
   const imageSelected = item?.images.find(i => i.selected);
+  const hasImages = item?.images && item.images.length > 0;
 
   return (
     <View style={{ flex: 1 }}>
@@ -81,8 +82,8 @@ const ExtractItemBrowser = ({ onGoBack }: SharedProps) => {
           }))
         }}
       /></View>}
-      {!item && <View style={{ height: 512 }}><LoadingBlock type="logo" /></View>}
-      {item && <FlashList
+      {!hasImages && <View style={{ height: 512 }}><LoadingBlock type="logo" /></View>}
+      {hasImages && <FlashList
         data={item?.images}
         numColumns={2}
         keyExtractor={(item) => item.url}
@@ -119,6 +120,7 @@ const ExtractItemBrowser = ({ onGoBack }: SharedProps) => {
                   aspectRatio: 3 / 4,
                   borderRadius: 12,
                   opacity: item.selected ? 0.8 : 1,
+                  backgroundColor: Colors.neutral[400]
                 }}
               />
             </View>
