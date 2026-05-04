@@ -12,9 +12,9 @@ export const useSafety = () => {
 
   type ContentRatingParams = {
     contentRating?: ContentRating,
-    item?: { contentRating: ContentRating },
-    outfit?: { contentRating: ContentRating },
-    preset?: { contentRating: ContentRating },
+    item?: { _id?: Id<'items'>, contentRating: ContentRating },
+    outfit?: { _id?: Id<'outfits'>, contentRating: ContentRating },
+    preset?: { _id?: Id<'presets'>, contentRating: ContentRating },
   }
   const isNsfw = (params: ContentRatingParams) => {
     const contentRating = params.contentRating ?? params.item?.contentRating
@@ -37,9 +37,12 @@ export const useSafety = () => {
     if (!getBlockedContents) return false; // Default to not hidden until loaded
 
     if (params.userId && getBlockedContents.blockedUsers.includes(params.userId)) return true;
+    if (params.outfit?._id && getBlockedContents.reportedOutfits.includes(params.outfit._id)) return true;
     if (params.outfitId && getBlockedContents.reportedOutfits.includes(params.outfitId)) return true;
     if (params.generationId && getBlockedContents.reportedGenerations.includes(params.generationId)) return true;
+    if (params.preset?._id && getBlockedContents.reportedPresets.includes(params.preset._id)) return true;
     if (params.presetId && getBlockedContents.reportedPresets.includes(params.presetId)) return true;
+    if (params.item?._id && getBlockedContents.reportedItems.includes(params.item._id)) return true;
     if (params.itemId && getBlockedContents.reportedItems.includes(params.itemId)) return true;
     if (params.itemIds && params.itemIds.some(itemId => getBlockedContents.reportedItems.includes(itemId))) return true;
 

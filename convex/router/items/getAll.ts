@@ -5,6 +5,7 @@ import { components, internal } from "../../_generated/api";
 import { Doc, Id } from "../../_generated/dataModel";
 import { ActionCtx, internalAction, internalQuery } from "../../_generated/server";
 import { getImage, GetImageDoc } from "../../functions/images";
+import { extractPosition, Position } from "../../functions/items";
 import { authAction, publicAction } from "../../procedures";
 
 const cache = new ActionCache(components.actionCache, {
@@ -13,7 +14,11 @@ const cache = new ActionCache(components.actionCache, {
   ttl: 1000 * 60 * 5, // 5 minutes
 });
 
-type ReturnType = (Doc<'items'> & { image: NonNullable<GetImageDoc>, ownedByUser?: boolean })[]
+type ReturnType = (Doc<'items'> & {
+  image: NonNullable<GetImageDoc>,
+  ownedByUser?: boolean,
+  position: Position
+})[]
 
 const sharedArgs = { filter: v.optional(v.string()) }
 
@@ -47,10 +52,12 @@ export const _internal_query_1 = internalQuery({
       if (!matches) continue;
 
       const image = await getImage(ctx, item.imageId);
+      const position = extractPosition(item.category);
       if (!image) continue;
 
       detailedItems.push({
         ...item,
+        position,
         image
       });
       i++;
@@ -74,10 +81,12 @@ export const _internal_query_2 = internalQuery({
 
     const detailedItems = await Promise.all(userItems.map(async (item) => {
       const image = await getImage(ctx, item.imageId);
+      const position = extractPosition(item.category);
       if (!image) return null;
       return {
         ...item,
         image,
+        position,
         ownedByUser: true,
       }
     }));
