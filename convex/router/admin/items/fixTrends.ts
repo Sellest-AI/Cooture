@@ -3,7 +3,7 @@ import { internalMutation } from "../../../procedures";
 
 export const _internal = internalMutation({
   handler: async (ctx) => {
-    const items = await ctx.db.query("items").order('desc').take(50);
+    const items = await ctx.db.query("items").order('desc').collect();
 
     for (const item of items) {
       if (item.trendTags) continue;
