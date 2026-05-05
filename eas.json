@@ -23,7 +23,8 @@
         "simulator": false,
         "image": "latest"
       },
-      "channel": "development"
+      "channel": "development",
+      "node": "22.13.0"
     },
     "preview": {
       "distribution": "store",
@@ -63,7 +64,8 @@
         "EXPO_PUBLIC_POSTHOG_KEY": "phc_xQpVK6aCST8T6NQdrkCGXV78gy7Nt7s2g5FXTds3oV28",
         "EXPO_PUBLIC_POSTHOG_HOST": "https://eu.i.posthog.com"
       },
-      "channel": "production"
+      "channel": "production",
+      "node": "22.13.0"
     }
   },
   "submit": {
