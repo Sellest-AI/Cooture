@@ -53,6 +53,7 @@ const ExtractItemBrowser = ({ onGoBack }: SharedProps) => {
   } | null>(null);
 
   const imageSelected = item?.images.find(i => i.selected);
+  const hasImages = item?.images && item.images.length > 0;
 
   return (
     <View style={{ flex: 1 }}>
@@ -70,19 +71,20 @@ const ExtractItemBrowser = ({ onGoBack }: SharedProps) => {
           const item = data.items?.[0];
           if (!item) return;
 
-          setItem({
+          setItem((_item) => ({
             url: sourceUrl,
             name: item.title,
             brand: item.brand ?? '',
             description: item.description ?? '',
-            images: item.images
-              .map((data) => ({ ...data, url: data.url!, selected: false }))
-          })
+            images: (_item?.images ?? []).concat(item.images
+              .map((data) => ({ ...data, url: data.url!, selected: false })))
+              .filter((data, i, arr) => data.url && arr.findIndex(d => d.url === data.url) === i) // unique by url
+          }))
         }}
       /></View>}
-      {!item && <View style={{ height: 512 }}><LoadingBlock type="logo" /></View>}
-      {item && <FlashList
-        data={item?.images.toReversed()}
+      {!hasImages && <View style={{ height: 512 }}><LoadingBlock type="logo" /></View>}
+      {hasImages && <FlashList
+        data={item?.images}
         numColumns={2}
         keyExtractor={(item) => item.url}
         showsVerticalScrollIndicator={false}
@@ -109,6 +111,7 @@ const ExtractItemBrowser = ({ onGoBack }: SharedProps) => {
               borderRadius: 12,
             }}>
               <Image
+                transition={false}
                 source={item.url}
                 contentFit="cover"
                 style={{
@@ -117,6 +120,7 @@ const ExtractItemBrowser = ({ onGoBack }: SharedProps) => {
                   aspectRatio: 3 / 4,
                   borderRadius: 12,
                   opacity: item.selected ? 0.8 : 1,
+                  backgroundColor: Colors.neutral[400]
                 }}
               />
             </View>

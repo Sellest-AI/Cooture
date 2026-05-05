@@ -41,16 +41,15 @@ export const authed = authMutation({
 
       if (itemsToAdd.length > 0 || itemsToRemove.length > 0) {
         await ctx.scheduler.runAfter(0, internal.router.outfits.updateCover._internal, { outfitId: args.outfitId });
+        await ctx.scheduler.runAfter(0, internal.router.outfits.updateTags._internal, { outfitId: args.outfitId });
       }
     }
 
-    if (!!args.name) {
-      await ctx.db.patch(args.outfitId, removeUndefinedKeys({
-        name: args.name,
-        updatedAt: Date.now(),
-        contentRating
-      }))
-    }
+    await ctx.db.patch(args.outfitId, removeUndefinedKeys({
+      name: args.name,
+      updatedAt: Date.now(),
+      contentRating,
+    }))
 
     return true;
   }

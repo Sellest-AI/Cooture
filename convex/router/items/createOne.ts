@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+import { internal } from "../../_generated/api";
 import { internalAction } from "../../_generated/server";
 import { createItem } from "../../functions/items/createItem";
 import { adminAction, authAction, internalMutation } from "../../procedures";
@@ -62,3 +63,35 @@ export const _internal_mutation = internalMutation({
     return itemId;
   }
 })
+
+export const _internal_trend_action = internalAction({
+  args: {
+    itemId: v.id("items"),
+  },
+  handler: async (ctx, { itemId }) => {
+    const item = await ctx.runQuery(internal.router.items.getOne._internal, { itemId });
+    if (!item) throw new Error("Item not found");
+
+    const trends = await ctx.runAction(internal.llm.triggers.trendExtractor._internal, {
+      items: [{
+        name: item.name,
+        brand: item.brand,
+        description: item.description,
+        features: item.features,
+        category: item.category,
+        weatherTags: item.weatherTags,
+        mainColors: item.mainColors,
+        colorTones: item.colorTones,
+        materialFeel: item.materialFeel,
+        materials: item.materials,
+        // ⚠️ We don't share styles because they can be wrongly interpreted as trends by the model.
+        // styles: item.styles,
+      }]
+    });
+
+    await ctx.runMutation(internal.router.items.editOne._internal, {
+      itemId,
+      trends: trends.filter((t) => t.confidence > 0.7).map((t) => t.trend),
+    });
+  }
+});

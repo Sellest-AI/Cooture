@@ -26,8 +26,10 @@ const extractPostDetails = async (ctx: MutationCtx, feedScore: Doc<'feedScores'>
   const hasVideo = predictions.some(pred => pred.videoId && pred.status === 'ACCEPTED');
   const hasPreset = !!generation?.presetId;
   const hasOutfit = !!generation?.outfitId;
+  const carouselLength = predictions.filter((p) => p.status === 'ACCEPTED').length;
 
   return {
+    carouselLength,
     hasVideo,
     hasOutfit,
     hasPreset,
@@ -55,8 +57,10 @@ const extraScore = async (ctx: MutationCtx, feedScore: Doc<'feedScores'>) => {
   const outfitScore = details.hasOutfit ? FEED_CONFIG.OUTFIT_WEIGHT : 0;
   const presetScore = details.hasPreset ? FEED_CONFIG.PRESET_WEIGHT : 0;
   const videoScore = details.hasVideo ? FEED_CONFIG.VIDEO_WEIGHT : 0;
+  // Each additional accepted prediction adds to the score, with a minimum of 0 (no negative impact)
+  const carouselScore = Math.max(0, ((details.carouselLength ?? 0) - 1) * FEED_CONFIG.CAROUSEL_WEIGHT);
 
-  return likes + bookmarks + outfitScore + presetScore + videoScore;
+  return likes + bookmarks + outfitScore + presetScore + videoScore + carouselScore;
 }
 
 const updateScore = async (ctx: MutationCtx, feedScore: Doc<'feedScores'>) => {
@@ -106,7 +110,7 @@ export const _internal = internalMutation({
 
     // If there are more results, schedule another iteration
     if (!result.isDone)
-      await ctx.scheduler.runAfter(0, internal.cron.feedRecentUpdate._internal,
+      await ctx.scheduler.runAfter(0, internal.crons.feedRecentUpdate._internal,
         { minAgeHours, maxAgeHours, cursor: result.continueCursor });
 
     return {

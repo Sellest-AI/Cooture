@@ -107,7 +107,13 @@ export const ROUTES = {
   PRICING: '/pricing',
   REFERRAL: (referralCode: string) => `${WEBSITE.URL}/${referralCode}` as const,
   ADMIN: {
+    USERS: {
+      ID: {
+        PATH: '/admin/users/[id]',
+      }
+    },
     BOTS: {
+      PATH: '/admin/bots',
       OUTFITS: {
         EXTRACTOR: '/admin/bots/outfits/extractor',
       }

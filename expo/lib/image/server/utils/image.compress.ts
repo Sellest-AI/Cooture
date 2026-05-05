@@ -67,14 +67,14 @@ const compressions: Level[] = [
 
 export const getCompression = (resolution: number, sizeKb: number): Compression => {
   // Tolerance percentage for matching resolutions
-  const THRESHOLD_POURCENT = 0.2;
+  const THRESHOLD_PERCENT = 0.2;
 
   // Sort compressions by resolution in descending order
   const sortedCompressions = compressions.sort((a, b) => b.resolution - a.resolution);
 
   // Find the compression level where the resolution is within the threshold percentage
   const compressionIndex = sortedCompressions.findIndex(
-    (c) => resolution >= c.resolution * (1 - THRESHOLD_POURCENT)
+    (c) => resolution >= c.resolution * (1 - THRESHOLD_PERCENT)
   );
   const compression = sortedCompressions[compressionIndex];
 

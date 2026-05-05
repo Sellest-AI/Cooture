@@ -12,7 +12,7 @@ export const Image = forwardRef<any, ImageProps>((props, ref) => {
       {...(rest as ExpoImageProps)}
       placeholder={rest.placeholder ?? placeholderSrc}
       ref={ref}
-      transition={300}
+      transition={props.transition === false ? 0 : 300}
       cachePolicy={props.cachePolicy ?? 'memory-disk'}
       style={style as any}
     />
@@ -23,6 +23,7 @@ Image.displayName = 'Image';
 
 export type ImageProps = ExpoImageProps & {
   image?: ImageObject;
+  transition?: number | boolean;
 }
 
 type ImageSize = {

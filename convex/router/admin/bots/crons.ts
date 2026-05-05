@@ -3,16 +3,16 @@ import { api, internal } from "../../../_generated/api";
 import { internalMutation } from "../../../procedures";
 
 const CONFIG = {
-  cronFrequency: [8, 12], // in hours, the cron will run every 8 to 12 hours randomly to avoid all bots running at the same time
+  cronFrequency: [12, 20], // in hours, the cron will run every 8 to 12 hours randomly to avoid all bots running at the same time
   like: {
-    amount: 10, // Number of items to like per cron
+    amount: 5, // Number of items to like per cron
     minDelay: 1, // in minutes
     maxDelay: 3, // in minutes
     stackDelay: 30, // in seconds
-    followChance: 0.05, // 0.05% chance to follow the person
+    followChance: 0.1, // 0.1% chance to follow the person
   },
   bookmark: {
-    amount: 5, // Number of items to bookmark per cron
+    amount: 3, // Number of items to bookmark per cron
     minDelay: 3, // in minutes
     maxDelay: 7, // in minutes
     stackDelay: 30, // in seconds

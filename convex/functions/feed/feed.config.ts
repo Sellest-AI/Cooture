@@ -8,6 +8,9 @@ export const FEED_CONFIG = {
   LIKES_WEIGHT: 300,
   SAVES_WEIGHT: 1000,
 
+  // Weight for carousel length
+  CAROUSEL_WEIGHT: 1000, // each extra slide adds 1000 points
+
   // Weight for extra score based on post type
   VIDEO_WEIGHT: 1200,
   PRESET_WEIGHT: 200,

@@ -18,7 +18,7 @@ import { ROUTES } from "routes";
 export default function NewOutfitScreen() {
   const [init, setInit] = useState(false);
   const { reset, setItems, name, setName, items: itemIds, saveOutfit } = useOutfit.New();
-  const { dismissTo, redirect } = useRouter("/new-outfit");
+  const { dismissTo, redirect, replace } = useRouter("/new-outfit");
   const { redirectTo } = useRoute("/new-outfit", {
     onInit: ({ itemIds }) => { setItems(itemIds ?? []); setInit(true); },
     resetFnc: reset,
@@ -133,6 +133,15 @@ export default function NewOutfitScreen() {
                   pathParams: { id: outfit },
                   fallbackTo: ['back', ROUTES.OUTFIT.ID(outfit)],
                   resetNextRoute: true
+                })
+
+                return;
+              }
+
+              if (redirectTo === ROUTES.PHOTOSHOOT.RECAP) {
+                replace(ROUTES.PHOTOSHOOT.RECAP, {
+                  params: { outfitId: outfit },
+                  resetNextRoute: false
                 })
 
                 return;

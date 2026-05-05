@@ -17,6 +17,9 @@ const gptOss120b = openrouter.chat("openai/gpt-oss-120b");
 // Vision support
 const qwen359b = openrouter.chat("qwen/qwen3.5-9b");
 
+// Cheapest (for offloading non-critical tasks)
+const deepseek4Flash = openrouter.chat("deepseek/deepseek-v4-flash");
+
 export const models = {
   orchestrator: {
     smartest: {
@@ -26,6 +29,12 @@ export const models = {
     default: {
       model: gptOss120b,
       ...providerOptions.openrouter.gptOss120b
+    }
+  },
+  offload: {
+    cheapest: {
+      model: deepseek4Flash,
+      ...providerOptions.openrouter.deepseek4Flash,
     }
   },
   default: {

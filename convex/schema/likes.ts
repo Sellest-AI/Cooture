@@ -11,7 +11,7 @@ export const likes = defineTable({
   type: LIKEABLE_TYPE,
   generationId: v.optional(v.id("generations")),
   outfitId: v.optional(v.id("outfits")),
-  createdAt: v.number(),
+  createdAt: v.optional(v.number()),
 })
   .index("by_user_type", ["userId", "type"])
   .index("by_user_generation", ["userId", "generationId"])

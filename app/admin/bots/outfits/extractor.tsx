@@ -40,7 +40,9 @@ const Save = ({ items }: { items: Item[] }) => {
   const saveItem = async (item: Item) => {
     if (!userId) return;
     const image = item.images.find(i => i.selected) ?? item.images[0];
-    const compressed = await compressImage(image.url, { maxResolution: 2048, keepMimeType: false });
+    const url = image.url ?? image.uri;
+    if (!url) return;
+    const compressed = await compressImage(url, { maxResolution: 2048, keepMimeType: false });
     const base64 = await compressed.toBase64();
     await removeBackground({
       userId,
@@ -103,7 +105,10 @@ export default function Screen() {
 
   const handleProductExtracted = (data: BrowserProductData) => {
     const items = data.items?.filter((i) => i.images.length > 0);
-    items?.map((i) => i.images).flat().forEach((img) => { prefetch(img.url) });
+    items?.map((i) => i.images).flat().forEach((img) => {
+      if (img.url) prefetch(img.url);
+      if (img.uri) prefetch(img.uri);
+    });
 
     const newItems = (items ?? []).map((item) => ({
       key: nanoid(),

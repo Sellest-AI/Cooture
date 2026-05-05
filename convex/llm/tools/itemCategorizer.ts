@@ -20,6 +20,7 @@ CRITICAL: You MUST use ONLY the categories listed in the schema. If the exact it
 For categories, choose the MOST SPECIFIC category that applies FROM THE AVAILABLE OPTIONS.
 For weather tags, select ALL applicable weather conditions.
 For materials, identify the PRIMARY materials visible or typical for the item.
+For the features array, act as a fashion trend analyst. Look for the defining physical characteristics that give the item its 'vibe'. Ignore standard, boring construction details. Focus on hardware (e.g., exposed zippers, chains), fabric treatments (e.g., acid wash, distressed, quilted), silhouette modifiers (e.g., padded shoulders, cropped, drop-shoulder), and specific functional details (e.g., utility pockets, bungee cords).
 
 FOR CONTENT RATING:
 - SAFE: Appropriate for all audiences (e.g., t-shirts, jeans, sneakers) (all audience)
@@ -55,6 +56,9 @@ export const itemCategorizer = createTool({
         "CAP", "GLASSES", "BAG", "JACKET", "LEGWEAR"
       ]).describe("The most specific category. E.g., use 'TSHIRT' instead of 'TOP' for t-shirts, 'JEANS' instead of 'BOTTOM' for jeans"),
 
+      features: z.array(z.string()).max(5).describe(
+        "Distinctive fashion details, hardware, or construction elements. Examples: 'cargo pockets', 'distressed', 'drawstrings', 'asymmetrical', 'pleated', 'graphic print', 'chunky sole'. Do not include basic elements like 'sleeves' or 'buttons' unless they are visually defining."
+      ),
       weatherTags: z.array(z.enum([
         "COLD", "WARM", "HOT", "RAINY", "SNOWY", "SUNNY", "WINDY"
       ])).min(1).describe("All weather conditions this item is suitable for. Can include multiple. E.g., a light jacket might be ['WARM', 'WINDY']"),

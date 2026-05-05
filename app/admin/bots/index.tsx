@@ -1,6 +1,7 @@
 import { ROUTES, useRouter } from "@/hooks";
 import { useAuthActions } from "@/lib/convex/auth";
 import { api, useQuery } from "@/lib/convex/client";
+import { TOTAL_TABS_SPACE } from "@/modules/tabs";
 import { Badge } from "@ui/badge";
 import { Block } from "@ui/block";
 import { Button } from "@ui/button";
@@ -13,7 +14,7 @@ import { SafeScrollView } from "@ui/safe-scroll-view";
 import { Text } from "@ui/text";
 import { router } from "expo-router";
 import { useState } from "react";
-import { View, ViewStyle } from "react-native";
+import { Platform, View, ViewStyle } from "react-native";
 import { Colors } from "theme";
 
 type SharedProps = { style?: ViewStyle }
@@ -130,16 +131,24 @@ export const WaitingBots = (props: SharedProps) => {
                   gap: 16,
                 }}
               >
-                <Image
-                  style={{
-                    width: 56,
-                    height: 56,
-                    borderRadius: 99,
-                    borderTopWidth: 1,
-                    borderColor: Colors.blur.medium,
+                <Pressable
+                  onPress={() => {
+                    push(ROUTES.USER.PATH, {
+                      pathParams: { id: i.userId }
+                    })
                   }}
-                  source={i.user?.image ?? require('assets/backgrounds/dark-gradient.png')}
-                />
+                >
+                  <Image
+                    style={{
+                      width: 56,
+                      height: 56,
+                      borderRadius: 99,
+                      borderTopWidth: 1,
+                      borderColor: Colors.blur.medium,
+                    }}
+                    source={i.user?.image ?? require('assets/backgrounds/dark-gradient.png')}
+                  />
+                </Pressable>
                 <View style={{ flex: 1 }}>
                   <Text.Sm color={Colors.neutral[400]} style={{ marginBottom: 2 }}>
                     @{i.user?.username}
@@ -262,10 +271,18 @@ export const Bots = (props: SharedProps) => {
 
 export default function Screen() {
   return (
-    <SafeScrollView contentContainerStyle={{ padding: 12 }} edges={{ bottom: 'android' }}>
+    <SafeScrollView
+      contentContainerStyle={{
+        paddingTop: Platform.OS !== 'ios' ? 12 : 0,
+        paddingHorizontal: 12,
+        paddingBottom: TOTAL_TABS_SPACE
+      }}
+      edges={{ bottom: 'android' }}
+    >
       <ModalHeader
         title="Bots"
         onBack={router.canGoBack() ? router.back : undefined}
+        style={{ marginBottom: 20 }}
       />
       <PendingBots style={{ marginBottom: 28 }} />
       <WaitingBots style={{ marginBottom: 28 }} />

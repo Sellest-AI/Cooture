@@ -136,6 +136,7 @@ export default function Screen() {
   return (
     <View style={{ flex: 1 }}>
       <ParallaxScrollView
+        enableExpandHeader={true}
         showsVerticalScrollIndicator={false}
         style={{
           // paddingTop: 12,

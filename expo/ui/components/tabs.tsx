@@ -7,7 +7,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "./motion
 import { Text } from "./text";
 
 type Tab<T extends string> = {
-  label: string;
+  label: string | number;
   value: T;
 };
 

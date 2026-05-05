@@ -12,7 +12,7 @@ import { notEmpty } from "@utils/convex-allowed";
 import { router, useLocalSearchParams } from "expo-router";
 import { useRef, useState } from "react";
 import { Dimensions, View } from "react-native";
-import { ROUTES } from "routes";
+import { ROUTES } from 'routes';
 import { Colors } from "theme";
 
 const UnlockMore = () => {
@@ -147,7 +147,7 @@ export default function Screen() {
 
     // Trigger animation
     const nextItem = visibleItems.find(item => item._id !== currentItem._id);
-    if (!nextItem) return router.dismissTo(ROUTES.PROFILE.GENERATIONS);
+    if (!nextItem) return router.dismissTo(ROUTES.ADMIN.BOTS.PATH);
   }
 
   return (

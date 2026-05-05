@@ -344,7 +344,7 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
             )
           }}
         />
-        {type && <MainButton
+        {(type && (onTurnToVideo || onRecreate)) && <MainButton
           type={type}
           style={{ marginTop: 8, marginHorizontal: PADDING_HORIZONTAL }}
           onRecreate={() => {
@@ -355,17 +355,17 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
             else onRecreate?.();
           }}
         />}
-        <View style={{ paddingHorizontal: PADDING_HORIZONTAL + 4, marginTop: 8 }}>
+        <View style={{ paddingHorizontal: PADDING_HORIZONTAL + 4, marginTop: 8, }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', gap: 8 }}>
-              <GhostIconWrapper
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', gap: 8, minHeight: 20 }}>
+              {onToggleLike && <GhostIconWrapper
                 style={{ padding: 4 }}
                 icon={HeartIcon}
                 selected={isLiked}
                 color={isLiked ? Colors.secondary[500] : Colors.foreground}
                 onPress={() => { onToggleLike?.(!isLiked); }}
                 size={24}
-              />
+              />}
               {likedAccounts && <View style={{ flexDirection: 'row', gap: 0, alignItems: 'center' }}>
                 {likedAccounts.slice(0, 3).map((account) => (
                   <Image
@@ -388,14 +388,14 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
                 <CircleFadingArrowUp size={20} color={Colors.neutral[200]} />
                 <Text.Base color={Colors.neutral[200]}>{recreateCountStr}</Text.Base>
               </Pressable>}
-              <GhostIconWrapper
+              {onToggleBookmark && <GhostIconWrapper
                 style={{ padding: 4 }}
                 icon={BookmarkIcon}
                 selected={isBookmarked}
                 color={Colors.primary[500]}
                 onPress={() => { onToggleBookmark?.(); }}
                 size={20}
-              />
+              />}
               {onShare && <ShareIcon size={20} color={Colors.secondary[500]} onPress={() => {
                 const id = images?.[currentIndex]._id ?? image?._id;
                 if (id) onShare?.(id);
@@ -432,16 +432,16 @@ export const Post = ({ style, image, users, preset, outfit, images, likedAccount
         onToggleBookmark={onToggleBookmark}
         onProfilePress={users?.[0].onPress}
         onOutfitPress={outfit?.onPress}
-        onRecreate={onRecreate ?? preset?.onPress}
+        onRecreate={onRecreate}
         report={report}
         onDownload={onDownload ? async () => {
           const url = currentItem?.url;
           if (url) await onDownload?.(url);
         } : undefined}
-        onShare={() => {
+        onShare={onShare ? () => {
           const id = currentItem?._id;
           if (id) onShare?.(id);
-        }}
+        } : undefined}
       />
     </>
   )

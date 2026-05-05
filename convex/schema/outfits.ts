@@ -9,7 +9,9 @@ export const outfits = defineTable({
   coverId: v.optional(v.id("images")),
   backgroundColor: v.optional(v.string()),
   contentRating: CONTENT_RATINGS,
+  tags: v.optional(v.string()),
 })
+  .searchIndex("search_tags", { searchField: "tags", filterFields: ["userId"] })
   .index("by_user_id", ["userId"]);
 
 export const outfitItems = defineTable({

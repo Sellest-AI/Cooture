@@ -8,7 +8,7 @@ export const _internal = internalMutation({
     let i = 0;
     for (const outfit of outfits) {
       i = i + 1;
-      const delay = i * 3000; // delay each update by 3 second to avoid overwhelming the server
+      const delay = i * 500; // delay each update by 500ms to avoid overwhelming the server
       await ctx.scheduler.runAfter(delay, internal.router.outfits.updateCover._internal, { outfitId: outfit._id });
       console.log(`Scheduled cover update for outfit ${outfit._id} with delay of ${delay}ms. (${i}/${outfits.length})`);
     }

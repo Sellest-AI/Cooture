@@ -109,7 +109,7 @@ export default function Screen() {
           <MenuItem
             icon={Lock}
             text="Access admin panel"
-            onPress={() => replace("/admin/bots")}
+            onPress={() => replace(ROUTES.ADMIN.BOTS.PATH)}
           />
         </MenuGroup>}
 
