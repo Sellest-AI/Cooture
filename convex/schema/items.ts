@@ -14,6 +14,11 @@ export const ITEM_STYLES = [
   "GOTHIC",
   "MINIMALIST",
   "ECLECTIC",
+  "Y2K",
+  "STREETWEAR",
+  "UTILITARIAN",
+  "ROMANTIC",
+  "TECHWEAR",
 ] as const;
 
 const V_ITEM_STYLES = v.union(...ITEM_STYLES.map(v.literal));
@@ -110,4 +115,5 @@ export const items = defineTable({
   .searchIndex("search_name", { searchField: "name", filterFields: ["userId"] })
   .searchIndex("search_brand", { searchField: "brand", filterFields: ["userId"] })
   .searchIndex("search_description", { searchField: "description", filterFields: ["userId"] })
+  .searchIndex("search_trends", { searchField: "trendTags", filterFields: ["userId"] })
   .searchIndex("search_colors", { searchField: "colorTags", filterFields: ["userId"] });

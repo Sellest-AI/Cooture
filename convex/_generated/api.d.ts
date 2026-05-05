@@ -115,6 +115,7 @@ import type * as llm_triggers_photoshootBytePlus from "../llm/triggers/photoshoo
 import type * as llm_triggers_presetCreator from "../llm/triggers/presetCreator.js";
 import type * as llm_triggers_presetPreview from "../llm/triggers/presetPreview.js";
 import type * as llm_triggers_removeBackground from "../llm/triggers/removeBackground.js";
+import type * as llm_triggers_trendExtractor from "../llm/triggers/trendExtractor.js";
 import type * as llm_utils_createTool from "../llm/utils/createTool.js";
 import type * as llm_utils_index from "../llm/utils/index.js";
 import type * as llm_utils_photoshoot_index from "../llm/utils/photoshoot/index.js";
@@ -136,6 +137,8 @@ import type * as router_admin_config_getConfig from "../router/admin/config/getC
 import type * as router_admin_config_initConfig from "../router/admin/config/initConfig.js";
 import type * as router_admin_items_fixColors from "../router/admin/items/fixColors.js";
 import type * as router_admin_items_fixColorsAction from "../router/admin/items/fixColorsAction.js";
+import type * as router_admin_items_fixTrends from "../router/admin/items/fixTrends.js";
+import type * as router_admin_outfits_fixTrends from "../router/admin/outfits/fixTrends.js";
 import type * as router_admin_outfits_regenerateCovers from "../router/admin/outfits/regenerateCovers.js";
 import type * as router_admin_presets_findByName from "../router/admin/presets/findByName.js";
 import type * as router_admin_presets_repairOne from "../router/admin/presets/repairOne.js";
@@ -407,6 +410,7 @@ declare const fullApi: ApiFromModules<{
   "llm/triggers/presetCreator": typeof llm_triggers_presetCreator;
   "llm/triggers/presetPreview": typeof llm_triggers_presetPreview;
   "llm/triggers/removeBackground": typeof llm_triggers_removeBackground;
+  "llm/triggers/trendExtractor": typeof llm_triggers_trendExtractor;
   "llm/utils/createTool": typeof llm_utils_createTool;
   "llm/utils/index": typeof llm_utils_index;
   "llm/utils/photoshoot/index": typeof llm_utils_photoshoot_index;
@@ -428,6 +432,8 @@ declare const fullApi: ApiFromModules<{
   "router/admin/config/initConfig": typeof router_admin_config_initConfig;
   "router/admin/items/fixColors": typeof router_admin_items_fixColors;
   "router/admin/items/fixColorsAction": typeof router_admin_items_fixColorsAction;
+  "router/admin/items/fixTrends": typeof router_admin_items_fixTrends;
+  "router/admin/outfits/fixTrends": typeof router_admin_outfits_fixTrends;
   "router/admin/outfits/regenerateCovers": typeof router_admin_outfits_regenerateCovers;
   "router/admin/presets/findByName": typeof router_admin_presets_findByName;
   "router/admin/presets/repairOne": typeof router_admin_presets_repairOne;

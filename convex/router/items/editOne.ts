@@ -1,7 +1,8 @@
+import { convertTagsToString } from "@/lib/helpers";
 import { removeUndefinedKeys } from "@shared/utils";
 import { v } from "convex/values";
 import { isAuthorized } from "../../functions/users";
-import { authMutation } from "../../procedures";
+import { authMutation, internalMutation } from "../../procedures";
 import { ITEM_CATEGORIES, ITEM_COLOR_TONES, ITEM_GENDERS, ITEM_MATERIAL_FEEL, ITEM_WEATHERS } from "../../schema/items";
 
 export const authed = authMutation({
@@ -32,5 +33,27 @@ export const authed = authMutation({
     const fields = removeUndefinedKeys(rest);
 
     return ctx.db.patch(itemId, fields);
+  }
+})
+
+export const _internal = internalMutation({
+  args: {
+    itemId: v.id("items"),
+    trends: v.optional(v.array(v.string())),
+  },
+  handler: async (ctx, args) => {
+    const item = await ctx.db.get(args.itemId);
+    if (!item) throw new Error("Item not found");
+
+    // We merge the existing styles with the trends
+    const mergedTrends = [...item.styles, ...(args.trends ?? [])]
+    const trendTags = convertTagsToString(mergedTrends);
+    const trendTagsString = trendTags.length > 0 ? trendTags : undefined;
+
+    const fields = removeUndefinedKeys({
+      trendTags: trendTagsString,
+    })
+
+    return ctx.db.patch(args.itemId, fields);
   }
 })

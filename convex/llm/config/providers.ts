@@ -85,6 +85,26 @@ const openrouterGemini31pro = {
   })
 }
 
+const openrouterDeepseek4Flash = {
+  pricing: {
+    inputTokens: 0.14,
+    outputTokens: 0.28,
+  },
+  providerOptions: (options: { effort: 'none' }) => ({
+    openrouter: {
+      reasoning: {
+        enabled: false,
+        effort: 'none'
+      },
+      provider: {
+        only: ["atlas-cloud/fp8", "novita", "siliconflow/fp8"],
+        order: ["atlas-cloud/fp8", "novita", "siliconflow/fp8"],
+        allow_fallbacks: false,
+      }
+    }
+  })
+}
+
 const openrouterGemini3flash = {
   pricing: {
     inputTokens: 0.5,
@@ -116,6 +136,7 @@ const openrouterGemini3flash = {
 
 export const providerOptions = {
   openrouter: {
+    deepseek4Flash: openrouterDeepseek4Flash,
     gemini31pro: openrouterGemini31pro,
     gemini3flash: openrouterGemini3flash,
     gptOss120b: openrouterGptOss120b,

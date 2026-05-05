@@ -1,9 +1,41 @@
-import { removeUndefinedKeys } from "@shared/utils";
+import { convertStringToTags, convertTagsToString } from "@/lib/helpers";
+import { notEmpty, removeUndefinedKeys } from "@shared/utils";
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
+import { Id } from "../../_generated/dataModel";
+import { extractPosition } from "../../functions/items";
 import { ContentRating, isOutfitNFSW } from "../../functions/outfits";
 import { isAuthorized } from "../../functions/users";
-import { authMutation } from "../../procedures";
+import { authMutation, QueryCtx } from "../../procedures";
+
+const extractTags = async (ctx: QueryCtx, itemIds: Id<'items'>[]): Promise<string[]> => {
+  const items = await Promise.all(itemIds.map((id) => ctx.db.get(id)));
+  const importantItems = items.filter(notEmpty).filter((i) => {
+    const position = extractPosition(i.category);
+    if (position === 'TOP') return true;
+    if (position === 'OUTERWEAR') return true;
+    if (position === 'ACCESSORY') return true;
+    if (position === 'INNERLAYER') return true;
+    return false;
+  })
+
+  const tags = importantItems.map((i) => i?.trendTags)
+    .filter(notEmpty).map((t) => convertStringToTags(t));
+
+  // We want to check each array of tags, and only keep the tags that are present in 30% of the items or more
+  const tagCount: Record<string, number> = {};
+  tags.forEach((itemTags) => {
+    // Make sure an item can't count for the same tag twice using a Set
+    const uniqueItemTags = [...new Set(itemTags)];
+    uniqueItemTags.forEach((tag) => {
+      tagCount[tag] = (tagCount[tag] || 0) + 1;
+    });
+  });
+
+  const threshold = Math.ceil(importantItems.length * 0.3);
+  const commonTags = Object.keys(tagCount).filter((tag) => tagCount[tag] >= threshold);
+  return commonTags;
+}
 
 export const authed = authMutation({
   args: {
@@ -21,6 +53,7 @@ export const authed = authMutation({
     if (hasBeenUsed) return false;
 
     let contentRating: ContentRating | undefined = undefined;
+    let tags: string[] = [];
 
     if (args.items !== undefined) {
       const existingOutfitItems = await ctx.db.query('outfitItems')
@@ -39,18 +72,21 @@ export const authed = authMutation({
       const remainingItems = [...existingOutfitItems.map((i) => i.itemId), ...itemsToAdd].filter(oi => !itemsToRemove.some(r => r.itemId === oi));
       contentRating = await isOutfitNFSW(ctx, remainingItems);
 
+      tags = await extractTags(ctx, remainingItems);
+
       if (itemsToAdd.length > 0 || itemsToRemove.length > 0) {
         await ctx.scheduler.runAfter(0, internal.router.outfits.updateCover._internal, { outfitId: args.outfitId });
       }
     }
 
-    if (!!args.name) {
-      await ctx.db.patch(args.outfitId, removeUndefinedKeys({
-        name: args.name,
-        updatedAt: Date.now(),
-        contentRating
-      }))
-    }
+    const tagsString = tags.length > 0 ? convertTagsToString(tags) : undefined;
+
+    await ctx.db.patch(args.outfitId, removeUndefinedKeys({
+      name: args.name,
+      updatedAt: Date.now(),
+      contentRating,
+      tags: tagsString,
+    }))
 
     return true;
   }

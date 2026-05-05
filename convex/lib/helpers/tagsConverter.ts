@@ -1,5 +1,7 @@
 export const convertTagsToString = (tags: string[]): string => {
-  return tags.map((tag) => sanitizeTag(tag)).join(", ");
+  return tags.map((tag) => sanitizeTag(tag))
+    .filter((t, i, arr) => t.length > 0 && arr.indexOf(t) === i) // remove empty and duplicate tags
+    .join(", ");
 }
 
 type Options = {
