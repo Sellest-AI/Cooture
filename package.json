@@ -12,12 +12,14 @@
     "convex:dev": "npx convex dev",
     "playground": "npx @convex-dev/agent-playground",
     "lint": "expo lint",
-    "postinstall": "node node_modules/@shopify/react-native-skia/scripts/install-skia.mjs"
+    "postinstall": "node node_modules/@shopify/react-native-skia/scripts/install-skia.mjs",
+    "preinstall": "pnpm config set ignore-scripts false"
   },
   "pnpm": {
     "patchedDependencies": {
       "xcode": "patches/xcode.patch"
-    }
+    },
+    "neverBuiltDependencies": []
   },
   "dependencies": {
     "@auth/core": "^0.37.0",
@@ -137,5 +139,6 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "prettier-plugin-tailwindcss": "^0.5.14",
     "typescript": "~5.9.2"
-  }
+  },
+  "packageManager": "pnpm@11.0.3"
 }
