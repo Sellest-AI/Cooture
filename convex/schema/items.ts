@@ -86,6 +86,7 @@ export const ITEMS_SCHEMA = {
   name: v.string(),
   brand: v.optional(v.string()),
   description: v.optional(v.string()),
+  features: v.optional(v.array(v.string())),
   imageId: v.id("images"),
   category: ITEM_CATEGORIES,
   weatherTags: v.array(ITEM_WEATHERS),
@@ -98,6 +99,7 @@ export const ITEMS_SCHEMA = {
   gender: ITEM_GENDERS,
   contentRating: CONTENT_RATINGS,
   link: v.optional(v.string()),
+  trendTags: v.optional(v.string()),
 }
 
 export const items = defineTable({

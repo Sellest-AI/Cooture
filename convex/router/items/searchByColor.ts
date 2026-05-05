@@ -1,4 +1,5 @@
 import { getTagsFromHexColors } from "@/lib/color";
+import { convertTagsToString, sanitizeTag } from "@/lib/helpers";
 import { notEmpty } from "@shared/utils";
 import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
@@ -14,18 +15,16 @@ export const anon = publicQuery({
   },
   handler: async (ctx, args) => {
     const tags = getTagsFromHexColors([args.hexColor, ...(args.extraHexColors || [])]);
-    const cleanedColors = tags.map((tag) => tag.toLowerCase().trim().replaceAll(' ', '_'));
-    const cleanedColor = cleanedColors.join(' ')
+    const cleanedColors = convertTagsToString(tags);
 
     const results = await ctx.db.query("items")
-      .withSearchIndex("search_colors", (q) => q.search('colorTags', cleanedColor))
+      .withSearchIndex("search_colors", (q) => q.search('colorTags', cleanedColors))
       .paginate(args.paginationOpts);
 
     const items = await Promise.all(results.page
       .filter((item) => {
         if (!args.category) return true;
-        const sanitizeCategory = (value: string) => value.toLowerCase().trim().replaceAll(' ', '_');
-        return sanitizeCategory(item.category) === sanitizeCategory(args.category);
+        return sanitizeTag(item.category) === sanitizeTag(args.category);
       })
       .map((item) => getItem(ctx, item._id)));
 

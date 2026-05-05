@@ -1,5 +1,6 @@
 import { internal } from "../../_generated/api";
 import { Id } from "../../_generated/dataModel";
+import { convertTagsToString } from "../../lib/helpers";
 import { ActionCtx } from "../../procedures";
 import { CREDITS_CONFIG } from "../credits";
 
@@ -27,8 +28,7 @@ export const createItem = async (ctx: ActionCtx, data: Args): Promise<Id<"items"
   })
 
   const mainColors = schema.mainColors.map((c) => c.hex);
-  const colorTags = schema.colorTags.map((tag) => tag.replaceAll(" ", "_").toLowerCase())
-    .reduce((a, b) => `${a} ${b}`, "").trim();
+  const colorTags = convertTagsToString(schema.colorTags);
 
   const item = await ctx.runMutation(internal.router.items.createOne._internal_mutation, {
     ...schema,

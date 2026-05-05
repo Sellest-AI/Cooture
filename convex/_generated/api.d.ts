@@ -67,6 +67,8 @@ import type * as http_runpod_generateVideo from "../http/runpod/generateVideo.js
 import type * as http_runpod_removeBackground from "../http/runpod/removeBackground.js";
 import type * as lib_byteplus_node from "../lib/byteplus/node.js";
 import type * as lib_color_index from "../lib/color/index.js";
+import type * as lib_helpers_index from "../lib/helpers/index.js";
+import type * as lib_helpers_tagsConverter from "../lib/helpers/tagsConverter.js";
 import type * as lib_image_index from "../lib/image/index.js";
 import type * as lib_image_node from "../lib/image/node.js";
 import type * as lib_image_sanitizeImage from "../lib/image/sanitizeImage.js";
@@ -102,6 +104,7 @@ import type * as llm_tools_itemCategorizer from "../llm/tools/itemCategorizer.js
 import type * as llm_tools_photoshootPrompter from "../llm/tools/photoshootPrompter.js";
 import type * as llm_tools_presetCreator from "../llm/tools/presetCreator.js";
 import type * as llm_tools_profilePictureGenerator from "../llm/tools/profilePictureGenerator.js";
+import type * as llm_tools_trendExtractor from "../llm/tools/trendExtractor.js";
 import type * as llm_tools_videoPrompter from "../llm/tools/videoPrompter.js";
 import type * as llm_triggers_generateDepthMap from "../llm/triggers/generateDepthMap.js";
 import type * as llm_triggers_generateFace from "../llm/triggers/generateFace.js";
@@ -356,6 +359,8 @@ declare const fullApi: ApiFromModules<{
   "http/runpod/removeBackground": typeof http_runpod_removeBackground;
   "lib/byteplus/node": typeof lib_byteplus_node;
   "lib/color/index": typeof lib_color_index;
+  "lib/helpers/index": typeof lib_helpers_index;
+  "lib/helpers/tagsConverter": typeof lib_helpers_tagsConverter;
   "lib/image/index": typeof lib_image_index;
   "lib/image/node": typeof lib_image_node;
   "lib/image/sanitizeImage": typeof lib_image_sanitizeImage;
@@ -391,6 +396,7 @@ declare const fullApi: ApiFromModules<{
   "llm/tools/photoshootPrompter": typeof llm_tools_photoshootPrompter;
   "llm/tools/presetCreator": typeof llm_tools_presetCreator;
   "llm/tools/profilePictureGenerator": typeof llm_tools_profilePictureGenerator;
+  "llm/tools/trendExtractor": typeof llm_tools_trendExtractor;
   "llm/tools/videoPrompter": typeof llm_tools_videoPrompter;
   "llm/triggers/generateDepthMap": typeof llm_triggers_generateDepthMap;
   "llm/triggers/generateFace": typeof llm_triggers_generateFace;
