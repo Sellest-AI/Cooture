@@ -91,7 +91,10 @@ export const SearchResults = ({ query, onLoadingChange }: Props) => {
   const { data: items, isSuccess: isItemsSuccess } = useQuery(api.router.items.searchMany.anon, hasQuery ? { query } : 'skip');
   const { data: outfits, isSuccess: isOutfitsSuccess } = useQuery(api.router.outfits.searchMany.anon, hasQuery ? { query } : 'skip');
 
-  const isSuccess = isUsersSuccess && isItemsSuccess && isOutfitsSuccess;
+  const hasOutfits = !!outfits && outfits.length > 0;
+  const { data: generations, isSuccess: isGenerationsSuccess } = useQuery(api.router.feed.getFromOutfits.anon, hasOutfits ? { outfitIds: outfits.map((o) => o._id) } : 'skip');
+
+  const isSuccess = isUsersSuccess && isItemsSuccess && isOutfitsSuccess && (hasOutfits ? isGenerationsSuccess : true);
   const showLoading = hasQuery && !isSuccess;
 
   useEffect(() => { onLoadingChange?.(showLoading); }, [showLoading, onLoadingChange]);
@@ -105,6 +108,7 @@ export const SearchResults = ({ query, onLoadingChange }: Props) => {
   const { isHidden } = useSafety();
   const outfitsData = shuffleWithSeed(outfits?.filter((o) => !isHidden({ outfit: o, itemIds: o.items.map((i) => i.itemId) })) ?? [], date);
   const itemsData = shuffleWithSeed(items?.filter((i) => !isHidden({ item: i })) ?? [], date);
+  const generationsData = shuffleWithSeed(generations?.filter((g) => !isHidden({ generationId: g.generationId })) ?? [], date);
 
   return (
     <SharedScreen
@@ -124,7 +128,7 @@ export const SearchResults = ({ query, onLoadingChange }: Props) => {
           <UserSkeleton style={{ marginBottom: 24 }} />
           <UserSkeleton style={{ marginBottom: 24 }} />
           <UserSkeleton style={{ marginBottom: 24 }} />
-          <View style={{ flexDirection: 'row', gap: 12, width: '100%', paddingRight: 12 }}>
+          <View style={{ flexDirection: 'row', gap: 12, width: '100%', paddingRight: 12, marginBottom: 32 }}>
             <Skeleton style={{ width: '50%', aspectRatio: 1 }} />
             <Skeleton style={{ width: '50%', aspectRatio: 1 }} />
           </View>
@@ -132,6 +136,7 @@ export const SearchResults = ({ query, onLoadingChange }: Props) => {
       </View>}
       outfits={outfitsData}
       items={itemsData}
+      predictions={generationsData?.map((g) => ({ _id: g._id, imageId: g.imageId }))}
     />
   )
 }

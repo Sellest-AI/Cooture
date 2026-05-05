@@ -161,6 +161,7 @@ import type * as router_credits_getUserWallet from "../router/credits/getUserWal
 import type * as router_credits_grantCredits from "../router/credits/grantCredits.js";
 import type * as router_credits_refundCredits from "../router/credits/refundCredits.js";
 import type * as router_feed_getFromOutfit from "../router/feed/getFromOutfit.js";
+import type * as router_feed_getFromOutfits from "../router/feed/getFromOutfits.js";
 import type * as router_feed_getFromPreset from "../router/feed/getFromPreset.js";
 import type * as router_feed_getPaginated from "../router/feed/getPaginated.js";
 import type * as router_generations_autoRefund from "../router/generations/autoRefund.js";
@@ -457,6 +458,7 @@ declare const fullApi: ApiFromModules<{
   "router/credits/grantCredits": typeof router_credits_grantCredits;
   "router/credits/refundCredits": typeof router_credits_refundCredits;
   "router/feed/getFromOutfit": typeof router_feed_getFromOutfit;
+  "router/feed/getFromOutfits": typeof router_feed_getFromOutfits;
   "router/feed/getFromPreset": typeof router_feed_getFromPreset;
   "router/feed/getPaginated": typeof router_feed_getPaginated;
   "router/generations/autoRefund": typeof router_generations_autoRefund;

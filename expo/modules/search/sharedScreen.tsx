@@ -2,6 +2,8 @@ import { useRouter } from "@/hooks"
 import { api, Id, useQuery } from "@/lib/convex/client"
 import { CardItem, Collection } from "@ui/cards"
 import { FlashList, FlashListRef } from "@ui/flat-list"
+import { Image } from "@ui/image"
+import { Pressable } from "@ui/pressable"
 import { Skeleton } from "@ui/skeleton"
 import { Text } from "@ui/text"
 import { notEmpty, ROUTES } from "@utils/convex-allowed"
@@ -33,7 +35,8 @@ const SharedFlashList = <T extends object | string>({ header, data, onScroll, re
       data={finalData.filter(notEmpty)}
       masonry
       numColumns={columns ?? 2}
-      keyExtractor={(item, index) => `${(typeof item === "object" && "_id" in item) ? item._id : item.toString()}-${index}`}
+      drawDistance={500}
+      keyExtractor={(item, index) => typeof item === 'string' ? `${item}-${index}` : (typeof item === 'object' ? JSON.stringify(item) : index.toString())}
       stickyHeaderIndices={[data.length]}
       stickyHeaderConfig={{
         hideRelatedCell: true,
@@ -47,9 +50,15 @@ const SharedFlashList = <T extends object | string>({ header, data, onScroll, re
             paddingBottom: 8,
             paddingLeft: index % 2 === 0 ? 0 : 4,
             paddingRight: index % 2 === 0 ? 4 : 0,
+            marginLeft: columns === 1 ? 12 : 0,
+            marginRight: columns === 1 ? 12 : 0,
             flex: 1,
           }}>
-            <Skeleton style={{ flex: 1, aspectRatio: 4 / 5 }} />
+            <Skeleton style={{
+              flex: 1,
+              aspectRatio: columns === 1 ? 6 / 3 : 4 / 5
+            }}
+            />
           </View>
         }
 
@@ -149,32 +158,89 @@ const HorizontalCarousel = ({ title, outfit, items }: HorizontalCarouselProps) =
   )
 }
 
+const PredictionsGridItem = ({ imageId, _id }: NonNullable<Props['predictions']>[number]) => {
+  const { data: image } = useQuery(api.router.storage.images.getOne.anon, { id: imageId });
+  const { push } = useRouter();
+
+  if (!image) return (
+    <View style={{ width: '100%', aspectRatio: 3 / 4 }}>
+      <Skeleton style={{ width: '100%', height: '100%', borderRadius: 8 }} />
+    </View>
+  )
+
+  return (
+    <Pressable
+      style={{ flex: 1 }}
+      onPress={() => { push(ROUTES.POST.PATH, { pathParams: { id: _id } }) }}
+    >
+      <Image
+        source={{ uri: image?.url }}
+        style={{
+          width: '100%',
+          aspectRatio: 3 / 4,
+          borderRadius: 8,
+          backgroundColor: Colors.blur.darkest,
+        }}
+      />
+    </Pressable>
+  )
+}
+
+const PredictionsGrid = ({ predictions }: { predictions: Props['predictions'] }) => {
+  return (
+    <FlashList
+      style={{ flex: 1 }}
+      data={predictions}
+      numColumns={3}
+      keyExtractor={(item) => item._id}
+      renderItem={({ item }) => {
+        return (<View style={{
+          padding: 2
+        }}>
+          <PredictionsGridItem
+            _id={item._id}
+            imageId={item.imageId}
+          />
+        </View>)
+      }}
+    />
+  )
+}
+
 type Props = {
+  predictions?: { _id: Id<'predictions'>, imageId: Id<'images'> }[];
   outfits?: { _id: Id<'outfits'>, name: string, backgroundColor?: string, cover: { sizes: { small: { url: string } } }, items: { itemId: Id<'items'> }[] }[];
   items?: { _id: Id<'items'>, name: string, position?: string, image: { url: string, width: number, height: number } }[];
   firstTab?: string;
   firstTabHeader?: React.ComponentType;
 }
 
-export const SharedScreen = ({ outfits, items, firstTab, firstTabHeader }: Props) => {
+export const SharedScreen = ({ outfits, items, predictions, firstTab, firstTabHeader }: Props) => {
   const [tab, setTab] = useState<string>(firstTab || 'trending');
   const ref = useRef<FlashListRef<any>>(null);
   const opacity = useAnimatedValue(0);
 
   const outfitsData = outfits?.map((o) => ({ ...o, type: "outfit" as const })) ?? [];
   const itemsData = items?.map((i) => ({ ...i, type: "item" as const })) ?? [];
+  const predictionsData = predictions?.map((p) => ({ ...p, type: "prediction" as const })) ?? [];
 
   const trendingData = [
+    { predictions: predictionsData.slice(0, 9), type: 'predictions' as const },
     ...outfitsData.slice(0, 1),
     { items: itemsData.slice(0, 6), type: 'items' as const },
+    { predictions: predictionsData.slice(9, 18), type: 'predictions' as const },
     ...outfitsData.slice(1, 2),
     { items: itemsData.slice(6, 12), type: 'items' as const },
+    { predictions: predictionsData.slice(18, 24), type: 'predictions' as const },
     ...outfitsData.slice(2, 3),
     { items: itemsData.slice(12, 18), type: 'items' as const },
+    { predictions: predictionsData.slice(24, 33), type: 'predictions' as const },
     ...outfitsData.slice(3, 4),
     { items: itemsData.slice(18, 24), type: 'items' as const },
+    { predictions: predictionsData.slice(33, 42), type: 'predictions' as const },
     ...outfitsData.slice(4, 99),
-  ].filter((v) => v.items?.length > 0);
+  ].filter((v) => v.type !== 'items' || v.items?.length > 0)
+    .filter((v) => v.type !== 'predictions' || v.predictions?.length >= 3);
 
   const { push } = useRouter();
 
@@ -244,7 +310,7 @@ export const SharedScreen = ({ outfits, items, firstTab, firstTabHeader }: Props
         onScroll={(value) => opacity.setValue(value)}
         data={trendingData}
         columns={1}
-        renderItem={(item) => {
+        renderItem={(item, index) => {
           if (item.type === 'outfit')
             return (
               <View style={{
@@ -269,6 +335,20 @@ export const SharedScreen = ({ outfits, items, firstTab, firstTabHeader }: Props
                   items={item.items}
                 />
               </View>)
+
+          if (item.type === 'predictions')
+            return (
+              <View style={{
+                flex: 1,
+                paddingHorizontal: 4,
+                marginBottom: 28,
+                marginTop: index > 0 ? 8 : 0,
+              }}>
+                <PredictionsGrid
+                  predictions={item.predictions}
+                />
+              </View>
+            )
         }}
       />}
     </SharedWrapper>
