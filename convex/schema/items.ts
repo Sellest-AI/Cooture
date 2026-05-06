@@ -19,6 +19,7 @@ export const ITEM_STYLES = [
   "UTILITARIAN",
   "ROMANTIC",
   "TECHWEAR",
+  "MAXIMALIST",
 ] as const;
 
 const V_ITEM_STYLES = v.union(...ITEM_STYLES.map(v.literal));
