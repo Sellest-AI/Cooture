@@ -9,7 +9,8 @@ export default function Screen() {
 
   return <PickOutfitScreen
     currentPath="/pick-outfit"
-    header={<ModalHeader title="Pick an outfit" />}
+    showOnlyOwnedOutfits={true}
+    header={<ModalHeader title="Pick an outfit" style={{ marginTop: 12 }} />}
     canSkipText={canSkip ? 'Skip' : undefined}
     preSelectedItemIds={itemIds}
     redirectTo={redirectTo}
