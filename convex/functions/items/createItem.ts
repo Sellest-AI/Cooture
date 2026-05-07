@@ -29,9 +29,12 @@ export const createItem = async (ctx: ActionCtx, data: Args): Promise<Id<"items"
 
   const mainColors = schema.mainColors.map((c) => c.hex);
   const colorTags = convertTagsToString(schema.colorTags);
+  const brand = (schema.brand?.toLowerCase() === 'unknown' || (schema.brand && schema.brand?.trim().length === 0))
+    ? undefined : schema.brand;
 
   const item = await ctx.runMutation(internal.router.items.createOne._internal_mutation, {
     ...schema,
+    brand,
     userId: data.userId,
     name: schema.name || 'Untitled Item',
     description: schema.description || undefined,

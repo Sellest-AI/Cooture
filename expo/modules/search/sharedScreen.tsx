@@ -7,7 +7,7 @@ import { Pressable } from "@ui/pressable"
 import { Skeleton } from "@ui/skeleton"
 import { Text } from "@ui/text"
 import { notEmpty, ROUTES } from "@utils/convex-allowed"
-import React, { ReactNode, useRef, useState } from "react"
+import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react"
 import { useAnimatedValue, View } from "react-native"
 import { Colors } from "theme"
 import { SharedWrapper } from "./sharedWrapper"
@@ -23,6 +23,9 @@ type SharedFlashListProps<T extends object | string> = {
 const SharedFlashList = <T extends object | string>({ header, data, onScroll, renderItem, columns, scrollRef }: SharedFlashListProps<T>) => {
   const loading = Array.from({ length: 4 }).map((_, i) => 'loading');
   const finalData = (data.length === 0 && !header) ? loading : [...data];
+
+  const dataKey = useMemo(() => JSON.stringify(data), [data]);
+  useEffect(() => { scrollRef?.current?.scrollToTop({ animated: true }) }, [dataKey, scrollRef])
 
   const Header = header;
 
@@ -231,13 +234,13 @@ export const SharedScreen = ({ outfits, items, predictions, firstTab, firstTabHe
     { predictions: predictionsData.slice(9, 18), type: 'predictions' as const },
     ...outfitsData.slice(1, 2),
     { items: itemsData.slice(6, 12), type: 'items' as const },
-    { predictions: predictionsData.slice(18, 24), type: 'predictions' as const },
+    { predictions: predictionsData.slice(18, 27), type: 'predictions' as const },
     ...outfitsData.slice(2, 3),
     { items: itemsData.slice(12, 18), type: 'items' as const },
-    { predictions: predictionsData.slice(24, 33), type: 'predictions' as const },
+    { predictions: predictionsData.slice(27, 36), type: 'predictions' as const },
     ...outfitsData.slice(3, 4),
     { items: itemsData.slice(18, 24), type: 'items' as const },
-    { predictions: predictionsData.slice(33, 42), type: 'predictions' as const },
+    { predictions: predictionsData.slice(36, 45), type: 'predictions' as const },
     ...outfitsData.slice(4, 99),
   ].filter((v) => v.type !== 'items' || v.items?.length > 0)
     .filter((v) => v.type !== 'predictions' || v.predictions?.length >= 3);
