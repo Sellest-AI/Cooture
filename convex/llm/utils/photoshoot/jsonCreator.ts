@@ -211,7 +211,7 @@ const updateSubjects = async (ctx: ActionCtx, schema: Schema, subjects: SubjectE
 
     const prompt = {
       ...presetSubject,
-      reference: image ? `Image ${images.length}. Use facial expression from prompt.` : undefined,
+      reference: image ? `Image ${images.length}. Use skin tone from image. Use facial expression from prompt.` : undefined,
       gender: appearance.gender,
       height: appearance.heightCm ? `${appearance.heightCm}cm ${heightAdjective} height` : undefined,
       size: buildCleaned ? `${buildCleaned} build` : undefined,
