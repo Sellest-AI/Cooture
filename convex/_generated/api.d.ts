@@ -11,6 +11,7 @@
 import type * as auth from "../auth.js";
 import type * as crons from "../crons.js";
 import type * as crons_feedRecentUpdate from "../crons/feedRecentUpdate.js";
+import type * as crons_notifyInReviews from "../crons/notifyInReviews.js";
 import type * as crons_updateStatistics from "../crons/updateStatistics.js";
 import type * as env from "../env.js";
 import type * as functions_credits_canPay from "../functions/credits/canPay.js";
@@ -308,6 +309,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   crons: typeof crons;
   "crons/feedRecentUpdate": typeof crons_feedRecentUpdate;
+  "crons/notifyInReviews": typeof crons_notifyInReviews;
   "crons/updateStatistics": typeof crons_updateStatistics;
   env: typeof env;
   "functions/credits/canPay": typeof functions_credits_canPay;

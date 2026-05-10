@@ -32,4 +32,11 @@ crons.interval(
   internal.crons.updateStatistics._internal,
 )
 
+crons.interval(
+  "send notifications for predictions in review for less than 3 days",
+  { hours: 12 }, // every 12 hours
+  internal.crons.notifyInReviews._internal,
+  { maxAgeDays: 3 }
+)
+
 export default crons;
