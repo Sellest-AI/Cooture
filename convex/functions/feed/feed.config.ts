@@ -15,4 +15,7 @@ export const FEED_CONFIG = {
   VIDEO_WEIGHT: 1200,
   PRESET_WEIGHT: 200,
   OUTFIT_WEIGHT: 1000,
+
+  // Penalty decay for posts
+  ITEMS_PENALTY_DECAY: 0.7, // 70% decay if multiple items of the same category (except accessories)
 }
