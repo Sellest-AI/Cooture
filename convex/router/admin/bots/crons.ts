@@ -74,7 +74,7 @@ export const _internal_step_likes = internalMutation({
   args: { id: v.id('users') },
   handler: async (ctx, args) => {
     const getPaginated = await ctx.runQuery(api.router.feed.getPaginated.anon, {
-      paginationOpts: { numItems: 100, cursor: null },
+      paginationOpts: { numItems: 200, cursor: null },
       maxAge: Date.now()
     });
 
