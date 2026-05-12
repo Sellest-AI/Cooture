@@ -38,7 +38,7 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples, guideline = 'de
     return <CameraPermission onSuccess={() => setHasPermission(true)} />
   }
 
-  const scale = Platform.OS === 'android' ? 1.6 : 1.4;
+  const scale = Platform.OS === 'android' ? 1 : 1.4;
 
   return (
     <View style={{
@@ -170,13 +170,8 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples, guideline = 'de
                 const imageWidth = photo.width;
                 const imageHeight = photo.height;
 
-                // On some Android devices, width and height might be swapped compared to the portrait view
-                const isPortrait = imageHeight > imageWidth;
-                const actualWidth = isPortrait ? imageWidth : imageHeight;
-                const actualHeight = isPortrait ? imageHeight : imageWidth;
-
-                const cropWidth = Math.round(actualWidth / scale);
-                const cropHeight = Math.round(actualHeight / scale);
+                const cropWidth = Math.round(imageWidth / scale);
+                const cropHeight = Math.round(imageHeight / scale);
 
                 const originX = Math.round((imageWidth - cropWidth) / 2);
                 const originY = Math.round((imageHeight - cropHeight) / 2);
