@@ -19,16 +19,16 @@ crons.interval(
 )
 
 crons.interval(
-  "update feed scores (72h to 7 days)",
+  "update feed scores (72h to X days)",
   { hours: 24 }, // every 24 hours
   internal.crons.feedRecentUpdate._internal,
   { minAgeHours: 72, maxAgeHours: FEED_CONFIG.FREEZE_AGE_HOURS + 24 }
 )
 
 // Update statistics every 24 hours
-crons.interval(
+crons.daily(
   "update admin statistics",
-  { hours: 24 }, // every 24 hours
+  { hourUTC: 12, minuteUTC: 0 }, // every 24 hours
   internal.crons.updateStatistics._internal,
 )
 
