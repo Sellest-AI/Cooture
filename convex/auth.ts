@@ -34,6 +34,13 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
       }
     },
     async beforeSessionCreation(ctx: MutationCtx, { userId }) {
+      const user = await ctx.db.get(userId);
+
+      // Block temp emails with '+' and emails containing timestamps (10+ digits)
+      if (user?.email && (user.email.includes('+') || /\d{10,}/.test(user.email))) {
+        throw new Error("This email address is not permitted.");
+      }
+
       // avoid duplicate
       const existing = await ctx.db.query('usersExtended')
         .withIndex('by_user_id', (q) => q.eq('userId', userId)).first();
