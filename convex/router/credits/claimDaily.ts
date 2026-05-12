@@ -26,6 +26,12 @@ export const authed = authMutation({
     const streakContinues = hoursSinceLastClaim < CREDITS_CONFIG.MAX_HOURS_TO_MAINTAIN_STREAK;
     const currentStreakDay = wallet.streak.dailyClaimStreak;
 
+    let previousBiggestStreak = wallet.streak.previousBiggestStreak ?? 0;
+
+    // If streak was broken, save it if it was their biggest
+    if (!streakContinues && currentStreakDay > previousBiggestStreak)
+      previousBiggestStreak = currentStreakDay;
+
     // Calculate new streak day (keeps incrementing forever)
     let newStreakDay: number;
     if (currentStreakDay === 0 || !streakContinues) {
@@ -35,6 +41,10 @@ export const authed = authMutation({
       // Continue streak - keep incrementing (day 1, 2, 3, ..., 100, 101, etc.)
       newStreakDay = currentStreakDay + 1;
     }
+
+    // Keep biggest streak up to date for current active streaks
+    if (newStreakDay > previousBiggestStreak)
+      previousBiggestStreak = newStreakDay;
 
     // Calculate reward for this streak day
     const rewardAmount = calculateDailyReward(newStreakDay);
@@ -60,6 +70,7 @@ export const authed = authMutation({
       streak: {
         dailyClaimStreak: newStreakDay,
         lastClaimAt: now,
+        previousBiggestStreak,
       },
     });
 

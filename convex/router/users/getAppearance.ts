@@ -15,3 +15,10 @@ export const _internal = internalQuery({
     return getAppearance(ctx, userId);
   }
 })
+
+export const admin = authQuery({
+  args: { userId: v.id("users") },
+  handler: async (ctx, { userId }) => {
+    return getAppearance(ctx, userId);
+  }
+})

@@ -8,6 +8,7 @@ export const userWallets = defineTable({
   userId: v.id('users'),
   credits: v.number(),
   streak: v.object({
+    previousBiggestStreak: v.optional(v.number()),
     dailyClaimStreak: v.number(),
     lastClaimAt: v.optional(v.number()),
   }),

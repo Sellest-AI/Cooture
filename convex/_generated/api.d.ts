@@ -147,6 +147,7 @@ import type * as router_admin_statistics_getAll from "../router/admin/statistics
 import type * as router_admin_users_addFakePremium from "../router/admin/users/addFakePremium.js";
 import type * as router_admin_users_approveWaitlist from "../router/admin/users/approveWaitlist.js";
 import type * as router_admin_users_getLatests from "../router/admin/users/getLatests.js";
+import type * as router_admin_users_getTransactions from "../router/admin/users/getTransactions.js";
 import type * as router_auth_getTestAccount from "../router/auth/getTestAccount.js";
 import type * as router_auth_linkStripeSubscription from "../router/auth/linkStripeSubscription.js";
 import type * as router_auth_postCreateOrUpdate from "../router/auth/postCreateOrUpdate.js";
@@ -445,6 +446,7 @@ declare const fullApi: ApiFromModules<{
   "router/admin/users/addFakePremium": typeof router_admin_users_addFakePremium;
   "router/admin/users/approveWaitlist": typeof router_admin_users_approveWaitlist;
   "router/admin/users/getLatests": typeof router_admin_users_getLatests;
+  "router/admin/users/getTransactions": typeof router_admin_users_getTransactions;
   "router/auth/getTestAccount": typeof router_auth_getTestAccount;
   "router/auth/linkStripeSubscription": typeof router_auth_linkStripeSubscription;
   "router/auth/postCreateOrUpdate": typeof router_auth_postCreateOrUpdate;
