@@ -38,7 +38,7 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples, guideline = 'de
     return <CameraPermission onSuccess={() => setHasPermission(true)} />
   }
 
-  const scale = Platform.OS === 'android' ? 1 : 1.4;
+  const scale = Platform.OS === 'android' ? 1.6 : 1.4;
 
   return (
     <View style={{
@@ -167,16 +167,21 @@ export const UpdatePortraits = ({ imageUri, onCapture, examples, guideline = 'de
 
                 const { ImageManipulator, SaveFormat } = await import('expo-image-manipulator');
 
-                const imageWidth = photo.width;
-                const imageHeight = photo.height;
+                // Fix for Android/Samsung EXIF rotation issue:
+                // Pre-bake the image so its physical dimensions match its EXIF orientation.
+                const preBake = await (await ImageManipulator.manipulate(photo.uri).renderAsync()).saveAsync({ format: SaveFormat.JPEG });
 
-                const cropWidth = Math.round(imageWidth / scale);
-                const cropHeight = Math.round(imageHeight / scale);
+                // Recalculate dimensions in case baking changed them
+                const bakedWidth = preBake.width;
+                const bakedHeight = preBake.height;
 
-                const originX = Math.round((imageWidth - cropWidth) / 2);
-                const originY = Math.round((imageHeight - cropHeight) / 2);
+                const cropWidth = Math.round(bakedWidth / scale);
+                const cropHeight = Math.round(bakedHeight / scale);
 
-                const manipulatedPhoto = await (await ImageManipulator.manipulate(photo.uri)
+                const originX = Math.round((bakedWidth - cropWidth) / 2);
+                const originY = Math.round((bakedHeight - cropHeight) / 2);
+
+                const manipulatedPhoto = await (await ImageManipulator.manipulate(preBake.uri)
                   .crop({
                     originX: Math.max(0, originX),
                     originY: Math.max(0, originY),
