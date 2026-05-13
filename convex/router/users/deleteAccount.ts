@@ -16,7 +16,7 @@ const handler = async (ctx: MutationCtx, userId: Id<'users'>, options: { delayDa
   if (userExtended.deleteFunctionId)
     await ctx.scheduler.cancel(userExtended.deleteFunctionId);
 
-  // Run after 30 days
+  // Run after X days
   const functionId = await ctx.scheduler.runAfter(options.delayDays * 24 * 60 * 60 * 1000,
     internal.router.users.deleteAccount._internal_delay, { userId })
 
@@ -95,6 +95,41 @@ const anonymizeUser = async (ctx: MutationCtx, userId: Id<'users'>) => {
 
     await ctx.db.delete(userAppearance._id);
   }
+}
+
+const deleteAccount = async (ctx: MutationCtx, userId: Id<'users'>) => {
+  const googleAccounts = await ctx.db.query('authAccounts')
+    .withIndex('userIdAndProvider', q => q.eq('userId', userId).eq('provider', 'google')).collect();
+
+  const appleAccounts = await ctx.db.query('authAccounts')
+    .withIndex('userIdAndProvider', q => q.eq('userId', userId).eq('provider', 'apple')).collect();
+
+  const passwordAccounts = await ctx.db.query('authAccounts')
+    .withIndex('userIdAndProvider', q => q.eq('userId', userId).eq('provider', 'password')).collect();
+
+  await Promise.all([googleAccounts, appleAccounts, passwordAccounts].flat().map(async (a) => {
+    await ctx.db.delete(a._id);
+    const verificationCodes = await ctx.db.query('authVerificationCodes')
+      .withIndex('accountId', q => q.eq('accountId', a._id)).collect();
+    await Promise.all(verificationCodes.map(c => ctx.db.delete(c._id)));
+  }));
+
+  const userSessions = await ctx.db.query('authSessions')
+    .withIndex('userId', q => q.eq('userId', userId)).collect();
+
+  await Promise.all(userSessions.map(s => ctx.db.delete(s._id)));
+}
+
+const deleteUser = async (ctx: MutationCtx, userId: Id<'users'>) => {
+  const userExtended = await ctx.db.query('usersExtended')
+    .withIndex("by_user_id", q => q.eq("userId", userId)).first();
+
+  const userAppearance = await ctx.db.query('usersAppearance')
+    .withIndex("by_user_id", q => q.eq("userId", userId)).first();
+
+  if (userExtended) await ctx.db.delete(userExtended._id);
+  if (userAppearance) await ctx.db.delete(userAppearance._id);
+  await ctx.db.delete(userId);
 }
 
 const deleteUnusedPresets = async (ctx: MutationCtx, userId: Id<'users'>) => {
@@ -231,8 +266,10 @@ const deleteNotifications = async (ctx: MutationCtx, userId: Id<'users'>) => {
 export const _internal_delay = internalMutation({
   args: {
     userId: v.id('users'),
+    /** Only use for bots, spammers, etc. */
+    forceDelete: v.optional(v.boolean()),
   },
-  handler: async (ctx, { userId }) => {
+  handler: async (ctx, { userId, forceDelete }) => {
     await anonymizeUser(ctx, userId);
 
     await deleteNotifications(ctx, userId);
@@ -248,6 +285,11 @@ export const _internal_delay = internalMutation({
     await deleteBookmarks(ctx, userId);
 
     await deleteLikes(ctx, userId);
+
+    await deleteAccount(ctx, userId);
+
+    /** Only use for bots, spammers, etc. */
+    if (forceDelete) await deleteUser(ctx, userId);
 
     // For now we keep the items & outfits because they can be reused by other users
     // Items & Outfits are anonymous anyway
