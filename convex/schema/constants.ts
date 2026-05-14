@@ -10,3 +10,23 @@ export const CONTENT_RATINGS_ORDER = CONTENT_RATINGS_C.reduce((acc, rating, inde
   acc[rating] = index;
   return acc;
 }, {} as Record<typeof CONTENT_RATINGS_C[number], number>)
+
+export const ITEM_STYLES = [
+  "CASUAL",
+  "FORMAL",
+  "SPORTY",
+  "VINTAGE",
+  "BOHO",
+  "EDGY",
+  "CHIC",
+  "PREPPY",
+  "GOTHIC",
+  "MINIMALIST",
+  "ECLECTIC",
+  "Y2K",
+  "STREETWEAR",
+  "UTILITARIAN",
+  "ROMANTIC",
+  "TECHWEAR",
+  "MAXIMALIST",
+] as const;

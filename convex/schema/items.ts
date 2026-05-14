@@ -1,26 +1,6 @@
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
-import { CONTENT_RATINGS } from "./constants";
-
-export const ITEM_STYLES = [
-  "CASUAL",
-  "FORMAL",
-  "SPORTY",
-  "VINTAGE",
-  "BOHO",
-  "EDGY",
-  "CHIC",
-  "PREPPY",
-  "GOTHIC",
-  "MINIMALIST",
-  "ECLECTIC",
-  "Y2K",
-  "STREETWEAR",
-  "UTILITARIAN",
-  "ROMANTIC",
-  "TECHWEAR",
-  "MAXIMALIST",
-] as const;
+import { CONTENT_RATINGS, ITEM_STYLES } from "./constants";
 
 const V_ITEM_STYLES = v.union(...ITEM_STYLES.map(v.literal));
 
@@ -117,4 +97,4 @@ export const items = defineTable({
   .searchIndex("search_brand", { searchField: "brand", filterFields: ["userId"] })
   .searchIndex("search_description", { searchField: "description", filterFields: ["userId"] })
   .searchIndex("search_trends", { searchField: "trendTags", filterFields: ["userId"] })
-  .searchIndex("search_colors", { searchField: "colorTags", filterFields: ["userId"] });
+  .searchIndex("search_colors", { searchField: "colorTags", filterFields: ["category", "userId"] });

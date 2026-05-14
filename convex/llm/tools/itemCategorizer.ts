@@ -1,6 +1,6 @@
 import { notEmpty, retryPromise } from "@shared/utils";
 import { z } from "zod";
-import { ITEM_STYLES } from "../../schema/items";
+import { ITEM_STYLES } from "../../schema/constants";
 import { defaultAgent } from "../agents/default";
 import { models } from "../config";
 import { createTool, wrapAgent } from "../utils";
