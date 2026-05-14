@@ -166,6 +166,7 @@ export const Block = <T extends Variant>({ className = "", children, variant, st
         {
           overflow: 'hidden',
           borderRadius,
+          borderBottomLeftRadius: style?.borderBottomLeftRadius ?? borderRadius,
           ...VariantColors,
           backgroundColor: 'transparent',
         }, style?.borderColor ? {
