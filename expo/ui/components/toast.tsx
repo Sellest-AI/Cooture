@@ -114,6 +114,7 @@ const ToastComponent = ({ toast, onRemove, list, onPress }: ToastComponentProps)
   return <GestureDetector gesture={pan}>
     <View
       style={{
+        zIndex: 9999,
         position: 'absolute',
         alignItems: 'center',
         width: '100%',

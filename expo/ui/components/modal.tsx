@@ -20,6 +20,7 @@ type Props = {
   onOpenChange?: (open: boolean) => void;
   children: ReactNode | Children;
   style?: ViewStyle;
+  stickyFooter?: ReactNode;
   header?: Pick<ModalHeaderProps, 'style' | 'title' | 'type' | 'customBackIcon' | 'endContent'>
   & {
     showBackButton?: boolean;
@@ -115,7 +116,7 @@ export const SlideToDismiss = ({
   );
 };
 
-export const Modal = ({ children, open, onOpenChange, style, header }: Props) => {
+export const Modal = ({ children, open, stickyFooter, onOpenChange, style, header }: Props) => {
   const [currentStep, setCurrentStep] = useState(0);
   const stepsLengthRef = useRef<number>(0);
 
@@ -255,7 +256,8 @@ export const Modal = ({ children, open, onOpenChange, style, header }: Props) =>
                     if (Array.isArray(children)) {
                       const arr = children as ReactNode[];
                       stepsLengthRef.current = arr.length;
-                      return arr[currentStep] ?? null;
+                      // return arr[currentStep] ?? null;
+                      return arr;
                     }
 
                     stepsLengthRef.current = 0;
@@ -263,6 +265,7 @@ export const Modal = ({ children, open, onOpenChange, style, header }: Props) =>
                   })()}
                 </Animated.ScrollView>
               </GestureDetector>
+              {stickyFooter}
             </Block>
           </SlideToDismiss>
         </AnimatePresence>

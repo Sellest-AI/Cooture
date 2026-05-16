@@ -12,6 +12,7 @@ const INTERNAL_COLOR_TAGS = [
   { tag: "brown", r: 51, g: 42, b: 42 },
   { tag: "brown", r: 29, g: 27, b: 23 },
   { tag: "brown", r: 84, g: 72, b: 73 },
+  { tag: "black", r: 34, g: 34, b: 34 },
   { tag: "black", r: 15, g: 15, b: 15 },
   { tag: "grey", r: 150, g: 150, b: 150 },
   { tag: "grey", r: 70, g: 83, b: 89 },

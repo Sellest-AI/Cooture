@@ -255,12 +255,7 @@ export const ItemScreen = ({ id, path, QuickAccessBar, isFullScreen = false, hea
               }}
             />
           </View>
-          <ColorsBlock style={{ marginTop: 24 }} />
-          {item.description && <View style={{ paddingHorizontal: 32, marginTop: 28, marginBottom: 24 }}>
-            <Text.Base color={Colors.neutral[200]} numberOfLines={4} style={{ textAlign: 'center' }}>
-              {item.description}
-            </Text.Base>
-          </View>}
+          <ColorsBlock style={{ marginTop: 24, marginBottom: 24 }} />
         </View>
       }
     >
@@ -305,6 +300,11 @@ export const ItemScreen = ({ id, path, QuickAccessBar, isFullScreen = false, hea
         >
           Information
         </Text.Lg>
+        {item.description && <View style={{ paddingHorizontal: 32, marginTop: 12, marginBottom: 24 }}>
+          <Text.Base color={Colors.neutral[200]} numberOfLines={4} style={{ textAlign: 'center' }}>
+            {item.description}
+          </Text.Base>
+        </View>}
         <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8 }}>
           <ItemCategory title={item.category} onPress={(category) => update({ category })} disabled={disabled(item.userId)} />
           <WeatherCategory title={item.weatherTags[0]} onPress={(weather) => update({ weatherTags: [weather, ...item.weatherTags.slice(1)] })} disabled={disabled(item.userId)} />
