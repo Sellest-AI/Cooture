@@ -10,8 +10,9 @@ import { useAppearance } from "../profiles/_hooks/useAppearance"
 
 type Props = {
   currentPath: Route;
+  onCancel?: () => void;
 }
-export const ModalAppearance = ({ currentPath }: Props) => {
+export const ModalAppearance = ({ currentPath, onCancel }: Props) => {
   const { push } = useRouter(currentPath);
   const { pathname } = useRoute.Path();
 
@@ -30,11 +31,14 @@ export const ModalAppearance = ({ currentPath }: Props) => {
   return (
     <Modal
       open={open}
-      onOpenChange={hasFullAppearance ? () => setOpen(false) : undefined}
+      onOpenChange={() => {
+        setOpen(false);
+        if (!hasFullAppearance) onCancel?.();
+      }}
       header={{
         title: "Appearance",
         type: "alt",
-        showBackButton: hasFullAppearance,
+        showBackButton: !!onCancel,
         customBackIcon: 'x'
       }}
     >
