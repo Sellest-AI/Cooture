@@ -5,6 +5,7 @@ import { Button } from "@ui/button";
 import { ImageGeneration } from "@ui/cards";
 import { Plus } from "@ui/icons";
 import { Image } from "@ui/image";
+import { FullScreenImageZoom } from "@ui/image.zoom";
 import { Pressable } from "@ui/pressable";
 import { Carousel, ICarouselInstance } from "@ui/screen-carousel";
 import { Text } from "@ui/text";
@@ -120,6 +121,7 @@ export default function Screen() {
   const items = (photoshoot?.predictions ?? []).map((p) => ({
     _id: p.predictionId,
     imageUrl: results?.find((r) => r._id === p.imageId)?.url,
+    imageAspectRatio: results?.find((r) => r._id === p.imageId)?.aspectRatio,
     status: p.status,
   }))
 
@@ -181,17 +183,26 @@ export default function Screen() {
                 )
 
               return (
-                <AnimatedGeneration
+                <FullScreenImageZoom
                   key={s._id}
-                  status={'IDLE'}
+                  source={s.imageUrl}
+                  imageAspectRatio={Number(s.imageAspectRatio?.actual)}
                 >
-                  <ImageGeneration
-                    loading={s.status === 'LOADING'}
-                    source={s.imageUrl}
-                    text={s.status === 'LOADING' ? "Generating..." :
-                      s.status === 'FAILED' ? "Failed to generate." : "Ready"}
-                  />
-                </AnimatedGeneration>
+                  {({ onPress }) => (
+                    <AnimatedGeneration
+                      key={s._id}
+                      status={'IDLE'}
+                    >
+                      <ImageGeneration
+                        loading={s.status === 'LOADING'}
+                        source={s.imageUrl}
+                        text={s.status === 'LOADING' ? "Generating..." :
+                          s.status === 'FAILED' ? "Failed to generate." : "Ready"}
+                        onPress={() => onPress()}
+                      />
+                    </AnimatedGeneration>
+                  )}
+                </FullScreenImageZoom>
               )
             })}
           />}

@@ -11,6 +11,7 @@ import { Block } from "@ui/block";
 import { ImageGeneration } from "@ui/cards";
 import { ArrowLeft, Check, X } from "@ui/icons";
 import { Image } from "@ui/image";
+import { FullScreenImageZoom } from "@ui/image.zoom";
 import { MotiView } from "@ui/motion";
 import { Pressable } from "@ui/pressable";
 import { SafeAreaView } from "@ui/safe-area-view";
@@ -65,6 +66,7 @@ export default function Screen() {
     _id: p._id,
     providerId: p.predictionId,
     imageUrl: results?.find((r) => r._id === p.imageId)?.url,
+    imageAspectRatio: results?.find((r) => r._id === p.imageId)?.aspectRatio,
     imageId: p.imageId,
     status: p.status,
   }))
@@ -237,36 +239,42 @@ export default function Screen() {
                       (s.status !== 'LOADING' && !s.imageId);
 
                     return (
-                      <AnimatedGeneration
+                      <FullScreenImageZoom
                         key={s.providerId}
-                        status={animatingItem?.id === s.providerId ? animatingItem.status : 'IDLE'}
-                        onAnimationComplete={handleAnimationComplete}
+                        source={s.imageUrl}
+                        imageAspectRatio={Number(s.imageAspectRatio?.actual)}
                       >
-                        <ImageGeneration
-                          loading={s.status === 'LOADING'}
-                          source={s.imageUrl}
-                          text={s.status === 'LOADING' ? "Generating..." :
-                            isFailed ? "Failed" : "Ready"}
-                          onDownload={s.imageUrl ? () => downloadImageCrossPlatform(s.imageUrl!, { applyWatermark: true }) : undefined}
-                        />
-                        {isFailed && <View style={{
-                          position: 'absolute',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          inset: 0,
-                        }}>
-                          <Text.Base color={Colors.neutral[400]}
-                            style={{ textAlign: 'center', maxWidth: '70%', marginTop: -32 }}
-                            weight={500}>
-                            This generation failed. You have not been charged for it.
-                          </Text.Base>
-                          <Text.Base color={Colors.neutral[400]}
-                            style={{ textAlign: 'center', maxWidth: '70%', marginTop: 16 }}
-                            weight={500}>
-                            Please try again.
-                          </Text.Base>
-                        </View>}
-                      </AnimatedGeneration>
+                        {({ onPress }) => <AnimatedGeneration
+                          status={animatingItem?.id === s.providerId ? animatingItem.status : 'IDLE'}
+                          onAnimationComplete={handleAnimationComplete}
+                        >
+                          <ImageGeneration
+                            loading={s.status === 'LOADING'}
+                            source={s.imageUrl}
+                            text={s.status === 'LOADING' ? "Generating..." :
+                              isFailed ? "Failed" : "Ready"}
+                            onDownload={s.imageUrl ? () => downloadImageCrossPlatform(s.imageUrl!, { applyWatermark: true }) : undefined}
+                            onPress={() => onPress()}
+                          />
+                          {isFailed && <View style={{
+                            position: 'absolute',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            inset: 0,
+                          }}>
+                            <Text.Base color={Colors.neutral[400]}
+                              style={{ textAlign: 'center', maxWidth: '70%', marginTop: -32 }}
+                              weight={500}>
+                              This generation failed. You have not been charged for it.
+                            </Text.Base>
+                            <Text.Base color={Colors.neutral[400]}
+                              style={{ textAlign: 'center', maxWidth: '70%', marginTop: 16 }}
+                              weight={500}>
+                              Please try again.
+                            </Text.Base>
+                          </View>}
+                        </AnimatedGeneration>}
+                      </FullScreenImageZoom>
                     )
                   })}
               />
