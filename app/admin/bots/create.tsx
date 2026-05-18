@@ -243,7 +243,7 @@ const Images = () => {
 }
 
 export default function Screen() {
-  const { identity, setIdentity, generateIdentity, images, createOne, reset } = useBot.New();
+  const { identity, setIdentity, generateIdentity, hasAllImages, createOne, reset } = useBot.New();
 
   useEffect(() => {
     if (!identity) { generateIdentity(); }
@@ -319,7 +319,7 @@ export default function Screen() {
           router.back();
           reset();
         }}
-        disabled={!images || !identity}
+        disabled={!hasAllImages || !identity}
         variant="primary"
         style={{
           position: 'absolute',
