@@ -1,34 +1,10 @@
 import { taskNames, taskStatus } from "@/lib/runpod";
+import { zodToConvexFields } from "convex-helpers/server/zod4";
 import { v } from "convex/values";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { internal } from "../../_generated/api";
 import { Id } from "../../_generated/dataModel";
 import { httpAction, internalAction } from "../../_generated/server";
-
-const removeBackgroundSchemaValidator = v.object({
-  url: v.string(),
-  callback: v.object({
-    userId: v.id("users"),
-    nextStep: v.union(v.literal('SAVE_IMAGE'), v.literal('CREATE_ITEM'), v.literal('UPDATE_ITEM')),
-    nextArgs: v.optional(v.object({
-      UPDATE_ITEM: v.optional(v.object({
-        itemId: v.id("items"),
-      })),
-      CREATE_ITEM: v.optional(v.object({
-        brand: v.optional(v.string()),
-        name: v.optional(v.string()),
-        description: v.optional(v.string()),
-        itemUrl: v.optional(v.string()),
-        gender: v.optional(v.string()),
-        fit: v.optional(v.string()),
-        materials: v.optional(v.array(v.string())),
-      }))
-    }))
-  })
-})
-
-export const REMOVE_BACKGROUND_NEXT_STEP = removeBackgroundSchemaValidator.fields.callback.fields.nextStep;
-export const REMOVE_BACKGROUND_NEXT_ARGS = removeBackgroundSchemaValidator.fields.callback.fields.nextArgs;
 
 const CallbackSchema = z.object({
   userId: z.string(),
@@ -58,10 +34,10 @@ const WebhookTaskSchema = z.object({
 const RemoveBackgroundTaskSchema = WebhookTaskSchema.extend({
   output: OutputSchema.extend({
     callback: CallbackSchema.extend({
-      nextStep: z.enum(REMOVE_BACKGROUND_NEXT_STEP.members.map((v) => v.value)),
+      nextStep: z.enum(['SAVE_IMAGE', 'CREATE_ITEM', 'UPDATE_ITEM']),
       nextArgs: z.object({
         UPDATE_ITEM: z.optional(z.object({
-          itemId: z.string(),
+          itemId: z.string().transform((val) => val as Id<'items'>),
         })),
         CREATE_ITEM: z.optional(z.object({
           brand: z.optional(z.string()),
@@ -82,6 +58,18 @@ const RemoveBackgroundTaskSchema = WebhookTaskSchema.extend({
       height: z.number()
     }),
   }).optional(),
+})
+
+export const REMOVE_BACKGROUND_NEXT_STEP = v.union(...RemoveBackgroundTaskSchema.shape.output.unwrap().shape.callback.shape.nextStep.options.map((o) => v.literal(o)));
+export const REMOVE_BACKGROUND_NEXT_ARGS = v.object(zodToConvexFields(RemoveBackgroundTaskSchema.shape.output.unwrap().shape.callback.shape.nextArgs.shape))
+
+const removeBackgroundSchemaValidator = v.object({
+  url: v.string(),
+  callback: v.object({
+    userId: v.id("users"),
+    nextStep: v.optional(REMOVE_BACKGROUND_NEXT_STEP),
+    nextArgs: v.optional(REMOVE_BACKGROUND_NEXT_ARGS)
+  })
 })
 
 export const _internal_process = internalAction({

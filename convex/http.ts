@@ -4,6 +4,7 @@ import { replicateHandler } from "./http/replicate";
 import { revenueCatHandler } from "./http/revenuecat";
 import { runpodGenerateVideoHandler } from "./http/runpod/generateVideo";
 import { runpodRemoveBackgroundHandler } from "./http/runpod/removeBackground";
+import { removeBackgroundHandler } from "./http/server";
 import { stripeWebhookHttpAction } from "./router/stripe/http.webhook";
 
 const http = httpRouter();
@@ -37,6 +38,12 @@ http.route({
   method: "POST",
   handler: runpodGenerateVideoHandler,
 })
+
+http.route({
+  path: "/api/server/remove-background",
+  method: "POST",
+  handler: removeBackgroundHandler
+});
 
 auth.addHttpRoutes(http);
 export default http;

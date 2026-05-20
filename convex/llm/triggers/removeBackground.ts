@@ -12,7 +12,7 @@ const args = {
   base64: v.optional(v.string()),
   url: v.optional(v.string()),
   nextStep: REMOVE_BACKGROUND_NEXT_STEP,
-  nextArgs: REMOVE_BACKGROUND_NEXT_ARGS,
+  nextArgs: v.optional(REMOVE_BACKGROUND_NEXT_ARGS),
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
