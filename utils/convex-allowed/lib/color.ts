@@ -2,6 +2,7 @@ const INTERNAL_COLOR_TAGS = [
   { tag: "blue", r: 90, g: 130, b: 180 },
   { tag: "blue", r: 17, g: 25, b: 48 },
   { tag: "blue", r: 33, g: 67, b: 101 },
+  { tag: "blue", r: 46, g: 55, b: 68 },
   { tag: "green", r: 100, g: 150, b: 110 },
   { tag: "green", r: 74, g: 124, b: 89 },
   { tag: "green", r: 124, g: 150, b: 90 },
