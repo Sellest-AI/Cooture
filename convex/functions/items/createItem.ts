@@ -11,6 +11,9 @@ type Args = {
     brand?: string;
     name?: string;
     description?: string;
+    gender?: string;
+    fit?: string;
+    materials?: string[];
     itemUrl?: string;
   }
 }
@@ -24,6 +27,9 @@ export const createItem = async (ctx: ActionCtx, data: Args): Promise<Id<"items"
       name: data.metadata.name,
       description: data.metadata.description,
       url: data.metadata.itemUrl,
+      gender: data.metadata.gender,
+      fit: data.metadata.fit,
+      materials: data.metadata.materials,
     } : undefined,
   })
 

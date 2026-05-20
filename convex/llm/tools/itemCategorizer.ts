@@ -45,6 +45,9 @@ export const itemCategorizer = createTool({
       brand: z.optional(z.string()),
       name: z.optional(z.string()),
       description: z.optional(z.string()),
+      gender: z.optional(z.string()),
+      fit: z.optional(z.string()),
+      materials: z.optional(z.array(z.string())),
       url: z.optional(z.string()),
     })),
   }),
@@ -88,6 +91,11 @@ export const itemCategorizer = createTool({
       gender: z.enum([
         "UNISEX", "MALE", "FEMALE",
       ]).describe("Target gender/age group. Use UNISEX for items that work for anyone"),
+
+      fit: z.enum([
+        "TIGHT", "REGULAR", "LOOSE"
+      ]).describe("The fit of the item. TIGHT: body-hugging, stretchy items. REGULAR: standard fit, not too tight or loose. LOOSE: oversized, relaxed fit")
+        .default("REGULAR"),
 
       ...(args.extractText ? {
         description: z.string().max(400).describe("A brief text description (max 30 words) suitable for an online store."),

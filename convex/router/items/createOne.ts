@@ -10,6 +10,9 @@ const sharedArgs = {
   metadata: v.optional(v.object({
     brand: v.optional(v.string()),
     name: v.optional(v.string()),
+    gender: v.optional(v.string()),
+    fit: v.optional(v.string()),
+    materials: v.optional(v.array(v.string())),
     description: v.optional(v.string()),
     itemUrl: v.optional(v.string()),
   })),

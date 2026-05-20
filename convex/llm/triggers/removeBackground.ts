@@ -5,23 +5,14 @@ import { Infer, v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { Id } from "../../_generated/dataModel";
 import { internalAction } from "../../_generated/server";
+import { REMOVE_BACKGROUND_NEXT_ARGS, REMOVE_BACKGROUND_NEXT_STEP } from "../../http/runpod/removeBackground";
 import { ActionCtx, adminAction, authAction } from "../../procedures";
 
 const args = {
   base64: v.optional(v.string()),
   url: v.optional(v.string()),
-  nextStep: v.union(v.literal('SAVE_IMAGE'), v.literal('CREATE_ITEM'), v.literal('UPDATE_ITEM')),
-  nextArgs: v.optional(v.object({
-    UPDATE_ITEM: v.optional(v.object({
-      itemId: v.id("items"),
-    })),
-    CREATE_ITEM: v.optional(v.object({
-      brand: v.optional(v.string()),
-      name: v.optional(v.string()),
-      description: v.optional(v.string()),
-      itemUrl: v.optional(v.string()),
-    })),
-  }))
+  nextStep: REMOVE_BACKGROUND_NEXT_STEP,
+  nextArgs: REMOVE_BACKGROUND_NEXT_ARGS,
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -38,7 +29,7 @@ const handler = async (ctx: ActionCtx, args: Args) => {
 
   // If the image has an alpha channel, we can skip the background removal step and directly upload it
   if (hasAlpha) {
-    await ctx.runAction(internal.http.runpod.removeBackground._internal_process, {
+    await ctx.scheduler.runAfter(0, internal.http.runpod.removeBackground._internal_process, {
       removeBackgroundData: {
         url: url,
         callback: {

@@ -68,12 +68,20 @@ export const ITEM_GENDERS = v.union(
   v.literal("FEMALE"),
 )
 
+export const ITEM_FIT = v.union(
+  v.literal("TIGHT"),
+  v.literal("REGULAR"),
+  v.literal("LOOSE"),
+)
+
 export const ITEMS_SCHEMA = {
+  sku: v.optional(v.string()),
   name: v.string(),
   brand: v.optional(v.string()),
   description: v.optional(v.string()),
   features: v.optional(v.array(v.string())),
   imageId: v.id("images"),
+  fit: v.optional(ITEM_FIT),
   category: ITEM_CATEGORIES,
   weatherTags: v.array(ITEM_WEATHERS),
   mainColors: v.array(v.string()),

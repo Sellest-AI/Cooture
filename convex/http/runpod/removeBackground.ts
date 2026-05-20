@@ -5,6 +5,31 @@ import { internal } from "../../_generated/api";
 import { Id } from "../../_generated/dataModel";
 import { httpAction, internalAction } from "../../_generated/server";
 
+const removeBackgroundSchemaValidator = v.object({
+  url: v.string(),
+  callback: v.object({
+    userId: v.id("users"),
+    nextStep: v.union(v.literal('SAVE_IMAGE'), v.literal('CREATE_ITEM'), v.literal('UPDATE_ITEM')),
+    nextArgs: v.optional(v.object({
+      UPDATE_ITEM: v.optional(v.object({
+        itemId: v.id("items"),
+      })),
+      CREATE_ITEM: v.optional(v.object({
+        brand: v.optional(v.string()),
+        name: v.optional(v.string()),
+        description: v.optional(v.string()),
+        itemUrl: v.optional(v.string()),
+        gender: v.optional(v.string()),
+        fit: v.optional(v.string()),
+        materials: v.optional(v.array(v.string())),
+      }))
+    }))
+  })
+})
+
+export const REMOVE_BACKGROUND_NEXT_STEP = removeBackgroundSchemaValidator.fields.callback.fields.nextStep;
+export const REMOVE_BACKGROUND_NEXT_ARGS = removeBackgroundSchemaValidator.fields.callback.fields.nextArgs;
+
 const CallbackSchema = z.object({
   userId: z.string(),
   task: z.object({
@@ -33,8 +58,8 @@ const WebhookTaskSchema = z.object({
 const RemoveBackgroundTaskSchema = WebhookTaskSchema.extend({
   output: OutputSchema.extend({
     callback: CallbackSchema.extend({
-      nextStep: z.enum(['SAVE_IMAGE', 'CREATE_ITEM', 'UPDATE_ITEM']),
-      nextArgs: z.optional(z.object({
+      nextStep: z.enum(REMOVE_BACKGROUND_NEXT_STEP.members.map((v) => v.value)),
+      nextArgs: z.object({
         UPDATE_ITEM: z.optional(z.object({
           itemId: z.string(),
         })),
@@ -43,8 +68,11 @@ const RemoveBackgroundTaskSchema = WebhookTaskSchema.extend({
           name: z.optional(z.string()),
           description: z.optional(z.string()),
           itemUrl: z.optional(z.string()),
+          gender: z.optional(z.string()),
+          fit: z.optional(z.string()),
+          materials: z.optional(z.array(z.string())),
         })),
-      }))
+      })
     }),
     url: z.string(),
     position: z.object({
@@ -54,25 +82,6 @@ const RemoveBackgroundTaskSchema = WebhookTaskSchema.extend({
       height: z.number()
     }),
   }).optional(),
-})
-
-const removeBackgroundSchemaValidator = v.object({
-  url: v.string(),
-  callback: v.object({
-    userId: v.id("users"),
-    nextStep: v.union(v.literal('SAVE_IMAGE'), v.literal('CREATE_ITEM'), v.literal('UPDATE_ITEM')),
-    nextArgs: v.optional(v.object({
-      UPDATE_ITEM: v.optional(v.object({
-        itemId: v.id("items"),
-      })),
-      CREATE_ITEM: v.optional(v.object({
-        brand: v.optional(v.string()),
-        name: v.optional(v.string()),
-        description: v.optional(v.string()),
-        itemUrl: v.optional(v.string()),
-      })),
-    }))
-  })
 })
 
 export const _internal_process = internalAction({
@@ -136,6 +145,9 @@ export const runpodRemoveBackgroundHandler = httpAction(async (ctx, request) => 
             description: callback.nextArgs.CREATE_ITEM?.description,
             itemUrl: callback.nextArgs.CREATE_ITEM?.itemUrl,
             brand: callback.nextArgs.CREATE_ITEM?.brand,
+            gender: callback.nextArgs.CREATE_ITEM?.gender,
+            fit: callback.nextArgs.CREATE_ITEM?.fit,
+            materials: callback.nextArgs.CREATE_ITEM?.materials,
           }
         } : callback.nextArgs?.UPDATE_ITEM ? {
           UPDATE_ITEM: {
