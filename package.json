@@ -43,6 +43,7 @@
     "@t3-oss/env-core": "^0.13.10",
     "ai": "^5.0.121",
     "clsx": "^2.1.1",
+    "color-name-list": "^14.37.0",
     "compromise": "^14.15.0",
     "convex": "^1.31.7",
     "convex-helpers": "^0.1.109",
@@ -84,6 +85,7 @@
     "moti": "^0.30.0",
     "nanoid": "^5.1.6",
     "nativewind": "^4.2.1",
+    "nearest-color": "^0.4.4",
     "patch-package": "^8.0.1",
     "phosphor-react-native": "^3.0.2",
     "posthog-react-native": "^4.21.0",
@@ -128,6 +130,7 @@
   "devDependencies": {
     "@babel/plugin-transform-react-jsx": "^7.28.6",
     "@types/mime-types": "^3.0.1",
+    "@types/nearest-color": "^0.4.1",
     "@types/node": "^25.0.7",
     "@types/react": "~19.2.0",
     "@types/unidecode": "^1.1.0",
