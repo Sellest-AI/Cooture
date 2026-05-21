@@ -173,6 +173,9 @@ const SimilarItems = ({ style, path }: { path: Route, style?: ViewStyle }) => {
         onEndReachedThreshold={0.7}
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => {
+          const isLarge = Number(item.image.aspectRatio.actual) > 7 / 4;
+          const image = isLarge ? item.image.sizes.medium : item.image.sizes.small;
+
           return (
             <View
               style={{
@@ -186,8 +189,8 @@ const SimilarItems = ({ style, path }: { path: Route, style?: ViewStyle }) => {
                 onPress={() => push(ROUTES.ITEM.PATH, {
                   pathParams: { id: item._id }
                 })}
-                source={item.image.sizes.small.url}
-                image={item.image.sizes.small}
+                source={image.url}
+                image={image}
                 title={item.name}
                 subtitle={item.brand}
                 style={{ height: '100%' }}
@@ -246,7 +249,7 @@ export const ItemScreen = ({ id, path, QuickAccessBar, isFullScreen = false, hea
             <Image
               priority="high"
               contentFit="contain"
-              source={item.image?.sizes.medium.url}
+              source={item.image?.sizes.large.url}
               placeholder={item.image?.sizes.thumbnail.url}
               placeholderContentFit="contain"
               style={{
