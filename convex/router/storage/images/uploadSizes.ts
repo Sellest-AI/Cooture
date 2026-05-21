@@ -18,7 +18,7 @@ const uploadSizes = async (ctx: ActionCtx, imageId: Id<'images'>) => {
   const sizes: Size[] = [
     { px: 150, quality: 40 },
     { px: 336, quality: 40 },
-    { px: 600, quality: 50 },
+    { px: 600, quality: 70 },
     { px: 1440, quality: 90 },
   ];
 
