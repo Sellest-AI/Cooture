@@ -8,6 +8,7 @@ type Args = {
   imageId: Id<"images">;
   userId: Id<"users">;
   metadata?: {
+    sku?: string;
     brand?: string;
     name?: string;
     description?: string;
@@ -15,6 +16,10 @@ type Args = {
     fit?: string;
     materials?: string[];
     itemUrl?: string;
+    price?: {
+      amount: number; // stored in minor units (cents) — avoids float issues
+      currency: "EUR" | "USD"; // hardcoded for now, extensible later
+    }
   }
 }
 
@@ -48,6 +53,9 @@ export const createItem = async (ctx: ActionCtx, data: Args): Promise<Id<"items"
     colorTags: colorTags,
     imageId: data.imageId,
     link: data.metadata?.itemUrl,
+    price: data.metadata?.price?.amount,
+    currency: data.metadata?.price?.currency,
+    sku: data.metadata?.sku,
   });
 
   await ctx.scheduler.runAfter(0, internal.router.items.createOne._internal_trend_action, {

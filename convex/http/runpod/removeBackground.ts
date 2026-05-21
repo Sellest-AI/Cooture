@@ -47,6 +47,11 @@ const RemoveBackgroundTaskSchema = WebhookTaskSchema.extend({
           gender: z.optional(z.string()),
           fit: z.optional(z.string()),
           materials: z.optional(z.array(z.string())),
+          sku: z.optional(z.string()),
+          price: z.optional(z.object({
+            amount: z.number(), // stored in minor units (cents) — avoids float issues
+            currency: z.enum(["EUR", "USD"]), // hardcoded for now, extensible later
+          })),
         })),
       })
     }),
@@ -136,6 +141,8 @@ export const runpodRemoveBackgroundHandler = httpAction(async (ctx, request) => 
             gender: callback.nextArgs.CREATE_ITEM?.gender,
             fit: callback.nextArgs.CREATE_ITEM?.fit,
             materials: callback.nextArgs.CREATE_ITEM?.materials,
+            price: callback.nextArgs.CREATE_ITEM?.price,
+            sku: callback.nextArgs.CREATE_ITEM?.sku,
           }
         } : callback.nextArgs?.UPDATE_ITEM ? {
           UPDATE_ITEM: {

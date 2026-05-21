@@ -94,6 +94,9 @@ export const ITEMS_SCHEMA = {
   contentRating: CONTENT_RATINGS,
   link: v.optional(v.string()),
   trendTags: v.optional(v.string()),
+  // price
+  price: v.optional(v.number()), // stored in minor units (cents) — avoids float issues
+  currency: v.optional(v.union(v.literal("EUR"), v.literal("USD"))), // hardcoded for now, extensible later
 }
 
 export const items = defineTable({
