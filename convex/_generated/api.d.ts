@@ -11,6 +11,7 @@
 import type * as auth from "../auth.js";
 import type * as crons from "../crons.js";
 import type * as crons_feedRecentUpdate from "../crons/feedRecentUpdate.js";
+import type * as crons_generateWardrobe from "../crons/generateWardrobe.js";
 import type * as crons_notifyInReviews from "../crons/notifyInReviews.js";
 import type * as crons_updateStatistics from "../crons/updateStatistics.js";
 import type * as env from "../env.js";
@@ -41,6 +42,7 @@ import type * as functions_notifications_index from "../functions/notifications/
 import type * as functions_notifications_readNotification from "../functions/notifications/readNotification.js";
 import type * as functions_notifications_registerToken from "../functions/notifications/registerToken.js";
 import type * as functions_notifications_saveNotification from "../functions/notifications/saveNotification.js";
+import type * as functions_outfits_generator from "../functions/outfits/generator.js";
 import type * as functions_outfits_getBackgroundColor from "../functions/outfits/getBackgroundColor.js";
 import type * as functions_outfits_getOutfit from "../functions/outfits/getOutfit.js";
 import type * as functions_outfits_index from "../functions/outfits/index.js";
@@ -197,6 +199,7 @@ import type * as router_notifications_readNotifications from "../router/notifica
 import type * as router_notifications_registerPushToken from "../router/notifications/registerPushToken.js";
 import type * as router_notifications_sendPushNotification from "../router/notifications/sendPushNotification.js";
 import type * as router_notifications_sendPushNotificationSteps from "../router/notifications/sendPushNotificationSteps.js";
+import type * as router_outfits_composeOne from "../router/outfits/composeOne.js";
 import type * as router_outfits_createOne from "../router/outfits/createOne.js";
 import type * as router_outfits_deleteOne from "../router/outfits/deleteOne.js";
 import type * as router_outfits_editOne from "../router/outfits/editOne.js";
@@ -300,6 +303,7 @@ import type * as workflows_database_countByField from "../workflows/database/cou
 import type * as workflows_database_countDocuments from "../workflows/database/countDocuments.js";
 import type * as workflows_database_countUserMetrics from "../workflows/database/countUserMetrics.js";
 import type * as workflows_statistics_update from "../workflows/statistics/update.js";
+import type * as workflows_wardrobe_generate from "../workflows/wardrobe/generate.js";
 
 import type {
   ApiFromModules,
@@ -311,6 +315,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   crons: typeof crons;
   "crons/feedRecentUpdate": typeof crons_feedRecentUpdate;
+  "crons/generateWardrobe": typeof crons_generateWardrobe;
   "crons/notifyInReviews": typeof crons_notifyInReviews;
   "crons/updateStatistics": typeof crons_updateStatistics;
   env: typeof env;
@@ -341,6 +346,7 @@ declare const fullApi: ApiFromModules<{
   "functions/notifications/readNotification": typeof functions_notifications_readNotification;
   "functions/notifications/registerToken": typeof functions_notifications_registerToken;
   "functions/notifications/saveNotification": typeof functions_notifications_saveNotification;
+  "functions/outfits/generator": typeof functions_outfits_generator;
   "functions/outfits/getBackgroundColor": typeof functions_outfits_getBackgroundColor;
   "functions/outfits/getOutfit": typeof functions_outfits_getOutfit;
   "functions/outfits/index": typeof functions_outfits_index;
@@ -497,6 +503,7 @@ declare const fullApi: ApiFromModules<{
   "router/notifications/registerPushToken": typeof router_notifications_registerPushToken;
   "router/notifications/sendPushNotification": typeof router_notifications_sendPushNotification;
   "router/notifications/sendPushNotificationSteps": typeof router_notifications_sendPushNotificationSteps;
+  "router/outfits/composeOne": typeof router_outfits_composeOne;
   "router/outfits/createOne": typeof router_outfits_createOne;
   "router/outfits/deleteOne": typeof router_outfits_deleteOne;
   "router/outfits/editOne": typeof router_outfits_editOne;
@@ -600,6 +607,7 @@ declare const fullApi: ApiFromModules<{
   "workflows/database/countDocuments": typeof workflows_database_countDocuments;
   "workflows/database/countUserMetrics": typeof workflows_database_countUserMetrics;
   "workflows/statistics/update": typeof workflows_statistics_update;
+  "workflows/wardrobe/generate": typeof workflows_wardrobe_generate;
 }>;
 
 /**

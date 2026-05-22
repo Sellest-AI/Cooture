@@ -39,4 +39,12 @@ crons.interval(
   { maxAgeDays: 3 }
 )
 
+// Generate Wardrobe Background job every 24 hours
+crons.daily(
+  "generate daily suggested wardrobes",
+  { hourUTC: 2, minuteUTC: 0 },
+  internal.crons.generateWardrobe._internal,
+  {}
+)
+
 export default crons;
