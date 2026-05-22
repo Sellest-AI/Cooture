@@ -6,7 +6,7 @@ import { internal } from "../../_generated/api";
 import { Id } from "../../_generated/dataModel";
 import { internalAction } from "../../_generated/server";
 import { REMOVE_BACKGROUND_NEXT_ARGS, REMOVE_BACKGROUND_NEXT_STEP } from "../../http/runpod/removeBackground";
-import { ActionCtx, adminAction, authAction } from "../../procedures";
+import { ActionCtx, adminAction, authAction, serverAction } from "../../procedures";
 
 const args = {
   base64: v.optional(v.string()),
@@ -70,6 +70,11 @@ export const admin = adminAction({
 })
 
 export const _internal = internalAction({
+  args: { ...args, userId: v.id("users") },
+  handler: (ctx, args) => handler(ctx, args)
+})
+
+export const server = serverAction({
   args: { ...args, userId: v.id("users") },
   handler: (ctx, args) => handler(ctx, args)
 })

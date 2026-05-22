@@ -67,7 +67,6 @@ import type * as http_replicate from "../http/replicate.js";
 import type * as http_revenuecat from "../http/revenuecat.js";
 import type * as http_runpod_generateVideo from "../http/runpod/generateVideo.js";
 import type * as http_runpod_removeBackground from "../http/runpod/removeBackground.js";
-import type * as http_server from "../http/server.js";
 import type * as lib_byteplus_node from "../lib/byteplus/node.js";
 import type * as lib_color_index from "../lib/color/index.js";
 import type * as lib_helpers_index from "../lib/helpers/index.js";
@@ -368,7 +367,6 @@ declare const fullApi: ApiFromModules<{
   "http/revenuecat": typeof http_revenuecat;
   "http/runpod/generateVideo": typeof http_runpod_generateVideo;
   "http/runpod/removeBackground": typeof http_runpod_removeBackground;
-  "http/server": typeof http_server;
   "lib/byteplus/node": typeof lib_byteplus_node;
   "lib/color/index": typeof lib_color_index;
   "lib/helpers/index": typeof lib_helpers_index;

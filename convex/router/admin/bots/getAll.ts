@@ -1,6 +1,6 @@
 import { notEmpty } from "@shared/utils";
 import { getUserPublic } from "../../../functions/users";
-import { adminQuery, internalQuery, QueryCtx } from "../../../procedures";
+import { adminQuery, internalQuery, QueryCtx, serverQuery } from "../../../procedures";
 
 const handler = async (ctx: QueryCtx) => {
   const bots = await ctx.db.query("bots").order("desc").collect();
@@ -27,5 +27,10 @@ export const _internal = internalQuery({
 })
 
 export const admin = adminQuery({
+  handler: async (ctx) => handler(ctx),
+})
+
+export const server = serverQuery({
+  args: {},
   handler: async (ctx) => handler(ctx),
 })

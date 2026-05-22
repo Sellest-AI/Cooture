@@ -4,7 +4,6 @@ import { replicateHandler } from "./http/replicate";
 import { revenueCatHandler } from "./http/revenuecat";
 import { runpodGenerateVideoHandler } from "./http/runpod/generateVideo";
 import { runpodRemoveBackgroundHandler } from "./http/runpod/removeBackground";
-import { botsListHandler, removeBackgroundHandler } from "./http/server";
 import { stripeWebhookHttpAction } from "./router/stripe/http.webhook";
 
 const http = httpRouter();
@@ -37,18 +36,6 @@ http.route({
   path: "/api/runpod/webhook/video-generation",
   method: "POST",
   handler: runpodGenerateVideoHandler,
-})
-
-http.route({
-  path: "/api/server/remove-background",
-  method: "POST",
-  handler: removeBackgroundHandler
-});
-
-http.route({
-  path: "/api/server/bots/list",
-  method: "POST",
-  handler: botsListHandler
 })
 
 auth.addHttpRoutes(http);
