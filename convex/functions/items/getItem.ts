@@ -2,6 +2,7 @@ import { Doc, Id } from "../../_generated/dataModel";
 import { QueryCtx } from "../../procedures";
 import { getImage } from "../images";
 import { extractPosition } from "./extractPosition";
+import { sanitizePrice } from "./sanitizePrice";
 
 export const getItem = async (ctx: QueryCtx, item: Id<'items'> | Doc<'items'>) => {
   const _item = typeof item === "string" ? await ctx.db.get(item) : item;
@@ -11,11 +12,7 @@ export const getItem = async (ctx: QueryCtx, item: Id<'items'> | Doc<'items'>) =
   return {
     ..._item,
     position: extractPosition(_item.category),
-    price: _item.price ? {
-      amount: _item.price / 100,
-      amountCents: _item.price,
-      currency: _item.currency!,
-    } : undefined,
+    price: sanitizePrice(_item),
     image,
   }
 }

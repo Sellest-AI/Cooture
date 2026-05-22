@@ -31,6 +31,14 @@ When in doubt about content rating, default to the most conservative option.
 
 The order of the fields in the arrays ARE VERY IMPORTANT and should reflect the prominence of each attribute in the item.
 
+FOR STYLES:
+- Only assign a style if the item has DIRECT visual or construction markers for it — not vague cultural associations.
+- CASUAL means genuinely relaxed everyday wear (plain tees, simple knitwear). Do NOT use it as a fallback or catch-all. If an item is already tagged STREETWEAR, TECHWEAR, or UTILITARIAN, do NOT also tag it CASUAL.
+- SPORTY requires real athletic DNA: performance/jersey fabric, sport-logo branding, mesh panels, or an athletic cut. A polo shirt with rugby heritage is PREPPY, not SPORTY.
+- STREETWEAR requires urban-coded garments. Do NOT apply it to classic tailored or dress footwear (loafers, oxfords, derbies, moccasins) — a lug sole is a styling detail, not streetwear DNA.
+- Saturation rule: if an item already has 3 or more strong specific styles (e.g., STREETWEAR + TECHWEAR + UTILITARIAN), do NOT add generic styles like CASUAL, SPORTY, or MINIMALIST on top.
+- Prefer fewer, accurate tags over many approximate ones.
+
 If a URL is included, do not mix the website's domain name with the clothing brand (for example, zalando = website, adidas = brand).
 
 RETURN THE DATA IN JSON FORMAT ONLY.
@@ -82,7 +90,8 @@ export const itemCategorizer = createTool({
         `),
 
       styles: z.array(z.enum(ITEM_STYLES))
-        .describe(`The style(s) of the item. Can include multiple styles if the item clearly incorporates elements of each.`),
+        .min(1).max(4)
+        .describe(`The style(s) of the item based on its design DNA. Follow the FOR STYLES rules in the system prompt.`),
 
       contentRating: z.enum([
         "SAFE", "SUGGESTIVE", "EXPLICIT", "NSFW"

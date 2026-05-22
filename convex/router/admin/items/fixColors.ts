@@ -8,9 +8,8 @@ export const _internal = internalAction({
     const items = await ctx.runQuery(internal.router.admin.items.fixColors._internal_query);
 
     let i = 0;
-    for (const item of items) {
-      console.log(`Processing item ${i + 1} / ${items.length} (${item._id})`);
 
+    await Promise.all(items.map(async (item) => {
       const { tags: colorTags, mainColors } = await ctx.runAction(internal.router.admin.items.fixColorsAction._internal_node, {
         imageUrl: item.imageUrl,
       });
@@ -21,8 +20,10 @@ export const _internal = internalAction({
         mainColors,
       });
 
+      console.log(`Processed item ${i + 1} / ${items.length} (${item._id})`);
+
       i++;
-    }
+    }));
   }
 })
 

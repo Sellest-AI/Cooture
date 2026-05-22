@@ -5,7 +5,7 @@ import { components, internal } from "../../_generated/api";
 import { Doc, Id } from "../../_generated/dataModel";
 import { ActionCtx, internalAction, internalQuery } from "../../_generated/server";
 import { getImage, GetImageDoc } from "../../functions/images";
-import { extractPosition, Position } from "../../functions/items";
+import { extractPosition, Position, SanitizedPrice, sanitizePrice } from "../../functions/items";
 import { authAction, publicAction } from "../../procedures";
 
 const cache = new ActionCache(components.actionCache, {
@@ -14,7 +14,8 @@ const cache = new ActionCache(components.actionCache, {
   ttl: 1000 * 60 * 5, // 5 minutes
 });
 
-type ReturnType = (Doc<'items'> & {
+type ReturnType = (Omit<Doc<'items'>, 'price'> & {
+  price: SanitizedPrice,
   image: NonNullable<GetImageDoc>,
   ownedByUser?: boolean,
   position: Position
@@ -57,6 +58,7 @@ export const _internal_query_1 = internalQuery({
 
       detailedItems.push({
         ...item,
+        price: sanitizePrice(item),
         position,
         image
       });
@@ -88,6 +90,7 @@ export const _internal_query_2 = internalQuery({
         image,
         position,
         ownedByUser: true,
+        price: sanitizePrice(item),
       }
     }));
 
