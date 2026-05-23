@@ -5,6 +5,7 @@ import { Infer, v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { Id } from "../../_generated/dataModel";
 import { internalAction } from "../../_generated/server";
+import { getItemFromSku } from "../../functions/items";
 import { REMOVE_BACKGROUND_NEXT_ARGS, REMOVE_BACKGROUND_NEXT_STEP } from "../../http/runpod/removeBackground";
 import { ActionCtx, adminAction, authAction, serverAction } from "../../procedures";
 
@@ -26,6 +27,18 @@ const handler = async (ctx: ActionCtx, args: Args) => {
   // If we have a base64 image, check if it has an alpha channel before starting the remove background task
   const buffer = await imageBufferFromUrl(url);
   const hasAlpha = await hasImageAlpha(buffer);
+
+  if (args.nextStep === 'CREATE_ITEM') {
+    if (args.nextArgs?.CREATE_ITEM?.sku) {
+      const alreadyExists = await getItemFromSku(ctx, args.nextArgs.CREATE_ITEM.sku);
+      if (alreadyExists) return {
+        completed: false,
+        started: false,
+        hasAlpha,
+      }
+    }
+  }
+
 
   // If the image has an alpha channel, we can skip the background removal step and directly upload it
   if (hasAlpha) {

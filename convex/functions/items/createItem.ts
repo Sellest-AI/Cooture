@@ -3,6 +3,7 @@ import { Id } from "../../_generated/dataModel";
 import { convertTagsToString } from "../../lib/helpers";
 import { ActionCtx } from "../../procedures";
 import { CREDITS_CONFIG } from "../credits";
+import { getItemFromSku } from "./getFromSku";
 
 type Args = {
   imageId: Id<"images">;
@@ -24,6 +25,11 @@ type Args = {
 }
 
 export const createItem = async (ctx: ActionCtx, data: Args): Promise<Id<"items">> => {
+  if (data.metadata?.sku) {
+    const alreadyExists = await getItemFromSku(ctx, data.metadata?.sku);
+    if (alreadyExists) return alreadyExists._id;
+  }
+
   const schema = await ctx.runAction(internal.llm.triggers.itemCategorizer._internal, {
     imageId: data.imageId,
     extractText: true,
