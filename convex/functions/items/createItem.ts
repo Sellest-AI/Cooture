@@ -58,10 +58,6 @@ export const createItem = async (ctx: ActionCtx, data: Args): Promise<Id<"items"
     sku: data.metadata?.sku,
   });
 
-  await ctx.scheduler.runAfter(0, internal.router.items.createOne._internal_trend_action, {
-    itemId: item,
-  });
-
   await ctx.runMutation(internal.router.credits.deductCredits._internal, {
     userId: data.userId,
     amount: CREDITS_CONFIG.COST_PER_ITEM,

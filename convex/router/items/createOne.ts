@@ -68,6 +68,11 @@ export const _internal_mutation = internalMutation({
   args: mutationArgs,
   handler: async (ctx, args) => {
     const itemId = await ctx.db.insert("items", args);
+
+    await ctx.scheduler.runAfter(0, internal.router.items.createOne._internal_trend_action, {
+      itemId,
+    });
+
     return itemId;
   }
 })
