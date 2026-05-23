@@ -38,10 +38,10 @@ const openrouterQwen359b = {
   }
 }
 
-const openrouterGrok41fast = {
+const openrouterGemini431B = {
   pricing: {
-    inputTokens: 0.2,
-    outputTokens: 0.5,
+    inputTokens: 0.12,
+    outputTokens: 0.37,
   },
   providerOptions: (options: { effort: 'none' | 'high' }) => ({
     openrouter: {
@@ -53,6 +53,7 @@ const openrouterGrok41fast = {
         effort: "high"
       },
       provider: {
+        order: ['ambient', 'venice/bf16', 'novita/bf16', 'siliconflow/fp8'],
         allow_fallbacks: true,
       }
     }
@@ -141,6 +142,6 @@ export const providerOptions = {
     gemini3flash: openrouterGemini3flash,
     gptOss120b: openrouterGptOss120b,
     qwen359b: openrouterQwen359b,
-    grok41fast: openrouterGrok41fast,
+    gemini431B: openrouterGemini431B,
   },
 }
