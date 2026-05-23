@@ -23,7 +23,7 @@ const handler = async (ctx: QueryCtx, args: {
   const faker = new Faker({ locale: en });
   faker.seed(seed);
 
-  const settings = await ctx.runQuery(api.router.outfits.composeOne.settings);
+  const settings = await ctx.runQuery(api.router.outfits.suggestOne.settings);
   const targetStyle = faker.helpers.arrayElement(args.styles as string[] ?? settings.styles) as Style;
   const targetPalette = faker.helpers.arrayElement(args.hexPalettes ?? settings.palettes.map(p => p.colors));
 

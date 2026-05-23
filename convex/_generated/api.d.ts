@@ -201,7 +201,6 @@ import type * as router_notifications_readNotifications from "../router/notifica
 import type * as router_notifications_registerPushToken from "../router/notifications/registerPushToken.js";
 import type * as router_notifications_sendPushNotification from "../router/notifications/sendPushNotification.js";
 import type * as router_notifications_sendPushNotificationSteps from "../router/notifications/sendPushNotificationSteps.js";
-import type * as router_outfits_composeOne from "../router/outfits/composeOne.js";
 import type * as router_outfits_createOne from "../router/outfits/createOne.js";
 import type * as router_outfits_deleteOne from "../router/outfits/deleteOne.js";
 import type * as router_outfits_editOne from "../router/outfits/editOne.js";
@@ -210,6 +209,7 @@ import type * as router_outfits_getFromUser from "../router/outfits/getFromUser.
 import type * as router_outfits_getLatest from "../router/outfits/getLatest.js";
 import type * as router_outfits_getOne from "../router/outfits/getOne.js";
 import type * as router_outfits_searchMany from "../router/outfits/searchMany.js";
+import type * as router_outfits_suggestOne from "../router/outfits/suggestOne.js";
 import type * as router_outfits_updateCover from "../router/outfits/updateCover.js";
 import type * as router_outfits_updateCoverInternal from "../router/outfits/updateCoverInternal.js";
 import type * as router_outfits_updateTags from "../router/outfits/updateTags.js";
@@ -507,7 +507,6 @@ declare const fullApi: ApiFromModules<{
   "router/notifications/registerPushToken": typeof router_notifications_registerPushToken;
   "router/notifications/sendPushNotification": typeof router_notifications_sendPushNotification;
   "router/notifications/sendPushNotificationSteps": typeof router_notifications_sendPushNotificationSteps;
-  "router/outfits/composeOne": typeof router_outfits_composeOne;
   "router/outfits/createOne": typeof router_outfits_createOne;
   "router/outfits/deleteOne": typeof router_outfits_deleteOne;
   "router/outfits/editOne": typeof router_outfits_editOne;
@@ -516,6 +515,7 @@ declare const fullApi: ApiFromModules<{
   "router/outfits/getLatest": typeof router_outfits_getLatest;
   "router/outfits/getOne": typeof router_outfits_getOne;
   "router/outfits/searchMany": typeof router_outfits_searchMany;
+  "router/outfits/suggestOne": typeof router_outfits_suggestOne;
   "router/outfits/updateCover": typeof router_outfits_updateCover;
   "router/outfits/updateCoverInternal": typeof router_outfits_updateCoverInternal;
   "router/outfits/updateTags": typeof router_outfits_updateTags;

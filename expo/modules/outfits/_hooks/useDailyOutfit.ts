@@ -51,7 +51,7 @@ const useSettings = () => {
   const convex = useConvex();
   const [, setItems] = useAtom(itemsAtom);
 
-  const { data: settings } = useQueryCached(api.router.outfits.composeOne.settings);
+  const { data: settings } = useQueryCached(api.router.outfits.suggestOne.settings);
 
   const [isRandomizing, setIsRandomizing] = useAtom(isRandomizingAtom);
   const [settingsState, setSettingsState] = useAtom(settingsAtom);
@@ -98,7 +98,7 @@ const useSettings = () => {
     const finalStyles = styles.length > 0 ? styles : undefined;
     const finalSeed = updateSeed();
 
-    const outfit = await convex.query(api.router.outfits.composeOne.authed, {
+    const outfit = await convex.query(api.router.outfits.suggestOne.authed, {
       seed: finalSeed,
       hexPalettes: finalPalettes?.map((p) => p.colors),
       styles: finalStyles,
