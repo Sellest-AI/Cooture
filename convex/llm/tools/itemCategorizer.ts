@@ -1,6 +1,7 @@
 import { notEmpty, retryPromise } from "@shared/utils";
 import { z } from "zod";
 import { ITEM_STYLES } from "../../schema/constants";
+import { ITEM_CATEGORIES } from "../../schema/items";
 import { defaultAgent } from "../agents/default";
 import { models } from "../config";
 import { createTool, wrapAgent } from "../utils";
@@ -61,11 +62,8 @@ export const itemCategorizer = createTool({
   }),
   handler: async (ctx, args) => {
     const schema = z.object({
-      category: z.enum([
-        "TOP", "BOTTOM", "DRESS", "OUTERWEAR", "SHOES", "ACCESSORY",
-        "HOODIE", "SWEATER", "TSHIRT", "JEANS", "SKIRT", "HAT",
-        "CAP", "GLASSES", "BAG", "JACKET", "LEGWEAR"
-      ]).describe("The most specific category. E.g., use 'TSHIRT' instead of 'TOP' for t-shirts, 'JEANS' instead of 'BOTTOM' for jeans"),
+      category: z.enum(ITEM_CATEGORIES)
+        .describe("The most specific category. E.g., use 'TSHIRT' instead of 'TOP' for t-shirts, 'JEANS' instead of 'BOTTOM' for jeans"),
 
       features: z.array(z.string()).max(5).describe(
         "Distinctive fashion details, hardware, or construction elements. Examples: 'cargo pockets', 'distressed', 'drawstrings', 'asymmetrical', 'pleated', 'graphic print', 'chunky sole'. Do not include basic elements like 'sleeves' or 'buttons' unless they are visually defining."

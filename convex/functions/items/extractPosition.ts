@@ -1,7 +1,7 @@
 import { ITEM_CATEGORIES } from "../../schema/items";
 
 export type Position = 'TOP' | 'BOTTOM' | 'LEGWEAR' | 'UNDERWEAR' | 'INNERLAYER' | 'OUTERWEAR' | 'ACCESSORY' | 'SHOES';
-type Category = typeof ITEM_CATEGORIES['type'];
+type Category = typeof ITEM_CATEGORIES[number];
 export const extractPosition = (category: Category): Position => {
   switch (category) {
     case "TOP":
@@ -9,6 +9,8 @@ export const extractPosition = (category: Category): Position => {
     case "BOTTOM":
       return 'BOTTOM';
     case "LEGWEAR":
+      return 'LEGWEAR';
+    case "SOCKS":
       return 'LEGWEAR';
     case "DRESS":
       return 'TOP';

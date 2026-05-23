@@ -1,5 +1,5 @@
 import { defineEvent, vWorkflowId } from "@convex-dev/workflow";
-import { Infer, v } from "convex/values";
+import { v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { extractPosition } from "../../functions/items/extractPosition";
 import { buildOutfitCombinations, GenderTag, GroupedPositions, WeatherTag } from "../../functions/outfits/generator";
@@ -136,7 +136,7 @@ export const generateCombinations = internalMutation({
 
     for (const [category, items] of Object.entries(groupedItems)) {
       const pos = extractPosition(category as any);
-      const _category = category as Infer<typeof ITEM_CATEGORIES>;
+      const _category = category as typeof ITEM_CATEGORIES[number];
       if (positions[pos]) {
         for (const item of items) {
           positions[pos].push({

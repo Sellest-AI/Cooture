@@ -10,7 +10,7 @@ export type GenderTag = Infer<typeof ITEM_GENDERS>;
 
 export type GroupedPositions = Record<Position, {
   id: Id<"items">;
-  category: Infer<typeof ITEM_CATEGORIES>;
+  category: typeof ITEM_CATEGORIES[number];
   colors: string[];      // color tags, e.g. ["black", "white"]
   weatherTags: string[]; // e.g. ["COLD", "SNOWY"]
   gender: GenderTag;     // "MALE" | "FEMALE" | "UNISEX"
