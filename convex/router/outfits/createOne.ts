@@ -7,7 +7,7 @@ import { internal } from "../../_generated/api";
 import { upsertFeedScore } from "../../functions/feed";
 import { isOutfitNFSW } from '../../functions/outfits';
 import { updateQuest } from '../../functions/quests';
-import { adminMutation, authMutation, MutationCtx } from "../../procedures";
+import { adminMutation, authMutation, MutationCtx, serverMutation } from "../../procedures";
 
 const args = {
   name: v.optional(v.string()),
@@ -72,6 +72,11 @@ export const authed = authMutation({
 })
 
 export const admin = adminMutation({
+  args: { ...args, userId: v.id("users") },
+  handler: handler
+})
+
+export const server = serverMutation({
   args: { ...args, userId: v.id("users") },
   handler: handler
 })

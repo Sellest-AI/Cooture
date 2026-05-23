@@ -22,6 +22,10 @@ const deepseek4Flash = openrouter.chat("deepseek/deepseek-v4-flash");
 
 export const models = {
   orchestrator: {
+    smartest: {
+      model: gemini3flash,
+      ...providerOptions.openrouter.gemini3flash,
+    },
     default: {
       model: gptOss120b,
       ...providerOptions.openrouter.gptOss120b
