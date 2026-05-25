@@ -3,7 +3,7 @@ import { predictImage } from "@/lib/kie/node";
 import { sliceText } from "@shared/utils";
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
-import { Id } from "../../_generated/dataModel";
+import { Doc, Id } from "../../_generated/dataModel";
 import { CREDITS_CONFIG } from "../../functions/credits";
 import { ActionCtx, adminAction, authAction } from "../../procedures";
 import { createPhotoshootSchema, schemaToMarkdown } from "../utils/photoshoot";
@@ -87,6 +87,22 @@ const generateFunction = async (ctx: ActionCtx, args: {
   return generationId;
 }
 
+const provisionCreditsForGeneration = async (ctx: ActionCtx & { userId: Id<'users'>, user: { role: Doc<'usersExtended'>['role'] } },
+  args: { numberToGenerate?: number, userId: Id<'users'> }) => {
+  if (ctx.user.role === 'ADMIN' || ctx.user.role === 'BOT') {
+    await ctx.runMutation(internal.router.credits.grantCredits._internal, {
+      amount: CREDITS_CONFIG.COST_PER_IMAGE_GENERATION * (args.numberToGenerate ?? 1),
+      userId: args.userId,
+      metadata: ctx.user.role === 'ADMIN' ? {
+        reason: "Admin grant for photoshoot generation",
+        adminId: ctx.userId,
+      } : {
+        reason: "System grant for photoshoot generation",
+      }
+    });
+  }
+}
+
 const sharedArgs = {
   generationId: v.optional(v.id("generations")),
   presetId: v.id("presets"),
@@ -102,22 +118,25 @@ const sharedArgs = {
 
 export const authed = authAction({
   args: sharedArgs,
-  handler: async (ctx, args): Promise<Id<'generations'>> => generateFunction(ctx, {
-    ...args,
-    userId: ctx.userId,
-  }),
+  handler: async (ctx, args): Promise<Id<'generations'>> => {
+    await provisionCreditsForGeneration(ctx, {
+      userId: ctx.userId,
+      numberToGenerate: args.numberToGenerate
+    });
+
+    return generateFunction(ctx, {
+      ...args,
+      userId: ctx.userId,
+    })
+  }
 })
 
 export const admin = adminAction({
   args: { ...sharedArgs, userId: v.id("users") },
   handler: async (ctx, args): Promise<Id<'generations'>> => {
-    await ctx.runMutation(internal.router.credits.grantCredits._internal, {
-      amount: CREDITS_CONFIG.COST_PER_IMAGE_GENERATION * (args.numberToGenerate ?? 1),
+    await provisionCreditsForGeneration(ctx, {
       userId: args.userId,
-      metadata: {
-        reason: "Admin grant for photoshoot generation",
-        adminId: ctx.userId,
-      }
+      numberToGenerate: args.numberToGenerate
     });
 
     return generateFunction(ctx, args);
