@@ -69,12 +69,46 @@ export const Button = ({ startIcon, startContent, endIcon, children, disabled, v
     setInnerLoading(false);
   }
 
+  const {
+    position,
+    top,
+    right,
+    bottom,
+    left,
+    width,
+    height,
+    flex,
+    margin,
+    marginTop,
+    marginRight,
+    marginBottom,
+    marginLeft,
+    marginHorizontal,
+    marginVertical,
+    ...restStyle
+  } = style || {};
+
+  const hasExplicitSize = width !== undefined || height !== undefined;
+
   return (
     <Pressable
       {...props}
       style={{
-        width: style?.width,
-        flex: style?.flex,
+        position,
+        top,
+        right,
+        bottom,
+        left,
+        width,
+        height,
+        flex,
+        margin,
+        marginTop,
+        marginRight,
+        marginBottom,
+        marginLeft,
+        marginHorizontal,
+        marginVertical,
         borderRadius: isRounded ? 99 : undefined,
         alignSelf: defaultAlign === "stretch" ? 'stretch' :
           defaultAlign === "center" ? 'center' :
@@ -93,7 +127,8 @@ export const Button = ({ startIcon, startContent, endIcon, children, disabled, v
           {...props}
           style={{
             borderRadius: isRounded ? 99 : 18,
-            ...style,
+            ...(hasExplicitSize ? { width: '100%', height: '100%' } : {}),
+            ...restStyle,
             flex: undefined,
           }}
         >

@@ -38,6 +38,7 @@ function hexLightness(hex: string): number {
 
 const BOTTOM_CATS = ["BOTTOM", "JEANS", "SKIRT"] as string[];
 const TOP_AREA_CATS = ["TOP", "SWEATER", "TSHIRT", "OUTERWEAR", "JACKET", "HOODIE"] as string[];
+const HEAD_CATS = ["HAT", "CAP"] as string[];
 
 export const buildOutfitCombinations = (
   palette: string[],
@@ -204,8 +205,15 @@ export const buildOutfitCombinations = (
     if (validAccs.length > 0 && (faker.datatype.boolean() || needAccessory)) {
       const acc1 = sample(validAccs)!;
       outfitItems.push(acc1);
+      const hasHeadItem = HEAD_CATS.includes(acc1.category);
       // If we added an accessory, try to add a second one that doesn't share the same category
-      const remaining = validAccs.filter(a => a.id !== acc1.id && a.category !== acc1.category);
+      // and avoid adding a second head item.
+      const remaining = validAccs.filter(a => {
+        if (a.id === acc1.id) return false;
+        if (a.category === acc1.category) return false;
+        if (hasHeadItem && HEAD_CATS.includes(a.category)) return false;
+        return true;
+      });
       if (remaining.length > 0 && faker.datatype.boolean()) {
         outfitItems.push(sample(remaining)!);
       }
