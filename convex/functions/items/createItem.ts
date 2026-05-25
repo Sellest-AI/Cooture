@@ -64,11 +64,12 @@ export const createItem = async (ctx: ActionCtx, data: Args): Promise<Id<"items"
     sku: data.metadata?.sku,
   });
 
-  await ctx.runMutation(internal.router.credits.deductCredits._internal, {
-    userId: data.userId,
-    amount: CREDITS_CONFIG.COST_PER_ITEM,
-    itemId: item,
-  }).catch(() => null);
+  if (CREDITS_CONFIG.COST_PER_ITEM > 0)
+    await ctx.runMutation(internal.router.credits.deductCredits._internal, {
+      userId: data.userId,
+      amount: CREDITS_CONFIG.COST_PER_ITEM,
+      itemId: item,
+    }).catch(() => null);
 
   return item;
 }

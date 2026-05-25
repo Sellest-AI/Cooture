@@ -36,6 +36,7 @@ import type * as functions_items_extractPosition from "../functions/items/extrac
 import type * as functions_items_getFromSku from "../functions/items/getFromSku.js";
 import type * as functions_items_getItem from "../functions/items/getItem.js";
 import type * as functions_items_index from "../functions/items/index.js";
+import type * as functions_items_sanitizeItem from "../functions/items/sanitizeItem.js";
 import type * as functions_items_sanitizePrice from "../functions/items/sanitizePrice.js";
 import type * as functions_items_searchItems from "../functions/items/searchItems.js";
 import type * as functions_notifications_getNotificationDetails from "../functions/notifications/getNotificationDetails.js";
@@ -342,6 +343,7 @@ declare const fullApi: ApiFromModules<{
   "functions/items/getFromSku": typeof functions_items_getFromSku;
   "functions/items/getItem": typeof functions_items_getItem;
   "functions/items/index": typeof functions_items_index;
+  "functions/items/sanitizeItem": typeof functions_items_sanitizeItem;
   "functions/items/sanitizePrice": typeof functions_items_sanitizePrice;
   "functions/items/searchItems": typeof functions_items_searchItems;
   "functions/notifications/getNotificationDetails": typeof functions_notifications_getNotificationDetails;
