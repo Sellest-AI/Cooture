@@ -1,5 +1,6 @@
 import { httpRouter } from "convex/server";
 import { auth } from "./auth";
+import { kieHandler } from "./http/kie";
 import { replicateHandler } from "./http/replicate";
 import { revenueCatHandler } from "./http/revenuecat";
 import { runpodGenerateVideoHandler } from "./http/runpod/generateVideo";
@@ -24,6 +25,12 @@ http.route({
   path: "/api/replicate/webhook",
   method: "POST",
   handler: replicateHandler,
+})
+
+http.route({
+  path: "/api/kie/webhook",
+  method: "POST",
+  handler: kieHandler,
 })
 
 http.route({

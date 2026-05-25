@@ -149,6 +149,7 @@ export const _internal_step = internalAction({
       const output = image ? [image] : [];
 
       if (status === 'failed') {
+        console.error(`Prediction ${id} failed to start:`, image);
         await ctx.runMutation(internal.router.generations.updatePrediction._internal, {
           predictionId: id,
           status: 'FAILED'

@@ -7,6 +7,8 @@ export const env = {
   BOT_DEFAULT_PASSWORD: process.env.BOT_DEFAULT_PASSWORD ?? '',
   // Optional Services
   REPLICATE_API_KEY: process.env.REPLICATE_API_KEY ?? '',
+  KIE_API_KEY: process.env.KIE_API_KEY ?? '',
+  KIE_WEBHOOK_HMAC_KEY: process.env.KIE_WEBHOOK_HMAC_KEY ?? '',
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ?? '',
   STRIPE_WEBHOOK_SECRETS: process.env.STRIPE_WEBHOOK_SECRETS ?? '',
   OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY ?? '',

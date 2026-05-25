@@ -67,6 +67,7 @@ import type * as functions_videos_index from "../functions/videos/index.js";
 import type * as functions_waitlist_index from "../functions/waitlist/index.js";
 import type * as functions_waitlist_updateWaitlist from "../functions/waitlist/updateWaitlist.js";
 import type * as http from "../http.js";
+import type * as http_kie from "../http/kie.js";
 import type * as http_replicate from "../http/replicate.js";
 import type * as http_revenuecat from "../http/revenuecat.js";
 import type * as http_runpod_generateVideo from "../http/runpod/generateVideo.js";
@@ -78,6 +79,9 @@ import type * as lib_helpers_tagsConverter from "../lib/helpers/tagsConverter.js
 import type * as lib_image_index from "../lib/image/index.js";
 import type * as lib_image_node from "../lib/image/node.js";
 import type * as lib_image_sanitizeImage from "../lib/image/sanitizeImage.js";
+import type * as lib_kie_node from "../lib/kie/node.js";
+import type * as lib_kie_upload from "../lib/kie/upload.js";
+import type * as lib_kie_utils from "../lib/kie/utils.js";
 import type * as lib_nanoid_index from "../lib/nanoid/index.js";
 import type * as lib_replicate_node from "../lib/replicate/node.js";
 import type * as lib_replicate_utils from "../lib/replicate/utils.js";
@@ -374,6 +378,7 @@ declare const fullApi: ApiFromModules<{
   "functions/waitlist/index": typeof functions_waitlist_index;
   "functions/waitlist/updateWaitlist": typeof functions_waitlist_updateWaitlist;
   http: typeof http;
+  "http/kie": typeof http_kie;
   "http/replicate": typeof http_replicate;
   "http/revenuecat": typeof http_revenuecat;
   "http/runpod/generateVideo": typeof http_runpod_generateVideo;
@@ -385,6 +390,9 @@ declare const fullApi: ApiFromModules<{
   "lib/image/index": typeof lib_image_index;
   "lib/image/node": typeof lib_image_node;
   "lib/image/sanitizeImage": typeof lib_image_sanitizeImage;
+  "lib/kie/node": typeof lib_kie_node;
+  "lib/kie/upload": typeof lib_kie_upload;
+  "lib/kie/utils": typeof lib_kie_utils;
   "lib/nanoid/index": typeof lib_nanoid_index;
   "lib/replicate/node": typeof lib_replicate_node;
   "lib/replicate/utils": typeof lib_replicate_utils;

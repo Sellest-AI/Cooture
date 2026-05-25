@@ -1,5 +1,5 @@
 "use node"
-import { predictImage } from "@/lib/replicate/node";
+import { predictImage } from "@/lib/kie/node";
 import { sliceText } from "@shared/utils";
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
@@ -14,7 +14,7 @@ const generateFunction = async (ctx: ActionCtx, args: {
   userId: Id<'users'>,
   generationId?: Id<'generations'>,
   presetId: Id<'presets'>,
-  outfit?: { _id: Id<'outfits'>, size?: "TIGHT" | "DEFAULT" | "LOOSE" | "EXTRA_LOOSE", },
+  outfit?: { _id: Id<'outfits'>, size?: "TIGHT" | "DEFAULT" | "LOOSE" | "EXTRA_LOOSE", shared?: boolean },
   extraUserIds?: Id<'users'>[],
   numberToGenerate?: number,
 }) => {
@@ -39,7 +39,7 @@ const generateFunction = async (ctx: ActionCtx, args: {
   }
 
   const subjects = [{ userId: args.userId, outfit: args.outfit },
-  ...(args.extraUserIds ?? []).map((id) => ({ userId: id }))
+  ...(args.extraUserIds ?? []).map((id) => ({ userId: id, outfit: args.outfit?.shared ? args.outfit : undefined }))
   ].map((subject, i) => ({ ...subject, prompt: baseSchema.prompt.subjects[i] }))
 
   const schema = await createPhotoshootSchema(ctx, baseSchema, subjects);
@@ -49,9 +49,9 @@ const generateFunction = async (ctx: ActionCtx, args: {
   const extraUsers = Array.from(new Set(subjects.map(s => s.userId)))
     .filter(id => id !== args.userId).slice(0, schema.prompt.subjects.length - 1);
 
-  // seedream 4.5 has a max prompt length of 5000 characters, 
+  // seedream 4.5 has a max prompt length of 3000 characters, 
   // so we need to shrink the prompt if it's too long
-  const shrinkedPrompt = sliceText(prompt, 5000);
+  const shrinkedPrompt = sliceText(prompt, 3000);
 
   const predictions = await Promise.all(Array.from({ length: NUMBER_OF_IMAGES }).map(async () => predictImage({
     model: 'bytedance/seedream-4.5',
@@ -93,6 +93,7 @@ const sharedArgs = {
   outfit: v.optional(v.object({
     _id: v.id("outfits"),
     size: v.optional(OUTFIT_SIZES_ARGS),
+    shared: v.optional(v.boolean())
   })),
   /** Other users to be added when duo/trio shot */
   extraUserIds: v.optional(v.array(v.id("users"))),

@@ -279,7 +279,7 @@ export default function Screen() {
   const { outfitId, outfitSize, presetId, friendId, disabled, hasMultipleSubjects, shareOutfit } = usePhotoshoot.New();
   const { dismissTo, push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
 
-  const { action, isLoading } = useAction(api.llm.triggers.photoshootBytePlus.authed);
+  const { action, isLoading } = useAction(api.llm.triggers.photoshoot.authed);
 
   return (
     <>
