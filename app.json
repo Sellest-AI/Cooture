@@ -192,6 +192,25 @@
           ],
           "iosHideView": true
         }
+      ],
+      [
+        "react-native-fbsdk-next",
+        {
+          "appID": "123XXX",
+          "clientToken": "0b99XX",
+          "displayName": "Cooture",
+          "scheme": "fb123XXX",
+          "advertiserIDCollectionEnabled": false,
+          "autoLogAppEventsEnabled": false,
+          "isAutoInitEnabled": false,
+          "iosUserTrackingPermission": "Allow Cooture to track your activity to help our small team grow our community and reach people who'd love the app."
+        }
+      ],
+      [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "Allow Cooture to track your activity to help our small team grow our community and reach people who'd love the app."
+        }
       ]
     ],
     "experiments": {
