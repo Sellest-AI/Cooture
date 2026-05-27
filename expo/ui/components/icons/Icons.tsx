@@ -40,7 +40,7 @@ export {
 
 // General Icons
 export {
-  ALargeSmall, ArrowLeft, ArrowRight, ArrowUpRight, AtSign, Bell, Bot, Camera, ChartPie, Check, ChevronDown, ChevronRight, CircleFadingArrowUp, Clapperboard, Clock9, CloudUpload, Compass, Copy, Download, EllipsisVertical, ExternalLink, EyeClosed, EyeOff, Feather, Flame, Gift, Globe,
+  ALargeSmall, ArrowLeft, ArrowRight, ArrowUpRight, AtSign, Bell, Bot, Camera, ChartPie, Check, ChevronDown, ChevronRight, CircleFadingArrowUp, Clapperboard, Clock9, CloudUpload, Compass, Copy, Dices, Download, EllipsisVertical, ExternalLink, EyeClosed, EyeOff, Feather, Flame, Frown, Gift, Globe,
   Home, ImageIcon, ImageUp, Info, LinkIcon, Lock, Mail, Package, Palette, Pause, Pencil, Play, Plus, Puzzle, QrCode, RefreshCcw, Ruler, ScanLine, Search, Settings, Shapes, ShareIcon, SkipBack, SkipForward, Smile, Snowflake, Star, Sun, Tags, Trash,
   TriangleAlert, Shirt as TShirt, User, UserRoundCheck, UserRoundPlus, UserRoundX, Users, X
 } from 'lucide-react-native';

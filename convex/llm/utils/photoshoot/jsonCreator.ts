@@ -198,19 +198,20 @@ const updateSubjects = async (ctx: ActionCtx, schema: Schema, subjects: SubjectE
     // If no appearance data is available, preserve the preset subject
     if (!appearance) { pushFakeSubject(presetSubject); continue; }
 
-    const heightAdjective = appearance.heightCm ? (appearance.heightCm > SUBJECT_CONFIG.tallHeight ? 'tall' :
+    const heightAdjective = appearance.heightCm ? (appearance.heightCm >= SUBJECT_CONFIG.tallHeight ? 'tall' :
       appearance.heightCm > SUBJECT_CONFIG.mediumHeight ? 'medium' : 'short') : undefined;
 
     const buildCleaned = appearance.size ? (appearance.size === 'heavy' ? 'heavyset' :
-      appearance.size === 'heavyset' ? 'extremely heavyset' : appearance.size) : undefined;
-
+      appearance.size === 'heavyset' ? 'extremely heavyset' :
+        appearance.size === 'athletic' ? 'lean and muscular' :
+          appearance.size === 'muscular' ? 'large and heavily muscled' : appearance.size) : undefined;
     let image = presetSubject.head.direction === "side" ? appearance.sideImage : appearance.frontImage;
     if (!image) image = appearance.frontImage;
     if (image) images.push({ url: image.url, hasAlpha: image.hasAlpha });
 
     const prompt = {
       ...presetSubject,
-      reference: image ? `Image ${images.length}. Use facial expression from prompt.` : undefined,
+      reference: image ? `Image ${images.length}. Use skin tone from image. Use facial expression from prompt.` : undefined,
       gender: appearance.gender,
       height: appearance.heightCm ? `${appearance.heightCm}cm ${heightAdjective} height` : undefined,
       size: buildCleaned ? `${buildCleaned} build` : undefined,

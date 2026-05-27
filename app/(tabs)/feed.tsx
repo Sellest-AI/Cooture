@@ -12,6 +12,7 @@ import { FlashList, FlashListRef } from "@ui/flat-list";
 import { ModalHeader } from "@ui/modal";
 import { SafeAreaView, useSafeAreaInsets } from "@ui/safe-area-view";
 import { Text } from "@ui/text";
+import { notEmpty } from "@utils/convex-allowed";
 import { useRef } from "react";
 import { Platform, RefreshControl, View } from "react-native";
 import { Colors } from "theme";
@@ -19,7 +20,9 @@ import { Colors } from "theme";
 export default function Screen() {
   const { feed, canLoadMore, updateSeed, isLoading, loadMore } = useFeed({ initialNumItems: 8 });
 
-  const listRef = useRef<FlashListRef<NonNullable<typeof feed>[number]>>(null);
+  const data = ['waitlist', ...feed].filter(notEmpty);
+
+  const listRef = useRef<FlashListRef<typeof data[number]>>(null);
 
   const { top } = useSafeAreaInsets();
   useScrollToTop(listRef);
@@ -41,8 +44,8 @@ export default function Screen() {
           />}
           // onRefresh={() => { updateSeed(); listRef.current?.scrollToOffset({ offset: 0 }) }}
           onEndReached={() => loadMore(8)}
-          data={(feed ?? [])}
-          keyExtractor={(i) => i?._id}
+          data={data}
+          keyExtractor={(i) => typeof i === 'string' ? i : i?._id}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             paddingBottom: TOTAL_TABS_SPACE,
@@ -54,7 +57,7 @@ export default function Screen() {
           </>}
           ListHeaderComponent={<>
             <ModalHeader
-              title="Feed"
+              title="Home"
               type="alt"
               size="big"
               endContent={<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -67,9 +70,13 @@ export default function Screen() {
                 backgroundColor: Colors.background,
               }}
             />
-            <WaitlistBlock
-              style={{ marginBottom: 24, marginHorizontal: 12 }}
-            />
+            {/* <View style={{
+              paddingHorizontal: 12,
+              marginBottom: 28,
+            }}>
+              <RandomizerHeader style={{ paddingRight: 8, marginBottom: 12 }} />
+              <OutfitRandomizerPreview />
+            </View> */}
           </>}
           ListFooterComponent={<>
             {isLoading && <>
@@ -84,6 +91,11 @@ export default function Screen() {
             </Text.Base>}
           </>}
           renderItem={({ item }) => {
+            if (typeof item === 'string')
+              return <WaitlistBlock
+                style={{ marginBottom: 28, marginHorizontal: 12 }}
+              />
+
             if (item.type === 'outfit')
               return <OutfitPost
                 key={item._id}

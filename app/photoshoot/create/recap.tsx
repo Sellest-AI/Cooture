@@ -17,6 +17,7 @@ import { Skeleton } from "@ui/skeleton";
 import { Slider } from "@ui/slider";
 import { Switch } from "@ui/switch";
 import { Text } from "@ui/text";
+import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
 import { Platform, View, ViewStyle } from "react-native";
 import { ROUTES } from "routes";
@@ -278,7 +279,7 @@ export default function Screen() {
   const { outfitId, outfitSize, presetId, friendId, disabled, hasMultipleSubjects, shareOutfit } = usePhotoshoot.New();
   const { dismissTo, push } = useRouter(ROUTES.PHOTOSHOOT.RECAP);
 
-  const { action, isLoading } = useAction(api.llm.triggers.photoshootBytePlus.authed);
+  const { action, isLoading } = useAction(api.llm.triggers.photoshoot.authed);
 
   return (
     <>
@@ -382,6 +383,7 @@ export default function Screen() {
       </View >
       <ModalAppearance
         currentPath={ROUTES.PHOTOSHOOT.RECAP}
+        onCancel={() => router.canGoBack() ? router.back() : ROUTES.PHOTOSHOOT.NEW}
       />
     </>
   );

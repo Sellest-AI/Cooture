@@ -11,7 +11,7 @@ const gemini31pro = openrouter.chat("google/gemini-3-pro-preview");
 const gemini3flash = openrouter.chat("google/gemini-3-flash-preview");
 
 // Best Price / Performance balance
-const grok41fast = openrouter.chat("x-ai/grok-4.1-fast");
+const gemini431B = openrouter.chat("google/gemma-4-31b-it");
 const gptOss120b = openrouter.chat("openai/gpt-oss-120b");
 
 // Vision support
@@ -23,8 +23,8 @@ const deepseek4Flash = openrouter.chat("deepseek/deepseek-v4-flash");
 export const models = {
   orchestrator: {
     smartest: {
-      model: grok41fast,
-      ...providerOptions.openrouter.grok41fast,
+      model: gemini3flash,
+      ...providerOptions.openrouter.gemini3flash,
     },
     default: {
       model: gptOss120b,
@@ -51,8 +51,8 @@ export const models = {
       ...providerOptions.openrouter.gemini3flash,
     },
     mini: {
-      model: grok41fast,
-      ...providerOptions.openrouter.grok41fast
+      model: gemini431B,
+      ...providerOptions.openrouter.gemini431B
     },
     nano: {
       model: qwen359b,

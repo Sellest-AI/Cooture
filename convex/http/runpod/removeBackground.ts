@@ -1,6 +1,7 @@
 import { taskNames, taskStatus } from "@/lib/runpod";
+import { zodToConvexFields } from "convex-helpers/server/zod4";
 import { v } from "convex/values";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { internal } from "../../_generated/api";
 import { Id } from "../../_generated/dataModel";
 import { httpAction, internalAction } from "../../_generated/server";
@@ -34,17 +35,25 @@ const RemoveBackgroundTaskSchema = WebhookTaskSchema.extend({
   output: OutputSchema.extend({
     callback: CallbackSchema.extend({
       nextStep: z.enum(['SAVE_IMAGE', 'CREATE_ITEM', 'UPDATE_ITEM']),
-      nextArgs: z.optional(z.object({
+      nextArgs: z.object({
         UPDATE_ITEM: z.optional(z.object({
-          itemId: z.string(),
+          itemId: z.string().transform((val) => val as Id<'items'>),
         })),
         CREATE_ITEM: z.optional(z.object({
           brand: z.optional(z.string()),
           name: z.optional(z.string()),
           description: z.optional(z.string()),
           itemUrl: z.optional(z.string()),
+          gender: z.optional(z.string()),
+          fit: z.optional(z.string()),
+          materials: z.optional(z.array(z.string())),
+          sku: z.optional(z.string()),
+          price: z.optional(z.object({
+            amount: z.number(), // stored in minor units (cents) — avoids float issues
+            currency: z.enum(["EUR", "USD"]), // hardcoded for now, extensible later
+          })),
         })),
-      }))
+      })
     }),
     url: z.string(),
     position: z.object({
@@ -56,22 +65,15 @@ const RemoveBackgroundTaskSchema = WebhookTaskSchema.extend({
   }).optional(),
 })
 
+export const REMOVE_BACKGROUND_NEXT_STEP = v.union(...RemoveBackgroundTaskSchema.shape.output.unwrap().shape.callback.shape.nextStep.options.map((o) => v.literal(o)));
+export const REMOVE_BACKGROUND_NEXT_ARGS = v.object(zodToConvexFields(RemoveBackgroundTaskSchema.shape.output.unwrap().shape.callback.shape.nextArgs.shape))
+
 const removeBackgroundSchemaValidator = v.object({
   url: v.string(),
   callback: v.object({
     userId: v.id("users"),
-    nextStep: v.union(v.literal('SAVE_IMAGE'), v.literal('CREATE_ITEM'), v.literal('UPDATE_ITEM')),
-    nextArgs: v.optional(v.object({
-      UPDATE_ITEM: v.optional(v.object({
-        itemId: v.id("items"),
-      })),
-      CREATE_ITEM: v.optional(v.object({
-        brand: v.optional(v.string()),
-        name: v.optional(v.string()),
-        description: v.optional(v.string()),
-        itemUrl: v.optional(v.string()),
-      })),
-    }))
+    nextStep: v.optional(REMOVE_BACKGROUND_NEXT_STEP),
+    nextArgs: v.optional(REMOVE_BACKGROUND_NEXT_ARGS)
   })
 })
 
@@ -136,6 +138,11 @@ export const runpodRemoveBackgroundHandler = httpAction(async (ctx, request) => 
             description: callback.nextArgs.CREATE_ITEM?.description,
             itemUrl: callback.nextArgs.CREATE_ITEM?.itemUrl,
             brand: callback.nextArgs.CREATE_ITEM?.brand,
+            gender: callback.nextArgs.CREATE_ITEM?.gender,
+            fit: callback.nextArgs.CREATE_ITEM?.fit,
+            materials: callback.nextArgs.CREATE_ITEM?.materials,
+            price: callback.nextArgs.CREATE_ITEM?.price,
+            sku: callback.nextArgs.CREATE_ITEM?.sku,
           }
         } : callback.nextArgs?.UPDATE_ITEM ? {
           UPDATE_ITEM: {

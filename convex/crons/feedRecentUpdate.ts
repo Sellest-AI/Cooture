@@ -1,3 +1,4 @@
+import { notEmpty } from "@shared/utils";
 import { v } from "convex/values";
 import { internal } from "../_generated/api";
 import { Doc } from "../_generated/dataModel";
@@ -12,7 +13,7 @@ const extractPostDetails = async (ctx: MutationCtx, feedScore: Doc<'feedScores'>
       hasVideo: false,
       hasOutfit: true,
       hasPreset: false,
-    };
+    }
 
   const [predictions, generation] = await Promise.all([
     await ctx.db.query('predictions')
@@ -36,17 +37,39 @@ const extractPostDetails = async (ctx: MutationCtx, feedScore: Doc<'feedScores'>
   }
 }
 
+const extraPenaltyDecay = async (ctx: MutationCtx, feedScore: Doc<'feedScores'>) => {
+  const outfitId = feedScore.outfitId;
+
+  if (!outfitId) return 0;
+
+  const itemIds = await ctx.db.query('outfitItems')
+    .withIndex('by_outfit_id', q => q.eq('outfitId', outfitId))
+    .collect();
+
+  const items = await Promise.all(itemIds.map(item => ctx.db.get(item.itemId)));
+
+  // Penalize posts with multiple items of the same category (except accessories) to promote variety
+  const itemsPenaltyDecay = items.filter(notEmpty).filter((i) => i.category !== 'ACCESSORY')
+    .filter((it, i, arr) => arr.findIndex(o => o.category === it.category) !== i)
+    .length > 0 ? FEED_CONFIG.ITEMS_PENALTY_DECAY : 0;
+
+  // Decay % to apply to the score
+  return itemsPenaltyDecay;
+}
+
 const extraScore = async (ctx: MutationCtx, feedScore: Doc<'feedScores'>) => {
   const KEYS = feedScore.generationId ?
     ['by_generation_id', 'generationId'] as const :
     ['by_outfit_id', 'outfitId'] as const;
 
+  const KEY_VALUE = feedScore.generationId ?? feedScore.outfitId;
+
   const [_likes, _bookmarks, details] = await Promise.all([
     ctx.db.query('likeStats')
-      .withIndex(KEYS[0], q => q.eq(KEYS[1], feedScore.generationId))
+      .withIndex(KEYS[0], q => q.eq(KEYS[1], KEY_VALUE))
       .first(),
     ctx.db.query('bookmarkStats')
-      .withIndex(KEYS[0], q => q.eq(KEYS[1], feedScore.generationId))
+      .withIndex(KEYS[0], q => q.eq(KEYS[1], KEY_VALUE))
       .first(),
     await extractPostDetails(ctx, feedScore),
   ]);
@@ -72,13 +95,17 @@ const updateScore = async (ctx: MutationCtx, feedScore: Doc<'feedScores'>) => {
   const extra = await extraScore(ctx, feedScore);
   const mergedScore = FEED_CONFIG.DEFAULT_SCORE + randomScore + extra;
 
+  // Apply penalty decay for bad posts (e.g. same item category in outfit) to promote variety
+  const penaltyDecay = await extraPenaltyDecay(ctx, feedScore);
+  const mergedScoreWithPenalty = Math.round(mergedScore * (1 - penaltyDecay));
+
   // Linear percentage decay: 0% at creation → 90% at freeze time
   const ageInHoursClamped = Math.min(ageInHours, FEED_CONFIG.FREEZE_AGE_HOURS);
   const decayPercent = (ageInHoursClamped / FEED_CONFIG.FREEZE_AGE_HOURS) * FEED_CONFIG.FREEZE_DECAY_PERCENT;
-  const decay = Math.round(mergedScore * (decayPercent / 100));
+  const decay = Math.round(mergedScoreWithPenalty * (decayPercent / 100));
 
   // Update the score and timestamp
-  const finalScore = Math.round(Math.max(0, mergedScore - decay));
+  const finalScore = Math.round(Math.max(0, mergedScoreWithPenalty - decay));
   await ctx.db.patch(feedScore._id, { score: finalScore, updatedAt: now });
 }
 
@@ -99,7 +126,7 @@ export const _internal = internalMutation({
       .withIndex("by_creation_time", q => q.gt("_creationTime", cutoffTimeMax)
         .lt("_creationTime", cutoffTimeMin)).order("desc")
       .filter(q => q.eq(q.field("archived"), false))
-      .paginate({ numItems: 500, cursor: cursor ?? null });
+      .paginate({ numItems: 256, cursor: cursor ?? null });
 
     let updatedCount = 0;
     // Apply time-based decay to each post

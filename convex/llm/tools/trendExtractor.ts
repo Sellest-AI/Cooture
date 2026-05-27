@@ -10,131 +10,216 @@ import { createTool, wrapAgent } from "../utils";
 // ============================================================================
 
 export const TREND_REGISTRY: TrendDefinition[] = [
+  // ==========================================
+  // EVERGREEN & TIMELESS
+  // ==========================================
   {
-    name: "Gorpcore",
-    description: "Utilitarian, outdoor-focused gear worn as streetwear.",
+    name: "Minimalist",
+    aliases: ["Normcore", "Neo-Minimalism", "Clean Girl", "Basics"],
+    description: "Effortless, clean dressing focused on high-quality basics and neutral palettes.",
     keyIndicators: [
-      "Waterproof or technical materials (nylon, gore-tex)",
-      "Utilitarian features (bungee cords, cargo pockets, waterproof zippers, drawstrings)",
-      "Categories: OUTERWEAR, JACKET, SHOES (hiking style), BOTTOM (cargo)",
-      "Styles: SPORTY combined with streetwear vibes"
+      "ColorTones: NEUTRAL, LIGHT (white, grey, beige, black)",
+      "Styles: MINIMALIST, CASUAL",
+      "Features: lack of logos, clean lines, basic silhouettes",
     ],
   },
   {
-    name: "Y2K",
-    description: "Late 90s to mid-2000s retro-futurism and pop culture.",
+    name: "Old Money",
+    aliases: ["Quiet Luxury", "Stealth Wealth", "Traditional"],
+    description: "High-quality, logo-less wealth aesthetics rooted in classic tailoring.",
     keyIndicators: [
-      "Baggy or aggressively cropped fits",
-      "Materials like denim, velour, or shiny synthetics",
-      "Features like distressed elements, rhinestones, graphic prints",
+      "Materials: WOOL, SILK, COTTON, LEATHER",
+      "Categories: SWEATER, DRESS, OUTERWEAR (coats), BOTTOM (trousers)",
+      "Styles: PREPPY, FORMAL, CHIC",
     ],
   },
   {
-    names: ["Old Money", "Quiet Luxury"],
-    description: "Minimalist, high-quality, logo-less wealth aesthetics.",
-    keyIndicators: [
-      "Natural premium materials (wool, silk, cotton, cashmere)",
-      "Neutral, muted color palettes (beige, navy, cream)",
-      "Classic categories like SWEATER, DRESS, OUTERWEAR (coats)",
-    ],
-  },
-  {
-    names: ["Neo-Minimalism", "Normcore"],
-    description: "Effortless, clean, and intentionally simple dressing focused on high-quality basics.",
-    keyIndicators: [
-      "Neutral, monochromatic, or muted color palettes (black, white, grey, beige)",
-      "Clean silhouettes with no loud logos or heavy patterns",
-      "Categories: TSHIRT (basic), JEANS (straight-leg), SNEAKERS (clean/white)",
-      "Styles: MINIMALIST, CASUAL"
-    ],
-  },
-  {
-    names: ["Parisian Chic", "Classic Elegance"],
+    name: "Parisian Chic",
+    aliases: ["French Girl", "Classic Elegance"],
     description: "Timeless European sophistication mixing structured staples with relaxed romance.",
     keyIndicators: [
-      "Classic wardrobe staples: Trench coats, tailored trousers, crisp white button-downs, little black dresses",
-      "Ballet flats, loafers, and structured leather handbags",
-      "Patterns: Subtle stripes (Breton) or polka dots",
-      "Categories: OUTERWEAR (trench), TOP (blouse/shirt), SHOES (flats)"
+      "Categories: OUTERWEAR (trench coats), TOP (button-downs, blouses), SHOES (ballet flats, loafers)",
+      "Features: subtle stripes (Breton), structured leather bags",
+      "Styles: CHIC, CASUAL, FORMAL"
+    ],
+  },
+  {
+    name: "Streetwear",
+    aliases: ["Urban", "Hypebeast", "Skater"],
+    description: "Casual, comfortable clothing rooted in skate and hip-hop culture.",
+    keyIndicators: [
+      "Categories: HOODIE, TSHIRT, SNEAKERS, CAP",
+      "Fits: OVERSIZED, BAGGY",
+      "Features: graphic prints, heavy cotton, prominent logos",
     ],
   },
   {
     name: "Boho Chic",
-    description: "A dreamy mix of earthy textures, vintage finds, and effortless, flowy charm.",
+    aliases: ["Bohemian", "Festival", "Free Spirit"],
+    description: "Earthy, relaxed romance with vintage and artisanal details.",
     keyIndicators: [
-      "Earthy tones and warm colors",
-      "Flowy fabrics, macrame, crochet, fringe, and floral patterns",
-      "Categories: DRESS (maxi), TOP (peasant blouse), ACCESSORY (wide-brim hat, layered jewelry)",
-      "Styles: BOHO, VINTAGE"
+      "Materials: COTTON, LEATHER (suede)",
+      "Categories: DRESS (maxi), ACCESSORY (layered, wide-brim hats)",
+      "Features: fringe, floral patterns, crochet, flowy fits",
     ],
   },
   {
     name: "Grunge",
+    aliases: ["Punk", "Alt", "Rocker"],
     description: "Rebellious, anti-fashion edge rooted in 90s rock culture.",
     keyIndicators: [
-      "Distressed denim, ripped textures, oversized fits",
-      "Plaid flannel, dark denim, heavy leather boots (e.g., Doc Martens)",
-      "Categories: JACKET (leather/biker), JEANS (distressed), SHOES (combat boots)",
-      "Styles: EDGY, GOTHIC"
+      "Materials: DENIM, LEATHER, SYNTHETIC",
+      "Features: distressed, ripped, plaid, studs, heavy hardware",
+      "Styles: EDGY, GOTHIC, VINTAGE",
     ],
   },
+
+  // ==========================================
+  // MODERN STAPLES (2020s Defining Aesthetics)
+  // ==========================================
   {
-    names: ["Poet-Core", "Dark Academia"],
-    description: "A blend of creative spirit, moody nostalgia, and preppy academic style.",
+    name: "Gorpcore",
+    aliases: ["Outdoor Chic", "Utility", "Camping", "Earthcore"],
+    description: "Utilitarian, outdoor-focused gear worn as urban fashion.",
     keyIndicators: [
-      "Oversized turtlenecks, vintage blazers, satchel bags, silk neckties",
-      "Rich, dark color tones (burgundy, forest green, dark brown)",
-      "Materials like tweed, wool, and lace details",
-      "Categories: SWEATER, JACKET (blazer), ACCESSORY (scarves/ties)",
-      "Styles: PREPPY, VINTAGE"
+      "Materials: SYNTHETIC (nylon, gore-tex)",
+      "Features: waterproof zippers, bungee cords, cargo pockets, drawstrings",
+      "Categories: JACKET, OUTERWEAR, SHOES (hiking)",
     ],
   },
   {
-    names: ["Glamoratti", "Mob Wife Aesthetic"],
-    description: "Unapologetic, high-impact 80s opulence. Command space and drip in confidence.",
+    name: "Y2K",
+    aliases: ["McBling", "2000s Nostalgia", "Cyber"],
+    description: "Late 90s to mid-2000s retro-futurism and pop culture.",
     keyIndicators: [
-      "Faux fur coats, animal prints (leopard), leather",
-      "Sculpted-shoulder suits, dramatic funnel necks",
-      "Chunky gold accessories, big cuffs, belts",
-      "Styles: CHIC, EDGY"
+      "Fits: BAGGY (bottoms), CROPPED or TIGHT (tops)",
+      "Materials: DENIM, SYNTHETIC (velour)",
+      "Features: rhinestones, low-rise, baby tees, graphic prints",
     ],
   },
   {
-    names: ["Utility-Chic", "Earthcore"],
-    description: "Functional outdoor styling elevated by thoughtful tailoring and natural textures.",
+    name: "Dark Academia",
+    aliases: ["Poetcore", "Prep-Goth", "Scholarly"],
+    description: "A moody, intellectual aesthetic blending vintage prep with gothic undertones.",
     keyIndicators: [
-      "Earthy tones mixed with modern fabrications",
-      "Utility details (pockets, adjustable elements) but with relaxed, flattering fits",
-      "Materials: Canvas, heavy cotton, technical blends",
-      "Categories: BOTTOM (cargo pants/skirts), OUTERWEAR (utility vests/jackets)"
+      "ColorTones: DARK, NEUTRAL (brown, burgundy, forest green, black)",
+      "Materials: WOOL (tweed), COTTON",
+      "Categories: SWEATER (cardigans, vests), JACKET (blazer)",
     ],
   },
   {
-    names: ["Street Bride", "Undone Romance"],
-    description: "Reclaiming traditional romantic and bridal fabrics for edgy everyday streetwear.",
+    name: "Coquette",
+    aliases: ["Balletcore", "Soft Girl", "Nymphet"],
+    description: "Hyper-feminine, delicate, and romantic styling.",
     keyIndicators: [
-      "Sheer lace, corsetry, slip dresses, tulle",
-      "Mixed with heavy contrast pieces (e.g., a delicate lace skirt with combat boots or an oversized blazer)",
-      "Colors: White, cream, vanilla yellow mixed with dark accents",
-      "Styles: ECLECTIC, EDGY"
+      "ColorTones: LIGHT (pastels, pink, white)",
+      "Features: bows, lace, ribbons, ruffles, pearls",
+      "Categories: DRESS, TOP (corsets), LEGWEAR (tights, leg warmers)",
     ],
   },
   {
-    names: ["Retro-Futurism", "Techwear"],
+    name: "Opium",
+    aliases: ["Vamp", "Avant-Garde Gothic", "Tech-Goth"],
+    description: "A modern, highly stylized dark aesthetic popularized by underground rap.",
+    keyIndicators: [
+      "ColorTones: DARK (strictly black)",
+      "Materials: LEATHER, SYNTHETIC",
+      "Features: extreme oversized fits, aggressive boots, silver chains, spikes",
+      "Styles: GOTHIC, EDGY",
+    ],
+  },
+
+  // ==========================================
+  // EMERGING & 2025/2026 FORECASTED TRENDS
+  // ==========================================
+  {
+    name: "Corporatecore",
+    aliases: ["Office Siren", "Geek Chic", "9-to-5"],
+    description: "Reclaiming rigid corporate office wear into sexy, stylized everyday looks.",
+    keyIndicators: [
+      "Categories: GLASSES (bayonetta frames), BOTTOM (pencil skirts), TOP (button-downs)",
+      "Fits: SLIM, TIGHT",
+      "Features: pinstripes, sheer tights, pointed kitten heels",
+    ],
+  },
+  {
+    name: "Blokecore",
+    aliases: ["Sporty Rich", "Terrace Casuals"],
+    description: "Vintage European football (soccer) culture mixed with straight-leg denim.",
+    keyIndicators: [
+      "Categories: TSHIRT (jerseys), SNEAKERS (low-top vintage, e.g., Sambas)",
+      "Features: sports team logos, racing stripes",
+      "Styles: SPORTY, VINTAGE, CASUAL",
+    ],
+  },
+  {
+    name: "Eclectic Grandpa",
+    aliases: ["Grandpacore", "Retro Leisure"],
+    description: "Comfortable, quirky, intentionally mismatched vintage layering.",
+    keyIndicators: [
+      "Categories: SWEATER (knit vests/cardigans), HAT (baseball caps), SHOES (loafers)",
+      "Features: argyle patterns, corduroy, chunky knits",
+      "Styles: ECLECTIC, VINTAGE",
+    ],
+  },
+  {
+    name: "Western Gothic",
+    aliases: ["Dark Americana", "Midnight Cowboy"],
+    description: "Traditional western wear elements (cowboy) filtered through a dark, moody lens.",
+    keyIndicators: [
+      "ColorTones: DARK",
+      "Materials: LEATHER, DENIM",
+      "Features: cowboy boots, fringes, silver bolo ties, heavy buckles",
+    ],
+  },
+  {
+    name: "Romcom Core",
+    aliases: ["Early 2010s", "Twee Revival"],
+    description: "The return of optimistic, slightly quirky early 2010s styling.",
+    keyIndicators: [
+      "Categories: DRESS (skater dresses), ACCESSORY (statement necklaces, thin belts)",
+      "ColorTones: COLORFUL",
+      "Features: polka dots, peplum, brightly colored cardigans",
+    ],
+  },
+  {
+    name: "Tech-Romance",
+    aliases: ["Street Bride", "Cyber-Fairy", "Undone Romance"],
+    description: "Juxtaposing delicate romantic fabrics with harsh technical or sporty elements.",
+    keyIndicators: [
+      "Mix of Materials: SILK/lace paired with SYNTHETIC/nylon",
+      "Features: corsets worn over track pants, sheer skirts with bulky sneakers",
+      "Styles: ECLECTIC, EDGY, SPORTY",
+    ],
+  },
+  {
+    name: "Mob Wife Aesthetic",
+    aliases: ["Glamoratti", "80s Opulence", "Maximalist Glam"],
+    description: "Unapologetic, high-impact 80s/90s opulence. Command space and drip in confidence.",
+    keyIndicators: [
+      "Materials: LEATHER, SYNTHETIC (faux fur)",
+      "Features: animal prints (leopard), chunky gold jewelry, sculpted shoulders",
+      "Styles: CHIC, EDGY, MAXIMALIST"
+    ],
+  },
+  {
+    name: "Retro-Futurism",
+    aliases: ["Techwear", "Cyberpunk", "Y3K"],
     description: "Sci-fi tactical aesthetics meeting sleek, wearable modern design.",
     keyIndicators: [
-      "Metallic finishes, glossy textures, shiny synthetics",
-      "Sleek lines paired with tactical utility (buckles, straps)",
-      "Colors: Silver, black, neon accents",
-      "Styles: SPORTY, EDGY"
+      "Materials: SYNTHETIC, PLASTIC, METAL",
+      "Features: metallic finishes, glossy textures, tactical buckles, straps",
+      "ColorTones: NEUTRAL (silver, black), COLORFUL (neon accents)"
     ]
   }
 ];
 
 export type TrendDefinition = {
+  name: string;
+  aliases?: string[];
   description: string;
   keyIndicators: string[];
-} & ({ name: string, names?: undefined } | { name?: undefined, names: string[] });
+};
 
 // ------------------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------------------
@@ -147,7 +232,7 @@ const generateTrendMarkdown = (trends: TrendDefinition[]): string => {
   return trends
     .map((trend) => {
       const indicators = trend.keyIndicators.map((i) => `  - ${i}`).join("\n");
-      return `### ${trend.names?.[0] ?? trend.name}\n${trend.description}\n**Key Indicators:**\n${indicators}`;
+      return `### ${trend.name}\n${trend.description}\n**Key Indicators:**\n${indicators}`;
     })
     .join("\n\n");
 };
@@ -222,17 +307,14 @@ export const trendExtractor = createTool({
       const confidence = trend.confidence / 100;
 
       // Try to find the trend in the registry to get the proper name (handles aliases)
-      const registryEntry = TREND_REGISTRY.find((t) =>
-        sanitizeTag(t.name ?? t.names?.[0]) === name ||
-        (t.names && t.names.some((n) => sanitizeTag(n) === name))
-      );
+      const registryEntry = TREND_REGISTRY.find((t) => sanitizeTag(t.name) === name);
 
       return [
         {
           name,
           confidence,
         },
-        ...(registryEntry?.names?.map((alias) => ({
+        ...(registryEntry?.aliases?.map((alias) => ({
           name: sanitizeTag(alias),
           confidence,
         })) || [])

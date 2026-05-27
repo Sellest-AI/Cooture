@@ -10,6 +10,7 @@ import { SafeAreaView } from "@ui/safe-area-view";
 import { Slider } from "@ui/slider";
 import { Text } from "@ui/text";
 import { TextInput } from "@ui/text-input";
+import { useToasts } from "@ui/toast";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { ComponentProps, useEffect, useState } from "react";
@@ -243,7 +244,8 @@ const Images = () => {
 }
 
 export default function Screen() {
-  const { identity, setIdentity, generateIdentity, images, createOne, reset } = useBot.New();
+  const { identity, appearance, setIdentity, generateIdentity, hasAllImages, createOne, reset } = useBot.New();
+  const { addToast } = useToasts();
 
   useEffect(() => {
     if (!identity) { generateIdentity(); }
@@ -253,6 +255,7 @@ export default function Screen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background }}>
       <ScrollView
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ paddingBottom: BUTTON_HEIGHT + 24 }}
       >
         <ModalHeader
@@ -313,23 +316,33 @@ export default function Screen() {
         <Appearance />
         <Images />
       </ScrollView>
-      <Button
-        onPress={async () => {
-          await createOne();
-          router.back();
-          reset();
-        }}
-        disabled={!images || !identity}
-        variant="primary"
-        style={{
-          position: 'absolute',
-          bottom: 8,
-          left: 8,
-          right: 8,
-        }}
+      <View style={{
+        position: 'absolute',
+        bottom: 12,
+        left: 8,
+        right: 8,
+      }}
       >
-        Save
-      </Button>
+        <Button
+          variant="primary"
+          disabled={!hasAllImages || !identity || !appearance}
+          onPress={async () => {
+            try {
+              await createOne();
+              router.back();
+              reset();
+            } catch (error) {
+              addToast({
+                type: "error",
+                title: "Create bot failed",
+                description: error instanceof Error ? error.message : "Unknown error",
+              });
+            }
+          }}
+        >
+          Save
+        </Button>
+      </View>
     </SafeAreaView>
   )
 }

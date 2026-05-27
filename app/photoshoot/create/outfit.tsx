@@ -11,5 +11,6 @@ export default function Screen() {
     redirectTo={ROUTES.PHOTOSHOOT.RECAP}
     canSkipText="Use preset look"
     preSelectedItemIds={outfit?.items.map((item) => item._id)}
+    showOnlyOwnedOutfits={false}
   />
 }

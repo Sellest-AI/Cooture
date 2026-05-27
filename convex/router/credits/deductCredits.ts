@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+import { Doc } from "../../_generated/dataModel";
 import { deductCredits } from "../../functions/credits";
 import { internalMutation } from "../../procedures";
 
@@ -15,10 +16,14 @@ export const _internal = internalMutation({
     reason: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const type: Doc<'creditTransactions'>['type'] =
+      args.generationId ? "GENERATION_COST" :
+        args.itemId ? "ITEM_IMPORT_COST" : "SYSTEM_DEDUCT";
+
     const result = await deductCredits(ctx, {
       userId: args.userId,
       amount: args.amount,
-      type: args.generationId ? "GENERATION_COST" : "SYSTEM_DEDUCT",
+      type: type,
       metadata: args.generationId ? {
         generationId: args.generationId,
         itemId: args.itemId,

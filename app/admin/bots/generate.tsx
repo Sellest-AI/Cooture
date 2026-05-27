@@ -190,7 +190,7 @@ export default function Screen() {
   const [outfitId, setOutfitId] = useState<Id<'outfits'> | null>(null);
 
   const { dismissTo } = useRouter();
-  const { action } = useAction(api.llm.triggers.photoshootBytePlus.admin);
+  const { action } = useAction(api.llm.triggers.photoshoot.admin);
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={{ top: 'off' }}>

@@ -92,8 +92,10 @@ const useNew = () => {
     setImages(null);
   }
 
+  const hasAllImages = images?.front && images?.side && images?.smiling && images?.profilePicture;
+
   const createOne = async () => {
-    if (!identity || !appearance || !images) return;
+    if (!identity || !appearance || !hasAllImages) return;
 
     const { skinTone, ...restAppearance } = appearance;
 
@@ -112,6 +114,7 @@ const useNew = () => {
   return {
     images,
     identity,
+    hasAllImages,
     setIdentity,
     appearance,
     setAppearance,

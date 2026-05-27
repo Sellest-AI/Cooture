@@ -1,6 +1,7 @@
 import { notEmpty, retryPromise } from "@shared/utils";
 import { z } from "zod";
-import { ITEM_STYLES } from "../../schema/items";
+import { ITEM_STYLES } from "../../schema/constants";
+import { ITEM_CATEGORIES } from "../../schema/items";
 import { defaultAgent } from "../agents/default";
 import { models } from "../config";
 import { createTool, wrapAgent } from "../utils";
@@ -31,6 +32,14 @@ When in doubt about content rating, default to the most conservative option.
 
 The order of the fields in the arrays ARE VERY IMPORTANT and should reflect the prominence of each attribute in the item.
 
+FOR STYLES:
+- Only assign a style if the item has DIRECT visual or construction markers for it — not vague cultural associations.
+- CASUAL means genuinely relaxed everyday wear (plain tees, simple knitwear). Do NOT use it as a fallback or catch-all. If an item is already tagged STREETWEAR, TECHWEAR, or UTILITARIAN, do NOT also tag it CASUAL.
+- SPORTY requires real athletic DNA: performance/jersey fabric, sport-logo branding, mesh panels, or an athletic cut. A polo shirt with rugby heritage is PREPPY, not SPORTY.
+- STREETWEAR requires urban-coded garments. Do NOT apply it to classic tailored or dress footwear (loafers, oxfords, derbies, moccasins) — a lug sole is a styling detail, not streetwear DNA.
+- Saturation rule: if an item already has 3 or more strong specific styles (e.g., STREETWEAR + TECHWEAR + UTILITARIAN), do NOT add generic styles like CASUAL, SPORTY, or MINIMALIST on top.
+- Prefer fewer, accurate tags over many approximate ones.
+
 If a URL is included, do not mix the website's domain name with the clothing brand (for example, zalando = website, adidas = brand).
 
 RETURN THE DATA IN JSON FORMAT ONLY.
@@ -45,16 +54,16 @@ export const itemCategorizer = createTool({
       brand: z.optional(z.string()),
       name: z.optional(z.string()),
       description: z.optional(z.string()),
+      gender: z.optional(z.string()),
+      fit: z.optional(z.string()),
+      materials: z.optional(z.array(z.string())),
       url: z.optional(z.string()),
     })),
   }),
   handler: async (ctx, args) => {
     const schema = z.object({
-      category: z.enum([
-        "TOP", "BOTTOM", "DRESS", "OUTERWEAR", "SHOES", "ACCESSORY",
-        "HOODIE", "SWEATER", "TSHIRT", "JEANS", "SKIRT", "HAT",
-        "CAP", "GLASSES", "BAG", "JACKET", "LEGWEAR"
-      ]).describe("The most specific category. E.g., use 'TSHIRT' instead of 'TOP' for t-shirts, 'JEANS' instead of 'BOTTOM' for jeans"),
+      category: z.enum(ITEM_CATEGORIES)
+        .describe("The most specific category. E.g., use 'TSHIRT' instead of 'TOP' for t-shirts, 'JEANS' instead of 'BOTTOM' for jeans"),
 
       features: z.array(z.string()).max(5).describe(
         "Distinctive fashion details, hardware, or construction elements. Examples: 'cargo pockets', 'distressed', 'drawstrings', 'asymmetrical', 'pleated', 'graphic print', 'chunky sole'. Do not include basic elements like 'sleeves' or 'buttons' unless they are visually defining."
@@ -79,7 +88,8 @@ export const itemCategorizer = createTool({
         `),
 
       styles: z.array(z.enum(ITEM_STYLES))
-        .describe(`The style(s) of the item. Can include multiple styles if the item clearly incorporates elements of each.`),
+        .min(1).max(4)
+        .describe(`The style(s) of the item based on its design DNA. Follow the FOR STYLES rules in the system prompt.`),
 
       contentRating: z.enum([
         "SAFE", "SUGGESTIVE", "EXPLICIT", "NSFW"
@@ -88,6 +98,11 @@ export const itemCategorizer = createTool({
       gender: z.enum([
         "UNISEX", "MALE", "FEMALE",
       ]).describe("Target gender/age group. Use UNISEX for items that work for anyone"),
+
+      fit: z.enum([
+        "TIGHT", "REGULAR", "LOOSE"
+      ]).describe("The fit of the item. TIGHT: body-hugging, stretchy items. REGULAR: standard fit, not too tight or loose. LOOSE: oversized, relaxed fit")
+        .default("REGULAR"),
 
       ...(args.extractText ? {
         description: z.string().max(400).describe("A brief text description (max 30 words) suitable for an online store."),

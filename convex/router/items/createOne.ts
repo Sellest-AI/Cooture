@@ -8,10 +8,18 @@ import { ITEMS_SCHEMA } from "../../schema/items";
 const sharedArgs = {
   imageId: v.id("images"),
   metadata: v.optional(v.object({
+    sku: v.optional(v.string()),
     brand: v.optional(v.string()),
     name: v.optional(v.string()),
+    gender: v.optional(v.string()),
+    fit: v.optional(v.string()),
+    materials: v.optional(v.array(v.string())),
     description: v.optional(v.string()),
     itemUrl: v.optional(v.string()),
+    price: v.optional(v.object({
+      amount: v.number(), // stored in minor units (cents) — avoids float issues
+      currency: v.union(v.literal("EUR"), v.literal("USD")), // hardcoded for now, extensible later
+    }))
   })),
 }
 
@@ -60,6 +68,11 @@ export const _internal_mutation = internalMutation({
   args: mutationArgs,
   handler: async (ctx, args) => {
     const itemId = await ctx.db.insert("items", args);
+
+    await ctx.scheduler.runAfter(0, internal.router.items.createOne._internal_trend_action, {
+      itemId,
+    });
+
     return itemId;
   }
 })

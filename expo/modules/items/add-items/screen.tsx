@@ -315,7 +315,7 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
 
           // For items with a very vertical aspect ratio, we want to use the medium size
           const isTall = Number(item.image.aspectRatio.actual) < 4 / 6;
-          const imageUrl = isTall ? item.image.sizes.medium.url : item.image.sizes.small.url;
+          const imageUrl = isTall ? item.image.sizes.large.url : item.image.sizes.medium.url;
 
           return (
             <View style={{

@@ -1,5 +1,6 @@
 import { env } from "env";
 import * as SecureStore from "expo-secure-store";
+import { createJSONStorage } from "jotai/utils";
 import { Platform } from "react-native";
 
 const CONVEX_URL = env.PUBLIC_CONVEX_URL.replace(/(^\w+:|^)\/\//, '').replace(/\./g, '')
@@ -15,10 +16,8 @@ const isWeb = Platform.OS === "web";
 export const convexAuthStorage = {
   getItem: async (key: string): Promise<string | null> => {
     try {
-      if (isWeb) {
-        return localStorage.getItem(key);
-      }
-      return await SecureStore.getItemAsync(key);
+      if (isWeb) return localStorage.getItem(key);
+      return await SecureStore.getItemAsync(key); // make sure this is awaited
     } catch (error) {
       console.error(`Error getting key "${key}":`, error);
       return null;
@@ -58,3 +57,5 @@ export const convexAuthStorage = {
     }
   },
 };
+
+export const createJotaiStorage = <T extends unknown>() => createJSONStorage<T>(() => convexAuthStorage);

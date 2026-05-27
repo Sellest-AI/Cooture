@@ -11,6 +11,8 @@
 import type * as auth from "../auth.js";
 import type * as crons from "../crons.js";
 import type * as crons_feedRecentUpdate from "../crons/feedRecentUpdate.js";
+import type * as crons_generateWardrobe from "../crons/generateWardrobe.js";
+import type * as crons_notifyInReviews from "../crons/notifyInReviews.js";
 import type * as crons_updateStatistics from "../crons/updateStatistics.js";
 import type * as env from "../env.js";
 import type * as functions_credits_canPay from "../functions/credits/canPay.js";
@@ -31,14 +33,18 @@ import type * as functions_images_index from "../functions/images/index.js";
 import type * as functions_images_saveImage from "../functions/images/saveImage.js";
 import type * as functions_items_createItem from "../functions/items/createItem.js";
 import type * as functions_items_extractPosition from "../functions/items/extractPosition.js";
+import type * as functions_items_getFromSku from "../functions/items/getFromSku.js";
 import type * as functions_items_getItem from "../functions/items/getItem.js";
 import type * as functions_items_index from "../functions/items/index.js";
+import type * as functions_items_sanitizeItem from "../functions/items/sanitizeItem.js";
+import type * as functions_items_sanitizePrice from "../functions/items/sanitizePrice.js";
 import type * as functions_items_searchItems from "../functions/items/searchItems.js";
 import type * as functions_notifications_getNotificationDetails from "../functions/notifications/getNotificationDetails.js";
 import type * as functions_notifications_index from "../functions/notifications/index.js";
 import type * as functions_notifications_readNotification from "../functions/notifications/readNotification.js";
 import type * as functions_notifications_registerToken from "../functions/notifications/registerToken.js";
 import type * as functions_notifications_saveNotification from "../functions/notifications/saveNotification.js";
+import type * as functions_outfits_generator from "../functions/outfits/generator.js";
 import type * as functions_outfits_getBackgroundColor from "../functions/outfits/getBackgroundColor.js";
 import type * as functions_outfits_getOutfit from "../functions/outfits/getOutfit.js";
 import type * as functions_outfits_index from "../functions/outfits/index.js";
@@ -61,6 +67,7 @@ import type * as functions_videos_index from "../functions/videos/index.js";
 import type * as functions_waitlist_index from "../functions/waitlist/index.js";
 import type * as functions_waitlist_updateWaitlist from "../functions/waitlist/updateWaitlist.js";
 import type * as http from "../http.js";
+import type * as http_kie from "../http/kie.js";
 import type * as http_replicate from "../http/replicate.js";
 import type * as http_revenuecat from "../http/revenuecat.js";
 import type * as http_runpod_generateVideo from "../http/runpod/generateVideo.js";
@@ -72,6 +79,9 @@ import type * as lib_helpers_tagsConverter from "../lib/helpers/tagsConverter.js
 import type * as lib_image_index from "../lib/image/index.js";
 import type * as lib_image_node from "../lib/image/node.js";
 import type * as lib_image_sanitizeImage from "../lib/image/sanitizeImage.js";
+import type * as lib_kie_node from "../lib/kie/node.js";
+import type * as lib_kie_upload from "../lib/kie/upload.js";
+import type * as lib_kie_utils from "../lib/kie/utils.js";
 import type * as lib_nanoid_index from "../lib/nanoid/index.js";
 import type * as lib_replicate_node from "../lib/replicate/node.js";
 import type * as lib_replicate_utils from "../lib/replicate/utils.js";
@@ -146,6 +156,7 @@ import type * as router_admin_statistics_getAll from "../router/admin/statistics
 import type * as router_admin_users_addFakePremium from "../router/admin/users/addFakePremium.js";
 import type * as router_admin_users_approveWaitlist from "../router/admin/users/approveWaitlist.js";
 import type * as router_admin_users_getLatests from "../router/admin/users/getLatests.js";
+import type * as router_admin_users_getTransactions from "../router/admin/users/getTransactions.js";
 import type * as router_auth_getTestAccount from "../router/auth/getTestAccount.js";
 import type * as router_auth_linkStripeSubscription from "../router/auth/linkStripeSubscription.js";
 import type * as router_auth_postCreateOrUpdate from "../router/auth/postCreateOrUpdate.js";
@@ -178,6 +189,7 @@ import type * as router_items_createOne from "../router/items/createOne.js";
 import type * as router_items_deleteOne from "../router/items/deleteOne.js";
 import type * as router_items_editOne from "../router/items/editOne.js";
 import type * as router_items_getAll from "../router/items/getAll.js";
+import type * as router_items_getFromSku from "../router/items/getFromSku.js";
 import type * as router_items_getFromUser from "../router/items/getFromUser.js";
 import type * as router_items_getMany from "../router/items/getMany.js";
 import type * as router_items_getOne from "../router/items/getOne.js";
@@ -202,6 +214,7 @@ import type * as router_outfits_getFromUser from "../router/outfits/getFromUser.
 import type * as router_outfits_getLatest from "../router/outfits/getLatest.js";
 import type * as router_outfits_getOne from "../router/outfits/getOne.js";
 import type * as router_outfits_searchMany from "../router/outfits/searchMany.js";
+import type * as router_outfits_suggestOne from "../router/outfits/suggestOne.js";
 import type * as router_outfits_updateCover from "../router/outfits/updateCover.js";
 import type * as router_outfits_updateCoverInternal from "../router/outfits/updateCoverInternal.js";
 import type * as router_outfits_updateTags from "../router/outfits/updateTags.js";
@@ -297,6 +310,7 @@ import type * as workflows_database_countByField from "../workflows/database/cou
 import type * as workflows_database_countDocuments from "../workflows/database/countDocuments.js";
 import type * as workflows_database_countUserMetrics from "../workflows/database/countUserMetrics.js";
 import type * as workflows_statistics_update from "../workflows/statistics/update.js";
+import type * as workflows_wardrobe_generate from "../workflows/wardrobe/generate.js";
 
 import type {
   ApiFromModules,
@@ -308,6 +322,8 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   crons: typeof crons;
   "crons/feedRecentUpdate": typeof crons_feedRecentUpdate;
+  "crons/generateWardrobe": typeof crons_generateWardrobe;
+  "crons/notifyInReviews": typeof crons_notifyInReviews;
   "crons/updateStatistics": typeof crons_updateStatistics;
   env: typeof env;
   "functions/credits/canPay": typeof functions_credits_canPay;
@@ -328,14 +344,18 @@ declare const fullApi: ApiFromModules<{
   "functions/images/saveImage": typeof functions_images_saveImage;
   "functions/items/createItem": typeof functions_items_createItem;
   "functions/items/extractPosition": typeof functions_items_extractPosition;
+  "functions/items/getFromSku": typeof functions_items_getFromSku;
   "functions/items/getItem": typeof functions_items_getItem;
   "functions/items/index": typeof functions_items_index;
+  "functions/items/sanitizeItem": typeof functions_items_sanitizeItem;
+  "functions/items/sanitizePrice": typeof functions_items_sanitizePrice;
   "functions/items/searchItems": typeof functions_items_searchItems;
   "functions/notifications/getNotificationDetails": typeof functions_notifications_getNotificationDetails;
   "functions/notifications/index": typeof functions_notifications_index;
   "functions/notifications/readNotification": typeof functions_notifications_readNotification;
   "functions/notifications/registerToken": typeof functions_notifications_registerToken;
   "functions/notifications/saveNotification": typeof functions_notifications_saveNotification;
+  "functions/outfits/generator": typeof functions_outfits_generator;
   "functions/outfits/getBackgroundColor": typeof functions_outfits_getBackgroundColor;
   "functions/outfits/getOutfit": typeof functions_outfits_getOutfit;
   "functions/outfits/index": typeof functions_outfits_index;
@@ -358,6 +378,7 @@ declare const fullApi: ApiFromModules<{
   "functions/waitlist/index": typeof functions_waitlist_index;
   "functions/waitlist/updateWaitlist": typeof functions_waitlist_updateWaitlist;
   http: typeof http;
+  "http/kie": typeof http_kie;
   "http/replicate": typeof http_replicate;
   "http/revenuecat": typeof http_revenuecat;
   "http/runpod/generateVideo": typeof http_runpod_generateVideo;
@@ -369,6 +390,9 @@ declare const fullApi: ApiFromModules<{
   "lib/image/index": typeof lib_image_index;
   "lib/image/node": typeof lib_image_node;
   "lib/image/sanitizeImage": typeof lib_image_sanitizeImage;
+  "lib/kie/node": typeof lib_kie_node;
+  "lib/kie/upload": typeof lib_kie_upload;
+  "lib/kie/utils": typeof lib_kie_utils;
   "lib/nanoid/index": typeof lib_nanoid_index;
   "lib/replicate/node": typeof lib_replicate_node;
   "lib/replicate/utils": typeof lib_replicate_utils;
@@ -443,6 +467,7 @@ declare const fullApi: ApiFromModules<{
   "router/admin/users/addFakePremium": typeof router_admin_users_addFakePremium;
   "router/admin/users/approveWaitlist": typeof router_admin_users_approveWaitlist;
   "router/admin/users/getLatests": typeof router_admin_users_getLatests;
+  "router/admin/users/getTransactions": typeof router_admin_users_getTransactions;
   "router/auth/getTestAccount": typeof router_auth_getTestAccount;
   "router/auth/linkStripeSubscription": typeof router_auth_linkStripeSubscription;
   "router/auth/postCreateOrUpdate": typeof router_auth_postCreateOrUpdate;
@@ -475,6 +500,7 @@ declare const fullApi: ApiFromModules<{
   "router/items/deleteOne": typeof router_items_deleteOne;
   "router/items/editOne": typeof router_items_editOne;
   "router/items/getAll": typeof router_items_getAll;
+  "router/items/getFromSku": typeof router_items_getFromSku;
   "router/items/getFromUser": typeof router_items_getFromUser;
   "router/items/getMany": typeof router_items_getMany;
   "router/items/getOne": typeof router_items_getOne;
@@ -499,6 +525,7 @@ declare const fullApi: ApiFromModules<{
   "router/outfits/getLatest": typeof router_outfits_getLatest;
   "router/outfits/getOne": typeof router_outfits_getOne;
   "router/outfits/searchMany": typeof router_outfits_searchMany;
+  "router/outfits/suggestOne": typeof router_outfits_suggestOne;
   "router/outfits/updateCover": typeof router_outfits_updateCover;
   "router/outfits/updateCoverInternal": typeof router_outfits_updateCoverInternal;
   "router/outfits/updateTags": typeof router_outfits_updateTags;
@@ -594,6 +621,7 @@ declare const fullApi: ApiFromModules<{
   "workflows/database/countDocuments": typeof workflows_database_countDocuments;
   "workflows/database/countUserMetrics": typeof workflows_database_countUserMetrics;
   "workflows/statistics/update": typeof workflows_statistics_update;
+  "workflows/wardrobe/generate": typeof workflows_wardrobe_generate;
 }>;
 
 /**

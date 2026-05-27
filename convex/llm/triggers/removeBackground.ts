@@ -5,23 +5,15 @@ import { Infer, v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { Id } from "../../_generated/dataModel";
 import { internalAction } from "../../_generated/server";
-import { ActionCtx, adminAction, authAction } from "../../procedures";
+import { getItemFromSku } from "../../functions/items";
+import { REMOVE_BACKGROUND_NEXT_ARGS, REMOVE_BACKGROUND_NEXT_STEP } from "../../http/runpod/removeBackground";
+import { ActionCtx, adminAction, authAction, serverAction } from "../../procedures";
 
 const args = {
   base64: v.optional(v.string()),
   url: v.optional(v.string()),
-  nextStep: v.union(v.literal('SAVE_IMAGE'), v.literal('CREATE_ITEM'), v.literal('UPDATE_ITEM')),
-  nextArgs: v.optional(v.object({
-    UPDATE_ITEM: v.optional(v.object({
-      itemId: v.id("items"),
-    })),
-    CREATE_ITEM: v.optional(v.object({
-      brand: v.optional(v.string()),
-      name: v.optional(v.string()),
-      description: v.optional(v.string()),
-      itemUrl: v.optional(v.string()),
-    })),
-  }))
+  nextStep: REMOVE_BACKGROUND_NEXT_STEP,
+  nextArgs: v.optional(REMOVE_BACKGROUND_NEXT_ARGS),
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -36,9 +28,21 @@ const handler = async (ctx: ActionCtx, args: Args) => {
   const buffer = await imageBufferFromUrl(url);
   const hasAlpha = await hasImageAlpha(buffer);
 
+  if (args.nextStep === 'CREATE_ITEM') {
+    if (args.nextArgs?.CREATE_ITEM?.sku) {
+      const alreadyExists = await getItemFromSku(ctx, args.nextArgs.CREATE_ITEM.sku);
+      if (alreadyExists) return {
+        completed: false,
+        started: false,
+        hasAlpha,
+      }
+    }
+  }
+
+
   // If the image has an alpha channel, we can skip the background removal step and directly upload it
   if (hasAlpha) {
-    await ctx.runAction(internal.http.runpod.removeBackground._internal_process, {
+    await ctx.scheduler.runAfter(0, internal.http.runpod.removeBackground._internal_process, {
       removeBackgroundData: {
         url: url,
         callback: {
@@ -79,6 +83,11 @@ export const admin = adminAction({
 })
 
 export const _internal = internalAction({
+  args: { ...args, userId: v.id("users") },
+  handler: (ctx, args) => handler(ctx, args)
+})
+
+export const server = serverAction({
   args: { ...args, userId: v.id("users") },
   handler: (ctx, args) => handler(ctx, args)
 })

@@ -51,6 +51,13 @@ export const authed = authMutation({
       return existingPortraits._id;
     }
 
+    // If user is still in waitlist, approve them as they upload their portraits (20s)
+    if (ctx.user.accountStatus === 'WAITLIST')
+      await ctx.scheduler.runAfter(20000, internal.router.admin.users.approveWaitlist._internal, {
+        amountToApprove: 1,
+        userIds: [userId]
+      })
+
     return ctx.db.insert("usersAppearance", {
       userId,
       frontImageId,

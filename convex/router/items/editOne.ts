@@ -5,10 +5,12 @@ import { isAuthorized } from "../../functions/users";
 import { authMutation, internalMutation } from "../../procedures";
 import { ITEM_CATEGORIES, ITEM_COLOR_TONES, ITEM_GENDERS, ITEM_MATERIAL_FEEL, ITEM_WEATHERS } from "../../schema/items";
 
+const V_ITEM_CATEGORIES = v.union(...ITEM_CATEGORIES.map(v.literal));
+
 export const authed = authMutation({
   args: {
     itemId: v.id("items"),
-    category: v.optional(ITEM_CATEGORIES),
+    category: v.optional(V_ITEM_CATEGORIES),
     weatherTags: v.optional(v.array(ITEM_WEATHERS)),
     colorTones: v.optional(v.array(ITEM_COLOR_TONES)),
     materialFeel: v.optional(ITEM_MATERIAL_FEEL),

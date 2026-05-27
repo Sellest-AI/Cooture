@@ -2,7 +2,7 @@ export const CREDITS_CONFIG = {
   // Generation cost
   COST_PER_IMAGE_GENERATION: 100,
   COST_PER_VIDEO_GENERATION: 150,
-  COST_PER_ITEM: 5,
+  COST_PER_ITEM: 0,
   COST_PER_PRESET: 30,
 
   // Daily rewards

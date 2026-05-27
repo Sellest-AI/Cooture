@@ -1,7 +1,7 @@
 import { UsageHandler } from "@convex-dev/agent";
 // import { internal } from "../../_generated/api";
-import { models } from "../config";
 import { Id } from "../../_generated/dataModel";
+import { models } from "../config";
 
 const baseRatio = models.orchestrator.smartest.pricing.inputTokens / models.orchestrator.smartest.pricing.outputTokens;
 
@@ -10,7 +10,7 @@ interface ModelPricing {
   outputTokens: number;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 const findModelPricing = (modelId: string, obj: any = models): ModelPricing | null => {
   for (const key in obj) {
     if (!obj.hasOwnProperty(key)) continue;

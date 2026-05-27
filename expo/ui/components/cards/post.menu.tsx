@@ -124,7 +124,15 @@ export const PostMenu = ({ open, onOpenChange, ...props }: Props) => {
               onPress={() => { onOutfitPress?.(); onOpenChange?.(false); }}
             />}
           </MenuGroup>}
-          {report && <View style={{ flexDirection: 'row', justifyContent: 'center', paddingHorizontal: 12, gap: 48, marginTop: 8, marginBottom: 12 }}>
+          {report && <View style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingHorizontal: 12,
+            gap: 48,
+            marginTop: 8,
+            marginBottom: 12
+          }}>
             <ButtonGhost
               variant="destructive"
               onPress={() => { setReportModalOpen(true); onOpenChange?.(false); }}

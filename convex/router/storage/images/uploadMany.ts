@@ -1,6 +1,6 @@
 "use node"
 
-import { compressImageAuto, hasImageAlpha, imageBufferFromUrl } from "@/lib/image/node";
+import { compressImageAuto, cropImageFromBuffer, hasImageAlpha, imageBufferFromUrl } from "@/lib/image/node";
 import { StorageCloud } from "@/lib/s3/node";
 import { retryPromise } from "@shared/utils";
 import { Infer, v } from "convex/values";
@@ -26,10 +26,12 @@ type Extra = {
 const uploadImage = async (ctx: ActionCtx, base64orUrl: string, extra: Extra) => {
   const buffer = await imageBufferFromUrl(base64orUrl);
 
-  const [hasAlpha, compressedImage] = await Promise.all([
-    hasImageAlpha(buffer),
-    compressImageAuto(buffer),
+  const [hasAlpha] = await Promise.all([
+    hasImageAlpha(buffer)
   ]);
+
+  const croppedImage = hasAlpha ? await cropImageFromBuffer(buffer) : undefined;
+  const compressedImage = await compressImageAuto(croppedImage?.buffer ?? buffer);
 
   const base64Data = compressedImage.buffer.toString('base64');
   const hashBase64 = createHash('sha256').update(base64Data).digest('hex');

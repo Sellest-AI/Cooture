@@ -14,6 +14,18 @@ export const outfits = defineTable({
   .searchIndex("search_tags", { searchField: "tags", filterFields: ["userId"] })
   .index("by_user_id", ["userId"]);
 
+export const suggestedOutfits = defineTable({
+  userId: v.optional(v.id("users")), // To optionally store local generation for a user specifically
+  searchableText: v.string(), // "id1 id2 style_STREETWEAR style_CASUAL"
+  mainColors: v.array(v.string()),
+  styles: v.array(v.string()), // The array of generated styles
+  items: v.array(v.id("items")), // The composed combination of items
+  signature: v.string(), // Sorted IDs joined by "_" for exact duplicate prevention
+})
+  .index("by_user_id", ["userId"])
+  .index("by_signature", ["signature"])
+  .searchIndex("search_text", { searchField: "searchableText", filterFields: ["userId"] });
+
 export const outfitItems = defineTable({
   outfitId: v.id("outfits"),
   itemId: v.id("items"),

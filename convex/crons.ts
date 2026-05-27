@@ -19,17 +19,32 @@ crons.interval(
 )
 
 crons.interval(
-  "update feed scores (72h to 7 days)",
+  "update feed scores (72h to X days)",
   { hours: 24 }, // every 24 hours
   internal.crons.feedRecentUpdate._internal,
   { minAgeHours: 72, maxAgeHours: FEED_CONFIG.FREEZE_AGE_HOURS + 24 }
 )
 
 // Update statistics every 24 hours
-crons.interval(
+crons.daily(
   "update admin statistics",
-  { hours: 24 }, // every 24 hours
+  { hourUTC: 12, minuteUTC: 0 }, // every 24 hours
   internal.crons.updateStatistics._internal,
+)
+
+crons.interval(
+  "send notifications for predictions in review for less than 3 days",
+  { hours: 12 }, // every 12 hours
+  internal.crons.notifyInReviews._internal,
+  { maxAgeDays: 3 }
+)
+
+// Generate Wardrobe Background job every 24 hours
+crons.daily(
+  "generate daily suggested wardrobes",
+  { hourUTC: 2, minuteUTC: 0 },
+  internal.crons.generateWardrobe._internal,
+  {}
 )
 
 export default crons;

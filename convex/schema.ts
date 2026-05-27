@@ -9,7 +9,7 @@ import { imageObjects, images, imageSizes, userImages } from "./schema/images";
 import { items } from "./schema/items";
 import { likes, likeStats } from "./schema/likes";
 import { notifications, pushTokens } from "./schema/notifications";
-import { outfitItems, outfits } from "./schema/outfits";
+import { outfitItems, outfits, suggestedOutfits } from "./schema/outfits";
 import { presetCategories, presetGenerations, presets } from "./schema/presets";
 import { quests, userQuestProgress } from "./schema/quests";
 import { userBlocks, userReports } from "./schema/safety";
@@ -37,6 +37,7 @@ export default defineSchema({
   items,
   outfits,
   outfitItems,
+  suggestedOutfits,
   generations,
   predictions,
   presets,

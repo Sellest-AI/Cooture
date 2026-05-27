@@ -8,6 +8,7 @@ export const userWallets = defineTable({
   userId: v.id('users'),
   credits: v.number(),
   streak: v.object({
+    previousBiggestStreak: v.optional(v.number()),
     dailyClaimStreak: v.number(),
     lastClaimAt: v.optional(v.number()),
   }),
@@ -22,6 +23,7 @@ export const TRANSACTION_TYPE = v.union(
   v.literal("DAILY_CLAIM"),
   v.literal("QUEST_REWARD"),
   v.literal("GENERATION_COST"),
+  v.literal("ITEM_IMPORT_COST"),
   v.literal("PRESET_CREATION_COST"),
   v.literal("PRESET_USAGE_REWARD"),
   v.literal("ADMIN_GRANT"),

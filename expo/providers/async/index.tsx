@@ -4,6 +4,7 @@ import { SplashScreen } from "expo-router";
 import { useEffect, useState } from "react";
 import { DeepLinkProvider } from "./deep-link";
 import { FontsProvider } from "./fonts";
+import { TrackingIOSProvider } from "./ios-tracking";
 import { NativeUpdateProvider } from "./native-update";
 import { NotificationsProvider } from "./notifications";
 import { OTAUpdateProvider } from "./ota-update";
@@ -30,6 +31,7 @@ export const AsyncProviders = ({ children }: Props) => {
       <NativeUpdateProvider />
       <NotificationsProvider />
       <DeepLinkProvider />
+      <TrackingIOSProvider />
       {/* <ThemeProvider /> */}
     </>
   )

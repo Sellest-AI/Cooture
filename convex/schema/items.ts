@@ -1,47 +1,31 @@
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
-import { CONTENT_RATINGS } from "./constants";
-
-export const ITEM_STYLES = [
-  "CASUAL",
-  "FORMAL",
-  "SPORTY",
-  "VINTAGE",
-  "BOHO",
-  "EDGY",
-  "CHIC",
-  "PREPPY",
-  "GOTHIC",
-  "MINIMALIST",
-  "ECLECTIC",
-  "Y2K",
-  "STREETWEAR",
-  "UTILITARIAN",
-  "ROMANTIC",
-  "TECHWEAR",
-] as const;
+import { CONTENT_RATINGS, ITEM_STYLES } from "./constants";
 
 const V_ITEM_STYLES = v.union(...ITEM_STYLES.map(v.literal));
 
-export const ITEM_CATEGORIES = v.union(
-  v.literal("TOP"),
-  v.literal("BOTTOM"),
-  v.literal("DRESS"),
-  v.literal("OUTERWEAR"),
-  v.literal("LEGWEAR"),
-  v.literal("JACKET"),
-  v.literal("SHOES"),
-  v.literal("ACCESSORY"),
-  v.literal("HOODIE"),
-  v.literal("SWEATER"),
-  v.literal("TSHIRT"),
-  v.literal("JEANS"),
-  v.literal("SKIRT"),
-  v.literal("HAT"),
-  v.literal("CAP"),
-  v.literal("GLASSES"),
-  v.literal("BAG"),
-)
+export const ITEM_CATEGORIES = [
+  "TOP",
+  "BOTTOM",
+  "DRESS",
+  "OUTERWEAR",
+  "LEGWEAR",
+  'SOCKS',
+  "JACKET",
+  "SHOES",
+  "ACCESSORY",
+  "HOODIE",
+  "SWEATER",
+  "TSHIRT",
+  "JEANS",
+  "SKIRT",
+  "HAT",
+  "CAP",
+  "GLASSES",
+  "BAG",
+] as const;
+
+const V_ITEM_CATEGORIES = v.union(...ITEM_CATEGORIES.map(v.literal));
 
 export const ITEM_WEATHERS = v.union(
   v.literal("COLD"),
@@ -87,13 +71,21 @@ export const ITEM_GENDERS = v.union(
   v.literal("FEMALE"),
 )
 
+export const ITEM_FIT = v.union(
+  v.literal("TIGHT"),
+  v.literal("REGULAR"),
+  v.literal("LOOSE"),
+)
+
 export const ITEMS_SCHEMA = {
+  sku: v.optional(v.string()),
   name: v.string(),
   brand: v.optional(v.string()),
   description: v.optional(v.string()),
   features: v.optional(v.array(v.string())),
   imageId: v.id("images"),
-  category: ITEM_CATEGORIES,
+  fit: v.optional(ITEM_FIT),
+  category: V_ITEM_CATEGORIES,
   weatherTags: v.array(ITEM_WEATHERS),
   mainColors: v.array(v.string()),
   colorTags: v.string(),
@@ -105,6 +97,9 @@ export const ITEMS_SCHEMA = {
   contentRating: CONTENT_RATINGS,
   link: v.optional(v.string()),
   trendTags: v.optional(v.string()),
+  // price
+  price: v.optional(v.number()), // stored in minor units (cents) — avoids float issues
+  currency: v.optional(v.union(v.literal("EUR"), v.literal("USD"))), // hardcoded for now, extensible later
 }
 
 export const items = defineTable({
@@ -112,8 +107,9 @@ export const items = defineTable({
   userId: v.id("users"),
 })
   .index("by_user_id", ["userId"])
+  .index("by_sku", ["sku"])
   .searchIndex("search_name", { searchField: "name", filterFields: ["userId"] })
   .searchIndex("search_brand", { searchField: "brand", filterFields: ["userId"] })
   .searchIndex("search_description", { searchField: "description", filterFields: ["userId"] })
   .searchIndex("search_trends", { searchField: "trendTags", filterFields: ["userId"] })
-  .searchIndex("search_colors", { searchField: "colorTags", filterFields: ["userId"] });
+  .searchIndex("search_colors", { searchField: "colorTags", filterFields: ["category", "userId"] });

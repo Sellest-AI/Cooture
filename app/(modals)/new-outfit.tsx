@@ -76,7 +76,7 @@ export default function NewOutfitScreen() {
               <View style={{ marginBottom: 24, paddingTop: 3, marginLeft, marginRight }}>
                 <CardItem
                   image={item.image}
-                  source={item.image.sizes.small.url}
+                  source={item.image.sizes.large.url}
                   title={item.name}
                   subtitle={item.category}
                   onPress={() => {
