@@ -24,6 +24,8 @@ export const env = createEnv({
     PUBLIC_POSTHOG_HOST: z.string().optional(),
     PUBLIC_AUTH_URL: z.string(),
     PUBLIC_APP_URL: z.string(),
+    PUBLIC_FACEBOOK_APP_ID: z.string().optional(),
+    PUBLIC_FACEBOOK_CLIENT_TOKEN: z.string().optional(),
   },
   /*
    * Due to how Expo bundles environment variables,
@@ -40,5 +42,7 @@ export const env = createEnv({
     PUBLIC_POSTHOG_KEY: process.env.EXPO_PUBLIC_POSTHOG_KEY,
     PUBLIC_POSTHOG_HOST: process.env.EXPO_PUBLIC_POSTHOG_HOST,
     PUBLIC_APP_URL: process.env.EXPO_PUBLIC_APP_URL,
+    PUBLIC_FACEBOOK_APP_ID: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID,
+    PUBLIC_FACEBOOK_CLIENT_TOKEN: process.env.EXPO_PUBLIC_FACEBOOK_CLIENT_TOKEN,
   },
 });

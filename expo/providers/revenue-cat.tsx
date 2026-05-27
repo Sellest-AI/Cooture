@@ -3,7 +3,20 @@ import { removeUndefinedKeys } from "@utils/convex-allowed";
 import { env } from "env";
 import { ReactNode, useEffect } from "react";
 import { Platform } from "react-native";
+import { AppEventsLogger } from 'react-native-fbsdk-next';
 import Purchases, { LOG_LEVEL } from 'react-native-purchases';
+
+const linkRevenueCatToMeta = async () => {
+  try {
+    const fbAnonId = await AppEventsLogger.getAnonymousID();
+    if (fbAnonId) {
+      await Purchases.setFBAnonymousID(fbAnonId);
+    }
+  } catch (e) {
+    // Ne pas bloquer l'app en cas d'erreur
+    console.warn('Meta/RevenueCat link failed:', e);
+  }
+};
 
 type Props = {
   children: ReactNode;
@@ -25,6 +38,8 @@ export const RevenueCatProvider = ({ children }: Props) => {
     } else if (Platform.OS === 'android') {
       Purchases.configure({ apiKey: androidApiKey });
     }
+
+    linkRevenueCatToMeta();
   }, []);
 
   // 2. Sync RevenueCat with Convex Authentication
@@ -55,7 +70,7 @@ export const RevenueCatProvider = ({ children }: Props) => {
             firstName: user.firstName,
             lastName: user.lastName,
           }))
-
+          linkRevenueCatToMeta();
         } else {
           // If logged out and not already anonymous, log out of RevenueCat
           const isAnonymous = await Purchases.isAnonymous();
