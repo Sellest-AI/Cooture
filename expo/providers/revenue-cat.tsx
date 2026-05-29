@@ -12,7 +12,12 @@ const linkRevenueCatToMeta = async () => {
     if (fbAnonId) {
       await Purchases.setFBAnonymousID(fbAnonId);
     }
-  } catch (e) {
+  } catch (e: any) {
+    // If RevenueCat says it cannot be modified, it means it's already successfully set!
+    const errorMessage = e?.message || String(e);
+    if (errorMessage.includes('cannot be modified') || errorMessage.includes('IDFV')) {
+      return;
+    }
     // Ne pas bloquer l'app en cas d'erreur
     console.warn('Meta/RevenueCat link failed:', e);
   }
@@ -76,6 +81,7 @@ export const RevenueCatProvider = ({ children }: Props) => {
           const isAnonymous = await Purchases.isAnonymous();
           if (!isAnonymous) {
             await Purchases.logOut();
+            linkRevenueCatToMeta(); // Link new anonymous user to Meta
           }
         }
       } catch (error) {
