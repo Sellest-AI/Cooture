@@ -34,7 +34,6 @@ export const env = createEnv({
    * 💡 You'll get type errors if not all variables from `server` & `client` are included here.
    */
   runtimeEnv: {
-    NODE_ENV: process.env.EXPO_PUBLIC_CUSTOM_NODE_ENV ?? process.env.NODE_ENV,
     PUBLIC_NODE_ENV: process.env.EXPO_PUBLIC_CUSTOM_NODE_ENV ?? process.env.NODE_ENV,
     PUBLIC_AUTH_URL: process.env.EXPO_PUBLIC_AUTH_URL,
     // convex
