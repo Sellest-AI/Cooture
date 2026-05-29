@@ -13,7 +13,7 @@ import { CardItem } from "@ui/cards/card-item";
 import { ReportModal } from "@ui/cards/report.modal";
 import { FlashList } from "@ui/flat-list";
 import { GhostIconWrapper } from "@ui/ghost-animation";
-import { BookmarkIcon, CircleFadingArrowUp, Credits, Pencil, ShareIcon, SquirishPlus, Trash, TriangleAlert } from "@ui/icons";
+import { BookmarkIcon, CircleFadingArrowUp, Copy, Credits, Pencil, ShareIcon, SquirishPlus, Trash, TriangleAlert } from "@ui/icons";
 import { Image } from "@ui/image";
 import { ModalHeader } from "@ui/modal";
 import { ParallaxScrollView } from "@ui/parallax-scroll-view";
@@ -349,24 +349,46 @@ export default function Screen() {
               keyExtractor={(i) => i}
               renderItem={({ item }) => {
                 if (item === 'share') return (
-                  <Button
-                    variant="secondary"
-                    style={{ marginBottom: 12 }}
-                    startIcon={ShareIcon}
-                    onPress={() => {
-                      posthog.capture('outfit_share_button_pressed', { generationId: id });
-                      const url = WEBSITE.URL + ROUTES.SHARE.OUTFIT(id);
-                      Share.share(Platform.OS === 'ios' ? {
-                        url,
-                        message: `Check out this outfit on Cooture!`,
-                      } : {
-                        title: `Check out this outfit on Cooture!`,
-                        message: url,
-                      })
-                    }}
-                  >
-                    Share outfit
-                  </Button>
+                  <View style={{
+                    flexDirection: 'row',
+                    gap: 12,
+                    marginBottom: 12
+                  }}>
+                    <Button
+                      size="sm"
+                      variant="blur"
+                      startIcon={Copy}
+                      style={{ flex: 1 }}
+                      onPress={() => {
+                        push(ROUTES.OUTFIT.NEW, {
+                          params: {
+                            itemIds: items.map((i) => i._id)
+                          }
+                        })
+                      }}
+                    >
+                      Duplicate
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      startIcon={ShareIcon}
+                      style={{ flex: 1 }}
+                      onPress={() => {
+                        posthog.capture('outfit_share_button_pressed', { generationId: id });
+                        const url = WEBSITE.URL + ROUTES.SHARE.OUTFIT(id);
+                        Share.share(Platform.OS === 'ios' ? {
+                          url,
+                          message: `Check out this outfit on Cooture!`,
+                        } : {
+                          title: `Check out this outfit on Cooture!`,
+                          message: url,
+                        })
+                      }}
+                    >
+                      Share outfit
+                    </Button>
+                  </View>
                 )
                 if (item === 'premium') return <PremiumBlock />
                 if (item === 'generations') return <Generations
