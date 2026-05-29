@@ -26,7 +26,7 @@ export const TrackingIOSProvider = () => {
       if (status !== 'denied') await initializeFacebookSDK();
     };
 
-    if (env.NODE_ENV === 'production')
+    if (env.PUBLIC_NODE_ENV === 'production')
       requestTrackingPermission();
   }, []);
 
