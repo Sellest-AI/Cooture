@@ -1,24 +1,29 @@
 import { v } from "convex/values";
-import { internal } from "../../../_generated/api";
-import { internalMutation } from "../../../_generated/server";
-import { IMAGE_TAGS } from "../../../schema/images";
+import { internal } from "../../../../_generated/api";
+import { Doc, Id } from "../../../../_generated/dataModel";
+import { internalMutation, internalQuery } from "../../../../_generated/server";
+import { IMAGE_TAGS } from "../../../../schema/images";
 
-export const _internal_step1 = internalMutation({
-  handler: async (ctx) => {
-    const images = await ctx.db.query('images')
-      .order('desc')
-      .filter((img) => img.eq(img.field('hasAlpha'), true))
-      .collect();
+type Image = Doc<'images'> & { userId: Id<'users'> | null };
 
-    return await Promise.all(images.map(async (img) => {
-      const user = await ctx.db.query('userImages')
-        .withIndex('by_image_id', q => q.eq('imageId', img._id))
-        .first();
+export const _internal_step1 = internalQuery({
+  args: {
+    imageId: v.id('images'),
+  },
+  handler: async (ctx, { imageId }): Promise<Image | null> => {
+    const image = await ctx.runQuery(internal.router.storage.images.getOne._internal, { id: imageId });
+    if (!image) return null;
 
-      return { ...img, userId: user?.userId ?? null };
-    }));
+    const user = await ctx.db.query('userImages')
+      .withIndex('by_image_id', (q) => q.eq('imageId', image._id))
+      .first();
+
+    return {
+      ...image,
+      userId: user?.userId ?? null,
+    }
   }
-});
+})
 
 export const _internal_step3 = internalMutation({
   args: {
@@ -48,11 +53,6 @@ export const _internal_step4 = internalMutation({
       alt: v.optional(v.string()),
       hasAlpha: v.optional(v.boolean()),
       tags: v.optional(IMAGE_TAGS),
-      object: v.optional(v.object({
-        x: v.number(),
-        y: v.number(),
-        baseImageId: v.id('images')
-      })),
     }),
   },
   handler: async (ctx, args) => {
