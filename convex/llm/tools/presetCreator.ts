@@ -242,6 +242,9 @@ export const presetCreator = createTool({
         return obj;
       }
       if (Array.isArray(obj)) {
+        // If array of empty objects [{}, {}], return []
+        if (obj.every(item => typeof item === 'object' && Object.keys(item).length === 0))
+          return [] as T;
         return obj.map(sanitize) as T;
       }
       if (typeof obj === 'object' && obj !== null) {
