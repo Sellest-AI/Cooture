@@ -153,6 +153,8 @@ import type * as router_admin_outfits_regenerateCovers from "../router/admin/out
 import type * as router_admin_presets_findByName from "../router/admin/presets/findByName.js";
 import type * as router_admin_presets_repairOne from "../router/admin/presets/repairOne.js";
 import type * as router_admin_statistics_getAll from "../router/admin/statistics/getAll.js";
+import type * as router_admin_storage_fixCrop from "../router/admin/storage/fixCrop.js";
+import type * as router_admin_storage_fixCropMutationInternal from "../router/admin/storage/fixCropMutationInternal.js";
 import type * as router_admin_users_addFakePremium from "../router/admin/users/addFakePremium.js";
 import type * as router_admin_users_approveWaitlist from "../router/admin/users/approveWaitlist.js";
 import type * as router_admin_users_getLatests from "../router/admin/users/getLatests.js";
@@ -464,6 +466,8 @@ declare const fullApi: ApiFromModules<{
   "router/admin/presets/findByName": typeof router_admin_presets_findByName;
   "router/admin/presets/repairOne": typeof router_admin_presets_repairOne;
   "router/admin/statistics/getAll": typeof router_admin_statistics_getAll;
+  "router/admin/storage/fixCrop": typeof router_admin_storage_fixCrop;
+  "router/admin/storage/fixCropMutationInternal": typeof router_admin_storage_fixCropMutationInternal;
   "router/admin/users/addFakePremium": typeof router_admin_users_addFakePremium;
   "router/admin/users/approveWaitlist": typeof router_admin_users_approveWaitlist;
   "router/admin/users/getLatests": typeof router_admin_users_getLatests;

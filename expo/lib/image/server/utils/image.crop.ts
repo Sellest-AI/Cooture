@@ -1,5 +1,8 @@
 import sharp from 'sharp';
 
+const ALPHA_THRESHOLD = 5;
+const PERCENTAGE_THRESHOLD = 0.10;
+
 type Response = {
   buffer: Buffer;
   original: { width: number; height: number };
@@ -28,7 +31,7 @@ export async function cropImageFromBuffer(input: Buffer | string): Promise<Respo
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       const alpha = data[(y * w + x) * 4 + 3] ?? 0;
-      if (alpha > 0) {
+      if (alpha > ALPHA_THRESHOLD) {
         if (x < minX) minX = x;
         if (x > maxX) maxX = x;
         if (y < minY) minY = y;
@@ -46,17 +49,38 @@ export async function cropImageFromBuffer(input: Buffer | string): Promise<Respo
   const top = minY;
   const newWidth = maxX - minX + 1;
   const newHeight = maxY - minY + 1;
-  const cropped = newWidth !== w || newHeight !== h;
 
-  const buffer = await image
-    .extract({ left, top, width: newWidth, height: newHeight })
-    .webp({ quality: 100 })
-    .toBuffer();
+  // Consider an image cropped only if we actually trim more than a certain percentage (e.g. 10% (PERCENTAGE_THRESHOLD))
+  // to prevent unnecessary processing for insignificant borders.
+  const widthDiffPercent = (w - newWidth) / w;
+  const heightDiffPercent = (h - newHeight) / h;
+  const cropped = widthDiffPercent > PERCENTAGE_THRESHOLD || heightDiffPercent > PERCENTAGE_THRESHOLD;
+
+  let buffer: Buffer;
+  let finalLeft = 0;
+  let finalTop = 0;
+  let finalWidth = w;
+  let finalHeight = h;
+
+  if (cropped) {
+    buffer = await image
+      .extract({ left, top, width: newWidth, height: newHeight })
+      .webp({ quality: 100 })
+      .toBuffer();
+    finalLeft = left;
+    finalTop = top;
+    finalWidth = newWidth;
+    finalHeight = newHeight;
+  } else {
+    buffer = input instanceof Buffer ? input : await image.toBuffer();
+  }
+
+  const position = { left: finalLeft, top: finalTop, width: finalWidth, height: finalHeight };
 
   return {
     buffer,
     original: { width: w, height: h },
     cropped,
-    position: { left, top, width: newWidth, height: newHeight },
+    position,
   };
 }

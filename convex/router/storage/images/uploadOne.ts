@@ -1,8 +1,8 @@
-import { v } from "convex/values"
-import { IMAGE_TAGS } from "../../../schema/images"
-import { authAction } from "../../../procedures";
+import { v } from "convex/values";
 import { internal } from "../../../_generated/api";
 import { SavedImage } from "../../../functions/images";
+import { authAction } from "../../../procedures";
+import { IMAGE_TAGS } from "../../../schema/images";
 
 export const uploadSingleArgs = {
   base64: v.optional(v.string()),
@@ -13,6 +13,7 @@ export const uploadSingleArgs = {
     y: v.number(),
   })),
   tags: v.optional(IMAGE_TAGS),
+  autoCrop: v.optional(v.boolean()),
 }
 
 export const authed = authAction({
