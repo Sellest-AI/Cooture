@@ -177,7 +177,7 @@ function Content({ outfitId }: { outfitId?: Id<'outfits'> }) {
 
   // Cost
   const { data: costData } = useQueryCached(api.router.credits.getCost.anon, { type: 'ITEM_CREATION_COST' });
-  const { data: canPay } = useQuery(api.router.credits.canPay.authed, costData ? { amount: costData } : 'skip');
+  const { data: canPay } = useQuery(api.router.credits.canPay.authed, costData !== undefined ? { amount: costData } : 'skip');
 
   return (
     <SafeAreaView
