@@ -2,7 +2,7 @@ import { ROUTES, useRouter } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
 import { useAccount } from "@/lib/convex/auth";
 import { useMutation, useQuery, useQueryCached, useQueryCachedData } from "@/lib/convex/client";
-import { downloadImageCrossPlatform } from "@/lib/image/client";
+import { downloadImageNative } from "@/lib/image/client";
 import { downloadVideo } from "@/lib/video";
 import { useSafety } from "@/modules/safety";
 import { Post } from "@ui/cards";
@@ -104,7 +104,7 @@ export const GenerationPost = ({ id, style, imageQuality = 'optimized' }: Props)
       })
     }))}
     onDownload={async (url) => {
-      await downloadImageCrossPlatform(url, { applyWatermark: true })
+      await downloadImageNative(url, { applyWatermark: true })
         .catch(async () => downloadVideo(url).catch(() => null))
     }}
     onTurnToVideo={(ownedByCurrentUser && env.PUBLIC_NODE_ENV !== 'production') ? (_id: string) => {

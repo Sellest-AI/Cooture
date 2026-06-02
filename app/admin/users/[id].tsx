@@ -1,7 +1,7 @@
 import { ROUTES, useRoute, useRouter } from "@/hooks";
 import { api, Id } from "@/lib/convex/api";
 import { usePaginatedQuery, useQuery, useQueryCached } from "@/lib/convex/client";
-import { downloadImageCrossPlatform } from "@/lib/image/client";
+import { downloadImageNative } from "@/lib/image/client";
 import { downloadVideo } from "@/lib/video/downloadVideo.native";
 import { TransactionsModal } from "@/modules/admin/transactions.modal";
 import { TOTAL_TABS_SPACE } from "@/modules/tabs";
@@ -81,7 +81,7 @@ const Generation = ({ id }: { id: Id<'generations'> }) => {
           onPress: () => push(ROUTES.OUTFIT.PATH, { pathParams: { id: post.outfit!._id } })
         } : undefined}
         onDownload={async (url) => {
-          await downloadImageCrossPlatform(url, { applyWatermark: true })
+          await downloadImageNative(url, { applyWatermark: true })
             .catch(async () => downloadVideo(url).catch(() => null))
         }}
       />
