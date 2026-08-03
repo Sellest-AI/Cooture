@@ -3,21 +3,16 @@ import { Image, Platform } from 'react-native';
 // reuse your existing web download implementation
 import { nanoid } from 'nanoid/non-secure';
 import { download as webDownload } from './download.web';
+import { applyWatermark } from './editing/apply-watermark.native';
 
 type Options = {
   applyWatermark?: boolean;
 }
-export async function downloadImageCrossPlatform(source: string, options?: Options) {
+export async function downloadImageNative(source: string, options?: Options) {
   let fileSource = source;
 
   if (Platform.OS === 'web') {
     return webDownload(fileSource);
-  }
-
-  if (options?.applyWatermark) {
-    const { applyWatermark } = await import('./editing/apply-watermark.native');
-    const watermarkUri = Image.resolveAssetSource(require('assets/images/watermark.png')).uri;
-    fileSource = await applyWatermark(source, watermarkUri);
   }
 
   const { File, Paths } = await import('expo-file-system');
@@ -27,6 +22,11 @@ export async function downloadImageCrossPlatform(source: string, options?: Optio
   // Request permission
   const { status } = await requestPermissionsAsync();
   if (status !== 'granted') return;
+
+  if (options?.applyWatermark) {
+    const watermarkUri = Image.resolveAssetSource(require('assets/images/watermark.png')).uri;
+    fileSource = await applyWatermark(source, watermarkUri);
+  }
 
   let localUri: string | null = null;
 

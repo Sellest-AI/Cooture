@@ -1,4 +1,4 @@
-import { downloadImageCrossPlatform } from "@/lib/image/client";
+import { downloadImageNative } from "@/lib/image/client";
 import { downloadVideo } from "@/lib/video";
 import { Block } from "@ui/block";
 import { Button, BUTTON_HEIGHT } from "@ui/button";
@@ -115,7 +115,7 @@ export const GenerationButtons = ({ onNext, currentItem, items }: Props) => {
                         durationS: 10,
                         icon: Loader
                       });
-                      downloadImageCrossPlatform(currentItem.imageUrl, { applyWatermark: true })
+                      downloadImageNative(currentItem.imageUrl, { applyWatermark: true })
                         .then(() => {
                           addToast({
                             title: 'Image saved to your gallery',

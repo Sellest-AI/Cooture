@@ -1,11 +1,12 @@
 import { ROUTES, useRouter } from "@/hooks";
-import { useAccount } from "@/lib/convex/auth";
+import { useAccount, useAuthActions } from "@/lib/convex/auth";
 import { api, useMutation, useQueryCachedData } from "@/lib/convex/client";
 import { KeyboardAvoiderView } from "@good-react-native/keyboard-avoider";
 import { Block } from "@ui/block";
 import { BlurKeys, BlurTargetView } from "@ui/blur-view";
 import { Button } from "@ui/button";
 import { QrCode } from "@ui/icons";
+import { Pressable } from "@ui/pressable";
 import { Skeleton } from "@ui/skeleton";
 import { Text } from "@ui/text";
 import { TextInput } from "@ui/text-input";
@@ -23,6 +24,7 @@ export default function Screen() {
   const { mutate: enterCode } = useMutation(api.router.waitlist.enterCode.authed);
 
   const { user } = useAccount();
+  const { signOut } = useAuthActions();
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -128,7 +130,6 @@ export default function Screen() {
               people are waiting
             </Text.Base>
           </View> : <Skeleton width={132} height={14} style={{ marginHorizontal: 'auto', marginTop: 8 }} />}
-
         <Button
           style={{ marginTop: 32 }}
           variant="primary"
@@ -138,6 +139,14 @@ export default function Screen() {
         >
           {user?.username ? "Edit profile" : "Claim my username"}
         </Button>
+        <Pressable
+          style={{ marginTop: 20, alignItems: 'center' }}
+          onPress={async () => signOut()}
+        >
+          <Text.Sm color={Colors.neutral[400]} style={{ opacity: 0.5 }}>
+            Wrong account? Sign out
+          </Text.Sm>
+        </Pressable>
       </View>
     </View>
   )

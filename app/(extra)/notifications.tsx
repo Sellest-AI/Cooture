@@ -195,7 +195,7 @@ export default function Screen() {
       style={{
         padding: 12,
         paddingHorizontal: 8,
-        paddingTop: Platform.OS !== 'ios' ? 12 : 0,
+        paddingTop: 0,
         flex: isEmpty ? 1 : undefined
       }}
       stickyHeaderIndices={[0]}
@@ -207,7 +207,11 @@ export default function Screen() {
       }}
     >
       <ModalHeader
-        style={{ backgroundColor: Colors.background, paddingHorizontal: 4 }}
+        style={{
+          backgroundColor: Colors.background,
+          paddingHorizontal: 4,
+          paddingTop: Platform.OS !== 'ios' ? 12 : 0,
+        }}
         onBack={() => router.canGoBack() ? router.back() : router.dismissTo(ROUTES.TABS.FEED)}
         title="Notifications"
         type="alt"

@@ -1,6 +1,6 @@
 import { api, Id } from "@/lib/convex/api";
 import { useQuery } from "@/lib/convex/client";
-import { downloadImageCrossPlatform } from "@/lib/image/client";
+import { downloadImageNative } from "@/lib/image/client";
 import { presentPaywallIfNeeded } from "@/lib/revenue-cat";
 import { AnimatedGeneration } from "@/modules/generations/animated-generation";
 import { GenerationButtons } from "@/modules/generations/generation-buttons";
@@ -253,7 +253,7 @@ export default function Screen() {
                             source={s.imageUrl}
                             text={s.status === 'LOADING' ? "Generating..." :
                               isFailed ? "Failed" : "Ready"}
-                            onDownload={s.imageUrl ? () => downloadImageCrossPlatform(s.imageUrl!, { applyWatermark: true }) : undefined}
+                            onDownload={s.imageUrl ? () => downloadImageNative(s.imageUrl!, { applyWatermark: true }) : undefined}
                             onPress={() => onPress()}
                           />
                           {isFailed && <View style={{

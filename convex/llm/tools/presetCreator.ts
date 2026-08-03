@@ -67,6 +67,7 @@ NOTES:
 - Avoid using terms like "disposable camera", "film point-and-shoot snapshot", or "polaroid" in the "style" or "technical" fields unless the image physically has white borders. Instead, use "raw candid flash photograph, digital capture", "35mm lens, handheld flash photography", or "compact camera, direct flash" to prevent the model from hallucinating framing borders.
 - Strict separation of wearable items vs props: Never list fashion accessories (hats, gloves, purses, bags) in "hands" or "heldObjects". These belong exclusively in "outfit.accessories". "heldObjects" is strictly for environmental props. Examples of valid heldObjects: "Bouquet of flowers, coffee cup, book, phone, skateboard".
 - NEVER describe natural skin tones or textures (e.g., "fair", "dark", "smooth skin", "neutral tones"). This is strictly prohibited to prevent bias. ONLY mention skin color if it is vividly unnatural or fantastical (e.g., blue, green, purple, metallic).
+- NEVE describe the subject's body type, or hair color unless it is vividly unnatural (e.g., bright pink hair, neon green buzzcut, long flowing silver hair). Focus on pose rather than body shape.
 
 OUTPUT FORMAT (VERY IMPORTANT):
 - Return a JSON object that exactly matches the schema structure.
@@ -242,6 +243,9 @@ export const presetCreator = createTool({
         return obj;
       }
       if (Array.isArray(obj)) {
+        // If array of empty objects [{}, {}], return []
+        if (obj.every(item => typeof item === 'object' && Object.keys(item).length === 0))
+          return [] as T;
         return obj.map(sanitize) as T;
       }
       if (typeof obj === 'object' && obj !== null) {

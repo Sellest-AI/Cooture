@@ -16,6 +16,7 @@ import { uploadSingleArgs } from "./uploadOne";
 type Extra = {
   userId: Id<'users'> | null,
   tags?: Infer<typeof IMAGE_TAGS>,
+  autoCrop?: boolean,
   object?: {
     baseImageId: Id<'images'>,
     x: number,
@@ -23,14 +24,15 @@ type Extra = {
   }
 }
 
-const uploadImage = async (ctx: ActionCtx, base64orUrl: string, extra: Extra) => {
+export const uploadImage = async (ctx: ActionCtx, base64orUrl: string, extra: Extra) => {
   const buffer = await imageBufferFromUrl(base64orUrl);
 
   const [hasAlpha] = await Promise.all([
     hasImageAlpha(buffer)
   ]);
 
-  const croppedImage = hasAlpha ? await cropImageFromBuffer(buffer) : undefined;
+  const autoCrop = extra.autoCrop ?? true;
+  const croppedImage = (hasAlpha && autoCrop) ? await cropImageFromBuffer(buffer) : undefined;
   const compressedImage = await compressImageAuto(croppedImage?.buffer ?? buffer);
 
   const base64Data = compressedImage.buffer.toString('base64');
@@ -74,6 +76,7 @@ export const uploadManySharedHandler = async (ctx: ActionCtx, args: SharedArgs):
     const url = image.url ?? image.base64;
     if (!url) throw new Error("Either url or base64 image data must be provided");
     return uploadImage(ctx, url, {
+      autoCrop: image.autoCrop,
       object: image.object,
       userId: args.userId,
       tags: image.tags,

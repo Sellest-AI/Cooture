@@ -294,6 +294,7 @@ export const _internal = internalAction({
       userId: outfit.userId,
       images: [{
         base64: imageBase64,
+        autoCrop: false,
       }]
     });
 

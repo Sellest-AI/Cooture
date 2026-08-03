@@ -48,10 +48,11 @@ export default function Screen() {
   const { data: preset } = useQuery(api.router.presets.getOne.anon, { presetId })
 
   return (
-    <View style={{ flex: 1, padding: 12 }}>
+    <View style={{ flex: 1, paddingVertical: 12 }}>
       <Text.H4 style={{
         marginTop: 16,
         marginBottom: 12,
+        paddingHorizontal: 12,
         alignSelf: 'center'
       }}
         weight={500}
@@ -95,7 +96,7 @@ export default function Screen() {
           )
         })}
       />
-      <View>
+      <View style={{ paddingHorizontal: 12 }}>
         <Button
           variant="primary"
           disabled={!selectedThumbnail}
