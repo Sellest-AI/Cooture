@@ -18,7 +18,7 @@ const gptOss120b = openrouter.chat("openai/gpt-oss-120b");
 const qwen359b = openrouter.chat("qwen/qwen3.5-9b");
 
 // Cheapest (for offloading non-critical tasks)
-const deepseek4Flash = openrouter.chat("deepseek/deepseek-v4-flash");
+const deepseek4Flash = openrouter.chat("deepseek/deepseek-v4-flash-0731");
 
 export const models = {
   orchestrator: {
