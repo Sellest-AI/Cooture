@@ -41,50 +41,8 @@ export const parseKieWebhook = (body: unknown) => {
   return result.data satisfies KieWebhookPayload;
 };
 
-const toBase64 = (bytes: Uint8Array) => {
-  let binary = '';
-  for (let i = 0; i < bytes.length; i += 1) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-
-  return btoa(binary);
-};
-
-const constantTimeEqual = (a: string, b: string) => {
-  if (a.length !== b.length) return false;
-
-  let result = 0;
-  for (let i = 0; i < a.length; i += 1) {
-    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-
-  return result === 0;
-};
-
-export const verifyKieWebhookSignature = async (
-  taskId: string,
-  timestampSeconds: string,
-  signature: string,
-  secret: string,
-) => {
-  if (!taskId || !timestampSeconds || !signature || !secret) return false;
-
-  const message = `${taskId}.${timestampSeconds}`;
-  const encoder = new TextEncoder();
-
-  const key = await crypto.subtle.importKey(
-    'raw',
-    encoder.encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign'],
-  );
-
-  const signed = await crypto.subtle.sign('HMAC', key, encoder.encode(message));
-  const expected = toBase64(new Uint8Array(signed));
-
-  return constantTimeEqual(expected, signature);
-};
+// The H-tMAC/base64/constantime helpers that used to live here are now in lib/crypto,
+// and http/kie.ts verifies through http/verified.ts so the check cannot be skipped.
 
 export const parseKieWebhookOutput = (payload: KieWebhookPayload) => {
   const urls = payload.data.resultJson?.resultUrls ?? [];

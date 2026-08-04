@@ -4,7 +4,9 @@ import { v } from "convex/values";
 import { z } from "zod/v4";
 import { internal } from "../../_generated/api";
 import { Id } from "../../_generated/dataModel";
-import { httpAction, internalAction } from "../../_generated/server";
+import { internalAction } from "../../_generated/server";
+import { env } from "../../env";
+import { verifiedWebhook, verifySharedSecret } from "../verified";
 
 const CallbackSchema = z.object({
   userId: z.string(),
@@ -113,45 +115,52 @@ export const _internal_process = internalAction({
   }
 })
 
-export const runpodRemoveBackgroundHandler = httpAction(async (ctx, request) => {
-  // Handle the Replicate webhook request here
-  const json = await request.json();
-
-  const body = RemoveBackgroundTaskSchema.parse(json);
-
-  if (!body.output) {
-    return Response.json({ received: true }, { status: 200 });
-  }
-
-  const callback = body.output.callback;
-  const userId = callback.userId as Id<'users'>;
-
-  await ctx.scheduler.runAfter(0, internal.http.runpod.removeBackground._internal_process, {
-    removeBackgroundData: {
-      url: body.output.url,
-      callback: {
-        userId,
-        nextStep: callback.nextStep,
-        nextArgs: callback.nextArgs?.CREATE_ITEM ? {
-          CREATE_ITEM: {
-            name: callback.nextArgs.CREATE_ITEM?.name,
-            description: callback.nextArgs.CREATE_ITEM?.description,
-            itemUrl: callback.nextArgs.CREATE_ITEM?.itemUrl,
-            brand: callback.nextArgs.CREATE_ITEM?.brand,
-            gender: callback.nextArgs.CREATE_ITEM?.gender,
-            fit: callback.nextArgs.CREATE_ITEM?.fit,
-            materials: callback.nextArgs.CREATE_ITEM?.materials,
-            price: callback.nextArgs.CREATE_ITEM?.price,
-            sku: callback.nextArgs.CREATE_ITEM?.sku,
-          }
-        } : callback.nextArgs?.UPDATE_ITEM ? {
-          UPDATE_ITEM: {
-            itemId: callback.nextArgs.UPDATE_ITEM.itemId as Id<'items'>,
-          }
-        } : undefined,
-      },
+/**
+ * RunPod does not sign its callbacks, and this handler used to accept any request that
+ * matched the schema — so an attacker could attach an arbitrary image to any user's
+ * wardrobe by supplying their `userId` (03-FLAWS F2).
+ *
+ * Verification is now the capability token appended to the callback URL in
+ * `lib/runpod/run.ts`, compared in constant time.
+ */
+export const runpodRemoveBackgroundHandler = verifiedWebhook({
+  verify: (request) => verifySharedSecret(request, env.RUNPOD_WEBHOOK_SECRET),
+  parse: (json) => RemoveBackgroundTaskSchema.parse(json),
+  handle: async (ctx, body) => {
+    if (!body.output) {
+      return Response.json({ received: true }, { status: 200 });
     }
-  })
 
-  return Response.json({ received: true }, { status: 200 });
+    const callback = body.output.callback;
+    const userId = callback.userId as Id<'users'>;
+
+    await ctx.scheduler.runAfter(0, internal.http.runpod.removeBackground._internal_process, {
+      removeBackgroundData: {
+        url: body.output.url,
+        callback: {
+          userId,
+          nextStep: callback.nextStep,
+          nextArgs: callback.nextArgs?.CREATE_ITEM ? {
+            CREATE_ITEM: {
+              name: callback.nextArgs.CREATE_ITEM?.name,
+              description: callback.nextArgs.CREATE_ITEM?.description,
+              itemUrl: callback.nextArgs.CREATE_ITEM?.itemUrl,
+              brand: callback.nextArgs.CREATE_ITEM?.brand,
+              gender: callback.nextArgs.CREATE_ITEM?.gender,
+              fit: callback.nextArgs.CREATE_ITEM?.fit,
+              materials: callback.nextArgs.CREATE_ITEM?.materials,
+              price: callback.nextArgs.CREATE_ITEM?.price,
+              sku: callback.nextArgs.CREATE_ITEM?.sku,
+            }
+          } : callback.nextArgs?.UPDATE_ITEM ? {
+            UPDATE_ITEM: {
+              itemId: callback.nextArgs.UPDATE_ITEM.itemId as Id<'items'>,
+            }
+          } : undefined,
+        },
+      }
+    })
+
+    return Response.json({ received: true }, { status: 200 });
+  },
 })

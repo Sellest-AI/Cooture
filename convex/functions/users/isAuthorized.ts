@@ -1,5 +1,7 @@
 import { Doc, Id } from "../../_generated/dataModel";
-import { QueryCtx } from "../../procedures";
+// Type-only: `procedures.ts` imports this module for `ownedQuery`/`ownedMutation`,
+// so a value import here would close a runtime cycle.
+import type { QueryCtx } from "../../procedures";
 
 type Context = QueryCtx & { userId: Id<'users'> };
 

@@ -182,8 +182,11 @@ const handleEvent = async (event: Stripe.Event, ctx: ActionCtx) => {
 
 
 export const stripeWebhookHttpAction = httpAction(async (ctx, request) => {
+  // Signature verification happens in retrieveEventFromRequest via
+  // stripe.webhooks.constructEventAsync — a null event means it failed, which is a 401,
+  // not the 500 an uncaught throw used to produce.
   const event = await retrieveEventFromRequest(request);
-  if (!event) throw new Error("Invalid Stripe event");
+  if (!event) return new Response("Unauthorized", { status: 401 });
 
   await handleEvent(event, ctx);
 
