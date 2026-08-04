@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { Id } from "../../_generated/dataModel";
 import { calculateDailyReward, CREDITS_CONFIG, getAllDailyRewards, getUserWallet } from "../../functions/credits";
-import { authQuery, QueryCtx } from "../../procedures";
+import { adminQuery, authQuery, QueryCtx } from "../../procedures";
 
 const handler = async (ctx: QueryCtx, userId: Id<"users">) => {
   const wallet = await getUserWallet(ctx, userId);
@@ -45,7 +45,11 @@ export const authed = authQuery({
   handler: async (ctx) => handler(ctx, ctx.userId)
 });
 
-export const admin = authQuery({
+/**
+ * Reads any user's balance and streak history from a caller-supplied id, so it must be
+ * gated on the ADMIN role — `authQuery` here made it readable by any signed-in user.
+ */
+export const admin = adminQuery({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => handler(ctx, args.userId)
 });

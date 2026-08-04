@@ -3,6 +3,7 @@ import { addBase64Header, addImageBackground, bufferToBase64, compressImageAuto,
 import { getClosestAspectRatio } from "@shared/utils";
 import Replicate from "replicate";
 import { env } from "../../env";
+import { withWebhookToken } from "../crypto";
 
 /** 
  * Sanitize image for Replicate by ensuring it meets aspect ratio requirements. 
@@ -104,7 +105,9 @@ export const predictImage = async (params: PredictImageParams) => {
       sequential_image_generation: "disabled",
       disable_safety_checker: true,
     },
-    webhook: env.CONVEX_SITE_URL + '/api/replicate/webhook',
+    // Capability token verified in `http/replicate.ts` — without it the callback is a
+    // public endpoint that can attach arbitrary output to any user's generation.
+    webhook: withWebhookToken(env.CONVEX_SITE_URL + '/api/replicate/webhook', env.REPLICATE_WEBHOOK_SECRET),
     webhook_events_filter: ['completed']
   });
 
