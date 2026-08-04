@@ -1,6 +1,7 @@
 "use node"
 import runpodSdk from 'runpod-sdk';
 import { env } from '../../env';
+import { withWebhookToken } from '../crypto';
 import { TaskCallback, TaskType } from './types';
 
 const runpod = runpodSdk(env.RUNPOD_API_KEY);
@@ -21,7 +22,11 @@ export const runAsync = async <T extends object>(task: TaskType, options: RunOpt
 
   const { endpoint: endpointId, webhookPath } = _endpoint;
 
-  const WEBHOOK_URL = env.CONVEX_SITE_URL + webhookPath;
+  // RunPod does not sign its callbacks, so the callback URL carries a capability token
+  // that the handler verifies. Without it the webhook is a public write endpoint.
+  // No worker/Docker change is needed: RunPod POSTs back to this URL verbatim, query
+  // string included (undocumented, but verified end to end against the dev endpoint).
+  const WEBHOOK_URL = withWebhookToken(env.CONVEX_SITE_URL + webhookPath, env.RUNPOD_WEBHOOK_SECRET);
 
   const endpoint = runpod.endpoint(endpointId);
 

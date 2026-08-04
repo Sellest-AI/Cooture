@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { Id } from "../../_generated/dataModel";
-import { authMutation, internalMutation, MutationCtx } from "../../procedures";
+import { internalMutation, MutationCtx, ownedMutation } from "../../procedures";
 
 const handler = async (ctx: MutationCtx, args: { id: Id<'presets'>, onlyIfArchived?: boolean }) => {
   const preset = await ctx.db.get(args.id);
@@ -43,11 +43,17 @@ export const _internal = internalMutation({
   }
 })
 
-export const authed = authMutation({
-  args: {
-    id: v.id("presets"),
-  },
-  handler: async (ctx, args): Promise<boolean> => {
-    return await handler(ctx, args);
+/**
+ * `authMutation` here only checked that *someone* was signed in, so any authenticated
+ * caller could delete any preset by id (03-FLAWS F6). `ownedMutation` supplies the same
+ * `{ id }` argument but resolves and authorises the document before the handler runs —
+ * there is no path into this handler with a preset the caller does not own.
+ */
+export const authed = ownedMutation("presets")({
+  // `args: {}` is required: the customization declares `{ id }` itself, and convex-helpers
+  // refuses to build a function that does not also declare its own args.
+  args: {},
+  handler: async (ctx): Promise<boolean> => {
+    return await handler(ctx, { id: ctx.doc._id });
   }
 })

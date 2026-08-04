@@ -3,8 +3,9 @@ import { v } from "convex/values";
 import { z } from "zod";
 import { internal } from "../../_generated/api";
 import { Id } from "../../_generated/dataModel";
-import { httpAction, internalAction } from "../../_generated/server";
+import { internalAction } from "../../_generated/server";
 import { env } from "../../env";
+import { verifiedWebhook, verifySharedSecret } from "../verified";
 
 const CallbackSchema = z.object({
   userId: z.string(),
@@ -83,47 +84,51 @@ export const _internal_process = internalAction({
   }
 })
 
-export const runpodGenerateVideoHandler = httpAction(async (ctx, request) => {
-  // Handle the Replicate webhook request here
-  const json = await request.json();
-
-  const base = WebhookBasicTaskSchema.parse(json);
-
-  if (base.status === 'FAILED' || base.status === 'TIMED_OUT' || base.status === 'CANCELLED') {
-    await ctx.runMutation(internal.router.generations.updatePrediction._internal,
-      { predictionId: base.id, status: 'FAILED' })
-    return Response.json({ received: true }, { status: 200 });
-  }
-
-  const body = WebhookTaskSchema.parse(json);
-
-  if (body.status !== 'COMPLETED')
-    return Response.json({ received: true }, { status: 200 });
-
-  if (!body.output) {
-    return Response.json({ received: true }, { status: 200 });
-  }
-
-  const callback = body.output.callback;
-  const userId = callback.userId as Id<'users'>;
-
-  const videoTmpPath = body.output?.texts?.[0]?.content_raw;
-  if (!videoTmpPath) {
-    return Response.json({ received: true }, { status: 200 });
-  }
-
-  await ctx.scheduler.runAfter(0, internal.http.runpod.generateVideo._internal_process, {
-    userId,
-    predictionId: body.id,
-    baseImageId: callback.imageId,
-    videoTmpPath,
-    video: {
-      durationMs: callback.video.durationMs,
-      width: callback.video.width,
-      height: callback.video.height,
-      fps: callback.video.fps,
+/**
+ * Unverified before: any caller could mark a generation FAILED, or point the video
+ * pipeline at an arbitrary S3 path under someone else's `userId` (03-FLAWS F2).
+ * Verified now by the capability token appended to the callback URL in `lib/runpod/run.ts`.
+ */
+export const runpodGenerateVideoHandler = verifiedWebhook({
+  verify: (request) => verifySharedSecret(request, env.RUNPOD_WEBHOOK_SECRET),
+  parse: (json) => ({ base: WebhookBasicTaskSchema.parse(json), json }),
+  handle: async (ctx, { base, json }) => {
+    if (base.status === 'FAILED' || base.status === 'TIMED_OUT' || base.status === 'CANCELLED') {
+      await ctx.runMutation(internal.router.generations.updatePrediction._internal,
+        { predictionId: base.id, status: 'FAILED' })
+      return Response.json({ received: true }, { status: 200 });
     }
-  })
 
-  return Response.json({ received: true }, { status: 200 });
+    const body = WebhookTaskSchema.parse(json);
+
+    if (body.status !== 'COMPLETED')
+      return Response.json({ received: true }, { status: 200 });
+
+    if (!body.output) {
+      return Response.json({ received: true }, { status: 200 });
+    }
+
+    const callback = body.output.callback;
+    const userId = callback.userId as Id<'users'>;
+
+    const videoTmpPath = body.output?.texts?.[0]?.content_raw;
+    if (!videoTmpPath) {
+      return Response.json({ received: true }, { status: 200 });
+    }
+
+    await ctx.scheduler.runAfter(0, internal.http.runpod.generateVideo._internal_process, {
+      userId,
+      predictionId: body.id,
+      baseImageId: callback.imageId,
+      videoTmpPath,
+      video: {
+        durationMs: callback.video.durationMs,
+        width: callback.video.width,
+        height: callback.video.height,
+        fps: callback.video.fps,
+      }
+    })
+
+    return Response.json({ received: true }, { status: 200 });
+  },
 })

@@ -1,16 +1,18 @@
 import { v } from "convex/values";
 import z from "zod";
 import { internal } from "../_generated/api";
-import { httpAction, MutationCtx } from "../_generated/server";
+import { MutationCtx } from "../_generated/server";
 import { env } from "../env";
 import { getUserWallet } from "../functions/credits";
 import { CREDITS_CONFIG } from "../functions/credits/credits.config";
+import { constantTimeEqual } from "../lib/crypto";
 import { internalMutation } from "../procedures";
+import { verifiedWebhook } from "./verified";
 
 const eventSchema = z.object({
   type: z.string(),
   product_id: z.string(),
-  entitlement_ids: z.array(z.string()),
+  entitlement_ids: z.array(z.string()).nullish().transform((ids) => ids ?? []),
   period_type: z.string().optional(),
   app_user_id: z.string(),
   original_app_user_id: z.string().optional(),
@@ -25,39 +27,38 @@ const eventArgs = v.object({
   original_app_user_id: v.optional(v.string()),
 })
 
-export const revenueCatHandler = httpAction(async (ctx, request) => {
-  const authorization = request.headers.get("authorization");
+/**
+ * This handler grants entitlements and mints credits, so an unauthenticated caller could
+ * hand themselves a premium account. The check used to be `if (webhookSecret && …)`, which
+ * a missing REVENUECAT_WEBHOOK_SECRET turned into no check at all (03-FLAWS F3).
+ *
+ * It is now unconditional and constant-time: reading the secret throws when unset, and the
+ * wrapper answers 401.
+ */
+export const revenueCatHandler = verifiedWebhook({
+  verify: (request) => {
+    const authorization = request.headers.get("authorization") ?? "";
+    if (!constantTimeEqual(authorization, env.REVENUECAT_WEBHOOK_SECRET))
+      throw new Error("Invalid RevenueCat webhook secret");
+  },
+  parse: (json) => (json as { event?: unknown })?.event,
+  handle: async (ctx, event) => {
+    if (!event) return new Response("No event found", { status: 400 });
 
-  // You should configure this secret in the Convex dashboard and RevenueCat dashboard
-  const webhookSecret = env.REVENUECAT_WEBHOOK_SECRET;
+    const parsed = eventSchema.safeParse(event);
+    if (!parsed.success) {
+      console.error("Malformed RC webhook event:", parsed.error.message);
+      return new Response("Bad Request", { status: 400 });
+    }
 
-  if (webhookSecret && authorization !== webhookSecret) {
-    return new Response("Unauthorized", { status: 401 });
-  }
-
-  const body = await request.json();
-  const event = body?.event;
-
-  if (!event) {
-    return new Response("No event found", { status: 400 });
-  }
-
-  try {
-    const sanitizedEvent = eventSchema.parse({
-      type: event.type,
-      product_id: event.product_id,
-      entitlement_ids: event.entitlement_ids ?? [],
-      period_type: event.period_type,
-      app_user_id: event.app_user_id,
-      original_app_user_id: event.original_app_user_id,
-    });
-
-    await ctx.runMutation(internal.http.revenuecat.processWebhook, { event: sanitizedEvent });
-    return new Response("Success", { status: 200 });
-  } catch (error) {
-    console.error("Error processing RC webhook:", error);
-    return new Response("Internal Server Error", { status: 500 });
-  }
+    try {
+      await ctx.runMutation(internal.http.revenuecat.processWebhook, { event: parsed.data });
+      return new Response("Success", { status: 200 });
+    } catch (error) {
+      console.error("Error processing RC webhook:", error);
+      return new Response("Internal Server Error", { status: 500 });
+    }
+  },
 });
 
 const extractUser = async (ctx: MutationCtx, event: any) => {

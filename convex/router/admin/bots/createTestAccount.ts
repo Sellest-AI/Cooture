@@ -1,6 +1,7 @@
 import { createAccount } from "@convex-dev/auth/server";
-import { api, internal } from "../../../_generated/api";
+import { internal } from "../../../_generated/api";
 import { internalAction, MutationCtx } from "../../../_generated/server";
+import { readTestAccount } from "../../../functions/auth/testAccount";
 import { internalMutation } from "../../../procedures";
 
 const getUser = (ctx: MutationCtx, email: string) => ctx.db.query("users").withIndex('email', (q) => q.eq('email', email)).first();
@@ -8,11 +9,17 @@ const getUser = (ctx: MutationCtx, email: string) => ctx.db.query("users").withI
 /**
  * Can be called to create a test account or restore it if it has been deleted.
  * The creation is split in two steps to avoid duplicate accounts.
+ *
+ * Credentials come from `functions/auth/testAccount` rather than a round trip through the
+ * public `getTestAccount.anon` mutation. On a deployment that has not opted in (production)
+ * there are no credentials and every step is a no-op.
  */
 export const _internal = internalMutation({
   handler: async (ctx) => {
     // Test Account
-    const TEST_ACCOUNT = await ctx.runMutation(api.router.auth.getTestAccount.anon);
+    const TEST_ACCOUNT = readTestAccount();
+    if (!TEST_ACCOUNT) return;
+
     const testAccount = await getUser(ctx, TEST_ACCOUNT.email);
 
     if (!testAccount)
@@ -26,7 +33,9 @@ export const _internal = internalMutation({
 
 export const _internal_step_1 = internalAction({
   handler: async (ctx) => {
-    const TEST_ACCOUNT = await ctx.runMutation(api.router.auth.getTestAccount.anon);
+    const TEST_ACCOUNT = readTestAccount();
+    if (!TEST_ACCOUNT) return;
+
     await createAccount(ctx, {
       provider: "password",
       account: {
@@ -44,7 +53,9 @@ export const _internal_step_1 = internalAction({
 
 export const _internal_step_2 = internalMutation({
   handler: async (ctx) => {
-    const TEST_ACCOUNT = await ctx.runMutation(api.router.auth.getTestAccount.anon);
+    const TEST_ACCOUNT = readTestAccount();
+    if (!TEST_ACCOUNT) return;
+
     const testAccount = await getUser(ctx, TEST_ACCOUNT.email);
 
     if (!testAccount) return;
