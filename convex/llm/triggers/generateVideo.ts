@@ -5,6 +5,7 @@ import { internal } from "../../_generated/api";
 import { Doc, Id } from "../../_generated/dataModel";
 import { ActionCtx, internalAction } from "../../_generated/server";
 import { CREDITS_CONFIG } from "../../functions/credits";
+import { withReservedCredits } from "../../functions/credits/withReservedCredits";
 import { authAction } from "../../procedures";
 import { videoPrompter } from "../tools/videoPrompter";
 
@@ -29,14 +30,6 @@ export const handler = async (ctx: ActionCtx, { generation, predictionId, newGen
   const COST = CREDITS_CONFIG.COST_PER_VIDEO_GENERATION;
   const userId = generation.userId;
 
-  // 1. Check if can pay
-  const canPay = await ctx.runQuery(internal.router.credits.canPay._internal, {
-    userId: userId,
-    amount: COST,
-  });
-
-  if (!canPay) throw new Error("Not enough credits to start video generation.");
-
   const imageId = generation.predictions.find(p => p._id === predictionId)?.imageId;
   if (!imageId) throw new Error("Image not found for prediction");
 
@@ -46,31 +39,32 @@ export const handler = async (ctx: ActionCtx, { generation, predictionId, newGen
   // For now we hardcode to 4 seconds, but we could allow the user to specify this in the future
   const durationS = 4;
 
-  const prompt = await videoPrompter.handler({ ...ctx }, {
-    imageUrl: image.sizes.large.url,
-    durationS,
-  });
+  // Charge up front — the reservation is refunded if the video cannot be started
+  return withReservedCredits(ctx, { userId, amount: COST }, async () => {
+    const prompt = await videoPrompter.handler({ ...ctx }, {
+      imageUrl: image.sizes.large.url,
+      durationS,
+    });
 
-  const run = await generateVideo({
-    imageUrl: image.url,
-    imageId: image._id,
-    durationMs: durationS * 1000,
-    prompt,
-    callback: {
-      userId: userId,
-      baseImageId: undefined,
-    }
-  });
+    const run = await generateVideo({
+      imageUrl: image.url,
+      imageId: image._id,
+      durationMs: durationS * 1000,
+      prompt,
+      callback: {
+        userId: userId,
+        baseImageId: undefined,
+      }
+    });
 
-  const preset = generation.presetId ? {
-    presetId: generation.presetId,
-    outfitId: generation.outfitId,
-    prompts: [prompt],
-  } : undefined;
+    const preset = generation.presetId ? {
+      presetId: generation.presetId,
+      outfitId: generation.outfitId,
+      prompts: [prompt],
+    } : undefined;
 
-  // Duplicate previous generation with new prediction, so it appears in the UI and can be tracked
-  const generationId =
-    newGeneration ? await ctx.runMutation(internal.router.generations.createOne._internal, {
+    // Duplicate previous generation with new prediction, so it appears in the UI and can be tracked
+    return newGeneration ? await ctx.runMutation(internal.router.generations.createOne._internal, {
       userId: userId,
       extraUserIds: generation.userIds,
       predictions: [{
@@ -85,15 +79,7 @@ export const handler = async (ctx: ActionCtx, { generation, predictionId, newGen
         baseImageId: imageId,
       }],
     });
-
-  // Deduct credits
-  await ctx.runMutation(internal.router.credits.deductCredits._internal, {
-    amount: COST,
-    userId: userId,
-    generationId,
-  }).catch(() => null);
-
-  return generationId;
+  });
 }
 
 export const _internal = internalAction({

@@ -1,6 +1,6 @@
 import { v } from "convex/values";
-import { authQuery, internalQuery, publicQuery } from "../../../convex/procedures";
-import { getGenerationMax } from "../../functions/generations";
+import { authQuery, internalQuery, publicQuery, userCheck } from "../../procedures";
+import { canReadDrafts, getGenerationMax, publicPredictions } from "../../functions/generations";
 
 export const _internal = internalQuery({
   args: {
@@ -45,7 +45,10 @@ export const anon = publicQuery({
     const generation = await getGenerationMax(ctx, prediction.generationId);
     if (!generation) return null;
 
-    const predictions = generation.predictions.filter((p) => p.status === 'ACCEPTED');
+    // Share links resolve here without sign-in: unpublished predictions are owner/admin only.
+    const predictions = canReadDrafts(await userCheck(ctx), generation)
+      ? generation.predictions.filter((p) => p.status === 'ACCEPTED')
+      : publicPredictions(generation, generation.predictions);
     if (predictions.length === 0) return null;
 
     const firstPredictionId = predictions[0]._id;

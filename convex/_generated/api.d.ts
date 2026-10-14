@@ -22,6 +22,7 @@ import type * as functions_credits_deductCredits from "../functions/credits/dedu
 import type * as functions_credits_getUserWallet from "../functions/credits/getUserWallet.js";
 import type * as functions_credits_grantCredits from "../functions/credits/grantCredits.js";
 import type * as functions_credits_index from "../functions/credits/index.js";
+import type * as functions_credits_withReservedCredits from "../functions/credits/withReservedCredits.js";
 import type * as functions_feed_index from "../functions/feed/index.js";
 import type * as functions_feed_updateFeedScore from "../functions/feed/updateFeedScore.js";
 import type * as functions_generations_createPrediction from "../functions/generations/createPrediction.js";
@@ -29,6 +30,7 @@ import type * as functions_generations_getGenerationDetails from "../functions/g
 import type * as functions_generations_getGenerationMax from "../functions/generations/getGenerationMax.js";
 import type * as functions_generations_getPrediction from "../functions/generations/getPrediction.js";
 import type * as functions_generations_index from "../functions/generations/index.js";
+import type * as functions_generations_visibility from "../functions/generations/visibility.js";
 import type * as functions_images_getImage from "../functions/images/getImage.js";
 import type * as functions_images_index from "../functions/images/index.js";
 import type * as functions_images_saveImage from "../functions/images/saveImage.js";
@@ -55,6 +57,7 @@ import type * as functions_presets_index from "../functions/presets/index.js";
 import type * as functions_presets_sanitizePresets from "../functions/presets/sanitizePresets.js";
 import type * as functions_quests_index from "../functions/quests/index.js";
 import type * as functions_quests_updateQuest from "../functions/quests/updateQuest.js";
+import type * as functions_rateLimits from "../functions/rateLimits.js";
 import type * as functions_subscriptions_getUserSubscription from "../functions/subscriptions/getUserSubscription.js";
 import type * as functions_subscriptions_index from "../functions/subscriptions/index.js";
 import type * as functions_subscriptions_isSubscriptionActive from "../functions/subscriptions/isSubscriptionActive.js";
@@ -131,6 +134,7 @@ import type * as llm_triggers_removeBackground from "../llm/triggers/removeBackg
 import type * as llm_triggers_trendExtractor from "../llm/triggers/trendExtractor.js";
 import type * as llm_utils_createTool from "../llm/utils/createTool.js";
 import type * as llm_utils_index from "../llm/utils/index.js";
+import type * as llm_utils_photoshoot_guards from "../llm/utils/photoshoot/guards.js";
 import type * as llm_utils_photoshoot_index from "../llm/utils/photoshoot/index.js";
 import type * as llm_utils_photoshoot_jsonCreator from "../llm/utils/photoshoot/jsonCreator.js";
 import type * as llm_utils_photoshoot_toMarkdown from "../llm/utils/photoshoot/toMarkdown.js";
@@ -176,6 +180,7 @@ import type * as router_credits_getTransactionsPaginated from "../router/credits
 import type * as router_credits_getUserWallet from "../router/credits/getUserWallet.js";
 import type * as router_credits_grantCredits from "../router/credits/grantCredits.js";
 import type * as router_credits_refundCredits from "../router/credits/refundCredits.js";
+import type * as router_credits_reserveCredits from "../router/credits/reserveCredits.js";
 import type * as router_feed_getFromOutfit from "../router/feed/getFromOutfit.js";
 import type * as router_feed_getFromOutfits from "../router/feed/getFromOutfits.js";
 import type * as router_feed_getFromPreset from "../router/feed/getFromPreset.js";
@@ -338,6 +343,7 @@ declare const fullApi: ApiFromModules<{
   "functions/credits/getUserWallet": typeof functions_credits_getUserWallet;
   "functions/credits/grantCredits": typeof functions_credits_grantCredits;
   "functions/credits/index": typeof functions_credits_index;
+  "functions/credits/withReservedCredits": typeof functions_credits_withReservedCredits;
   "functions/feed/index": typeof functions_feed_index;
   "functions/feed/updateFeedScore": typeof functions_feed_updateFeedScore;
   "functions/generations/createPrediction": typeof functions_generations_createPrediction;
@@ -345,6 +351,7 @@ declare const fullApi: ApiFromModules<{
   "functions/generations/getGenerationMax": typeof functions_generations_getGenerationMax;
   "functions/generations/getPrediction": typeof functions_generations_getPrediction;
   "functions/generations/index": typeof functions_generations_index;
+  "functions/generations/visibility": typeof functions_generations_visibility;
   "functions/images/getImage": typeof functions_images_getImage;
   "functions/images/index": typeof functions_images_index;
   "functions/images/saveImage": typeof functions_images_saveImage;
@@ -371,6 +378,7 @@ declare const fullApi: ApiFromModules<{
   "functions/presets/sanitizePresets": typeof functions_presets_sanitizePresets;
   "functions/quests/index": typeof functions_quests_index;
   "functions/quests/updateQuest": typeof functions_quests_updateQuest;
+  "functions/rateLimits": typeof functions_rateLimits;
   "functions/subscriptions/getUserSubscription": typeof functions_subscriptions_getUserSubscription;
   "functions/subscriptions/index": typeof functions_subscriptions_index;
   "functions/subscriptions/isSubscriptionActive": typeof functions_subscriptions_isSubscriptionActive;
@@ -447,6 +455,7 @@ declare const fullApi: ApiFromModules<{
   "llm/triggers/trendExtractor": typeof llm_triggers_trendExtractor;
   "llm/utils/createTool": typeof llm_utils_createTool;
   "llm/utils/index": typeof llm_utils_index;
+  "llm/utils/photoshoot/guards": typeof llm_utils_photoshoot_guards;
   "llm/utils/photoshoot/index": typeof llm_utils_photoshoot_index;
   "llm/utils/photoshoot/jsonCreator": typeof llm_utils_photoshoot_jsonCreator;
   "llm/utils/photoshoot/toMarkdown": typeof llm_utils_photoshoot_toMarkdown;
@@ -492,6 +501,7 @@ declare const fullApi: ApiFromModules<{
   "router/credits/getUserWallet": typeof router_credits_getUserWallet;
   "router/credits/grantCredits": typeof router_credits_grantCredits;
   "router/credits/refundCredits": typeof router_credits_refundCredits;
+  "router/credits/reserveCredits": typeof router_credits_reserveCredits;
   "router/feed/getFromOutfit": typeof router_feed_getFromOutfit;
   "router/feed/getFromOutfits": typeof router_feed_getFromOutfits;
   "router/feed/getFromPreset": typeof router_feed_getFromPreset;
@@ -666,4 +676,5 @@ export declare const components: {
   agent: import("@convex-dev/agent/_generated/component.js").ComponentApi<"agent">;
   rag: import("@convex-dev/rag/_generated/component.js").ComponentApi<"rag">;
   workflow: import("@convex-dev/workflow/_generated/component.js").ComponentApi<"workflow">;
+  rateLimiter: import("@convex-dev/rate-limiter/_generated/component.js").ComponentApi<"rateLimiter">;
 };

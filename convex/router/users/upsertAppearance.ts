@@ -1,5 +1,5 @@
 import { removeUndefinedKeys } from "@shared/utils";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { authMutation } from "../../procedures";
 import { userSizes } from "../../schema/users";
@@ -17,6 +17,15 @@ export const authed = authMutation({
   handler: async (ctx, args) => {
     const { userId } = ctx;
     const { frontImageId, sideImageId, smileImageId, heightCm, gender, size } = args
+
+    // Portraits feed every photoshoot, and replaced ones are deleted below — so they must be
+    // images the caller uploaded, not someone else's face (and not someone else's file to delete).
+    for (const imageId of [frontImageId, sideImageId, smileImageId]) {
+      if (!imageId) continue;
+      const owned = await ctx.db.query("userImages")
+        .withIndex("by_image_id", (q) => q.eq("imageId", imageId)).first();
+      if (owned?.userId !== userId) throw new ConvexError("Unauthorized");
+    }
 
     const existingPortraits = await ctx.db.query("usersAppearance")
       .withIndex("by_user_id", (q) => q.eq("userId", userId)).first();
