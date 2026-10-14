@@ -79,7 +79,7 @@ Convex deployment, not from `.env.local`. The client keys are validated in [env.
 
 ## 📄 License
 
-Copyright (c) 2026 Franck Desfrançais. All rights reserved.
+Copyright (c) 2026 Sellest-AI. All rights reserved.
 
 The source is published so it can be read. It may not be used, copied, modified or redistributed
 without written permission. The full terms are in [LICENSE](LICENSE).
