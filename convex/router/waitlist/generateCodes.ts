@@ -1,4 +1,5 @@
 import { nanoid } from "@/lib/nanoid";
+import { ConvexError } from "convex/values";
 import { updateWaitlist } from "../../functions/waitlist";
 import { authMutation, QueryCtx } from "../../procedures";
 
@@ -16,6 +17,9 @@ const generateCode = async (ctx: QueryCtx) => {
 export const authed = authMutation({
   handler: async (ctx) => {
     const { user } = ctx;
+
+    // Codes let others skip the waitlist — a waitlisted user could otherwise invite themselves.
+    if (user.accountStatus === 'WAITLIST') throw new ConvexError("Unauthorized");
 
     const existingCodes = await ctx.db.query('waitlistCodes')
       .withIndex("by_user_id", q => q.eq("userId", user._id)).collect();
