@@ -56,6 +56,7 @@ import type * as functions_presets_index from "../functions/presets/index.js";
 import type * as functions_presets_sanitizePresets from "../functions/presets/sanitizePresets.js";
 import type * as functions_quests_index from "../functions/quests/index.js";
 import type * as functions_quests_updateQuest from "../functions/quests/updateQuest.js";
+import type * as functions_rateLimits from "../functions/rateLimits.js";
 import type * as functions_subscriptions_getUserSubscription from "../functions/subscriptions/getUserSubscription.js";
 import type * as functions_subscriptions_index from "../functions/subscriptions/index.js";
 import type * as functions_subscriptions_isSubscriptionActive from "../functions/subscriptions/isSubscriptionActive.js";
@@ -375,6 +376,7 @@ declare const fullApi: ApiFromModules<{
   "functions/presets/sanitizePresets": typeof functions_presets_sanitizePresets;
   "functions/quests/index": typeof functions_quests_index;
   "functions/quests/updateQuest": typeof functions_quests_updateQuest;
+  "functions/rateLimits": typeof functions_rateLimits;
   "functions/subscriptions/getUserSubscription": typeof functions_subscriptions_getUserSubscription;
   "functions/subscriptions/index": typeof functions_subscriptions_index;
   "functions/subscriptions/isSubscriptionActive": typeof functions_subscriptions_isSubscriptionActive;
@@ -672,4 +674,5 @@ export declare const components: {
   agent: import("@convex-dev/agent/_generated/component.js").ComponentApi<"agent">;
   rag: import("@convex-dev/rag/_generated/component.js").ComponentApi<"rag">;
   workflow: import("@convex-dev/workflow/_generated/component.js").ComponentApi<"workflow">;
+  rateLimiter: import("@convex-dev/rate-limiter/_generated/component.js").ComponentApi<"rateLimiter">;
 };

@@ -1,7 +1,8 @@
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
 import { Id } from "../../_generated/dataModel";
-import { CREDITS_CONFIG, canPay, deductCredits } from "../../functions/credits";
+import { CREDITS_CONFIG, deductCredits } from "../../functions/credits";
+import { rateLimiter } from "../../functions/rateLimits";
 import { isPremium } from "../../functions/users";
 import { imageCategorizer } from "../../llm/tools/imageCategorizer";
 import { authAction, internalMutation, serverAction } from "../../procedures";
@@ -15,11 +16,29 @@ export const authed = authAction({
   },
   handler: async (ctx, { name, base64 }): Promise<Id<'presets'> | null> => {
     await isPremium(ctx);
-    await canPay(ctx, { type: "PRESET_CREATION_COST" });
+
+    if (ctx.user.role !== 'ADMIN')
+      await rateLimiter.limit(ctx, "presetCreation", { key: ctx.userId, throws: true });
+
+    // Charge before any paid work: `canPay` only threw when signed out, and the deduction
+    // used to run after the LLM and depth-map calls, so a broke or parallel caller got the
+    // processing for free. Refunded below if processing fails.
+    const transactionId = await ctx.runMutation(internal.router.presets.createOne._internal_payment, { userId: ctx.userId });
+    let refundOnFailure = true;
+
+    const refund = () => ctx.runMutation(internal.router.credits.refundCredits._internal, {
+      userId: ctx.userId,
+      amount: CREDITS_CONFIG.COST_PER_PRESET,
+      reason: "Preset creation failed",
+      originalTransactionId: transactionId,
+    });
 
     const images = await ctx.runAction(internal.router.storage.images.uploadMany._internal, {
       images: [{ base64 }],
       userId: null
+    }).catch(async (error) => {
+      await refund();
+      throw error;
     })
 
     const promptPromises = Promise.all(images.map((img) => ctx.runAction(internal.llm.triggers.presetCreator._internal, {
@@ -40,8 +59,9 @@ export const authed = authAction({
       // Sort from most to least restrictive and take the most restrictive one as the preset content rating
       const contentRating = prompts.map((x) => x.contentRating).sort((a, b) => CONTENT_RATINGS_ORDER[b] - CONTENT_RATINGS_ORDER[a])[0];
 
-      // Charge the user only after all processing is done to avoid charging for failed preset creations
-      await ctx.runMutation(internal.router.presets.createOne._internal_payment, { userId: ctx.userId });
+      // Processing succeeded: from here the charge is kept — including for NSFW rejections,
+      // which were charged before this change too.
+      refundOnFailure = false;
 
       if (contentRating === 'EXPLICIT' || contentRating === 'NSFW')
         throw new Error("Preset contains explicit or NSFW content");
@@ -66,14 +86,16 @@ export const authed = authAction({
       return presetId;
 
     } catch {
+      if (refundOnFailure) await refund();
+
       // Cleanup uploaded image on failure
       for (const img of images) {
         await ctx.scheduler.runAfter(10000,
           internal.router.storage.images.deleteOne._internal, { imageId: img._id });
       }
 
-      // Cleanup generated depth maps on failure
-      for (const dm of await depthMapPromises) {
+      // Cleanup generated depth maps on failure (none to clean if the depth map step itself failed)
+      for (const dm of await depthMapPromises.catch(() => [])) {
         await ctx.scheduler.runAfter(10000,
           internal.router.storage.images.deleteOne._internal, { imageId: dm });
       }
@@ -143,11 +165,12 @@ export const _internal_payment = internalMutation({
     userId: v.id("users"),
   },
   handler: async (ctx, { userId }) => {
-    await deductCredits(ctx, {
+    const { transactionId } = await deductCredits(ctx, {
       userId: userId,
       amount: CREDITS_CONFIG.COST_PER_PRESET,
       type: "PRESET_CREATION_COST",
     });
+    return transactionId;
   }
 });
 

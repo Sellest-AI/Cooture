@@ -2,6 +2,7 @@
 import { parseReplicateRunOutput, runImage } from "@/lib/replicate/node";
 import { v } from "convex/values";
 import { internal } from "../../_generated/api";
+import { rateLimiter } from "../../functions/rateLimits";
 import { isPremium } from "../../functions/users";
 import { authAction } from "../../procedures";
 import { createPhotoshootSchema, schemaToMarkdown } from "../utils/photoshoot";
@@ -13,6 +14,12 @@ export const authed = authAction({
   },
   handler: async (ctx, args): Promise<string[]> => {
     await isPremium(ctx, { throwOnReject: true });
+
+    const numberOfImages = args.numberOfImages || 3;
+
+    // Free for the user but paid per image by us — capped per user (admins exempt).
+    if (ctx.user.role !== 'ADMIN')
+      await rateLimiter.limit(ctx, "presetPreviewImages", { key: ctx.userId, count: numberOfImages, throws: true });
 
     const preset = await ctx.runQuery(internal.router.presets.getOne._internal, { presetId: args.presetId });
     if (!preset) throw new Error("Preset not found");
@@ -29,8 +36,6 @@ export const authed = authAction({
 
     const schema = await createPhotoshootSchema(ctx, baseSchema, subjects);
     const prompt = await schemaToMarkdown(schema.prompt);
-
-    const numberOfImages = args.numberOfImages || 3;
 
     const runs = await Promise.all(Array.from({ length: numberOfImages }).map(async () => runImage({
       model: 'prunaai/z-image-turbo',
