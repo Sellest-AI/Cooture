@@ -5,6 +5,32 @@ import { convexAuth } from "@convex-dev/auth/server";
 import { internal } from "./_generated/api";
 import { MutationCtx } from "./_generated/server";
 
+/** Native deep-link scheme from app.json — what `makeRedirectUri` produces in builds. */
+const APP_SCHEME = "cooture:";
+
+/** Local web build (`expo start --web`). A code sent here stays on the user's own machine. */
+const LOCAL_HOSTNAMES = new Set(["localhost", "127.0.0.1", "[::1]"]);
+
+/**
+ * Convex Auth appends the one-time sign-in `code` to `redirectTo`, so returning it
+ * unchecked let an attacker start an OAuth flow, have a victim finish it, and receive the
+ * victim's code on their own domain. Only the app scheme and localhost are accepted.
+ */
+const resolveRedirect = (redirectTo: string) => {
+  let url: URL;
+  try {
+    url = new URL(redirectTo);
+  } catch {
+    throw new Error(`Invalid redirectTo: ${redirectTo}`);
+  }
+
+  if (url.protocol === APP_SCHEME) return redirectTo;
+  if ((url.protocol === "http:" || url.protocol === "https:") && LOCAL_HOSTNAMES.has(url.hostname))
+    return redirectTo;
+
+  throw new Error(`Invalid redirectTo: ${redirectTo}`);
+};
+
 const allowEmail = (email: string) => {
   if ((email.includes('+') || /\d{8,}/.test(email)))
     throw new Error("This email address is not permitted.");
@@ -41,15 +67,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
   ],
   callbacks: {
     async redirect({ redirectTo }) {
-      const url = new URL(redirectTo);
-
-      if (url.protocol === "http:" || url.protocol === "https:") {
-        // Web
-        return redirectTo;
-      } else {
-        // Mobile (scheme://)
-        return redirectTo;
-      }
+      return resolveRedirect(redirectTo);
     },
     async beforeSessionCreation(ctx: MutationCtx, { userId }) {
       const user = await ctx.db.get(userId);
