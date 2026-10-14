@@ -32,6 +32,9 @@ importers:
       '@convex-dev/rag':
         specifier: ^0.6.1
         version: 0.6.1(@convex-dev/workpool@0.3.1(convex-helpers@0.1.109(@standard-schema/spec@1.1.0)(convex@1.36.1(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@4.3.5))(convex@1.36.1(react@19.2.0)))(convex-helpers@0.1.109(@standard-schema/spec@1.1.0)(convex@1.36.1(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@4.3.5))(convex@1.36.1(react@19.2.0))(zod@4.3.5)
+      '@convex-dev/rate-limiter':
+        specifier: 0.3.2
+        version: 0.3.2(convex@1.36.1(react@19.2.0))(react@19.2.0)
       '@convex-dev/workflow':
         specifier: 0.3.5
         version: 0.3.5(@convex-dev/workpool@0.3.1(convex-helpers@0.1.109(@standard-schema/spec@1.1.0)(convex@1.36.1(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@4.3.5))(convex@1.36.1(react@19.2.0)))(convex-helpers@0.1.109(@standard-schema/spec@1.1.0)(convex@1.36.1(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@4.3.5))(convex@1.36.1(react@19.2.0))
@@ -1157,6 +1160,15 @@ packages:
       convex: ^1.24.8
       convex-helpers: ^0.1.94
 
+  '@convex-dev/rate-limiter@0.3.2':
+    resolution: {integrity: sha512-+oBPsBfFbzdxiF/9XaaTQmVnvDlvEfg/c69/v8LxTbw4VLuiflIKlfnPQL8OS0azXQQ11hcPWHmU8ytFmHKDXA==}
+    peerDependencies:
+      convex: ^1.24.8
+      react: ^18.2.0 || ^19.0.0
+    peerDependenciesMeta:
+      react:
+        optional: true
+
   '@convex-dev/workflow@0.3.5':
     resolution: {integrity: sha512-pJGi4VRqwfvpbYzewEFU6O7lhohBu+c1blhkcyqvKlJyFJs3bSVvJDr+e9UNCZb2/X2KYx5p0Qdf+xURNaqlpQ==}
     peerDependencies:
@@ -1396,7 +1408,7 @@ packages:
 
   '@expo/bunyan@4.0.1':
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
 
   '@expo/cli@55.0.16':
     resolution: {integrity: sha512-rp1mBnA5msGDPTfFuqVl+9RsJOtuA0cXsWSJpHdvsIxcSVg0oJyF/rgvrwsFrNQCLXzkMXm+o3CsY9iL1D/CDA==}
@@ -8505,6 +8517,12 @@ snapshots:
       convex-helpers: 0.1.109(@standard-schema/spec@1.1.0)(convex@1.36.1(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@4.3.5)
     transitivePeerDependencies:
       - zod
+
+  '@convex-dev/rate-limiter@0.3.2(convex@1.36.1(react@19.2.0))(react@19.2.0)':
+    dependencies:
+      convex: 1.36.1(react@19.2.0)
+    optionalDependencies:
+      react: 19.2.0
 
   '@convex-dev/workflow@0.3.5(@convex-dev/workpool@0.3.1(convex-helpers@0.1.109(@standard-schema/spec@1.1.0)(convex@1.36.1(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@4.3.5))(convex@1.36.1(react@19.2.0)))(convex-helpers@0.1.109(@standard-schema/spec@1.1.0)(convex@1.36.1(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@4.3.5))(convex@1.36.1(react@19.2.0))':
     dependencies:

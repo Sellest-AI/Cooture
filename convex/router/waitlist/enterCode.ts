@@ -16,7 +16,7 @@ export const authed = authMutation({
     const codeData = await ctx.db.query('waitlistCodes')
       .withIndex("by_code", q => q.eq("code", codeUpper)).collect();
 
-    const codes = codeData.filter((c) => !c.usedById);
+    const codes = codeData.filter((c) => !c.usedById && c.userId !== user._id);
 
     if (codes.length === 0) return false;
 
