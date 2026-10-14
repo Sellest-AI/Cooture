@@ -30,6 +30,7 @@ import type * as functions_generations_getGenerationDetails from "../functions/g
 import type * as functions_generations_getGenerationMax from "../functions/generations/getGenerationMax.js";
 import type * as functions_generations_getPrediction from "../functions/generations/getPrediction.js";
 import type * as functions_generations_index from "../functions/generations/index.js";
+import type * as functions_generations_visibility from "../functions/generations/visibility.js";
 import type * as functions_images_getImage from "../functions/images/getImage.js";
 import type * as functions_images_index from "../functions/images/index.js";
 import type * as functions_images_saveImage from "../functions/images/saveImage.js";
@@ -350,6 +351,7 @@ declare const fullApi: ApiFromModules<{
   "functions/generations/getGenerationMax": typeof functions_generations_getGenerationMax;
   "functions/generations/getPrediction": typeof functions_generations_getPrediction;
   "functions/generations/index": typeof functions_generations_index;
+  "functions/generations/visibility": typeof functions_generations_visibility;
   "functions/images/getImage": typeof functions_images_getImage;
   "functions/images/index": typeof functions_images_index;
   "functions/images/saveImage": typeof functions_images_saveImage;
